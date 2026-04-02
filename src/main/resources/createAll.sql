@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS espiritu (
+id SERIAL PRIMARY KEY,
+tipo VARCHAR(255) NOT NULL UNIQUE,
+nombre int NOT NULL UNIQUE,
+nivelDeConexion int NOT NULL,
+ADD CONSTRAINT conexion_valida
+CHECK (nivelDeConexion BETWEEN 0 AND 100);
+);
