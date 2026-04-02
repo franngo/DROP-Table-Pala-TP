@@ -14,6 +14,17 @@ public class Espiritu implements Serializable {
         this.nivelDeConexion = nivelDeConexion;
         this.nombre = nombre;
     }
+    //CAMBIOS
+    public Espiritu(Long id, String tipo, Integer nivelDeConexion, String nombre) {
+        this.id=id;
+        this.tipo = tipo;
+        this.nivelDeConexion = nivelDeConexion;
+        this.nombre = nombre;
+    }
+
+
+    //END cambios
+
 
     public Medium aumentarConexion(Medium medium) {
         // TODO completar

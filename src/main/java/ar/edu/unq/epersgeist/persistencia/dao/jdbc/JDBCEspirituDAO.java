@@ -20,7 +20,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
             try {
                 var ps = prepareInsertQueryStatement(espiritu, conn);
                // return ps.execute();
-                return this.buildEspiritu(ps.execute());
+                return this.buildEspiritu(espiritu,ps.execute());
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -34,20 +34,20 @@ public record JDBCEspirituDAO() implements EspirituDAO {
 
             return ps;
         }
-    private static Espiritu buildPersonaje(String nombre, ResultSet resultSet) throws SQLException {
+    private static Espiritu buildPersonaje(Espiritu espiritu, ResultSet resultSet) throws SQLException {
         Espiritu personaje = null;
         while (resultSet.next()) {
             //si personaje no es null aca significa que el while dio mas de una vuelta, eso
             //suele pasar cuando el resultado (resultset) tiene mas de un elemento.
             if (personaje != null) {
-                throw new RuntimeException(String.format("Existe mas de un personaje con el nombre %s", nombre));
+                throw new RuntimeException(String.format("Existe mas de un personaje con el nombre %s", espiritu));
             }
-            personaje = new Espiritu(nombre,
-                    resultSet.getInt("pesoMaximo"),
-                    resultSet.getInt("xp"),
-                    resultSet.getInt("vida"),
-                    new HashSet<>()
+            personaje = new Espiritu(resultSet.getLong("id"),
+                    resultSet.getString("tipo"),
+                    resultSet.getInt("nivelDeConexion"),
+                    resultSet.getString("nombre")
             );
+
         }
         return personaje;
     }
