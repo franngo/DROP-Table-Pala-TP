@@ -19,37 +19,47 @@ public record JDBCEspirituDAO() implements EspirituDAO {
         JDBCConnector.getInstance().execute(conn  -> {
             try {
                 var ps = prepareInsertQueryStatement(espiritu, conn);
-               // return ps.execute();
-                return this.buildEspiritu(espiritu,ps.execute());
+                var resultSet = ps.executeQuery();
+                return buildEspiritu(espiritu, resultSet);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
         });
     }
         private static PreparedStatement prepareInsertQueryStatement(Espiritu espiritu, Connection conn) throws SQLException {
-            var ps = conn.prepareStatement("INSERT INTO espiritu (tipo, nombre, nivelDeConexion) VALUES (?,?,?)");
+
+            var ps = conn.prepareStatement(
+                    "INSERT INTO espiritu (tipo, nombre, nivelDeConexion)VALUES (?,?,?) RETURNING id, tipo, nombre, nivelDeConexion"
+            );
+
+
             ps.setString(1, espiritu.getTipo());
             ps.setString(2, espiritu.getNombre());
             ps.setInt(3, espiritu.getNivelDeConexion());
 
             return ps;
         }
-    private static Espiritu buildPersonaje(Espiritu espiritu, ResultSet resultSet) throws SQLException {
-        Espiritu personaje = null;
+    private static Espiritu buildEspiritu(Espiritu espiritu, ResultSet resultSet) throws SQLException {
+        Espiritu espirituModelo = null;
+
         while (resultSet.next()) {
             //si personaje no es null aca significa que el while dio mas de una vuelta, eso
             //suele pasar cuando el resultado (resultset) tiene mas de un elemento.
-            if (personaje != null) {
-                throw new RuntimeException(String.format("Existe mas de un personaje con el nombre %s", espiritu));
+
+            if (espirituModelo != null) {
+                //TODO preguntar si agregar errores custom
+                throw new RuntimeException(String.format("Existe mas de un espiritu con el mismo id %s", espirituModelo.getId()));
             }
-            personaje = new Espiritu(resultSet.getLong("id"),
+
+
+            espirituModelo = new Espiritu(resultSet.getLong("id"),
                     resultSet.getString("tipo"),
                     resultSet.getInt("nivelDeConexion"),
                     resultSet.getString("nombre")
             );
 
         }
-        return personaje;
+        return espirituModelo;
     }
 
     public Espiritu recuperar(Long idDelEspiritu) {
