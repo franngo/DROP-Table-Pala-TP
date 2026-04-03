@@ -9,7 +9,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
 import java.util.List;
 
 public record JDBCEspirituDAO() implements EspirituDAO {
@@ -20,27 +19,29 @@ public record JDBCEspirituDAO() implements EspirituDAO {
             try {
                 var ps = prepareInsertQueryStatement(espiritu, conn);
                 var resultSet = ps.executeQuery();
-                return buildEspiritu(espiritu, resultSet);
+                return buildEspiritu(resultSet);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
         });
 
     }
-        private static PreparedStatement prepareInsertQueryStatement(Espiritu espiritu, Connection conn) throws SQLException {
 
-            var ps = conn.prepareStatement(
-                    "INSERT INTO espiritu (tipo, nombre, nivelDeConexion)VALUES (?,?,?) RETURNING id, tipo, nombre, nivelDeConexion"
-            );
+    private static PreparedStatement prepareInsertQueryStatement(Espiritu espiritu, Connection conn) throws SQLException {
+
+        var ps = conn.prepareStatement(
+                "INSERT INTO espiritu (tipo, nombre, nivelDeConexion)VALUES (?,?,?) RETURNING id, tipo, nombre, nivelDeConexion"
+        );
 
 
-            ps.setString(1, espiritu.getTipo());
-            ps.setString(2, espiritu.getNombre());
-            ps.setInt(3, espiritu.getNivelDeConexion());
+        ps.setString(1, espiritu.getTipo());
+        ps.setString(2, espiritu.getNombre());
+        ps.setInt(3, espiritu.getNivelDeConexion());
 
-            return ps;
-        }
-    private static Espiritu buildEspiritu(Espiritu espiritu, ResultSet resultSet) throws SQLException {
+        return ps;
+    }
+
+    private static Espiritu buildEspiritu(ResultSet resultSet) throws SQLException {
         Espiritu espirituModelo = null;
 
         while (resultSet.next()) {
@@ -64,8 +65,22 @@ public record JDBCEspirituDAO() implements EspirituDAO {
     }
 
     public Espiritu recuperar(Long idDelEspiritu) {
-        // TODO completar
-        return null;
+        return JDBCConnector.getInstance().execute(conn -> {
+            try {
+                var ps = prepareSelectQueryStatement(idDelEspiritu, conn);
+                var resultSet = ps.executeQuery();
+                return buildEspiritu(resultSet);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+    }
+
+    private static PreparedStatement prepareSelectQueryStatement(Long idDelEspiritu, Connection conn) throws SQLException {
+        var ps = conn.prepareStatement("SELECT id, tipo,nivelDeConexion, nombre FROM espiritu WHERE id = ?");
+        ps.setLong(1, idDelEspiritu);
+        return ps;
     }
 
     public List<Espiritu> recuperarTodos() {
