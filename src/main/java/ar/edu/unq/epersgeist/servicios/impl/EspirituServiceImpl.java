@@ -8,6 +8,9 @@ import java.util.List;
 
 public class EspirituServiceImpl implements EspirituService {
 
+    public EspirituServiceImpl() {
+    }
+
     @Override
     public Espiritu crear(Espiritu espiritu) {
         // TODO completar

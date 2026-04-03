@@ -16,7 +16,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
 
     public Espiritu crear(Espiritu espiritu) {
         // TODO completar
-        JDBCConnector.getInstance().execute(conn  -> {
+        return JDBCConnector.getInstance().execute(conn -> {
             try {
                 var ps = prepareInsertQueryStatement(espiritu, conn);
                 var resultSet = ps.executeQuery();
@@ -25,6 +25,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                 throw new RuntimeException(e);
             }
         });
+
     }
         private static PreparedStatement prepareInsertQueryStatement(Espiritu espiritu, Connection conn) throws SQLException {
 
