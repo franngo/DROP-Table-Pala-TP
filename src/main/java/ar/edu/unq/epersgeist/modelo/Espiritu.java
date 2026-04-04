@@ -15,12 +15,14 @@ public class Espiritu implements Serializable {
         this.nombre = nombre;
     }
     //CAMBIOS
+    /*
     public Espiritu(Long id, String tipo, Integer nivelDeConexion, String nombre) {
         this.id=id;
         this.tipo = tipo;
         this.nivelDeConexion = nivelDeConexion;
         this.nombre = nombre;
     }
+    */
 
 
     //END cambios
@@ -45,5 +47,8 @@ public class Espiritu implements Serializable {
 
     public String getNombre() {
         return nombre;
+    }
+
+    private void setId(long id) {
     }
 }

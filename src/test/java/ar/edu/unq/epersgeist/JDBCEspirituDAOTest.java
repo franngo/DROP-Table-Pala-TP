@@ -12,17 +12,19 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class JDBCEspirituDAOTest {
     private EspirituDAO espirituDao = new JDBCEspirituDAO();
-    private Espiritu espirituTest;
+    private Espiritu espirituM;
 
     @BeforeEach
     void setUp() {
-        espirituTest = new Espiritu("Pokemon", 0, "das");
+        espirituM = new Espiritu("Pokemon", 0, "das");
     }
 
     @Test
     void seCreaElEspirituEnLaBase() {
-        var unEspiritu = espirituDao.crear(espirituTest);
-
+        Espiritu espirituP = espirituDao.crear(espirituM);
+        //Compruebo que no son el mismo
+        System.out.println("ID del modelo");
+        System.out.println(unEspiritu.getId());
         assertNotNull(unEspiritu.getId());
 
 
@@ -31,7 +33,7 @@ public class JDBCEspirituDAOTest {
     @Test
     void seRecuperaUnEspirituDadoUnId() {
         //creo un espiritu
-        var unEspiritu = espirituDao.crear(espirituTest);
+        Espiritu unEspiritu = espirituDao.crear(espirituM);
         Espiritu espirituRecuperado = espirituDao.recuperar((long) 1);
 
         assertEquals(1, espirituRecuperado.getId());
