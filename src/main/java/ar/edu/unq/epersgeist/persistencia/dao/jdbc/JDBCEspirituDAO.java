@@ -5,10 +5,7 @@ import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 
 public record JDBCEspirituDAO() implements EspirituDAO {
@@ -30,13 +27,19 @@ public record JDBCEspirituDAO() implements EspirituDAO {
     private static PreparedStatement prepareInsertQueryStatement(Espiritu espiritu, Connection conn) throws SQLException {
 
         var ps = conn.prepareStatement(
-                "INSERT INTO espiritu (tipo, nombre, nivelDeConexion)VALUES (?,?,?) RETURNING id, tipo, nombre, nivelDeConexion"
+                "INSERT INTO espiritu (tipo, nombre, nivelDeConexion)" +
+                        "VALUES (?,?,?) RETURNING id, tipo, nombre, nivelDeConexion", Statement.RETURN_GENERATED_KEYS
+
         );
 
 
         ps.setString(1, espiritu.getTipo());
         ps.setString(2, espiritu.getNombre());
         ps.setInt(3, espiritu.getNivelDeConexion());
+
+        try (ResultSet generateKeys = ps.getGeneratedKeys()) {
+            
+        }
 
         return ps;
     }

@@ -20,14 +20,15 @@ public class JDBCEspirituDAOTest {
 
     @Test
     void seCreaElEspirituEnLaBase() {
-        System.out.println("ID del modelo");
-        System.out.println(espirituM.getId());
+        //veo que el modelo no tiene id
         assertNull(espirituM.getId());
+        //exercise 
         Espiritu espirituP = espirituDao.crear(espirituM);
-        System.out.println("ID de la base");
 
-        System.out.println(espirituP.getId());
         //Compruebo que no son el mismo
+        assertNotEquals(espirituM, espirituP);
+
+        //Compruebo que el modelo se persistio porque tiene id
         assertNotNull(espirituP.getId());
 
 
