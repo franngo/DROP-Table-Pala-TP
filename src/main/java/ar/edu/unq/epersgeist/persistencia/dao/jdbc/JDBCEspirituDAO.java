@@ -11,7 +11,7 @@ import java.util.List;
 public record JDBCEspirituDAO() implements EspirituDAO {
 
     public Espiritu crear(Espiritu espiritu) {
-        // TODO completar
+   
         return JDBCConnector.getInstance().execute(conn -> {
             try {
                 var ps = prepareInsertQueryStatement(espiritu, conn);
@@ -32,14 +32,9 @@ public record JDBCEspirituDAO() implements EspirituDAO {
 
         );
 
-
         ps.setString(1, espiritu.getTipo());
         ps.setString(2, espiritu.getNombre());
         ps.setInt(3, espiritu.getNivelDeConexion());
-
-        try (ResultSet generateKeys = ps.getGeneratedKeys()) {
-            
-        }
 
         return ps;
     }
