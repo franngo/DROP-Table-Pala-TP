@@ -59,7 +59,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                     resultSet.getInt("nivelDeConexion"),
                     resultSet.getString("nombre")
             );
-            espirituModelo.setId(resultSet.getLong("id");
+            espirituModelo.setId(resultSet.getLong("id"));
 
         }
         return espirituModelo;

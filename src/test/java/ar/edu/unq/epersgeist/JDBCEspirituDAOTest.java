@@ -7,8 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JDBCEspirituDAOTest {
     private EspirituDAO espirituDao = new JDBCEspirituDAO();
@@ -21,11 +20,15 @@ public class JDBCEspirituDAOTest {
 
     @Test
     void seCreaElEspirituEnLaBase() {
-        Espiritu espirituP = espirituDao.crear(espirituM);
-        //Compruebo que no son el mismo
         System.out.println("ID del modelo");
-        System.out.println(unEspiritu.getId());
-        assertNotNull(unEspiritu.getId());
+        System.out.println(espirituM.getId());
+        assertNull(espirituM.getId());
+        Espiritu espirituP = espirituDao.crear(espirituM);
+        System.out.println("ID de la base");
+
+        System.out.println(espirituP.getId());
+        //Compruebo que no son el mismo
+        assertNotNull(espirituP.getId());
 
 
     }
