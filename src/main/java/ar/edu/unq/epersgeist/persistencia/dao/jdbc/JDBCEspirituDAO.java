@@ -1,12 +1,14 @@
 package ar.edu.unq.epersgeist.persistencia.dao.jdbc;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlCrearEspirituException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 public record JDBCEspirituDAO() implements EspirituDAO {
@@ -19,9 +21,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                 var resultSet = ps.executeQuery();
                 return buildEspiritu(resultSet);
             } catch (SQLException e) {
-                throw new ErrorAlCrearEspirituException(
-                        "No se pudo crear el espíritu '" + espiritu.getNombre() + "'", e
-                );
+                throw new RuntimeException(e);
             }
         });
 
@@ -31,7 +31,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
 
         var ps = conn.prepareStatement(
                 "INSERT INTO espiritu (tipo, nombre, nivelDeConexion)" +
-                        "VALUES (?,?,?) RETURNING id, tipo, nombre, nivelDeConexion", Statement.RETURN_GENERATED_KEYS
+                        "VALUES (?,?,?) RETURNING id, tipo, nombre, nivelDeConexion"
 
         );
 

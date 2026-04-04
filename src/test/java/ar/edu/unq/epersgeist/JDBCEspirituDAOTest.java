@@ -22,7 +22,7 @@ public class JDBCEspirituDAOTest {
     void seCreaElEspirituEnLaBase() {
         //veo que el modelo no tiene id
         assertNull(espirituM.getId());
-        //exercise 
+        //exercise
         Espiritu espirituP = espirituDao.crear(espirituM);
 
         //Compruebo que no son el mismo
@@ -42,6 +42,7 @@ public class JDBCEspirituDAOTest {
 
         assertEquals(1, espirituRecuperado.getId());
     }
+
 
     @AfterEach
     void tearDown() {
