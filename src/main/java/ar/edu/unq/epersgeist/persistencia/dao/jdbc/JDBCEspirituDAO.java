@@ -1,6 +1,7 @@
 package ar.edu.unq.epersgeist.persistencia.dao.jdbc;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlCrearEspirituException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 
 import java.nio.file.Files;
@@ -11,14 +12,16 @@ import java.util.List;
 public record JDBCEspirituDAO() implements EspirituDAO {
 
     public Espiritu crear(Espiritu espiritu) {
-   
+
         return JDBCConnector.getInstance().execute(conn -> {
             try {
                 var ps = prepareInsertQueryStatement(espiritu, conn);
                 var resultSet = ps.executeQuery();
                 return buildEspiritu(resultSet);
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new ErrorAlCrearEspirituException(
+                        "No se pudo crear el espíritu '" + espiritu.getNombre() + "'", e
+                );
             }
         });
 
