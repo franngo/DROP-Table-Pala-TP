@@ -14,7 +14,7 @@ import java.util.List;
 public record JDBCEspirituDAO() implements EspirituDAO {
 
     public Espiritu crear(Espiritu espiritu) {
-        // TODO completar
+
         return JDBCConnector.getInstance().execute(conn -> {
             try {
                 var ps = prepareInsertQueryStatement(espiritu, conn);
@@ -30,9 +30,10 @@ public record JDBCEspirituDAO() implements EspirituDAO {
     private static PreparedStatement prepareInsertQueryStatement(Espiritu espiritu, Connection conn) throws SQLException {
 
         var ps = conn.prepareStatement(
-                "INSERT INTO espiritu (tipo, nombre, nivelDeConexion)VALUES (?,?,?) RETURNING id, tipo, nombre, nivelDeConexion"
-        );
+                "INSERT INTO espiritu (tipo, nombre, nivelDeConexion)" +
+                        "VALUES (?,?,?) RETURNING id, tipo, nombre, nivelDeConexion"
 
+        );
 
         ps.setString(1, espiritu.getTipo());
         ps.setString(2, espiritu.getNombre());
@@ -54,11 +55,12 @@ public record JDBCEspirituDAO() implements EspirituDAO {
             }
 
 
-            espirituModelo = new Espiritu(resultSet.getLong("id"),
+            espirituModelo = new Espiritu(
                     resultSet.getString("tipo"),
                     resultSet.getInt("nivelDeConexion"),
                     resultSet.getString("nombre")
             );
+            espirituModelo.setId(resultSet.getLong("id"));
 
         }
         return espirituModelo;
