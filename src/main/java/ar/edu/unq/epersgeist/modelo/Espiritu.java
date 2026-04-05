@@ -25,8 +25,8 @@ public class Espiritu implements Serializable {
 
 
     public void aumentarConexion(Medium medium) {
-        //this.actualizarConexion(10);
-        this.setNivelDeConexion(10);
+        this.actualizarConexion(10);
+        //this.setNivelDeConexion(10);
         medium.agregarEspiritu(this);
 
     }
