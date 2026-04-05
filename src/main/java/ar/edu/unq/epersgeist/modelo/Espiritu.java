@@ -6,13 +6,15 @@ public class Espiritu implements Serializable {
 
     private Long id;
     private String tipo;
+
+
     private Integer nivelDeConexion;
     private String nombre;
 
-    public Espiritu(String tipo, Integer nivelDeConexion, String nombre) {
+    public Espiritu(String tipo, String nombre) {
 
         this.tipo = tipo;
-        this.nivelDeConexion = nivelDeConexion;
+        this.nivelDeConexion = 0;
         this.nombre = nombre;
     }
 
@@ -41,4 +43,10 @@ public class Espiritu implements Serializable {
     public void setId(long id) {
         this.id = id;
     }
+
+    public void setNivelDeConexion(Integer nivelDeConexion) {
+        this.nivelDeConexion = nivelDeConexion;
+    }
+
+
 }

@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public record JDBCEspirituDAO() implements EspirituDAO {
 
@@ -74,12 +76,36 @@ public record JDBCEspirituDAO() implements EspirituDAO {
         return ps;
     }
 
+
+    public List<Espiritu> recuperarTodos() {
+
+        return JDBCConnector.getInstance().execute(conn -> {
+
+            List<Espiritu> todosLosEspiritus = new ArrayList<>();
+            try (PreparedStatement ps = prepareGetAllQueryStatement(conn);
+                 ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+                    todosLosEspiritus.add(buildEspiritu(rs));
+                }
+
+                return todosLosEspiritus;
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private PreparedStatement prepareGetAllQueryStatement(Connection conn) throws SQLException {
+
+        return conn.prepareStatement(
+                "SELECT * FROM espiritu ORDER BY nombre ASC"
+        );
+    }
+
+
     //
-//    public List<Espiritu> recuperarTodos() {
-//        // TODO completar
-//        return null;
-//    }
-//
 //    public void actualizar(Espiritu espiritu) {
 //        // TODO completar
 //    }
@@ -140,7 +166,6 @@ public record JDBCEspirituDAO() implements EspirituDAO {
 
         Espiritu espiritu = new Espiritu(
                 resultSet.getString("tipo"),
-                resultSet.getInt("nivelDeConexion"),
                 resultSet.getString("nombre")
         );
 

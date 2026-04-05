@@ -7,6 +7,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class JDBCEspirituDAOTest {
@@ -15,7 +17,7 @@ public class JDBCEspirituDAOTest {
 
     @BeforeEach
     public void setUp() {
-        espirituM = new Espiritu("Pokemon", 0, "das");
+        espirituM = new Espiritu("Pokemon", "das");
     }
 
     @Test
@@ -66,6 +68,61 @@ public class JDBCEspirituDAOTest {
         });
     }
 
+    @Test
+    public void noFallaAlEliminarUnEspirituInexistente() {
+
+        // Arrange
+        Long idInexistente = 99999L;
+
+        // Act & Assert
+        assertDoesNotThrow(() -> {
+            espirituDao.eliminar(idInexistente);
+        });
+    }
+
+    @Test
+    public void recuperarTodosDevuelveListaVacia() {
+
+        List<Espiritu> lista = espirituDao.recuperarTodos();
+
+        assertNotNull(lista);
+        assertTrue(lista.isEmpty());
+    }
+
+    @Test
+    public void recuperarTodosDevuelveUnEspiritu() {
+
+        espirituDao.crear(new Espiritu("Pokemon", "Matias"));
+
+        List<Espiritu> lista = espirituDao.recuperarTodos();
+
+        assertEquals(1, lista.size());
+    }
+
+    @Test
+    public void recuperarTodosDevuelveVariosElementos() {
+
+        espirituDao.crear(new Espiritu("Pokemon", "Matias"));
+        espirituDao.crear(new Espiritu("Pokemon", "Juan"));
+
+        List<Espiritu> lista = espirituDao.recuperarTodos();
+
+        assertEquals(2, lista.size());
+    }
+
+    @Test
+    public void recuperarTodosDevuelveListaOrdenadaPorNombre() {
+
+        espirituDao.crear(new Espiritu("Pokemon", "Matias"));
+        espirituDao.crear(new Espiritu("Pokemon", "Juanchi el Pastelero"));
+        espirituDao.crear(new Espiritu("Pokemon", "Alberto"));
+
+        List<Espiritu> lista = espirituDao.recuperarTodos();
+
+        assertEquals("Alberto", lista.get(0).getNombre());
+        assertEquals("Juanchi el Pastelero", lista.get(1).getNombre());
+        assertEquals("Matias", lista.get(2).getNombre());
+    }
 
     @AfterEach
     void tearDown() {

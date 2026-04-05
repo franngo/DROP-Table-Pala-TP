@@ -33,7 +33,7 @@ public class JDBCEspirituServiceTest {
     @BeforeEach
     public void setUp() {
 
-        matias = new Espiritu("Pokemon", 0, "Matias");
+        matias = new Espiritu("Pokemon", "Matias");
     }
 
     @Test
