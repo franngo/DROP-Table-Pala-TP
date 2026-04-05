@@ -33,7 +33,7 @@ public class EspirituServiceImpl implements EspirituService {
 
     @Override
     public void eliminar(Long espirituId) {
-        //  espirituDao.eliminar(espirituId);
+        espirituDao.eliminar(espirituId);
 
     }
 

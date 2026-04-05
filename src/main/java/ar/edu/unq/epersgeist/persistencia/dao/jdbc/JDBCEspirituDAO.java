@@ -63,6 +63,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
         });
     }
 
+
     private static PreparedStatement prepareSelectQueryStatement(Long idDelEspiritu, Connection conn) throws SQLException {
         var ps = conn.prepareStatement(
                 "SELECT id, tipo, nivelDeConexion, nombre FROM espiritu WHERE id = ?"
@@ -84,25 +85,36 @@ public record JDBCEspirituDAO() implements EspirituDAO {
 //    }
 //
 //
-//    public void eliminar(Long espirituId) {
-//        JDBCConnector.getInstance().execute(conn -> {
-//            try {
-//                var ps = prepareDeleteQueryStatement(espirituId, conn);
-//                return ps.execute();
-//            } catch (SQLException e) {
-//                throw new RuntimeException(e);
-//            }
-//        });
-//    }
-//
-//    private static PreparedStatement prepareDeleteQueryStatement(Long espirituId, Connection conn) throws SQLException {
-//        var ps = conn.prepareStatement("DELETE FROM espiritu WHERE id =  ? ");
-//        ps.setLong(1, espirituId);
-//        return ps;
-//    }
-//
-//
+    public void eliminar(Long espirituId) {
+        JDBCConnector.getInstance().execute(conn -> {
+            try {
+                var ps = prepareDeleteQueryStatement(espirituId, conn);
+                return ps.execute();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private static PreparedStatement prepareDeleteQueryStatement(Long espirituId, Connection conn) throws SQLException {
+        var ps = conn.prepareStatement("DELETE FROM espiritu WHERE id =  ? ");
+        ps.setLong(1, espirituId);
+        return ps;
+    }
+
     // Método inicializador del JDBCDAO -> ejecución de DDL. No modificar.
+    @Override
+    public void eliminarTodos() {
+        JDBCConnector.getInstance().execute(conn -> {
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM espiritu")) {
+                ps.executeUpdate();
+                return null;
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
     public JDBCEspirituDAO() {
         try {
             var uri = getClass().getClassLoader().getResource("createAll.sql").toURI();
@@ -136,5 +148,5 @@ public record JDBCEspirituDAO() implements EspirituDAO {
 
         return espiritu;
     }
-    
+
 }

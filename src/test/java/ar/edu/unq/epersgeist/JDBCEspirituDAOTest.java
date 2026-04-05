@@ -50,10 +50,26 @@ public class JDBCEspirituDAOTest {
         assertNotNull(espirituRecuperado.getId());
     }
 
+    @Test
+    public void seEliminaUnEspirituExistente() {
+
+        // Arrange
+        Espiritu creado = espirituDao.crear(espirituM);
+        assertNotNull(creado.getId());
+
+        // Act
+        espirituDao.eliminar(creado.getId());
+
+        // Assert
+        assertThrows(RuntimeException.class, () -> {
+            espirituDao.recuperar(creado.getId());
+        });
+    }
+
 
     @AfterEach
     void tearDown() {
         // TODO implementar eliminar
-        //espirituDao.eliminar(espirituM.getId());
+        espirituDao.eliminarTodos();
     }
 }
