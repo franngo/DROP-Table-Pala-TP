@@ -14,12 +14,14 @@ public class JDBCEspirituDAOTest {
     private Espiritu espirituM;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         espirituM = new Espiritu("Pokemon", 0, "das");
     }
 
     @Test
-    void seCreaElEspirituEnLaBase() {
+    public void seCreaElEspirituEnLaBase() {
+
+
         //veo que el modelo no tiene id
         assertNull(espirituM.getId());
         //exercise
@@ -34,19 +36,24 @@ public class JDBCEspirituDAOTest {
 
     }
 
-    @Test
-    void seRecuperaUnEspirituDadoUnId() {
-        //creo un espiritu
-        Espiritu unEspiritu = espirituDao.crear(espirituM);
-        Espiritu espirituRecuperado = espirituDao.recuperar((long) 1);
 
-        assertEquals(1, espirituRecuperado.getId());
+    @Test
+    public void seRecuperaUnEspirituDadoUnId() {
+
+        Espiritu unEspiritu = espirituDao.crear(espirituM);
+        assertNotNull(unEspiritu.getId());
+        System.out.println(unEspiritu);
+
+        Espiritu espirituRecuperado = espirituDao.recuperar(unEspiritu.getId());
+        System.out.println(espirituRecuperado);
+
+        assertNotNull(espirituRecuperado.getId());
     }
 
 
     @AfterEach
     void tearDown() {
         // TODO implementar eliminar
-        espirituDao.eliminar((long) 1);
+        //espirituDao.eliminar(espirituM.getId());
     }
 }

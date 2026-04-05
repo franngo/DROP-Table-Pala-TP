@@ -9,22 +9,25 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
 public record JDBCEspirituDAO() implements EspirituDAO {
 
-    public Espiritu crear(Espiritu espiritu) {
 
+    public Espiritu crear(Espiritu espiritu) {
         return JDBCConnector.getInstance().execute(conn -> {
-            try {
-                var ps = prepareInsertQueryStatement(espiritu, conn);
-                var resultSet = ps.executeQuery();
-                return buildEspiritu(resultSet);
+            try (PreparedStatement ps = prepareInsertQueryStatement(espiritu, conn);
+                 ResultSet rs = ps.executeQuery()) {
+
+                if (!rs.next()) {
+                    throw new RuntimeException("No se pudo crear el espiritu");
+                }
+
+                return buildEspiritu(rs);
+
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
         });
-
     }
 
     private static PreparedStatement prepareInsertQueryStatement(Espiritu espiritu, Connection conn) throws SQLException {
@@ -42,62 +45,63 @@ public record JDBCEspirituDAO() implements EspirituDAO {
         return ps;
     }
 
-    private static Espiritu buildEspiritu(ResultSet resultSet) throws SQLException {
-        Espiritu espirituModelo = null;
-
-        while (resultSet.next()) {
-            //si personaje no es null aca significa que el while dio mas de una vuelta, eso
-            //suele pasar cuando el resultado (resultset) tiene mas de un elemento.
-
-            if (espirituModelo != null) {
-                //TODO preguntar si agregar errores custom
-                throw new RuntimeException(String.format("Existe mas de un espiritu con el mismo id %s", espirituModelo.getId()));
-            }
-
-
-            espirituModelo = new Espiritu(
-                    resultSet.getString("tipo"),
-                    resultSet.getInt("nivelDeConexion"),
-                    resultSet.getString("nombre")
-            );
-            espirituModelo.setId(resultSet.getLong("id"));
-
-        }
-        return espirituModelo;
-    }
 
     public Espiritu recuperar(Long idDelEspiritu) {
         return JDBCConnector.getInstance().execute(conn -> {
-            try {
-                var ps = prepareSelectQueryStatement(idDelEspiritu, conn);
-                var resultSet = ps.executeQuery();
-                return buildEspiritu(resultSet);
+            try (PreparedStatement ps = prepareSelectQueryStatement(idDelEspiritu, conn);
+                 ResultSet rs = ps.executeQuery()) {
+
+                if (!rs.next()) {
+                    throw new RuntimeException("No se encontró el espíritu con id " + idDelEspiritu);
+                }
+
+                return buildEspiritu(rs);
+
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
         });
-
     }
 
     private static PreparedStatement prepareSelectQueryStatement(Long idDelEspiritu, Connection conn) throws SQLException {
-        var ps = conn.prepareStatement("SELECT id, tipo,nivelDeConexion, nombre FROM espiritu WHERE id = ?");
+        var ps = conn.prepareStatement(
+                "SELECT id, tipo, nivelDeConexion, nombre FROM espiritu WHERE id = ?"
+        );
+
         ps.setLong(1, idDelEspiritu);
+
         return ps;
     }
 
-    public List<Espiritu> recuperarTodos() {
-        // TODO completar
-        return null;
-    }
-
-    public void actualizar(Espiritu espiritu) {
-        // TODO completar
-    }
-
-    public void eliminar(Long idDelEspiritu) {
-        // TODO completar
-    }
-
+    //
+//    public List<Espiritu> recuperarTodos() {
+//        // TODO completar
+//        return null;
+//    }
+//
+//    public void actualizar(Espiritu espiritu) {
+//        // TODO completar
+//    }
+//
+//
+//    public void eliminar(Long espirituId) {
+//        JDBCConnector.getInstance().execute(conn -> {
+//            try {
+//                var ps = prepareDeleteQueryStatement(espirituId, conn);
+//                return ps.execute();
+//            } catch (SQLException e) {
+//                throw new RuntimeException(e);
+//            }
+//        });
+//    }
+//
+//    private static PreparedStatement prepareDeleteQueryStatement(Long espirituId, Connection conn) throws SQLException {
+//        var ps = conn.prepareStatement("DELETE FROM espiritu WHERE id =  ? ");
+//        ps.setLong(1, espirituId);
+//        return ps;
+//    }
+//
+//
     // Método inicializador del JDBCDAO -> ejecución de DDL. No modificar.
     public JDBCEspirituDAO() {
         try {
@@ -115,4 +119,22 @@ public record JDBCEspirituDAO() implements EspirituDAO {
             throw new RuntimeException(e);
         }
     }
+
+    /*
+     *
+     *   @param tiene que recibir un resulSet que no sea nulo
+     * */
+    private static Espiritu buildEspiritu(ResultSet resultSet) throws SQLException {
+
+        Espiritu espiritu = new Espiritu(
+                resultSet.getString("tipo"),
+                resultSet.getInt("nivelDeConexion"),
+                resultSet.getString("nombre")
+        );
+
+        espiritu.setId(resultSet.getLong("id"));
+
+        return espiritu;
+    }
+    
 }

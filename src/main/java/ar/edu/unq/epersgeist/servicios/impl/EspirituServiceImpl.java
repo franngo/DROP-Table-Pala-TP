@@ -23,6 +23,7 @@ public class EspirituServiceImpl implements EspirituService {
     public Espiritu recuperar(Long espirituId) {
 
         return espirituDao.recuperar(espirituId);
+
     }
 
     @Override
@@ -32,7 +33,8 @@ public class EspirituServiceImpl implements EspirituService {
 
     @Override
     public void eliminar(Long espirituId) {
-        // TODO completar
+        //  espirituDao.eliminar(espirituId);
+
     }
 
     @Override

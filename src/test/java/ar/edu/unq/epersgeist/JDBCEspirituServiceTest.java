@@ -10,12 +10,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static java.util.logging.LogManager.getLogManager;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JDBCEspirituServiceTest {
-    private JDBCEspirituDAO espirituDao = new JDBCEspirituDAO();
-    private EspirituService serviceEspiritu = new EspirituServiceImpl(espirituDao);
+    private final JDBCEspirituDAO espirituDao = new JDBCEspirituDAO();
+    private final EspirituService serviceEspiritu = new EspirituServiceImpl(espirituDao);
     private Espiritu matias;
+
 
     @BeforeAll
     static void setupLogging() {
@@ -30,12 +31,13 @@ public class JDBCEspirituServiceTest {
     }
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
+
         matias = new Espiritu("Pokemon", 0, "Matias");
     }
 
     @Test
-    void seUsaElServicioParaGuardarModelo() {
+    public void seUsaElServicioParaGuardarModelo() {
 
         Espiritu espirituP = serviceEspiritu.crear(matias);
         var otroEspiritu = serviceEspiritu.recuperar(espirituP.getId());
@@ -48,6 +50,32 @@ public class JDBCEspirituServiceTest {
         //Pero no son el mismo objeto =(
         //A esto nos referimos con "perdida de identidad"
         Assertions.assertNotEquals(espirituP, otroEspiritu);
+    }
+
+    @Test
+    void eliminoUnEspirituCorrectamente() {
+
+        Espiritu espirituEliminar = serviceEspiritu.crear(matias);
+
+        assertNotNull(espirituEliminar.getId());
+
+
+        serviceEspiritu.eliminar(espirituEliminar.getId());
+
+
+        assertThrows(RuntimeException.class, () -> {
+            serviceEspiritu.recuperar(espirituEliminar.getId());
+        });
+    }
+
+    @Test
+    void noSePuedeEliminarEspirituQueNoExiste() {
+
+        Long idInexistente = 9999L;
+
+        assertThrows(RuntimeException.class, () -> {
+            serviceEspiritu.eliminar(idInexistente);
+        });
     }
 
 }
