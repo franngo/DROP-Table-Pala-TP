@@ -44,7 +44,9 @@ public class EspirituServiceImpl implements EspirituService {
 
     @Override
     public Medium conectar(Long espirituId, Medium medium) {
-        // TODO completar
-        return null;
+        Espiritu espirituAConectar = espirituDao.recuperar(espirituId);
+        espirituAConectar.aumentarConexion(medium);
+        espirituDao.actualizar(espirituAConectar);
+        return medium;
     }
 }

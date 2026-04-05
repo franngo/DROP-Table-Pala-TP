@@ -24,9 +24,16 @@ public class Espiritu implements Serializable {
     }
 
 
-    public Medium aumentarConexion(Medium medium) {
-        // TODO completar
-        return null;
+    public void aumentarConexion(Medium medium) {
+        this.actualizarConexion(10);
+        medium.agregarEspiritu(this);
+
+    }
+
+    private void actualizarConexion(int cantidad) {
+        if (this.nivelDeConexion + cantidad < 100) {
+            this.nivelDeConexion += cantidad;
+        }
     }
 
 

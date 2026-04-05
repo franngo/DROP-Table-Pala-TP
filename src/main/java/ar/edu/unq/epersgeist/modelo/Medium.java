@@ -23,8 +23,8 @@ public class Medium implements Serializable {
         this.mana = mana;
     }
 
-    public void conectarseAEspiritu(Espiritu espiritu) {
-        // TODO completar
+    public void agregarEspiritu(Espiritu espiritu) {
+        espiritus.add(espiritu);
     }
 
 

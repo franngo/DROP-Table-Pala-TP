@@ -104,26 +104,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
         );
     }
 
-
-    //    @Override
-//    public void actualizar(Espiritu espiritu) {
-//        JDBCConnector.getInstance().execute(conn -> {
-//            try (PreparedStatement ps = prepareUpdateQueryStatement(espiritu, conn);
-//                 ResultSet rs = ps.executeQuery()) {
-//
-//                if (!rs.next()) {
-//                    throw new RuntimeException("No se pudo actualizar el espiritu");
-//                }
-//                return null;
-//
-//            } catch (SQLException e) {
-//                throw new RuntimeException(e);
-//            }
-//
-//
-//        });
-//
-//    }
+    
     @Override
     public void actualizar(Espiritu espiritu) {
         JDBCConnector.getInstance().execute(conn -> {
