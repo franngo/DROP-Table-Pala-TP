@@ -105,12 +105,60 @@ public record JDBCEspirituDAO() implements EspirituDAO {
     }
 
 
-    //
+    //    @Override
 //    public void actualizar(Espiritu espiritu) {
-//        // TODO completar
+//        JDBCConnector.getInstance().execute(conn -> {
+//            try (PreparedStatement ps = prepareUpdateQueryStatement(espiritu, conn);
+//                 ResultSet rs = ps.executeQuery()) {
+//
+//                if (!rs.next()) {
+//                    throw new RuntimeException("No se pudo actualizar el espiritu");
+//                }
+//                return null;
+//
+//            } catch (SQLException e) {
+//                throw new RuntimeException(e);
+//            }
+//
+//
+//        });
+//
 //    }
-//
-//
+    @Override
+    public void actualizar(Espiritu espiritu) {
+        JDBCConnector.getInstance().execute(conn -> {
+            try (PreparedStatement ps = prepareUpdateQueryStatement(espiritu, conn)) {
+
+                if (espiritu.getId() == null) {
+                    throw new RuntimeException("El espiritu no tiene id");
+                }
+
+                int filas = ps.executeUpdate();
+
+                if (filas == 0) {
+                    throw new RuntimeException("No se pudo actualizar el espiritu");
+                }
+
+                return null;
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+
+    private PreparedStatement prepareUpdateQueryStatement(Espiritu espiritu, Connection conn) throws SQLException {
+        PreparedStatement ps = conn.prepareStatement("UPDATE espiritu SET tipo=?,nombre=?,nivelDeConexion=? WHERE id =  ? ");
+
+        ps.setString(1, espiritu.getTipo());
+        ps.setString(2, espiritu.getNombre());
+        ps.setInt(3, espiritu.getNivelDeConexion());
+        ps.setLong(4, espiritu.getId());
+        return ps;
+    }
+
+
     public void eliminar(Long espirituId) {
         JDBCConnector.getInstance().execute(conn -> {
             try {

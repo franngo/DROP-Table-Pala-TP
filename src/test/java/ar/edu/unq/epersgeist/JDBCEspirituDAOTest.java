@@ -124,6 +124,50 @@ public class JDBCEspirituDAOTest {
         assertEquals("Matias", lista.get(2).getNombre());
     }
 
+    @Test
+    public void seActualizaUnEspirituExistente() {
+
+        // Arrange
+        Espiritu creado = espirituDao.crear(new Espiritu("Pokemon", "Matias"));
+        assertNotNull(creado.getId());
+
+        // Modifico datos
+        creado.setNombre("NombreActualizado");
+
+        // Act
+        espirituDao.actualizar(creado);
+
+        // Assert
+        Espiritu actualizado = espirituDao.recuperar(creado.getId());
+
+        assertEquals("NombreActualizado", actualizado.getNombre());
+    }
+
+    @Test
+    public void fallaAlActualizarUnEspirituInexistente() {
+
+        // Arrange
+        Espiritu inexistente = new Espiritu("Pokemon", "NoExisto");
+        inexistente.setId(12312L); // ID que no está en la base
+
+        // Act & Assert
+        assertThrows(RuntimeException.class, () -> {
+            espirituDao.actualizar(inexistente);
+        });
+    }
+
+    @Test
+    public void fallaAlActualizarUnEspirituSinId() {
+
+        // Arrange
+        Espiritu espirituMsinId = new Espiritu("Pokemon", "NoEstoyPersistido");
+
+        // Act & Assert
+        assertThrows(RuntimeException.class, () -> {
+            espirituDao.actualizar(espirituMsinId);
+        });
+    }
+
     @AfterEach
     void tearDown() {
         // TODO implementar eliminar

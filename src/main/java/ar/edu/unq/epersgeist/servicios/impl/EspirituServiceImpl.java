@@ -28,7 +28,7 @@ public class EspirituServiceImpl implements EspirituService {
 
     @Override
     public void actualizar(Espiritu espiritu) {
-        // TODO completar
+        espirituDao.actualizar(espiritu);
     }
 
     @Override
@@ -39,8 +39,7 @@ public class EspirituServiceImpl implements EspirituService {
 
     @Override
     public List<Espiritu> recuperarTodos() {
-        // TODO completar
-        return null;
+        return espirituDao.recuperarTodos();
     }
 
     @Override
