@@ -42,11 +42,44 @@ public class EspirituServiceImpl implements EspirituService {
         return espirituDao.recuperarTodos();
     }
 
+    //    @Override
+//    public Medium conectar(Long espirituId, Medium medium) {
+//        //lo pido de la base
+//        Espiritu espirituAConectar = espirituDao.recuperar(espirituId);
+//        // aplico la logica de negocio ENTRE MODELOS
+//        espirituAConectar.aumentarConexion(medium);
+//        //persisto los cambios
+//        espirituDao.actualizar(espirituAConectar);
+//        return medium;
+//    }
     @Override
     public Medium conectar(Long espirituId, Medium medium) {
+
+        System.out.println("👉 Entrando a conectar()");
+        System.out.println("📌 espirituId: " + espirituId);
+        System.out.println("📌 medium: " + medium);
+
+        // lo pido de la base
+        System.out.println("🔍 Recuperando espiritu de la base...");
         Espiritu espirituAConectar = espirituDao.recuperar(espirituId);
+        System.out.println("✅ Espiritu recuperado: " + espirituAConectar);
+        System.out.println("🔗 Nivel de conexión actual: " + espirituAConectar.getNivelDeConexion());
+
+        // aplico la lógica de negocio
+        System.out.println("⚙️ Aplicando lógica de conexión...");
+        System.out.println("ESPIRITUCONECTAR");
+        System.out.println(espirituAConectar.hashCode());
         espirituAConectar.aumentarConexion(medium);
+
+        System.out.println("🔗 Nuevo nivel de conexión: " + espirituAConectar.getNivelDeConexion());
+
+        // persisto los cambios
+        System.out.println("💾 Persistiendo cambios...");
         espirituDao.actualizar(espirituAConectar);
+        System.out.println("✅ Cambios persistidos");
+
+        System.out.println("👋 Saliendo de conectar()");
+
         return medium;
     }
 }

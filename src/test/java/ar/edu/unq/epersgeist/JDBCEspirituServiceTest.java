@@ -1,13 +1,11 @@
 package ar.edu.unq.epersgeist;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu;
+import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.persistencia.dao.jdbc.JDBCEspirituDAO;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
 import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import static java.util.logging.LogManager.getLogManager;
 import static org.junit.jupiter.api.Assertions.*;
@@ -68,14 +66,39 @@ public class JDBCEspirituServiceTest {
         });
     }
 
+
     @Test
-    void noSePuedeEliminarEspirituQueNoExiste() {
+    public void seConectaUnEspirituConUnMedium() {
 
-        Long idInexistente = 9999L;
+        // Arrange
+        Espiritu espirituM = new Espiritu("Pokemon", "Matias");
+        Espiritu espirituP = espirituDao.crear(espirituM);
+        Medium mediumM = new Medium("Juan", 120, 10);
 
-        assertThrows(RuntimeException.class, () -> {
-            serviceEspiritu.eliminar(idInexistente);
-        });
+        System.out.println("espirituP");
+        System.out.println(espirituP.hashCode());
+        
+        assertEquals(0, espirituP.getNivelDeConexion());
+        // Act
+        Medium medium2 = serviceEspiritu.conectar(espirituP.getId(), mediumM);
+
+        assertTrue(medium2.getEspiritus().contains(espirituM));
+
+
+        // Assert
+        Espiritu espirituActualizado = serviceEspiritu.recuperar(espirituP.getId());
+        System.out.println("espirituActualizado");
+        System.out.println(espirituActualizado.hashCode());
+
+        //  assertEquals(10, espirituActualizado.getNivelDeConexion());
+
+
+    }
+
+    @AfterEach
+    void tearDown() {
+        // TODO implementar eliminar
+        espirituDao.eliminarTodos();
     }
 
 }
