@@ -104,7 +104,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
         );
     }
 
-    
+
     @Override
     public void actualizar(Espiritu espiritu) {
         JDBCConnector.getInstance().execute(conn -> {
@@ -199,6 +199,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
         );
 
         espiritu.setId(resultSet.getLong("id"));
+        espiritu.setNivelDeConexion(resultSet.getInt("nivelDeConexion"));
 
         return espiritu;
     }
