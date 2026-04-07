@@ -60,11 +60,9 @@ public class EspirituTest {
     @Test
     public void alAumentarMuchaConexionNoDebePasarDeCien() {
 
-
-        espirituM.fortalecerConexion(99);
-        assertEquals(99, espirituM.getNivelDeConexion());
-        espirituM.fortalecerConexion(100);
-        assertEquals(99, espirituM.getNivelDeConexion());
+        medium.setCantFortalece(120);
+        espirituM.aumentarConexion(medium);
+        assertEquals(0, espirituM.getNivelDeConexion());
 
     }
 
