@@ -22,14 +22,11 @@ public class EspirituTest {
     @Test
     public void unEspirituSeCreaConNivelDeConexionEnCero() {
 
-
         assertEquals(0, espirituM.getNivelDeConexion());
     }
 
     @Test
     public void aumentarConexionIncrementaElNivelEnDiez() {
-
-
 
         espiritu.aumentarConexion(medium);
 
@@ -38,8 +35,6 @@ public class EspirituTest {
 
     @Test
     public void aumentarConexionSeAcumulaCorrectamente() {
-
-
 
         espirituM.aumentarConexion(medium);
         espirituM.aumentarConexion(medium);
