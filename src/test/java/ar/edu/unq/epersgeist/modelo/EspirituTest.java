@@ -8,10 +8,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class EspirituTest {
 
     Espiritu espirituM;
+    Espiritu espiritu;
+    Medium medium;
 
     @BeforeEach
     void setUp() {
+
         espirituM = new Espiritu("Pokemon", "Matias");
+        espiritu = new Espiritu("Pokemon", "Matias");
+        medium = new Medium("Juan", 100, 10);
     }
 
     @Test
@@ -24,8 +29,7 @@ public class EspirituTest {
     @Test
     public void aumentarConexionIncrementaElNivelEnDiez() {
 
-        Espiritu espiritu = new Espiritu("Pokemon", "Matias");
-        Medium medium = new Medium("Juan", 100, 10);
+
 
         espiritu.aumentarConexion(medium);
 
@@ -36,7 +40,6 @@ public class EspirituTest {
     public void aumentarConexionSeAcumulaCorrectamente() {
 
 
-        Medium medium = new Medium("Juan", 100, 10);
 
         espirituM.aumentarConexion(medium);
         espirituM.aumentarConexion(medium);
@@ -47,7 +50,7 @@ public class EspirituTest {
     @Test
     public void alAumentarConexionElMediumRecibeElEspiritu() {
 
-        Medium medium = new Medium("Juan", 100, 10);
+
 
         espirituM.aumentarConexion(medium);
 
@@ -56,6 +59,8 @@ public class EspirituTest {
 
     @Test
     public void alAumentarMuchaConexionNoDebePasarDeCien() {
+
+
         espirituM.fortalecerConexion(99);
         assertEquals(99, espirituM.getNivelDeConexion());
         espirituM.fortalecerConexion(100);
