@@ -5,9 +5,11 @@ import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.persistencia.dao.jdbc.JDBCEspirituDAO;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
 import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static java.util.logging.LogManager.getLogManager;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class JDBCEspirituServiceTest {
@@ -15,7 +17,7 @@ public class JDBCEspirituServiceTest {
     private final EspirituService serviceEspiritu = new EspirituServiceImpl(espirituDao);
     private Espiritu matias;
 
-
+     /*
     @BeforeAll
     static void setupLogging() {
         try {
@@ -27,6 +29,7 @@ public class JDBCEspirituServiceTest {
             System.err.println("No se pudo cargar la configuración de logging: " + e.getMessage());
         }
     }
+    */
 
     @BeforeEach
     public void setUp() {

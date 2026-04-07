@@ -42,15 +42,20 @@ public class EspirituServiceImpl implements EspirituService {
         return espirituDao.recuperarTodos();
     }
 
+
+    /*
+     * Paso 1: pedir el espiritu a la BBDD
+     * Paso 2: aplicar logica de negocio entre MODELOS
+     * Paso 3: persistir los cambios
+     * */
     @Override
     public Medium conectar(Long espirituId, Medium medium) {
-        //TODO Terminar de implementar conectar
-        //lo pido de la base
         Espiritu espirituAConectar = espirituDao.recuperar(espirituId);
-        // aplico la logica de negocio ENTRE MODELOS
+
         espirituAConectar.aumentarConexion(medium);
-        //persisto los cambios
+
         espirituDao.actualizar(espirituAConectar);
+
         return medium;
     }
 
