@@ -47,7 +47,6 @@ public class EspirituTest {
     @Test
     public void alAumentarConexionElMediumRecibeElEspiritu() {
 
-
         Medium medium = new Medium("Juan", 100, 10);
 
         espirituM.aumentarConexion(medium);
@@ -56,8 +55,16 @@ public class EspirituTest {
     }
 
     @Test
-    public void fallaSiElMediumEsNull() {
+    public void alAumentarMuchaConexionNoDebePasarDeCien() {
+        espirituM.fortalecerConexion(99);
+        assertEquals(99, espirituM.getNivelDeConexion());
+        espirituM.fortalecerConexion(100);
+        assertEquals(99, espirituM.getNivelDeConexion());
 
+    }
+
+    @Test
+    public void fallaSiElMediumEsNull() {
 
         assertThrows(RuntimeException.class, () -> {
             espirituM.aumentarConexion(null);

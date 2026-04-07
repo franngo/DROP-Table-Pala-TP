@@ -11,8 +11,6 @@ public class Espiritu implements Serializable {
 
     private Long id;
     private String tipo;
-
-
     private Integer nivelDeConexion;
     private String nombre;
 
@@ -23,19 +21,18 @@ public class Espiritu implements Serializable {
         this.nombre = nombre;
     }
 
-
     public void aumentarConexion(Medium medium) {
         this.fortalecerConexion(medium.getCantFortalece());
         medium.agregarEspiritu(this);
 
     }
 
-    private void fortalecerConexion(int cantidad) {
+    // TODO discutir si este metodo deberia ser privado ya que no es un caso de uso
+    // pero tuve que hacerlo privado para testear
+    public void fortalecerConexion(int cantidad) {
         if (this.nivelDeConexion + cantidad < 100) {
             this.nivelDeConexion = this.getNivelDeConexion() + cantidad;
         }
 
     }
-
-
 }

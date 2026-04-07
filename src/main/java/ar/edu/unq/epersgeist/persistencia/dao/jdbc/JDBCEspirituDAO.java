@@ -82,7 +82,6 @@ public record JDBCEspirituDAO() implements EspirituDAO {
         return ps;
     }
 
-
     public List<Espiritu> recuperarTodos() {
 
         return JDBCConnector.getInstance().execute(conn -> {
@@ -110,7 +109,6 @@ public record JDBCEspirituDAO() implements EspirituDAO {
         );
     }
 
-
     @Override
     public void actualizar(Espiritu espiritu) {
         JDBCConnector.getInstance().execute(conn -> {
@@ -134,7 +132,6 @@ public record JDBCEspirituDAO() implements EspirituDAO {
         });
     }
 
-
     private PreparedStatement prepareUpdateQueryStatement(Espiritu espiritu, Connection conn) throws SQLException {
         PreparedStatement ps = conn.prepareStatement("UPDATE espiritu SET tipo=?,nombre=?,nivelDeConexion=? WHERE id =  ? ");
 
@@ -144,7 +141,6 @@ public record JDBCEspirituDAO() implements EspirituDAO {
         ps.setLong(4, espiritu.getId());
         return ps;
     }
-
 
     public void eliminar(Long espirituId) {
         JDBCConnector.getInstance().execute(conn -> {
@@ -177,7 +173,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
             }
         });
     }
-    
+
     // Método inicializador del JDBCDAO -> ejecución de DDL. No modificar.
     public JDBCEspirituDAO() {
         try {
