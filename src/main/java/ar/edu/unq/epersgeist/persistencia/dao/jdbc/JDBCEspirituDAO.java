@@ -1,6 +1,9 @@
 package ar.edu.unq.epersgeist.persistencia.dao.jdbc;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarEspirituException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlCrearEspirituException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 
 import java.nio.file.Files;
@@ -21,7 +24,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                  ResultSet rs = ps.executeQuery()) {
 
                 if (!rs.next()) {
-                    throw new RuntimeException("No se pudo crear el espiritu");
+                    throw new ErrorAlCrearEspirituException("No se pudo crear el espiritu");
                 }
 
                 return buildEspiritu(rs);
@@ -31,6 +34,9 @@ public record JDBCEspirituDAO() implements EspirituDAO {
             }
         });
     }
+    /*
+     * Crea la Query para insertar los datos a partir del modelo
+     * */
 
     private static PreparedStatement prepareInsertQueryStatement(Espiritu espiritu, Connection conn) throws SQLException {
 
@@ -54,7 +60,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                  ResultSet rs = ps.executeQuery()) {
 
                 if (!rs.next()) {
-                    throw new RuntimeException("No se encontró el espíritu con id " + idDelEspiritu);
+                    throw new ErrorAlRecuperarEspirituException("No se encontró el espíritu con id " + idDelEspiritu);
                 }
 
                 return buildEspiritu(rs);
@@ -117,7 +123,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                 int filas = ps.executeUpdate();
 
                 if (filas == 0) {
-                    throw new RuntimeException("No se pudo actualizar el espiritu");
+                    throw new ErrorAlActualizarEspirituException("No se pudo actualizar el espiritu");
                 }
 
                 return null;
@@ -157,7 +163,9 @@ public record JDBCEspirituDAO() implements EspirituDAO {
         return ps;
     }
 
-    // Método inicializador del JDBCDAO -> ejecución de DDL. No modificar.
+    /*
+     * Metodo para limpiar BBDD usado en los test
+     * */
     @Override
     public void eliminarTodos() {
         JDBCConnector.getInstance().execute(conn -> {
@@ -169,7 +177,8 @@ public record JDBCEspirituDAO() implements EspirituDAO {
             }
         });
     }
-
+    
+    // Método inicializador del JDBCDAO -> ejecución de DDL. No modificar.
     public JDBCEspirituDAO() {
         try {
             var uri = getClass().getClassLoader().getResource("createAll.sql").toURI();
@@ -189,7 +198,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
 
     /*
      *
-     *   @param tiene que recibir un resulSet que no sea nulo
+     *   @param resulSet con datos para construir un Espiritu. No puede ser null
      * */
     private static Espiritu buildEspiritu(ResultSet resultSet) throws SQLException {
 
