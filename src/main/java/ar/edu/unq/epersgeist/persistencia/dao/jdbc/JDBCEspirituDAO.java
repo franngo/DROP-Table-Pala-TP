@@ -144,12 +144,12 @@ public record JDBCEspirituDAO() implements EspirituDAO {
 
     public void eliminar(Long espirituId) {
         JDBCConnector.getInstance().execute(conn -> {
-            try {
-                var ps = prepareDeleteQueryStatement(espirituId, conn);
-                return ps.execute();
+            try (var ps = prepareDeleteQueryStatement(espirituId, conn);){
+                ps.execute();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
+            return null;
         });
     }
 

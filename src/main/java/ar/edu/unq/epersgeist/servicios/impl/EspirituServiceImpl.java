@@ -41,8 +41,6 @@ public class EspirituServiceImpl implements EspirituService {
     public List<Espiritu> recuperarTodos() {
         return espirituDao.recuperarTodos();
     }
-
-
     /*
      * Paso 1: pedir el espiritu a la BBDD
      * Paso 2: aplicar logica de negocio entre MODELOS
