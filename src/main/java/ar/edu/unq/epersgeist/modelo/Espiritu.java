@@ -1,7 +1,12 @@
 package ar.edu.unq.epersgeist.modelo;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 
+@Getter
+@Setter
 public class Espiritu implements Serializable {
 
     private Long id;
@@ -9,30 +14,29 @@ public class Espiritu implements Serializable {
     private Integer nivelDeConexion;
     private String nombre;
 
-    public Espiritu(String tipo, Integer nivelDeConexion, String nombre) {
+    public Espiritu(String tipo, String nombre) {
+
         this.tipo = tipo;
-        this.nivelDeConexion = nivelDeConexion;
+        this.nivelDeConexion = 0;
         this.nombre = nombre;
     }
 
-    public Medium aumentarConexion(Medium medium) {
-        // TODO completar
-        return null;
+    public void aumentarConexion(Medium medium) {
+        this.fortalecerConexion(medium.getCantFortalece());
+        medium.agregarEspiritu(this);
+
     }
 
-    public Long getId() {
-        return id;
+    public void fortalecerConexion(int cantidad) {
+        this.nivelDeConexion = Math.min(this.limiteConexion(),this.nuevaConexion(cantidad));
+
     }
 
-    public String getTipo() {
-        return tipo;
+    private int nuevaConexion(int cantidad){
+        return this.getNivelDeConexion() + cantidad;
     }
 
-    public Integer getNivelDeConexion() {
-        return nivelDeConexion;
-    }
-
-    public String getNombre() {
-        return nombre;
+    private int limiteConexion() {
+        return 100;
     }
 }
