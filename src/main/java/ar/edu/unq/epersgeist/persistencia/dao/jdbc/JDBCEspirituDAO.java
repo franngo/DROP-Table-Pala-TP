@@ -28,7 +28,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                 return buildEspiritu(rs);
 
             } catch (SQLException e) {
-                throw new EpergeistException(e);
+                throw new EpergeistException(e, "Ocurrió un error de base de datos al intentar crear el espíritu.");
             }
         });
     }
@@ -64,7 +64,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                 return buildEspiritu(rs);
 
             } catch (SQLException e) {
-                throw new EpergeistException(e);
+                throw new EpergeistException(e, "Ocurrió un error de base de datos al intentar recuperar el espíritu.");
             }
         });
     }
@@ -95,7 +95,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                 return todosLosEspiritus;
 
             } catch (SQLException e) {
-                throw new EpergeistException(e);
+                throw new EpergeistException(e, "Ocurrió un error de base de datos al intentar recuperar todos los espíritus.");
             }
         });
     }
@@ -125,7 +125,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                 return null;
 
             } catch (SQLException e) {
-                throw new EpergeistException(e);
+                throw new EpergeistException(e, "Ocurrió un error de base de datos al intentar actualizar el espíritu.");
             }
         });
     }
@@ -152,7 +152,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
 
                 return null;
             } catch (SQLException e) {
-                throw new EpergeistException(e);
+                throw new EpergeistException(e, "Ocurrió un error de base de datos al intentar eliminar el espíritu.");
             }
         });
     }
@@ -173,7 +173,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                 ps.executeUpdate();
                 return null;
             } catch (SQLException e) {
-                throw new EpergeistException(e);
+                throw new EpergeistException(e, "Ocurrió un error de base de datos al intentar eliminar todos los espíritus.");
             }
         });
     }
