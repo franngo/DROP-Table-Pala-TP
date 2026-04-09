@@ -25,7 +25,21 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
-
+          
+      postgres:
+        image: postgres:15
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: nitro-note
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          
       mongodb:
         image: mongo
         ports:
@@ -70,31 +84,31 @@ jobs:
 
       - name: Run tests
         run: ./gradlew test
+#Ojo al eliminar las # por tema espacios que yaml creo que solamente soporta tab -dami
+#      - name: Success notification
+ #       if: success()
+  #      env:
+   #       DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+    #      DISCORD_USERNAME: ${{ github.repository }}
+     #     DISCORD_AVATAR: https://www.iconsdb.com/icons/preview/green/github-9-xxl.png
+#        uses: EPERS-UNQ/action-discord@master
+ #       with:
+  #        fields: '[{"name":"Proyecto",  "value":" [{{ EVENT_PAYLOAD.repository.name }}]({{ EVENT_PAYLOAD.repository.url }}) ", "inline": true}, {"name":"Tag",  "value":"[${{ steps.tagName.outputs.tagName }}](https://github.com/${{ github.repository }}/releases/tag/${{ steps.tagName.outputs.tagName }})", "inline": true}]'
+   #       title: ':green_circle: Entrega exitosa'
+    #      color: 3258062
+     #     author: true
+      #    includeCommits: true
 
-      - name: Success notification
-        if: success()
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          DISCORD_USERNAME: ${{ github.repository }}
-          DISCORD_AVATAR: https://www.iconsdb.com/icons/preview/green/github-9-xxl.png
-        uses: EPERS-UNQ/action-discord@master
-        with:
-          fields: '[{"name":"Proyecto",  "value":" [{{ EVENT_PAYLOAD.repository.name }}]({{ EVENT_PAYLOAD.repository.url }}) ", "inline": true}, {"name":"Tag",  "value":"[${{ steps.tagName.outputs.tagName }}](https://github.com/${{ github.repository }}/releases/tag/${{ steps.tagName.outputs.tagName }})", "inline": true}]'
-          title: ':green_circle: Entrega exitosa'
-          color: 3258062
-          author: true
-          includeCommits: true
-
-      - name: Failure notification
-        if: failure()
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          DISCORD_USERNAME: ${{ github.repository }}
-          DISCORD_AVATAR: https://www.iconsdb.com/icons/preview/red/github-10-xxl.png
-        uses: EPERS-UNQ/action-discord@master
-        with:
-          fields: '[{"name":"Proyecto",  "value":" [{{ EVENT_PAYLOAD.repository.name }}]({{ EVENT_PAYLOAD.repository.url }}) ", "inline": true},{"name":"Tag",  "value":"[${{ steps.tagName.outputs.tagName }}](https://github.com/${{ github.repository }}/releases/tag/${{ steps.tagName.outputs.tagName }})", "inline": true}]'
-          title: ':red_circle: Entrega fallida'
-          color: 9503748
-          author: true
-          includeCommits: true
+   #   - name: Failure notification
+    #    if: failure()
+     #   env:
+      #    DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+       #   DISCORD_USERNAME: ${{ github.repository }}
+        #  DISCORD_AVATAR: https://www.iconsdb.com/icons/preview/red/github-10-xxl.png
+ #       uses: EPERS-UNQ/action-discord@master
+  #      with:
+   #       fields: '[{"name":"Proyecto",  "value":" [{{ EVENT_PAYLOAD.repository.name }}]({{ EVENT_PAYLOAD.repository.url }}) ", "inline": true},{"name":"Tag",  "value":"[${{ steps.tagName.outputs.tagName }}](https://github.com/${{ github.repository }}/releases/tag/${{ steps.tagName.outputs.tagName }})", "inline": true}]'
+    #      title: ':red_circle: Entrega fallida'
+     #     color: 9503748
+      #    author: true
+       #   includeCommits: true
