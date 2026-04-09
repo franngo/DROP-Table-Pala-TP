@@ -1,6 +1,7 @@
 package ar.edu.unq.epersgeist.persistencia;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu;
+import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.jdbc.JDBCEspirituDAO;
 import org.junit.jupiter.api.AfterEach;
@@ -75,7 +76,7 @@ public class JDBCEspirituDAOTest {
         Long idInexistente = 99999L;
 
         // Act & Assert
-        assertDoesNotThrow(() -> {
+        assertThrows(RuntimeException.class,() -> {
             espirituDao.eliminar(idInexistente);
         });
     }

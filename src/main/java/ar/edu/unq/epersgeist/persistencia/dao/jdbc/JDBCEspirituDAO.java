@@ -1,9 +1,7 @@
 package ar.edu.unq.epersgeist.persistencia.dao.jdbc;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarEspirituException;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlCrearEspirituException;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
+import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 
 import java.nio.file.Files;
@@ -24,13 +22,13 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                  ResultSet rs = ps.executeQuery()) {
 
                 if (!rs.next()) {
-                    throw new ErrorAlCrearEspirituException("No se pudo crear el espiritu");
+                    throw new ErrorAlCrearEspirituException();
                 }
 
                 return buildEspiritu(rs);
 
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new EpergeistException(e, "Ocurrió un error de base de datos al intentar crear el espíritu.");
             }
         });
     }
@@ -60,13 +58,13 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                  ResultSet rs = ps.executeQuery()) {
 
                 if (!rs.next()) {
-                    throw new ErrorAlRecuperarEspirituException("No se encontró el espíritu con id " + idDelEspiritu);
+                    throw new ErrorAlRecuperarEspirituException(idDelEspiritu);
                 }
 
                 return buildEspiritu(rs);
 
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new EpergeistException(e, "Ocurrió un error de base de datos al intentar recuperar el espíritu.");
             }
         });
     }
@@ -97,7 +95,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                 return todosLosEspiritus;
 
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new EpergeistException(e, "Ocurrió un error de base de datos al intentar recuperar todos los espíritus.");
             }
         });
     }
@@ -121,13 +119,13 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                 int filas = ps.executeUpdate();
 
                 if (filas == 0) {
-                    throw new ErrorAlActualizarEspirituException("No se pudo actualizar el espiritu");
+                    throw new ErrorAlActualizarEspirituException();
                 }
 
                 return null;
 
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new EpergeistException(e, "Ocurrió un error de base de datos al intentar actualizar el espíritu.");
             }
         });
     }
@@ -144,12 +142,18 @@ public record JDBCEspirituDAO() implements EspirituDAO {
 
     public void eliminar(Long espirituId) {
         JDBCConnector.getInstance().execute(conn -> {
-            try (var ps = prepareDeleteQueryStatement(espirituId, conn);){
-                ps.execute();
+            try {
+                var ps = prepareDeleteQueryStatement(espirituId, conn);
+                int filas = ps.executeUpdate();
+
+                if (filas == 0) {
+                    throw new ErrorAlEliminarEspirituException(espirituId);
+                }
+
+                return null;
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new EpergeistException(e, "Ocurrió un error de base de datos al intentar eliminar el espíritu.");
             }
-            return null;
         });
     }
 
@@ -169,7 +173,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                 ps.executeUpdate();
                 return null;
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new EpergeistException(e, "Ocurrió un error de base de datos al intentar eliminar todos los espíritus.");
             }
         });
     }
