@@ -33,8 +33,8 @@ jobs:
           - 5432:5432
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: nitro-note
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: epers_ejemplo_jdbc
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
