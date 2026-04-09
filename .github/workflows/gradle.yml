@@ -85,7 +85,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client
-          PGPASSWORD=root psql -h localhost -U postgres -d epers_ejemplo_jdbc -f createAll.sql
+          PGPASSWORD=root psql -h localhost -U postgres -d epers_ejemplo_jdbc -f src/main/resources/createAll.sql
 
       - name: Make Gradle Wrapper executable
         run: chmod +x ./gradlew
