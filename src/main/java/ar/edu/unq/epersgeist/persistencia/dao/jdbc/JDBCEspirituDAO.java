@@ -28,7 +28,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                 return buildEspiritu(rs);
 
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new EpergeistException(e);
             }
         });
     }
@@ -64,7 +64,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                 return buildEspiritu(rs);
 
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new EpergeistException(e);
             }
         });
     }
@@ -95,7 +95,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                 return todosLosEspiritus;
 
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new EpergeistException(e);
             }
         });
     }
@@ -125,7 +125,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                 return null;
 
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new EpergeistException(e);
             }
         });
     }
@@ -152,7 +152,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
 
                 return null;
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new EpergeistException(e);
             }
         });
     }
@@ -173,7 +173,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                 ps.executeUpdate();
                 return null;
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new EpergeistException(e);
             }
         });
     }
