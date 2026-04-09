@@ -1,9 +1,7 @@
 package ar.edu.unq.epersgeist.persistencia.dao.jdbc;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarEspirituException;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlCrearEspirituException;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
+import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 
 import java.nio.file.Files;
@@ -24,7 +22,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                  ResultSet rs = ps.executeQuery()) {
 
                 if (!rs.next()) {
-                    throw new ErrorAlCrearEspirituException("No se pudo crear el espiritu");
+                    throw new ErrorAlCrearEspirituException();
                 }
 
                 return buildEspiritu(rs);
@@ -121,7 +119,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                 int filas = ps.executeUpdate();
 
                 if (filas == 0) {
-                    throw new ErrorAlActualizarEspirituException("No se pudo actualizar el espiritu");
+                    throw new ErrorAlActualizarEspirituException();
                 }
 
                 return null;
@@ -149,7 +147,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                 int filas = ps.executeUpdate();
 
                 if (filas == 0) {
-                    throw new RuntimeException("No se pudo eliminar el espiritu");
+                    throw new ErrorAlEliminarEspirituException(espirituId);
                 }
 
                 return null;
