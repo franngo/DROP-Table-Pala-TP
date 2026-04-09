@@ -1,14 +1,11 @@
-# This workflow will build a Java project with Gradle
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
-
 name: Java CI with Gradle
 
 on:
   push:
-    tags:
-      - "*"
     branches:
       - main
+    tags:
+      - "*"
   pull_request:
     branches:
       - main
@@ -78,43 +75,22 @@ jobs:
           restore-keys: |
             gradle-${{ runner.os }}-
 
-      - name: Extract tag name
-        run: fullTagName=${{ github.ref }} && path='refs/tags/' && a='' && tagName=${fullTagName/$path/$a} && echo $tagName && echo "##[set-output name=tagName;]$tagName"
-        id: tagName
-
       - name: Configure environment variables
-        run: echo -e "MYSQL_USER=root\nMYSQL_PASSWORD=root\nMYSQL_DATABASE=epersgeist\nNEO_URL=bolt://localhost:7687\nNEO_USER=neo4j\nNEO_PASSWORD=rootroot" >> $GITHUB_ENV
+        run: echo -e "MYSQL_USER=root\nMYSQL_PASSWORD=root\nMYSQL_DATABASE=epersgeist\nNEO_URL=bolt://localhost:7687\nNEO_USER=neo4j\nNEO_PASSWORD=rootroot\nDB_USER=postgres\nDB_PASSWORD=root\nDB_HOST=localhost\nDB_NAME=epers_ejemplo_jdbc\nDB_PORT=5432" >> $GITHUB_ENV
+
+      - name: Wait for Postgres
+        run: sleep 10
+
+      - name: Init DB schema
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+          psql -h localhost -U postgres -d epers_ejemplo_jdbc -c "CREATE TABLE IF NOT EXISTS espiritu (id SERIAL PRIMARY KEY, nombre TEXT, tipo TEXT);"
+        env:
+          PGPASSWORD: root
 
       - name: Make Gradle Wrapper executable
         run: chmod +x ./gradlew
 
       - name: Run tests
-        run: ./gradlew test --info
-#Ojo al eliminar las # por tema espacios que yaml creo que solamente soporta tab -dami
-#      - name: Success notification
- #       if: success()
-  #      env:
-   #       DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-    #      DISCORD_USERNAME: ${{ github.repository }}
-     #     DISCORD_AVATAR: https://www.iconsdb.com/icons/preview/green/github-9-xxl.png
-#        uses: EPERS-UNQ/action-discord@master
- #       with:
-  #        fields: '[{"name":"Proyecto",  "value":" [{{ EVENT_PAYLOAD.repository.name }}]({{ EVENT_PAYLOAD.repository.url }}) ", "inline": true}, {"name":"Tag",  "value":"[${{ steps.tagName.outputs.tagName }}](https://github.com/${{ github.repository }}/releases/tag/${{ steps.tagName.outputs.tagName }})", "inline": true}]'
-   #       title: ':green_circle: Entrega exitosa'
-    #      color: 3258062
-     #     author: true
-      #    includeCommits: true
-
-   #   - name: Failure notification
-    #    if: failure()
-     #   env:
-      #    DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-       #   DISCORD_USERNAME: ${{ github.repository }}
-        #  DISCORD_AVATAR: https://www.iconsdb.com/icons/preview/red/github-10-xxl.png
- #       uses: EPERS-UNQ/action-discord@master
-  #      with:
-   #       fields: '[{"name":"Proyecto",  "value":" [{{ EVENT_PAYLOAD.repository.name }}]({{ EVENT_PAYLOAD.repository.url }}) ", "inline": true},{"name":"Tag",  "value":"[${{ steps.tagName.outputs.tagName }}](https://github.com/${{ github.repository }}/releases/tag/${{ steps.tagName.outputs.tagName }})", "inline": true}]'
-    #      title: ':red_circle: Entrega fallida'
-     #     color: 9503748
-      #    author: true
-       #   includeCommits: true
+        run: ./gradlew clean test --info --stacktrace --no-daemon
