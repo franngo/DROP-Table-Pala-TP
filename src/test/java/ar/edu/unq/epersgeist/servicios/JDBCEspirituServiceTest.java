@@ -168,7 +168,10 @@ public class JDBCEspirituServiceTest {
         Medium mediumConectado = serviceEspiritu.conectar(espirituP.getId(), mediumJuan);
 
         assertEquals(1, mediumJuan.getEspiritus().size());
-
+        assertTrue(
+                mediumConectado.getEspiritus().stream()
+                        .anyMatch(e -> e.getId().equals(espirituP.getId()))
+        );
     }
 
     @Test

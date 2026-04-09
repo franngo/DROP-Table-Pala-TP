@@ -57,7 +57,7 @@ public class EspirituTest {
 
         medium.setCantFortalece(120);
         espirituM.aumentarConexion(medium);
-        assertEquals(0, espirituM.getNivelDeConexion());
+        assertEquals(100, espirituM.getNivelDeConexion());
 
     }
 

@@ -27,12 +27,16 @@ public class Espiritu implements Serializable {
 
     }
 
-    // TODO discutir si este metodo deberia ser privado ya que no es un caso de uso
-    // pero tuve que hacerlo privado para testear
     public void fortalecerConexion(int cantidad) {
-        if (this.nivelDeConexion + cantidad < 100) {
-            this.nivelDeConexion = this.getNivelDeConexion() + cantidad;
-        }
+        this.nivelDeConexion = Math.min(this.limiteConexion(),this.nuevaConexion(cantidad));
 
+    }
+
+    private int nuevaConexion(int cantidad){
+        return this.getNivelDeConexion() + cantidad;
+    }
+
+    private int limiteConexion() {
+        return 100;
     }
 }
