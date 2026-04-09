@@ -60,7 +60,7 @@ public record JDBCEspirituDAO() implements EspirituDAO {
                  ResultSet rs = ps.executeQuery()) {
 
                 if (!rs.next()) {
-                    throw new ErrorAlRecuperarEspirituException("No se encontró el espíritu con id " + idDelEspiritu);
+                    throw new ErrorAlRecuperarEspirituException(idDelEspiritu);
                 }
 
                 return buildEspiritu(rs);
@@ -146,7 +146,13 @@ public record JDBCEspirituDAO() implements EspirituDAO {
         JDBCConnector.getInstance().execute(conn -> {
             try {
                 var ps = prepareDeleteQueryStatement(espirituId, conn);
-                return ps.execute();
+                int filas = ps.executeUpdate();
+
+                if (filas == 0) {
+                    throw new RuntimeException("No se pudo eliminar el espiritu");
+                }
+
+                return null;
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
