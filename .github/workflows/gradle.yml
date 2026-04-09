@@ -85,12 +85,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client
-          psql -h localhost -U postgres -d epers_ejemplo_jdbc -c "CREATE TABLE IF NOT EXISTS espiritu (id SERIAL PRIMARY KEY, nombre TEXT, tipo TEXT);"
-        env:
-          PGPASSWORD: root
+          PGPASSWORD=root psql -h localhost -U postgres -d epers_ejemplo_jdbc -f createAll.sql
 
       - name: Make Gradle Wrapper executable
         run: chmod +x ./gradlew
 
       - name: Run tests
-        run: ./gradlew clean test --info --stacktrace --no-daemon
+        run: ./gradlew clean test --no-daemon
