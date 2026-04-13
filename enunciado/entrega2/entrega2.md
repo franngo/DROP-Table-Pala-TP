@@ -1,26 +1,26 @@
 # TP 2 - HIBERNATE
 
-Tras varios días en los que volcamos nuestro escaso conocimiento sobre aquellos seres y el supuesto nuevo mundo que conocimos en cada expedición todos nos encontrabamos reunidos a altas horas de la noche en llamada.
+Tras varios días en los que volcamos nuestro escaso conocimiento sobre aquellos seres y el supuesto nuevo mundo que conocimos en cada expedición, todos nos encontrábamos reunidos a altas horas de la noche en llamada.
 
-Algunos puliendo detalles de la representación creada durante la última semana, otros explorando foros olvidados como Reddit sobre ritualismo, y alguno preparandose un cafe mientras vagas ideas rondaban por nuestras cabezas.
+Algunos afinaban los últimos detalles de la representación creada durante la semana; otros se perdían en foros olvidados, como Reddit, donde se hablaba de ritualismo; mientras tanto, alguno se preparaba un café, y en nuestras cabezas vagaban ideas dispersas, apenas hilvanadas por la expectativa y la curiosidad.
 
-Prueba, error, teorización e investigación guiaron nuestro accionar hasta un posteo hecho por un usuario hace años: 
+Prueba, error, teorización e investigación, guiaron nuestro accionar hasta un posteo hecho por un usuario hace años:
 
 ```
     Ritualistas
 --------------------------------------------------------------------------------  
-Desconocidos, ¿alguna vez sintieron la presencia de otro ser pese a estar solos?
-Confien, sé como se siente.
+Desconocidos, ¿alguna vez sintieron la presencia de otro ser, pese a estar solos?
+Confíen, sé como se siente.
 Los espero, http:/altiru.lev.di
 
     .rdj
 ```
 
-Pese a leer este viejo posteo firmado por un usuario bajo las siglas RDJ despertó nuestra curiosidad así como incredulidad. Sin embargo, la sensación de estar leyendo algo más complejo que un simple posteo seguía latente.
+Pese a leer este viejo posteo firmado por un usuario bajo las siglas RDJ, despertó nuestra curiosidad así como incredulidad. Sin embargo, la sensación de estar leyendo algo más complejo que un simple posteo seguía latente.
 
-Ese mensaje se sentía dirigido hacia nosotros, por lo que decidimos explorar el enlace de la publicación, el cual presentaba una página con varios pasos a seguir para _"revelar otra parte de la verdad"_
+Ese mensaje se sentía dirigido hacia nosotros, por lo que decidimos explorar el enlace de la publicación, que presentaba una página con varios pasos a seguir para _"revelar otra parte de la verdad"_
 
-Tras el inicio del ritual, todos sentimos una repentina debilidad apoderandose de nuestros cuerpos hasta que luego de un parpadeo vimos en frente nuestro a otra entidad, la cual presentaba una extraña mezcla de rasgos demoniacos y angelicales esperandonos para darnos un breve mensaje
+Tras el inicio del ritual, todos sentimos una repentina debilidad apoderándose de nuestros cuerpos, hasta que, tras un parpadeo, vimos frente a nosotros a otra entidad, la cual mostraba una extraña mezcla de rasgos demoníacos y angelicales, esperándonos para darnos un breve mensaje:
 
 > _¿Ustedes... son los causantes del desequilibrio...?_
 
@@ -28,7 +28,7 @@ Tras el inicio del ritual, todos sentimos una repentina debilidad apoderandose d
   <img src="angel-y-demonio.jpeg" />
 </p>
 
-Tras el resonar de sus palabras una densa bruma comenzó a rodearnos mientras veaimos recuerdos del espiritu gracias a algún tipo de arte arcana hasta que nos despertamos en el mismo lugar donde realizamos el ritual, conscientes de nuestra proxima misión... 
+Tras el resonar de sus palabras, una densa bruma comenzó a rodearnos mientras veíamos recuerdos del espíritu gracias a algún tipo de arte arcana, hasta que nos despertamos en el mismo lugar donde realizamos el ritual, conscientes de nuestra próxima misión...
 
 
 ## Cambios desde el TP anterior
@@ -39,41 +39,63 @@ Se identificaron una serie de cambios necesarios a hacerse sobre la prueba de co
 
 ## Funcionalidad
 
-Los seis programadores vieron que la representación de los espíritus actual se quedaba corta, por lo cual había que profundizar mas en ella.
+Los seis programadores vieron que la representación de los espíritus actual se quedaba corta, por lo cual había que profundizar más en ella.
 - Su tipo, puede ser Demoníaco, o Angelical.
-- Su Médium, puede (o no) estar conectado a uno. Nota: En caso de no estar conectado a algún médium, se lo considera libre.
-- Su energía, este atributo se representa con un valor numérico del 0 al 100.
+- Todo espíritu puede o no estar conectado a un Medium. En caso de no estar conectado a ningún médium, se lo considera libre.
 
 ### Ubicación
 
-Tanto los espíritus como los médiums están en una ubicación, la cual debera crearse con un nombre que **NO** podrá repetirse.
+Tanto los espíritus como los médiums están en una ubicación, la cual deberá crearse con un nombre que **NO** podrá repetirse, y que servirá como refugio temporal para los médiums.
 
 ### Exorcismo
 
-Un médium puede intentar exorcizar a otro médium para desligarlo de los espiritus demoniacos que el segundo posea.
+Un médium puede intentar exorcizar a otro médium para desligarlo de los espíritus demoníacos que el segundo posea, a coste de arriesgar a sus propios ángeles en el intento.
 
-Para intentar un exorcismo, el médium que llevará a cabo el exorcismo debe de estar conectado con algún espíritu angelical. En caso de no tener ningún aliado de tipo Angel consigo, debera arrojarse la excepción `ExorcistaSinAngelesException`.
+Para exorcizar a otro médium, el exorcista deberá de tener, al menos, un espíritu angelical conectado consigo. En caso de no tener ningún aliado de tipo Ángel, deberá lanzarse la excepción `ExorcistaSinAngelesException`.
 
-En caso de tener espíritus angelicales como alidos, se desencadena la siguente lógica para resolver el exorcismo:
+Si el médium exorcista cuenta con espíritus angelicales como aliados, se desencadena la siguiente lógica para resolver el exorcismo:
 
-Todos los angeles conectados al médium exorcista tendrán un ataque con un demonio del médium a exorcisar, y en cada ataque, deberá calcularse si el ataque del ángel es exitoso o no, para lo cual se tomara como base un número aleatorio entre el 1 y el 10, y a este número se le suma el nivel de conexión del espiritu angelical.
+Todos los ángeles conectados al médium exorcista tendrán un único ataque contra un demonio del médium a exorcizar, y en cada ataque, deberá calcularse si el ataque del ángel es exitoso o no, para lo cual se tomará como base un número aleatorio entre el 1 y el 10, y a este número se le sumará el nivel de conexión del espíritu angelical, definiendo las chances de hacer un ataque exitoso de la siguiente manera:
 
 ```porcentaje de ataque exitoso = (random(1, 10)) + nivelDeConexion```
 
-Una vez calculado, si el porcentaje de ataque exitoso supera un umbral del 66%, se considera que su ataque fue exitoso.
+**Nota: si la suma de estos valores llegara a superar los 100 puntos, debe limitarse a 100**
 
-Por parte del espíritu atacante, un ataque exitoso implica una perdida de energía de 10 unidades unicamente como condición necesaria para realizar el ataque. Por parte del espíritu demoniaco atacado, un ataque exitoso implica la perdida de energía equivalente a la mitad del nivel de conexión del ángel con su médium. 
+Una vez calculado el porcentaje de éxito del ataque, se debe verificar si este supera a un número aleatorio entre 1 y 100 que representa la capacidad defensiva del demonio ante ese ataque, y en caso de ser superior a esa defensa, el ataque será exitoso. Llevándolo a un ejemplo concreto:
 
-Llevandolo a un ejemplo concreto, si el ángel Tyrael cuenta con un nivel de conexión de 40 con su médium y 100 de energia, al atacar exitosamente al demonio Valak que contaba con 60 de energía, tras el ataque:
+Si tenemos al ángel Tyrael, el cual tiene 30 puntos de nivel de conexión, vinculado a un médium que intenta exorcizar a otro médium, el cálculo de éxito de un ataque de Tyrael se calculará como:
 
-- Tyrael seguirá teniendo una conexión de 40 puntos con su médium, pero ahora contará con 90 de energía
-- Mientras que Valak pasará a tener 40 unidades de energía, pues perdió 20 unidades por el ataque de Tyrael (recordemos que Tyrael tenia 40 de conexión, por lo que 40 / 2 = 20 puntos de efecto)
+```porcentaje de ataque exitoso = (random(1, 10)) + 30```
 
-Ahora bien, en caso de que el porcentaje de ataque exitoso no supere el umbral, el demonio no tendra ninguna penalización, mientras que el ángel seguirá perdiendo la energía necesaria para el ataque.
+Supongamos que el random nos devuelve 5, el porcentaje final será 35.
 
-Por otro lado, para determinar si el exorcismo de un demonio es completamente exitoso, debemos ver el resultado de cada ataque sobre el demonio, ya que si al perder energía por el ataque de un ángel la energía del demonio baja de 0, este demonio deberá desconectarse de su médium, perdiendo completamente el nivel de conexión con el mismo.
+¿Cómo se resuelve el resto del ataque? Se calcula el porcentaje de defensa del demonio, y entonces:
 
-**Importante:** notar que los unicos espíritus que pueden desconectarse de su médium son los espíritus demoniacos del médium a exorcisar
+- Si el porcentaje de ataque es mayor al de defensa *(supongamos que fue 26)*, el demonio que recibió el ataque perderá una cantidad de nivel de conexión equivalente a la mitad del nivel de conexión que tenía el ángel, en este ejemplo, 15 *(30 / 2)*, mientras el ángel no sufre ningún efecto secundario.
+- En caso contrario, si el porcentaje de defensa es igual o mayor que el de ataque, el ángel perderá 5 puntos de conexión y el demonio no sufrirá ninguna penalización.
+
+Si durante el exorcismo un ángel o demonio pierde todos sus puntos de nivel de conexión, el espíritu se desvinculará de su médium.
+
+---
+
+Visualmente, un flujo de un exorcismo se vería como:
+
+```
+Ángeles de un médium: [Rika (nivelDeConexion: 60), Ivaar (nivelDeConexion: 80), Hana (nivelDeConexion: 5)]
+Demonios de otro médium [Jaeger (nivelDeConexion: 50), Noroi (nivelDeConexion: 66)]
+
+-- 1er ataque:
+Rika ataca a Jaeger, y supongamos que su ataque es exitoso 
+>>> Jaeger pierde 30 puntos de conexión, quedando con 20.
+
+-- 2do ataque:
+Ivaar ataca a Jaeger, y supongamos que su ataque es exitoso
+>>> Jaeger pierde 40 puntos de conexión, quedando con 0, por lo que deja de estar conectado a su médium.
+
+-- 3er ataque:
+Hana ataca a Noroi, y supongamos que su ataque falla
+>>> Hana pierde 5 puntos de conexión, quedando con 0, por lo que deja de estar conectada a su médium.
+```
 
 ## Servicios
 
@@ -83,21 +105,21 @@ Se pide que implementen los siguientes servicios los cuales serán consumidos po
 
 - Métodos CRUD + `recuperarTodos`.
 
-- `void descansar(Long mediumId)` - Dado un médium, recuperará 15 puntos de mana y cada espíritu conectado hacia él recuperará 20 puntos de energía.
+- `void descansar(Long mediumId)` - Dado un médium, recuperará 15 puntos de mana y cada espíritu conectado hacia él recuperará 5 puntos de conexión.
 
 - `void exorcizar(Long idMediumExorcista, Long idMediumAExorcizar)` - Dado dos médiums, el médium exorcista intentará exorcizar al otro con las reglas ya planteadas.
 
 - `List<Espiritu> espiritus(Long mediumId)` - Dado un médium, retorna todos los espíritus con los que está conectado.
 
-- `Espiritu invocar(Long mediumId, Long espirituId)` - Dado un médium y un espíritu, el médium deberá invocar al espíritu a su ubicación generandole un costo de 10 puntos de mana. Si el médium no tiene mana suficiente no hace nada. Si el espíritu no esta libre, lanzar una excepción.
+- `Espiritu invocar(Long mediumId, Long espirituId)` - Dado un médium y un espíritu, el médium deberá invocar al espíritu a su ubicación generándole un costo de 10 puntos de mana. Si el médium no tiene mana suficiente no hace nada. Si el espíritu no está libre, lanzar una excepción.
 
 ### EspirituService
 
 - Métodos CRUD + `recuperarTodos`.
 
-- `Medium conectar(Long espirituId, Long mediumId)` - Deberá lograr que el espíritu y el médium queden conectados, y además fortalecer el nivel de conexión del espiritu con el 20% del mana del medium. Si no están en la misma ubicación o el espíritu no esta libre, lanzar una excepción.
+- `Medium conectar(Long espirituId, Long mediumId)` - Deberá lograr que el espíritu y el médium queden conectados, y además fortalecer el nivel de conexión del espíritu con el 20% del mana del médium. Si no están en la misma ubicación o el espíritu no está libre, lanzar una excepción.
 
-- `List<Espiritu> espiritusDemoniacos()` - Retorna los espíritus demoníacos ordenados según su cantidad de energía en orden descendente.
+- `List<Espiritu> espiritusDemoniacos()` - Retorna los espíritus demoníacos ordenados según su nivel de conexión en orden descendente.
 
 ### UbicacionService
 
@@ -118,19 +140,18 @@ Se pide que implementen los siguientes servicios los cuales serán consumidos po
 - Pueden agregar nuevos métodos y atributos a los objetos ya provistos.
 
 ### Consejos útiles:
-- Finalicen los métodos de los services de uno en uno. Que quiere decir esto? Elijan un service, tomen el método más sencillo que vean en ese service, y encárguense de desarrollar la capa de modelo, de servicios y persistencia solo para ese único método. Una vez finalizado (esto también significa testeado), pasen al próximo método y repitan.
-- Cuando tengan que persistir con Hibernate, analicen: Qué objetos deben ser persistentes y cuáles no? Cuál es la cardinalidad de cada una de las relaciones? Cómo mapearlas?
+- Finalicen los métodos de los services de uno en uno. ¿Qué quiere decir esto? Elijan un service, tomen el método más sencillo que vean en ese service y encárguense de desarrollar la capa de modelo, de servicios y persistencia solo para ese único método. Una vez finalizado (esto también significa testeado), pasen al próximo método y repitan.
+- Cuando tengan que persistir con Hibernate, analicen:
+  ¿Qué objetos deben ser persistentes y cuáles no?
+  ¿Cuál es la cardinalidad de cada una de las relaciones?
+  ¿Cómo mapearlas?
 
 ## Bonus: Paginación
-
-(Intro?)
-
-## Implementacion bonus
 
 Se nos pide agregar paginación al método `espiritusDemoniacos()` de EspirituService.
 
 Se agregará a la firma de este método una página, una cantidad por página, y una dirección que puede ser: ASCENDENTE o DESCENDENTE.
 
-- `List<Espiritu> espiritusDemoniacos(Direccion direccion, Int pagina, Int cantidadPorPagina)` - Retorna los espíritus demoníacos ordenados según su cantidad de energía, respetando la dirección, la página y cantidad declaradas en la firma del método.
+- `List<Espiritu> espiritusDemoniacos(Direccion direccion, Int pagina, Int cantidadPorPagina)` - Retorna los espíritus demoníacos ordenados según su nivel de conexión, respetando la dirección, la página y cantidad declaradas en la firma del método.
 
-Un ejemplo: espiritusDemoniacos(DESCENDENTE, 0, 5): Retorna los primeros 5 espíritus demoníacos con más energía.
+Un ejemplo: espiritusDemoniacos(DESCENDENTE, 1, 5): Retorna los primeros 5 espíritus demoníacos con mayor nivel de conexión.
