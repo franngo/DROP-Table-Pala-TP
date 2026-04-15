@@ -1,6 +1,10 @@
 package ar.edu.unq.epersgeist.modelo;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 import java.io.Serializable;
@@ -9,7 +13,11 @@ import java.util.List;
 
 @Getter
 @Setter
+@Entity
 public class Medium implements Serializable {
+
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     private String nombre;
     private Integer manaMax;
@@ -17,7 +25,7 @@ public class Medium implements Serializable {
     private List<Espiritu> espiritus;
     private int cantFortalece;
 
-    public Medium(String nombre, Integer manaMax, Integer mana) {
+    public Medium(@NonNull String nombre, @NonNull Integer manaMax, @NonNull Integer mana) {
         this.espiritus = new ArrayList<>();
         this.nombre = nombre;
         this.manaMax = manaMax;
@@ -28,5 +36,5 @@ public class Medium implements Serializable {
     public void agregarEspiritu(Espiritu espiritu) {
         espiritus.add(espiritu);
     }
-    
+
 }

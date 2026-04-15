@@ -17,13 +17,14 @@ public class EspirituServiceImpl implements EspirituService {
 
     @Override
     public Espiritu crear(Espiritu espiritu) {
-        return espirituDao.crear(espiritu);
+        return
+                HibernateTransactionRunner.runTrx(() -> espirituDao.crear(espiritu));
     }
 
     @Override
     public Espiritu recuperar(Long espirituId) {
         return HibernateTransactionRunner.runTrx(() ->
-            espirituDao.recuperar(espirituId));
+                espirituDao.recuperar(espirituId));
 
     }
 
@@ -40,13 +41,13 @@ public class EspirituServiceImpl implements EspirituService {
         HibernateTransactionRunner.runTrx(() -> {
             espirituDao.eliminar(espirituId);
             return null;
-        }
-
+        });
     }
 
     @Override
     public List<Espiritu> recuperarTodos() {
-        return espirituDao.recuperarTodos();
+        return HibernateTransactionRunner.runTrx(() ->
+                espirituDao.recuperarTodos());
     }
 
     /*
@@ -63,6 +64,11 @@ public class EspirituServiceImpl implements EspirituService {
         espirituDao.actualizar(espirituAConectar);
 
         return medium;
+    }
+
+    @Override
+    public List<Espiritu> espiritusDemoniacos() {
+        return List.of();
     }
 
 }
