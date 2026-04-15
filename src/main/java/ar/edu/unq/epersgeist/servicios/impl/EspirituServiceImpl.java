@@ -4,6 +4,7 @@ import ar.edu.unq.epersgeist.modelo.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
+import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 
 import java.util.List;
 
@@ -21,19 +22,25 @@ public class EspirituServiceImpl implements EspirituService {
 
     @Override
     public Espiritu recuperar(Long espirituId) {
-
-        return espirituDao.recuperar(espirituId);
+        return HibernateTransactionRunner.runTrx(() ->
+            espirituDao.recuperar(espirituId));
 
     }
 
     @Override
     public void actualizar(Espiritu espiritu) {
-        espirituDao.actualizar(espiritu);
+        HibernateTransactionRunner.runTrx(() -> {
+            espirituDao.actualizar(espiritu);
+            return null;
+        });
     }
 
     @Override
     public void eliminar(Long espirituId) {
-        espirituDao.eliminar(espirituId);
+        HibernateTransactionRunner.runTrx(() -> {
+            espirituDao.eliminar(espirituId);
+            return null;
+        }
 
     }
 
@@ -41,6 +48,7 @@ public class EspirituServiceImpl implements EspirituService {
     public List<Espiritu> recuperarTodos() {
         return espirituDao.recuperarTodos();
     }
+
     /*
      * Paso 1: pedir el espiritu a la BBDD
      * Paso 2: aplicar logica de negocio entre MODELOS
