@@ -2,15 +2,15 @@ package ar.edu.unq.epersgeist.servicios.impl;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
-import ar.edu.unq.epersgeist.persistencia.dao.jdbc.JDBCEspirituDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
 
 import java.util.List;
 
 public class EspirituServiceImpl implements EspirituService {
-    private JDBCEspirituDAO espirituDao;
+    private HibernateEspirituDAO espirituDao;
 
-    public EspirituServiceImpl(JDBCEspirituDAO espirituDao) {
+    public EspirituServiceImpl(HibernateEspirituDAO espirituDao) {
         this.espirituDao = espirituDao;
     }
 

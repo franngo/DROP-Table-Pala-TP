@@ -2,7 +2,7 @@ package ar.edu.unq.epersgeist.servicios;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
-import ar.edu.unq.epersgeist.persistencia.dao.jdbc.JDBCEspirituDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
 import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JDBCEspirituServiceTest {
-    private final JDBCEspirituDAO espirituDao = new JDBCEspirituDAO();
+public class HibernateEspirituServiceTest {
+    private final HibernateEspirituDAO espirituDao = new HibernateEspirituDAO();
     private final EspirituService serviceEspiritu = new EspirituServiceImpl(espirituDao);
     private Espiritu matias;
 
