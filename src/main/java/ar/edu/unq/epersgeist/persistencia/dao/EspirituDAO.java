@@ -1,6 +1,6 @@
 package ar.edu.unq.epersgeist.persistencia.dao;
 
-import ar.edu.unq.epersgeist.modelo.Espiritu;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 
 import java.util.List;
 

@@ -18,7 +18,7 @@
         <!-- Create-Drop table after test execution -->
         <property name="hibernate.hbm2ddl.auto">create-drop</property>
         <!-- Classes - Persistence -->
-        <mapping class="ar.edu.unq.epersgeist.modelo.Espiritu" />
+        <mapping class="ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu" />
 
     </session-factory>
 </hibernate-configuration>

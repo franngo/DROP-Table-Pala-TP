@@ -1,10 +1,7 @@
 package ar.edu.unq.epersgeist.persistencia.dao.hibernate;
 
-import ar.edu.unq.epersgeist.modelo.Espiritu;
-import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateSessionContext;
 import org.hibernate.Session;
-import org.hibernate.query.Query;
 
 public class HibernateDAO<T> {
 

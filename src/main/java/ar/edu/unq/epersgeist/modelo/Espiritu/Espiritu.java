@@ -1,5 +1,6 @@
-package ar.edu.unq.epersgeist.modelo;
+package ar.edu.unq.epersgeist.modelo.Espiritu;
 
+import ar.edu.unq.epersgeist.modelo.Medium;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,7 +15,7 @@ import java.io.Serializable;
 @Getter @Setter @NoArgsConstructor
 
 @Entity
-public final class Espiritu implements Serializable {
+public class Espiritu implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
