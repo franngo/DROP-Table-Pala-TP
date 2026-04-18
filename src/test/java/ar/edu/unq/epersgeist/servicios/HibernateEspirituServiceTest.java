@@ -8,8 +8,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class HibernateEspirituServiceTest {
     private final HibernateEspirituDAO espirituDao = new HibernateEspirituDAO();
@@ -76,7 +75,7 @@ public class HibernateEspirituServiceTest {
         assertEquals("Juanchi el pastelero", actualizado.getNombre());
         assertEquals(99, actualizado.getNivelDeConexion());
     }
-/*
+
     @Test
     void noDeberiaActualizarConIdNulo() {
         assertThrows(RuntimeException.class, () -> {
@@ -98,6 +97,7 @@ public class HibernateEspirituServiceTest {
             });
         });
     }
+ /*
 
     @Test
     public void seUsaElServicioParaGuardarModelo() {
