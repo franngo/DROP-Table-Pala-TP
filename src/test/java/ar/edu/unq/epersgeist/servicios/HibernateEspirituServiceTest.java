@@ -57,26 +57,26 @@ public class HibernateEspirituServiceTest {
         assertEquals(matias.getNivelDeConexion(), espirituRecuperado.getNivelDeConexion());
     }
 
-    /*
+
     @Test
     void deberiaActualizarSoloLosCamposModificados() {
 
-        Long id = serviceEspiritu.crear(matias).getId();
+        Long id = HibernateTransactionRunner.runTrx(() -> serviceEspiritu.crear(matias).getId());
 
         // ⚠️ nueva instancia (no reutilizar la anterior)
         Espiritu modificado = new Espiritu("Otro Pokemon", "Juanchi el pastelero");
         modificado.setId(id);
         modificado.setNivelDeConexion(99);
 
-        serviceEspiritu.actualizar(modificado);
+        this.executeBlockInPersistentContext(() -> serviceEspiritu.actualizar(modificado));
 
-        Espiritu actualizado = serviceEspiritu.recuperar(id);
+        Espiritu actualizado = HibernateTransactionRunner.runTrx(() -> serviceEspiritu.recuperar(id));
 
         assertEquals("Otro Pokemon", actualizado.getTipo());
         assertEquals("Juanchi el pastelero", actualizado.getNombre());
         assertEquals(99, actualizado.getNivelDeConexion());
     }
-
+/*
     @Test
     void noDeberiaActualizarConIdNulo() {
         assertThrows(RuntimeException.class, () -> {

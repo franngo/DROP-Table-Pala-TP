@@ -28,7 +28,11 @@ public class HibernateEspirituDAO extends HibernateDAO<Espiritu> implements Espi
             throw new ErrorAlActualizarEspirituException("No existe el espiritu con id: " + espiritu.getId());
         }
 
-        session.update(espiritu);
+        persistido.setTipo(espiritu.getTipo());
+        persistido.setNombre(espiritu.getNombre());
+        persistido.setNivelDeConexion(espiritu.getNivelDeConexion());
+
+        session.flush();
     }
 
     @Override
