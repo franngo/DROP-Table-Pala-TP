@@ -2,6 +2,7 @@ package ar.edu.unq.epersgeist.servicios.impl;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
@@ -23,9 +24,15 @@ public class EspirituServiceImpl implements EspirituService {
 
     @Override
     public Espiritu recuperar(Long espirituId) {
-        return HibernateTransactionRunner.runTrx(() ->
-                espirituDao.recuperar(espirituId));
+        return HibernateTransactionRunner.runTrx(() -> {
+            Espiritu espiritu = espirituDao.recuperar(espirituId);
 
+            if (espiritu == null) {
+                throw new ErrorAlRecuperarEspirituException(espirituId);
+            }
+
+            return espiritu;
+        });
     }
 
     @Override

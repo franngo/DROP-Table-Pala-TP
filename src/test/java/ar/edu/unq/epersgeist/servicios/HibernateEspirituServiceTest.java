@@ -1,6 +1,7 @@
 package ar.edu.unq.epersgeist.servicios;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
 import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
@@ -87,23 +88,17 @@ public class HibernateEspirituServiceTest {
         });
     }
 
+   
     @Test
     void deberiaEliminarYNoPoderRecuperarloLuego() {
 
-        Long id = HibernateTransactionRunner.runTrx(() ->
-                serviceEspiritu.crear(matias).getId()
-        );
+        Long id = serviceEspiritu.crear(matias).getId();
 
-        HibernateTransactionRunner.runTrx(() -> {
-            serviceEspiritu.eliminar(id);
-            return null;
+        serviceEspiritu.eliminar(id);
+
+        assertThrows(RuntimeException.class, () -> {
+            serviceEspiritu.recuperar(id);
         });
-
-        Espiritu resultado = HibernateTransactionRunner.runTrx(() ->
-                serviceEspiritu.recuperar(id)
-        );
-
-        assertNull(resultado);
     }
 
     @Test
@@ -125,25 +120,18 @@ public class HibernateEspirituServiceTest {
     @Test
     void eliminoUnEspirituCorrectamente() {
 
-        Espiritu espirituEliminar = HibernateTransactionRunner.runTrx(() ->
-                serviceEspiritu.crear(matias)
-        );
+        Espiritu espirituEliminar = serviceEspiritu.crear(matias);
 
         assertNotNull(espirituEliminar.getId());
 
+        serviceEspiritu.eliminar(espirituEliminar.getId());
 
-        this.executeBlockInPersistentContext(() -> serviceEspiritu.eliminar(espirituEliminar.getId()));
-
-
-        assertThrows(RuntimeException.class, () -> {
-            HibernateTransactionRunner.runTrx(() ->
-                    serviceEspiritu.recuperar(espirituEliminar.getId())
-            );
+        assertThrows(ErrorAlRecuperarEspirituException.class, () -> {
+            serviceEspiritu.recuperar(espirituEliminar.getId());
         });
     }
 
-
- /*
+/*
     @Test
     public void seConectaUnEspirituConUnMedium() {
 
@@ -160,6 +148,7 @@ public class HibernateEspirituServiceTest {
 
         assertEquals(10, espirituActualizado.getNivelDeConexion());
     }
+
 
     @Test
     void noDeberiaConectarUnEspirituInexistenteConUnMedium() {
