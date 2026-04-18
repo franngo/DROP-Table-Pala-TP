@@ -1,46 +1,62 @@
 package ar.edu.unq.epersgeist.servicios.impl;
 
-import ar.edu.unq.epersgeist.modelo.Espiritu;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
-import ar.edu.unq.epersgeist.persistencia.dao.jdbc.JDBCEspirituDAO;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
+import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
+import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 
 import java.util.List;
 
 public class EspirituServiceImpl implements EspirituService {
-    private JDBCEspirituDAO espirituDao;
+    private HibernateEspirituDAO espirituDao;
 
-    public EspirituServiceImpl(JDBCEspirituDAO espirituDao) {
+    public EspirituServiceImpl(HibernateEspirituDAO espirituDao) {
         this.espirituDao = espirituDao;
     }
 
     @Override
     public Espiritu crear(Espiritu espiritu) {
-        return espirituDao.crear(espiritu);
+        return
+                HibernateTransactionRunner.runTrx(() -> espirituDao.crear(espiritu));
     }
 
     @Override
     public Espiritu recuperar(Long espirituId) {
+        return HibernateTransactionRunner.runTrx(() -> {
+            Espiritu espiritu = espirituDao.recuperar(espirituId);
 
-        return espirituDao.recuperar(espirituId);
+            if (espiritu == null) {
+                throw new ErrorAlRecuperarEspirituException(espirituId);
+            }
 
+            return espiritu;
+        });
     }
 
     @Override
     public void actualizar(Espiritu espiritu) {
-        espirituDao.actualizar(espiritu);
+        HibernateTransactionRunner.runTrx(() -> {
+            espirituDao.actualizar(espiritu);
+            return null;
+        });
     }
 
     @Override
     public void eliminar(Long espirituId) {
-        espirituDao.eliminar(espirituId);
-
+        HibernateTransactionRunner.runTrx(() -> {
+            espirituDao.eliminar(espirituId);
+            return null;
+        });
     }
 
     @Override
     public List<Espiritu> recuperarTodos() {
-        return espirituDao.recuperarTodos();
+        return HibernateTransactionRunner.runTrx(() ->
+                espirituDao.recuperarTodos());
     }
+
     /*
      * Paso 1: pedir el espiritu a la BBDD
      * Paso 2: aplicar logica de negocio entre MODELOS
@@ -55,6 +71,11 @@ public class EspirituServiceImpl implements EspirituService {
         espirituDao.actualizar(espirituAConectar);
 
         return medium;
+    }
+
+    @Override
+    public List<Espiritu> espiritusDemoniacos() {
+        return List.of();
     }
 
 }

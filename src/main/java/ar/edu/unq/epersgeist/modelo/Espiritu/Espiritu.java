@@ -1,20 +1,31 @@
-package ar.edu.unq.epersgeist.modelo;
+package ar.edu.unq.epersgeist.modelo.Espiritu;
 
+import ar.edu.unq.epersgeist.modelo.Medium;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 
 import java.io.Serializable;
 
-@Getter
-@Setter
+@Getter @Setter @NoArgsConstructor
+
+@Entity
 public class Espiritu implements Serializable {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     private String tipo;
     private Integer nivelDeConexion;
     private String nombre;
 
-    public Espiritu(String tipo, String nombre) {
+    public Espiritu(@NonNull String tipo, @NonNull String nombre) {
 
         this.tipo = tipo;
         this.nivelDeConexion = 0;

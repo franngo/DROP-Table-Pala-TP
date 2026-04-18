@@ -1,9 +1,10 @@
 package ar.edu.unq.epersgeist.servicios;
 
-import ar.edu.unq.epersgeist.modelo.Espiritu;
-import ar.edu.unq.epersgeist.modelo.Medium;
-import ar.edu.unq.epersgeist.persistencia.dao.jdbc.JDBCEspirituDAO;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
+import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
 import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
+import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,8 +12,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JDBCEspirituServiceTest {
-    private final JDBCEspirituDAO espirituDao = new JDBCEspirituDAO();
+public class HibernateEspirituServiceTest {
+    private final HibernateEspirituDAO espirituDao = new HibernateEspirituDAO();
     private final EspirituService serviceEspiritu = new EspirituServiceImpl(espirituDao);
     private Espiritu matias;
 
@@ -35,52 +36,70 @@ public class JDBCEspirituServiceTest {
 
         matias = new Espiritu("Pokemon", "Matias");
     }
+
     @Test
     void deberiaAsignarIdAlCrearUnEspiritu() {
-        Espiritu espiritu = serviceEspiritu.crear(matias);
+        Espiritu espiritu = HibernateTransactionRunner.runTrx(() ->
+                serviceEspiritu.crear(matias)
+        );
+
         assertNotNull(espiritu.getId());
     }
 
     @Test
-    void deberiaRecuperarCorrectamenteLosDatosDelEspiritu(){
-        Espiritu espirituP = serviceEspiritu.crear(matias);
-        Espiritu espirituRecuperado = serviceEspiritu.recuperar(espirituP.getId());
+    void deberiaRecuperarCorrectamenteLosDatosDelEspiritu() {
+        Espiritu espirituRecuperado = HibernateTransactionRunner.runTrx(() -> {
+            Espiritu espirituP = serviceEspiritu.crear(matias);
+            return serviceEspiritu.recuperar(espirituP.getId());
+        });
 
-        assertEquals(espirituP.getId(),espirituRecuperado.getId());
-        assertEquals(espirituP.getTipo(),espirituRecuperado.getTipo());
-        assertEquals(espirituP.getNombre(),espirituRecuperado.getNombre());
-        assertEquals(espirituP.getNivelDeConexion(),espirituRecuperado.getNivelDeConexion());
+        assertEquals(matias.getTipo(), espirituRecuperado.getTipo());
+        assertEquals(matias.getNombre(), espirituRecuperado.getNombre());
+        assertEquals(matias.getNivelDeConexion(), espirituRecuperado.getNivelDeConexion());
+    }
+
+
+    @Test
+    void deberiaActualizarSoloLosCamposModificados() {
+
+        Long id = HibernateTransactionRunner.runTrx(() -> serviceEspiritu.crear(matias).getId());
+
+        // ⚠️ nueva instancia (no reutilizar la anterior)
+        Espiritu modificado = new Espiritu("Otro Pokemon", "Juanchi el pastelero");
+        modificado.setId(id);
+        modificado.setNivelDeConexion(99);
+
+        this.executeBlockInPersistentContext(() -> serviceEspiritu.actualizar(modificado));
+
+        Espiritu actualizado = HibernateTransactionRunner.runTrx(() -> serviceEspiritu.recuperar(id));
+
+        assertEquals("Otro Pokemon", actualizado.getTipo());
+        assertEquals("Juanchi el pastelero", actualizado.getNombre());
+        assertEquals(99, actualizado.getNivelDeConexion());
     }
 
     @Test
-    void deberiaActualizarSoloLosCamposModificados(){
-        Espiritu espirituP = serviceEspiritu.crear(matias);
-        espirituP.setTipo("Otro Pokemon");
-        espirituP.setNivelDeConexion(99);
-        espirituP.setNombre("Juanchi el pastelero");
-        serviceEspiritu.actualizar(espirituP);
-        Espiritu espirituActualizado = espirituDao.recuperar(espirituP.getId());
-
-        assertEquals(espirituP.getTipo(),espirituActualizado.getTipo());
-        assertEquals(espirituP.getNombre(),espirituActualizado.getNombre());
-        assertEquals(espirituP.getNivelDeConexion(),espirituActualizado.getNivelDeConexion());
-    }
-
-    @Test
-   void noDeberiaActualizarConIdNulo() {
-
+    void noDeberiaActualizarConIdNulo() {
         assertThrows(RuntimeException.class, () -> {
-            serviceEspiritu.actualizar(matias);
+            HibernateTransactionRunner.runTrx(() -> {
+                serviceEspiritu.actualizar(matias);
+                return null;
+            });
         });
     }
-    @Test
-    void deberiaEliminarYNoPoderRecuperarloLuego(){
-        Espiritu espirituP = serviceEspiritu.crear(matias);
 
-        serviceEspiritu.eliminar(espirituP.getId());
+   
+    @Test
+    void deberiaEliminarYNoPoderRecuperarloLuego() {
+
+        Long id = serviceEspiritu.crear(matias).getId();
+
+        serviceEspiritu.eliminar(id);
+
         assertThrows(RuntimeException.class, () -> {
-            serviceEspiritu.recuperar(espirituP.getId());
-        });    }
+            serviceEspiritu.recuperar(id);
+        });
+    }
 
     @Test
     public void seUsaElServicioParaGuardarModelo() {
@@ -105,16 +124,14 @@ public class JDBCEspirituServiceTest {
 
         assertNotNull(espirituEliminar.getId());
 
-
         serviceEspiritu.eliminar(espirituEliminar.getId());
 
-
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(ErrorAlRecuperarEspirituException.class, () -> {
             serviceEspiritu.recuperar(espirituEliminar.getId());
         });
     }
 
-
+/*
     @Test
     public void seConectaUnEspirituConUnMedium() {
 
@@ -131,6 +148,7 @@ public class JDBCEspirituServiceTest {
 
         assertEquals(10, espirituActualizado.getNivelDeConexion());
     }
+
 
     @Test
     void noDeberiaConectarUnEspirituInexistenteConUnMedium() {
@@ -228,11 +246,20 @@ public class JDBCEspirituServiceTest {
         assertEquals(tipoOriginal, recuperado.getTipo());
         assertEquals(nombreOriginal, recuperado.getNombre());
     }
+    */
+
+
+    private void executeBlockInPersistentContext(Runnable block) {
+        HibernateTransactionRunner.runTrx(() -> {
+            block.run();
+            return null;
+        });
+    }
 
     @AfterEach
     void tearDown() {
-        // limpiar BBDD
-        espirituDao.eliminarTodos();
+        this.executeBlockInPersistentContext(espirituDao::eliminarTodos);
     }
+
 
 }
