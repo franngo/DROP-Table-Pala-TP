@@ -5,6 +5,7 @@ import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
 import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -88,16 +89,22 @@ public class HibernateEspirituServiceTest {
 
     @Test
     void deberiaEliminarYNoPoderRecuperarloLuego() {
-        assertThrows(RuntimeException.class, () -> {
-            HibernateTransactionRunner.runTrx(() -> {
-                Espiritu espirituP = serviceEspiritu.crear(matias);
-                serviceEspiritu.eliminar(espirituP.getId());
-                serviceEspiritu.recuperar(espirituP.getId());
-                return null;
-            });
+
+        Long id = HibernateTransactionRunner.runTrx(() ->
+                serviceEspiritu.crear(matias).getId()
+        );
+
+        HibernateTransactionRunner.runTrx(() -> {
+            serviceEspiritu.eliminar(id);
+            return null;
         });
+
+        Espiritu resultado = HibernateTransactionRunner.runTrx(() ->
+                serviceEspiritu.recuperar(id)
+        );
+
+        assertNull(resultado);
     }
- /*
 
     @Test
     public void seUsaElServicioParaGuardarModelo() {
@@ -118,20 +125,25 @@ public class HibernateEspirituServiceTest {
     @Test
     void eliminoUnEspirituCorrectamente() {
 
-        Espiritu espirituEliminar = serviceEspiritu.crear(matias);
+        Espiritu espirituEliminar = HibernateTransactionRunner.runTrx(() ->
+                serviceEspiritu.crear(matias)
+        );
 
         assertNotNull(espirituEliminar.getId());
 
 
-        serviceEspiritu.eliminar(espirituEliminar.getId());
+        this.executeBlockInPersistentContext(() -> serviceEspiritu.eliminar(espirituEliminar.getId()));
 
 
         assertThrows(RuntimeException.class, () -> {
-            serviceEspiritu.recuperar(espirituEliminar.getId());
+            HibernateTransactionRunner.runTrx(() ->
+                    serviceEspiritu.recuperar(espirituEliminar.getId())
+            );
         });
     }
 
 
+ /*
     @Test
     public void seConectaUnEspirituConUnMedium() {
 
