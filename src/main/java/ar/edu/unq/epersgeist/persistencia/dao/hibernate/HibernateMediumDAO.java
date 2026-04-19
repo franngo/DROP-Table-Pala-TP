@@ -7,4 +7,14 @@ public class HibernateMediumDAO extends HibernateDAO<Medium> implements MediumDA
     public HibernateMediumDAO() {
         super(Medium.class);
     }
+
+    @Override
+    public void actualizar(Medium espiritu) {
+
+    }
+
+    @Override
+    public void eliminar(Long idDelMedium) {
+
+    }
 }

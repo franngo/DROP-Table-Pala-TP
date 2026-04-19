@@ -24,6 +24,7 @@ public class MediumServiceImpl implements MediumService {
     @Override
     public Medium crear(Medium medium) {
 
+        return null;
     }
 
     @Override
@@ -46,7 +47,10 @@ public class MediumServiceImpl implements MediumService {
 
     @Override
     public void eliminar(Long idMedium) {
-
+        HibernateTransactionRunner.runTrx(() -> {
+            mediumDao.eliminar(idMedium);
+            return null;
+        });
     }
 
     @Override
