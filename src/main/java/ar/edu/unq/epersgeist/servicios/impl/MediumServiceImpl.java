@@ -4,6 +4,7 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
 import ar.edu.unq.epersgeist.servicios.MediumService;
+import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 
 import java.util.List;
 
@@ -21,12 +22,20 @@ public class MediumServiceImpl implements MediumService {
 
     @Override
     public Medium crear(Medium medium) {
-        return null;
+
     }
 
     @Override
     public Medium recuperar(Long idMedium) {
-        return null;
+        return HibernateTransactionRunner.runTrx(() -> {
+            Medium mediumRecuperado = mediumDao.recuperar(idMedium);
+
+            if (mediumRecuperado == null) {
+                throw new ErrorAlRecuperarMediumException(idMedium);
+            }
+
+            return mediumRecuperado;
+        });
     }
 
     @Override
