@@ -4,6 +4,9 @@ import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateSessionContext;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
+
+import java.util.List;
 
 public class HibernateMediumDAO extends HibernateDAO<Medium> implements MediumDAO {
     public HibernateMediumDAO() {
@@ -24,4 +27,14 @@ public class HibernateMediumDAO extends HibernateDAO<Medium> implements MediumDA
         }
         session.remove(medium);
     }
+
+    @Override
+    public List<Medium> recuperarTodos() {
+        Session session = HibernateSessionContext.getCurrentSession();
+        String hql = "select e from Medium e order by e.nombre asc";
+        Query<Medium> query = session.createQuery(hql, Medium.class);
+        return query.getResultList();
+    }
+
+
 }
