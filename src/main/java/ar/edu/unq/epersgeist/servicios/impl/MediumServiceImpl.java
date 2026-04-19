@@ -17,14 +17,13 @@ import java.util.List;
 public class MediumServiceImpl implements MediumService {
     private MediumDAO mediumDao;
 
-    public MediumServiceImpl(MediumDAO mediumDaoDao) {
+    public MediumServiceImpl(MediumDAO mediumDao) {
         this.mediumDao = mediumDao;
     }
 
     @Override
     public Medium crear(Medium medium) {
-
-        return null;
+        return HibernateTransactionRunner.runTrx(() -> this.mediumDao.crear(medium) );
     }
 
     @Override
@@ -42,7 +41,10 @@ public class MediumServiceImpl implements MediumService {
 
     @Override
     public void actualizar(Medium medium) {
-
+        HibernateTransactionRunner.runTrx(() -> {
+            this.mediumDao.actualizar(medium);
+            return null;
+        } );
     }
 
     @Override
