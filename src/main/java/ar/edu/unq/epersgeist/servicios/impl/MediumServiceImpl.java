@@ -15,8 +15,8 @@ import java.util.List;
 public class MediumServiceImpl implements MediumService {
     private HibernateMediumDAO mediumDao;
 
-    public MediumServiceImpl(HibernateMediumDAO espirituDao) {
-        this.mediumDao = espirituDao;
+    public MediumServiceImpl(HibernateMediumDAO mediumDaoDao) {
+        this.mediumDao = mediumDao;
     }
 
     @Override
