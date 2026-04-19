@@ -20,13 +20,13 @@ public class HibernateMediumDAO extends HibernateDAO<Medium> implements MediumDA
 
 
         if (medium.getId() == null) {
-            throw new ErrorAlActualizarEspirituException("No se puede actualizar que no tiene id.");
+            throw new ErrorAlActualizarEspirituException("No se puede actualizar un medium que no tiene id.");
         }
 
         Medium m = session.get(Medium.class, medium.getId());
 
         if (m == null) {
-            throw new ErrorAlActualizarEspirituException("No existe el medium con id: " + medium.getId());
+            throw new ErrorAlActualizarEspirituException("No existe en la BD el medium con id: " + medium.getId());
         }
 
         m.setNombre(medium.getNombre());

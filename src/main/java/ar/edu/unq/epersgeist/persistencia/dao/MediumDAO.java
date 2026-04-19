@@ -2,6 +2,8 @@ package ar.edu.unq.epersgeist.persistencia.dao;
 
 import ar.edu.unq.epersgeist.modelo.Medium;
 
+import java.util.List;
+
 public interface MediumDAO {
     Medium crear(Medium medium);
 
@@ -10,4 +12,6 @@ public interface MediumDAO {
     void actualizar(Medium medium);
 
     void eliminar(Long idDelMedium);
+
+    public List<Medium> recuperarTodos();
 }
