@@ -2,6 +2,7 @@ package ar.edu.unq.epersgeist.servicios.impl;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
 import ar.edu.unq.epersgeist.servicios.MediumService;
 
 import java.util.List;
@@ -12,6 +13,12 @@ import java.util.List;
  * Servicio Medium
  * */
 public class MediumServiceImpl implements MediumService {
+    private HibernateMediumDAO mediumDao;
+
+    public MediumServiceImpl(HibernateMediumDAO espirituDao) {
+        this.mediumDao = espirituDao;
+    }
+
     @Override
     public Medium crear(Medium medium) {
         return null;
