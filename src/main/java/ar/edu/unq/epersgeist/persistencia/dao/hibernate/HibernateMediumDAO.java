@@ -48,6 +48,7 @@ public class HibernateMediumDAO extends HibernateDAO<Medium> implements MediumDA
         session.remove(medium);
     }
 
+   
     @Override
     public List<Medium> recuperarTodos() {
         Session session = HibernateSessionContext.getCurrentSession();
