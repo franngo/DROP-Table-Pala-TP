@@ -1,9 +1,11 @@
 package ar.edu.unq.epersgeist.persistencia;
 
 import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarMediumException;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,8 +23,84 @@ public class HibernateMediumDAOTest {
         mediumM = new Medium("Matias", 200, 100);
     }
 
+    //tests de crear y actualizar
+    @Test
+    public void seCreaElMediumEnLaBase() {
 
-    //test recuperar y eliminar
+        Medium medium = HibernateTransactionRunner.runTrx(() ->
+                mediumDao.crear(mediumM)
+        );
+
+        assertNotNull(medium.getId());
+
+    }
+
+    @Test
+    void deberiaActualizarSoloLosCamposModificados1() {
+
+        Long id = HibernateTransactionRunner.runTrx(() -> mediumDao.crear(mediumM).getId());
+
+        Medium modificado = new Medium("Rolando el audaz", 120, 50);
+        modificado.setId(id);
+        modificado.setCantFortalece(15);
+
+        //como modificado tiene el mismo id que mediumM, actualiza dicha fila en la BD
+        this.executeBlockInPersistentContext(() -> mediumDao.actualizar(modificado));
+
+        Medium actualizado = HibernateTransactionRunner.runTrx(() -> mediumDao.recuperar(id));
+
+        assertEquals(modificado.getId(), actualizado.getId());
+        assertEquals(modificado.getNombre(), actualizado.getNombre());
+        assertEquals(modificado.getMana(), actualizado.getMana());
+        assertEquals(modificado.getManaMax(), actualizado.getManaMax());
+        assertEquals(modificado.getCantFortalece(), actualizado.getCantFortalece());
+    }
+
+    @Test
+    void deberiaActualizarSoloLosCamposModificados2() {
+
+        Long id = HibernateTransactionRunner.runTrx(() -> mediumDao.crear(mediumM).getId());
+
+        mediumM.setNombre("Rolando el audaz");
+        mediumM.setMana(120);
+        mediumM.setCantFortalece(15);
+
+        //se actualiza la fila con el id de epifanio en la DB
+        this.executeBlockInPersistentContext(() -> mediumDao.actualizar(mediumM));
+
+        Medium actualizado = HibernateTransactionRunner.runTrx(() -> mediumDao.recuperar(id));
+
+        assertEquals(mediumM.getId(), actualizado.getId());
+        assertEquals(mediumM.getNombre(), actualizado.getNombre());
+        assertEquals(mediumM.getMana(), actualizado.getMana());
+        assertEquals(mediumM.getManaMax(), actualizado.getManaMax());
+        assertEquals(mediumM.getCantFortalece(), actualizado.getCantFortalece());
+    }
+
+    @Test
+    void noDeberiaActualizarConIdQueNoSeEncuentraEnBD() {
+        ErrorAlActualizarMediumException exception =
+        assertThrows(ErrorAlActualizarMediumException.class, () -> {
+            this.executeBlockInPersistentContext(() -> {
+                mediumM.setId(1L); //no hay nada en la DB con id 1, porque arranca vacía
+                mediumDao.actualizar(mediumM);
+            });
+        });
+        assertEquals("No existe en la BD el medium con id: 1", exception.getMessage());
+    }
+
+    @Test
+    void noDeberiaActualizarConIdNulo() {
+        ErrorAlActualizarMediumException exception =
+        assertThrows(ErrorAlActualizarMediumException.class, () -> {
+            this.executeBlockInPersistentContext(() -> {
+                mediumDao.actualizar(mediumM); //comienza sin id
+            });
+        });
+        assertEquals("No se puede actualizar un medium que no tiene id.", exception.getMessage());
+    }
+
+    //tests de recuperar y eliminar
     @Test
     public void seRecuperaUnMediumDadoUnId() {
         this.executeBlockInPersistentContext(() -> {
@@ -124,6 +202,13 @@ public class HibernateMediumDAOTest {
                     return null;
                 }
         );
+    }
+
+    @AfterEach
+    void tearDown() {
+        executeBlockInPersistentContext(() -> {
+            mediumDao.eliminarTodos();
+        });
     }
 
 }

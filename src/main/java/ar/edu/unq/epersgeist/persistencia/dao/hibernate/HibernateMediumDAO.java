@@ -2,6 +2,7 @@ package ar.edu.unq.epersgeist.persistencia.dao.hibernate;
 
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarMediumException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlCrearMediumException;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateSessionContext;
 import org.hibernate.Session;
@@ -12,6 +13,17 @@ import java.util.List;
 public class HibernateMediumDAO extends HibernateDAO<Medium> implements MediumDAO {
     public HibernateMediumDAO() {
         super(Medium.class);
+    }
+
+    @Override
+    public Medium crear(Medium medium) {
+        Medium m = super.crear(medium);
+
+        if (m == null || m.getId() == null) {
+            throw new ErrorAlCrearMediumException();
+        }
+
+        return m;
     }
 
     @Override
