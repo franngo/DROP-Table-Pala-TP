@@ -19,4 +19,9 @@ public class HibernateUbicacionDAO implements UbicacionDAO {
                 .setParameter("nombre", nombre)
                 .uniqueResult();
     }
+
+    @Override
+    public void eliminarTodos() {
+        this.hibernateDAO.eliminarTodos();
+    }
 }
