@@ -8,7 +8,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class HibernateMediumServiceTest {
     private final HibernateMediumDAO mediumDao = new HibernateMediumDAO();
@@ -21,7 +21,37 @@ public class HibernateMediumServiceTest {
     }
 
     @Test
-    void test() {
+    void deberiaAsignarIdAlCrearUnEspiritu() {
+        Medium medium = HibernateTransactionRunner.runTrx(() ->
+                serviceMedium.crear(epifanio)
+        );
+
+        assertNotNull(medium.getId());
+    }
+
+
+
+    @Test
+    void deberiaRecuperarCorrectamenteLosDatosDelEspiritu() {
+        Medium mediumRecuperado = HibernateTransactionRunner.runTrx(() -> {
+            Medium mediumEpi = serviceMedium.crear(epifanio);
+            return serviceMedium.recuperar(mediumEpi.getId());
+        });
+
+        assertEquals(epifanio.getId(), mediumRecuperado.getId());
+        assertEquals(epifanio.getNombre(), mediumRecuperado.getNombre());
+        assertEquals(epifanio.getMana(), mediumRecuperado.getMana());
+        assertEquals(epifanio.getManaMax(), mediumRecuperado.getManaMax());
+        assertEquals(epifanio.getCantFortalece(), mediumRecuperado.getCantFortalece());
+        assertEquals(0, epifanio.getEspiritus().size());
+        assertEquals(0, mediumRecuperado.getEspiritus().size());
+    }
+
+    private void executeBlockInPersistentContext(Runnable block) {
+        HibernateTransactionRunner.runTrx(() -> {
+            block.run();
+            return null;
+        });
     }
 
     @AfterEach
