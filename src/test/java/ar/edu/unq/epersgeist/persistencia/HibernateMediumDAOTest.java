@@ -7,6 +7,8 @@ import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HibernateMediumDAOTest {
@@ -56,6 +58,64 @@ public class HibernateMediumDAOTest {
                 }
         );
 
+    }
+
+    @Test
+    public void recuperarTodosDevuelveListaVacia() {
+
+        this.executeBlockInPersistentContext(() -> {
+            List<Medium> coleccionSinMediums = mediumDao.recuperarTodos();
+
+            assertNotNull(coleccionSinMediums);
+            assertTrue(coleccionSinMediums.isEmpty());
+        });
+    }
+
+    @Test
+    public void recuperarTodosDevuelveUnEspiritu() {
+
+        this.executeBlockInPersistentContext(() -> {
+            mediumDao.crear(new Medium("Juanchi el pastelero", 100, 200));
+
+            List<Medium> lista = mediumDao.recuperarTodos();
+
+            assertEquals(1, lista.size());
+        });
+    }
+
+    @Test
+    public void recuperarTodosDevuelveVariosElementos() {
+
+        this.executeBlockInPersistentContext(() -> {
+
+            Medium mediumM1 = new Medium("Juancho", 100, 30);
+            Medium mediumM2 = new Medium("Alfonso", 200, 10);
+            mediumDao.crear(mediumM1);
+            mediumDao.crear(mediumM2);
+
+            List<Medium> lista = mediumDao.recuperarTodos();
+
+            assertEquals(2, lista.size());
+        });
+    }
+
+    @Test
+    public void recuperarTodosDevuelveListaOrdenadaPorNombre() {
+
+        this.executeBlockInPersistentContext(() -> {
+
+            Medium mediumM1 = new Medium("Juancho", 100, 30);
+            Medium mediumM2 = new Medium("Alfonso", 200, 10);
+            mediumDao.crear(mediumM1);
+            mediumDao.crear(mediumM2);
+
+
+            List<Medium> lista = mediumDao.recuperarTodos();
+
+            assertEquals("Alfonso", lista.get(0).getNombre());
+            assertEquals("Juancho", lista.get(1).getNombre());
+
+        });
     }
 
     private void executeBlockInPersistentContext(Runnable aBlock) {
