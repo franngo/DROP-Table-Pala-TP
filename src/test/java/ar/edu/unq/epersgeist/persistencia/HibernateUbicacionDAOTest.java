@@ -37,7 +37,7 @@ public class HibernateUbicacionDAOTest extends HibernateTest {
 
     @Test
     void debeRecuperarUbicacionPorId() {
-        runTrx(() -> {
+        this.runTrx(() -> {
             Ubicacion ubicacionGuardada = ubicacionDAO.guardar(new Ubicacion("Santuario de la Luz"));
 
             Ubicacion ubicacionRecuperada = ubicacionDAO.recuperar(ubicacionGuardada.getId());
@@ -66,7 +66,7 @@ public class HibernateUbicacionDAOTest extends HibernateTest {
     @Test
     public void debeRetornarNullSiNoExisteUbicacionConEseNombre() {
         this.runTrx(() -> {
-            Ubicacion ubicacionEncontrada = ubicacionDAO.recuperarPorNombre("Inexistente");
+            Ubicacion ubicacionEncontrada = ubicacionDAO.recuperarPorNombre("Santuario de la Luz");
 
             assertNull(ubicacionEncontrada);
         });
@@ -74,7 +74,7 @@ public class HibernateUbicacionDAOTest extends HibernateTest {
 
     @Test
     void recuperarPorNombreNoConfundeUbicaciones() {
-        runTrx(() -> {
+        this.runTrx(() -> {
             ubicacionDAO.guardar(new Ubicacion("Santuario de la Luz"));
             ubicacionDAO.guardar(new Ubicacion("Catedral de la Oscuridad"));
 
@@ -89,7 +89,7 @@ public class HibernateUbicacionDAOTest extends HibernateTest {
 
     @Test
     void debeRecuperarTodasLasUbicaciones() {
-        runTrx(() -> {
+        this.runTrx(() -> {
             ubicacionDAO.guardar(new Ubicacion("Santuario de la Luz"));
             ubicacionDAO.guardar(new Ubicacion("Catedral de la Oscuridad"));
 
@@ -104,7 +104,7 @@ public class HibernateUbicacionDAOTest extends HibernateTest {
 
     @Test
     void debeRetornarListaVaciaSiNoHayUbicaciones() {
-        runTrx(() -> {
+        this.runTrx(() -> {
             List<Ubicacion> ubicaciones = ubicacionDAO.recuperarTodos();
 
             assertNotNull(ubicaciones);
@@ -116,7 +116,7 @@ public class HibernateUbicacionDAOTest extends HibernateTest {
 
     @Test
     void debeEliminarTodasLasUbicaciones() {
-        runTrx(() -> {
+        this.runTrx(() -> {
             ubicacionDAO.guardar(new Ubicacion("Santuario de la Luz"));
             ubicacionDAO.guardar(new Ubicacion("Catedral de la Oscuridad"));
 
@@ -132,7 +132,7 @@ public class HibernateUbicacionDAOTest extends HibernateTest {
 
     @Test
     void eliminarTodosNoFallaSiNoHayUbicaciones() {
-        runTrx(() -> {
+        this.runTrx(() -> {
             ubicacionDAO.eliminarTodos();
 
             Ubicacion ubicacionEncontrada = ubicacionDAO.recuperarPorNombre("Santuario de la Luz");

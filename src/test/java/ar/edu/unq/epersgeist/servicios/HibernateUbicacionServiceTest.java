@@ -42,13 +42,13 @@ public class HibernateUbicacionServiceTest extends HibernateTest {
     void debeCrearMultiplesUbicacionesConNombresDistintos() {
         this.runTrx(() -> {
             Ubicacion ubicacion1 = ubicacionService.crear("Santuario de la Luz");
-            Ubicacion ubicacion2 = ubicacionService.crear("Cripta de los Susurros");
+            Ubicacion ubicacion2 = ubicacionService.crear("Catedral de la Oscuridad");
 
             assertNotNull(ubicacion1.getId());
             assertNotNull(ubicacion2.getId());
 
             assertEquals("Santuario de la Luz", ubicacion1.getNombre());
-            assertEquals("Cripta de los Susurros", ubicacion2.getNombre());
+            assertEquals("Catedral de la Oscuridad", ubicacion2.getNombre());
         });
     }
 
