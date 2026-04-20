@@ -76,7 +76,7 @@ public class HibernateMediumServiceTest {
             return null;
         });
     }
-
+   
     @AfterEach
     void tearDown() {
         HibernateTransactionRunner.runTrx(() -> {
