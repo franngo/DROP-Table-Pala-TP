@@ -33,7 +33,7 @@ public class HibernateMediumDAO extends HibernateDAO<Medium> implements MediumDA
         m.setManaMax(medium.getManaMax());
         m.setMana(medium.getMana());
         m.setCantFortalece(medium.getCantFortalece());
-        //m.setEspiritus(medium.getEspiritus());
+        m.setEspiritus(medium.getEspiritus()); //dudas ¿Qué implicaría hacer flush de esto en la DB? ¿Qué datos se actualizan? ¿Se actualizan las filas de Espiritu?
 
         session.flush();
     }
