@@ -50,7 +50,45 @@ public class Medium implements Serializable {
         this.iniciarExorcismo(mediumAExorcizar); // posible foreach entre listas
     }
 
-    private void iniciarExorcismo(Medium mediumAExorcizar) {
+//    private void iniciarExorcismo(Medium mediumAExorcizar) {
+//        List<Angelical> espiritusAngelicales = this.espiritusAngelicales();
+//        List<Demonio> demoniosMediumAExorcizar = mediumAExorcizar.espiritusDemonios();
+//
+//        for (Angelical angel : espiritusAngelicales) {
+//             int 0;
+//            // Si ya no quedan demonios, termina el exorcismo
+//            if (indiceDemonio >= demoniosMediumAExorcizar.size()) {
+//                break;
+//            }
+//
+//            Demonio demonio = demoniosMediumAExorcizar.get(indiceDemonio);
+//
+//            int porcentajeAtaque = Math.min(
+//                    Random.numeroGenerado(1, 10) + angel.nivelDeConexion(),
+//                    100
+//            );
+//
+//            int porcentajeDefensa = Random.numeroGenerado(1, 100);
+//
+//            if (porcentajeAtaque > porcentajeDefensa) {
+//
+//                demonio.perderConexion(angel.nivelDeConexion() / 2);
+//
+//                if (demonio.nivelDeConexion() <= 0) {
+//                    mediumAExorcizar.desvincular(demonio);
+//                    demonios.remove(indiceDemonio);
+//                }
+//
+//            } else {
+//
+//                angel.perderConexion(5);
+//
+//                if (angel.nivelDeConexion() <= 0) {
+//                    this.desvincular(angel);
+//                }
+//            }
+//        }
+//    }
     }
 
     private void validarExorcismo() throws ExorcistaSinAngelesException {
@@ -80,9 +118,11 @@ public class Medium implements Serializable {
     }
 
     public int porcentajeDeAtaqueExitoso(Espiritu espiritu){
-        return Random.numeroGenerado() + espiritu.getNivelDeConexion();
+        return (int) Math.max(Random.numeroGenerado() + espiritu.getNivelDeConexion(),100);
     }
 
-
+    public boolean superaDefensaDemonio(){
+        return
+    }
 
 }
