@@ -31,6 +31,21 @@ public class HibernateUbicacionDAOTest extends HibernateTest {
         });
     }
 
+    // ============================== RECUPERAR ==============================
+
+    @Test
+    void debeRecuperarUbicacionPorId() {
+        runTrx(() -> {
+            Ubicacion ubicacionGuardada = ubicacionDAO.guardar(new Ubicacion("Santuario de la Luz"));
+
+            Ubicacion ubicacionRecuperada = ubicacionDAO.recuperar(ubicacionGuardada.getId());
+
+            assertNotNull(ubicacionRecuperada);
+            assertEquals(ubicacionGuardada.getId(), ubicacionRecuperada.getId());
+            assertEquals("Santuario de la Luz", ubicacionRecuperada.getNombre());
+        });
+    }
+
     // ============================== RECUPERAR POR NOMBRE ==============================
 
     @Test

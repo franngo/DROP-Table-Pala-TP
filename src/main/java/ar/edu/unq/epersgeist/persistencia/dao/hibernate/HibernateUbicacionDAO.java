@@ -13,6 +13,11 @@ public class HibernateUbicacionDAO implements UbicacionDAO {
     }
 
     @Override
+    public Ubicacion recuperar(Long id) {
+        return this.hibernateDAO.recuperar(id);
+    }
+
+    @Override
     public Ubicacion recuperarPorNombre(String nombre) {
         return HibernateSessionContext.getCurrentSession()
                 .createQuery("FROM Ubicacion WHERE nombre = :nombre", Ubicacion.class)
