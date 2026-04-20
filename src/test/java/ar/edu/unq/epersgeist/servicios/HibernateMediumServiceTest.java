@@ -1,6 +1,7 @@
 package ar.edu.unq.epersgeist.servicios;
 
 import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarMediumException;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
 import ar.edu.unq.epersgeist.servicios.impl.MediumServiceImpl;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
@@ -45,6 +46,70 @@ public class HibernateMediumServiceTest {
         assertEquals(epifanio.getCantFortalece(), mediumRecuperado.getCantFortalece());
         assertEquals(0, epifanio.getEspiritus().size());
         assertEquals(0, mediumRecuperado.getEspiritus().size());
+    }
+
+
+    @Test
+    void deberiaActualizarSoloLosCamposModificados1() {
+
+        Long id = HibernateTransactionRunner.runTrx(() -> serviceMedium.crear(epifanio).getId());
+
+        Medium modificado = new Medium("Rolando el audaz", 120, 50);
+        modificado.setId(id);
+        modificado.setCantFortalece(15);
+
+        //como modificado tiene el mismo id que epifanio, actualiza dicha fila en la BD
+        this.executeBlockInPersistentContext(() -> serviceMedium.actualizar(modificado));
+
+        Medium actualizado = HibernateTransactionRunner.runTrx(() -> serviceMedium.recuperar(id));
+
+        assertEquals(modificado.getId(), actualizado.getId());
+        assertEquals(modificado.getNombre(), actualizado.getNombre());
+        assertEquals(modificado.getMana(), actualizado.getMana());
+        assertEquals(modificado.getManaMax(), actualizado.getManaMax());
+        assertEquals(modificado.getCantFortalece(), actualizado.getCantFortalece());
+    }
+
+    @Test
+    void deberiaActualizarSoloLosCamposModificados2() {
+
+        Long id = HibernateTransactionRunner.runTrx(() -> serviceMedium.crear(epifanio).getId());
+
+        epifanio.setNombre("Rolando el audaz");
+        epifanio.setMana(120);
+        epifanio.setCantFortalece(15);
+
+        //se actualiza la fila con el id de epifanio en la DB
+        this.executeBlockInPersistentContext(() -> serviceMedium.actualizar(epifanio));
+
+        Medium actualizado = HibernateTransactionRunner.runTrx(() -> serviceMedium.recuperar(id));
+
+        assertEquals(epifanio.getId(), actualizado.getId());
+        assertEquals(epifanio.getNombre(), actualizado.getNombre());
+        assertEquals(epifanio.getMana(), actualizado.getMana());
+        assertEquals(epifanio.getManaMax(), actualizado.getManaMax());
+        assertEquals(epifanio.getCantFortalece(), actualizado.getCantFortalece());
+    }
+
+    @Test
+    void noDeberiaActualizarConIdNulo() {
+        assertThrows(ErrorAlActualizarMediumException.class, () -> {
+            HibernateTransactionRunner.runTrx(() -> {
+                serviceMedium.actualizar(epifanio);
+                return null;
+            });
+        });
+    }
+
+    @Test
+    void noDeberiaActualizarConIdQueNoSeEncuentraEnBD() {
+        assertThrows(ErrorAlActualizarMediumException.class, () -> {
+            HibernateTransactionRunner.runTrx(() -> {
+                epifanio.setId(1L); //no hay nada en la DB con id 1, porque arranca vacía
+                serviceMedium.actualizar(epifanio);
+                return null;
+            });
+        });
     }
 
     private void executeBlockInPersistentContext(Runnable block) {
