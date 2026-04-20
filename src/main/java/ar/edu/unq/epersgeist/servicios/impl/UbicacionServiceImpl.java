@@ -1,6 +1,7 @@
 package ar.edu.unq.epersgeist.servicios.impl;
 
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.IdUbicacionInvalidoException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.NombreUbicacionInvalidoException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
@@ -32,6 +33,17 @@ public class UbicacionServiceImpl implements UbicacionService {
         }
 
         return this.ubicacionDAO.guardar(new Ubicacion(nombre));
+    }
+
+    // --------------------------------------------------------------------------------
+
+    @Override
+    public Ubicacion recuperar(Long id) {
+        if (id == null) {
+            throw new IdUbicacionInvalidoException();
+        }
+
+        return this.ubicacionDAO.recuperar(id);
     }
 
     // --------------------------------------------------------------------------------

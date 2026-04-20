@@ -1,23 +1,27 @@
 package ar.edu.unq.epersgeist.servicios;
 
+import ar.edu.unq.epersgeist.HibernateTest;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.IdUbicacionInvalidoException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.NombreUbicacionInvalidoException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
+import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.impl.UbicacionServiceImpl;
-import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class HibernateUbicacionServiceTest {
+public class HibernateUbicacionServiceTest extends HibernateTest {
+    private UbicacionDAO ubicacionDAO;
     private UbicacionService ubicacionService;
 
     @BeforeEach
     void setUp() {
-        this.ubicacionService = new UbicacionServiceImpl(new HibernateUbicacionDAO());
+        this.ubicacionDAO = new HibernateUbicacionDAO();
+        this.ubicacionService = new UbicacionServiceImpl(this.ubicacionDAO);
     }
 
     // ============================== CREAR ==============================
@@ -34,7 +38,7 @@ public class HibernateUbicacionServiceTest {
 
     @Test
     void debeCrearMultiplesUbicacionesConNombresDistintos() {
-        runTrx(() -> {
+        this.runTrx(() -> {
             Ubicacion ubicacion1 = ubicacionService.crear("Santuario de la Luz");
             Ubicacion ubicacion2 = ubicacionService.crear("Cripta de los Susurros");
 
@@ -59,34 +63,31 @@ public class HibernateUbicacionServiceTest {
 
     @Test
     void debeLanzarExcepcionSiElNombreEsNull() {
-        runTrx(() -> {
+        this.runTrx(() ->
             assertThrows(NombreUbicacionInvalidoException.class, () ->
                     ubicacionService.crear(null)
-            );
-        });
+            ));
     }
 
     @Test
     void debeLanzarExcepcionSiElNombreEsVacio() {
-        runTrx(() -> {
+        this.runTrx(() ->
             assertThrows(NombreUbicacionInvalidoException.class, () ->
                     ubicacionService.crear("")
-            );
-        });
+            ));
     }
 
     @Test
     void debeLanzarExcepcionSiElNombreEsSoloEspacios() {
-        runTrx(() -> {
+        this.runTrx(() ->
             assertThrows(NombreUbicacionInvalidoException.class, () ->
                     ubicacionService.crear("   ")
-            );
-        });
+            ));
     }
 
     @Test
     void debeLanzarExcepcionSiElNombreYaExisteAunqueTengaEspaciosAlrededor() {
-        runTrx(() -> {
+        this.runTrx(() -> {
             ubicacionService.crear("Santuario de la Luz");
 
             assertThrows(UbicacionYaExisteException.class, () ->
@@ -95,12 +96,34 @@ public class HibernateUbicacionServiceTest {
         });
     }
 
-    // ============================== HELPERS ==============================
+    // ============================== RECUPERAR ==============================
 
-    private void runTrx(Runnable block) {
-        HibernateTransactionRunner.runTrx(() -> {
-            block.run();
-            return null;
+    @Test
+    void debeRecuperarUbicacionPorId() {
+        this.runTrx(() -> {
+            Ubicacion ubicacionCreada = ubicacionService.crear("Santuario de la Luz");
+
+            Ubicacion ubicacionRecuperada = ubicacionService.recuperar(ubicacionCreada.getId());
+
+            assertNotNull(ubicacionRecuperada);
+            assertEquals("Santuario de la Luz", ubicacionRecuperada.getNombre());
+        });
+    }
+
+    @Test
+    void debeLanzarExcepcionSiElIdEsNull() {
+        this.runTrx(() ->
+            assertThrows(IdUbicacionInvalidoException.class, () ->
+                    ubicacionService.recuperar(null)
+            ));
+    }
+
+    @Test
+    void debeRetornarNullSiNoExisteLaUbicacion() {
+        this.runTrx(() -> {
+            Ubicacion ubicacionRecuperada = ubicacionService.recuperar(999L);
+
+            assertNull(ubicacionRecuperada);
         });
     }
 
@@ -108,6 +131,6 @@ public class HibernateUbicacionServiceTest {
 
     @AfterEach
     void tearDown() {
-        // TODO
+        this.runTrx(() -> ubicacionDAO.eliminarTodos());
     }
 }
