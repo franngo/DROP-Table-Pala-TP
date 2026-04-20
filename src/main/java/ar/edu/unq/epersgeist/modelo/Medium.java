@@ -4,6 +4,7 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.exceptions.ExorcistaSinAngelesException;
+import ar.edu.unq.epersgeist.modelo.random.Random;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NonNull;
@@ -49,6 +50,9 @@ public class Medium implements Serializable {
         this.iniciarExorcismo(mediumAExorcizar); // posible foreach entre listas
     }
 
+    private void iniciarExorcismo(Medium mediumAExorcizar) {
+    }
+
     private void validarExorcismo() throws ExorcistaSinAngelesException {
         if (!this.tengoAlgunEspirituAngel()){
             throw new ExorcistaSinAngelesException("El medium no cuenta con espiritus angeles");
@@ -65,7 +69,7 @@ public class Medium implements Serializable {
     private List<Demonio> espiritusDemonios() {
         return espiritus.stream()
                 .filter(e -> e instanceof Demonio)
-                .map(e -> (Angelical) e)
+                .map(e -> (Demonio) e)
                 .toList();
     }
 
@@ -74,5 +78,11 @@ public class Medium implements Serializable {
     private boolean tengoAlgunEspirituAngel(){
         return espiritus.stream().anyMatch( e -> e instanceof Angelical);
     }
+
+    public int porcentajeDeAtaqueExitoso(Espiritu espiritu){
+        return Random.numeroGenerado() + espiritu.getNivelDeConexion();
+    }
+
+
 
 }

@@ -1,0 +1,13 @@
+package ar.edu.unq.epersgeist.modelo.random;
+
+import java.util.random.RandomGenerator;
+
+public class EstrategiaAleatoria10 implements EstrategiaNumero {
+
+
+    @Override
+    public int numeroGenerado() {
+        return RandomGenerator.getDefault().nextInt(1, 10);
+    }
+}
+
