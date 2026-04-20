@@ -7,6 +7,8 @@ import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteExcept
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
 
+import java.util.List;
+
 public class UbicacionServiceImpl implements UbicacionService {
     private final UbicacionDAO ubicacionDAO;
 
@@ -44,6 +46,13 @@ public class UbicacionServiceImpl implements UbicacionService {
         }
 
         return this.ubicacionDAO.recuperar(id);
+    }
+
+    // --------------------------------------------------------------------------------
+
+    @Override
+    public List<Ubicacion> recuperarTodos() {
+        return ubicacionDAO.recuperarTodos();
     }
 
     // --------------------------------------------------------------------------------

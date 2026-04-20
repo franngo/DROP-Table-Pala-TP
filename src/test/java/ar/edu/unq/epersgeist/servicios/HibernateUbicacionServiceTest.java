@@ -12,6 +12,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HibernateUbicacionServiceTest extends HibernateTest {
@@ -124,6 +126,20 @@ public class HibernateUbicacionServiceTest extends HibernateTest {
             Ubicacion ubicacionRecuperada = ubicacionService.recuperar(999L);
 
             assertNull(ubicacionRecuperada);
+        });
+    }
+
+    // ============================== RECUPERAR TODOS ==============================
+
+    @Test
+    void debeRecuperarTodasLasUbicaciones() {
+        this.runTrx(() -> {
+            ubicacionService.crear("Santuario de la Luz");
+            ubicacionService.crear("Catedral de la Oscuridad");
+
+            List<Ubicacion> ubicaciones = ubicacionService.recuperarTodos();
+
+            assertEquals(2, ubicaciones.size());
         });
     }
 

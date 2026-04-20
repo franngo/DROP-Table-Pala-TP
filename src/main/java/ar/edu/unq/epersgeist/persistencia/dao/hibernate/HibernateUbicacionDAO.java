@@ -4,6 +4,8 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateSessionContext;
 
+import java.util.List;
+
 public class HibernateUbicacionDAO implements UbicacionDAO {
     private final HibernateDAO<Ubicacion> hibernateDAO = new HibernateDAO<>(Ubicacion.class);
 
@@ -15,6 +17,13 @@ public class HibernateUbicacionDAO implements UbicacionDAO {
     @Override
     public Ubicacion recuperar(Long id) {
         return this.hibernateDAO.recuperar(id);
+    }
+
+    @Override
+    public List<Ubicacion> recuperarTodos() {
+        return HibernateSessionContext.getCurrentSession()
+                .createQuery("FROM Ubicacion", Ubicacion.class)
+                .list();
     }
 
     @Override

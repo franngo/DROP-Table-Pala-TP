@@ -8,6 +8,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HibernateUbicacionDAOTest extends HibernateTest {
@@ -80,6 +82,33 @@ public class HibernateUbicacionDAOTest extends HibernateTest {
 
             assertNotNull(ubicacionEncontrada);
             assertEquals("Santuario de la Luz", ubicacionEncontrada.getNombre());
+        });
+    }
+
+    // ============================== RECUPERAR TODOS ==============================
+
+    @Test
+    void debeRecuperarTodasLasUbicaciones() {
+        runTrx(() -> {
+            ubicacionDAO.guardar(new Ubicacion("Santuario de la Luz"));
+            ubicacionDAO.guardar(new Ubicacion("Catedral de la Oscuridad"));
+
+            List<Ubicacion> ubicaciones = ubicacionDAO.recuperarTodos();
+            List<String> nombres = ubicaciones.stream().map(Ubicacion::getNombre).toList();
+
+            assertEquals(2, ubicaciones.size());
+            assertTrue(nombres.contains("Santuario de la Luz"));
+            assertTrue(nombres.contains("Catedral de la Oscuridad"));
+        });
+    }
+
+    @Test
+    void debeRetornarListaVaciaSiNoHayUbicaciones() {
+        runTrx(() -> {
+            List<Ubicacion> ubicaciones = ubicacionDAO.recuperarTodos();
+
+            assertNotNull(ubicaciones);
+            assertTrue(ubicaciones.isEmpty());
         });
     }
 
