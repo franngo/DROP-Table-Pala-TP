@@ -62,22 +62,24 @@ public class MediumServiceImpl implements MediumService {
     }
 
     @Override
-    public void descanzar(Long id) {
+    public void descansar(Long idMedium) {
 
     }
 
     @Override
-    public void exorcizar(Long idatacante, Long idAtacado) {
+    public void exorcizar(Long idMediumExorcista, Long idMediumAExorcizar) {
 
     }
 
     @Override
-    public List<Medium> espiritus() {
+    public List<Espiritu> espiritus(Long mediumId) {
         return List.of();
     }
 
     @Override
-    public Espiritu invocar(Long id, Long idMedium) {
+    public Espiritu invocar(Long mediumId, Long espirituId) {
         return null;
     }
+
+
 }

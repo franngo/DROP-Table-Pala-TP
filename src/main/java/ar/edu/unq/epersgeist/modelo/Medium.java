@@ -1,6 +1,9 @@
 package ar.edu.unq.epersgeist.modelo;
 
+import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.exceptions.ExorcistaSinAngelesException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NonNull;
@@ -39,6 +42,37 @@ public class Medium implements Serializable {
 
     public void agregarEspiritu(Espiritu espiritu) {
         espiritus.add(espiritu);
+    }
+
+    public void exorcizar(Medium mediumAExorcizar) throws ExorcistaSinAngelesException {
+        this.validarExorcismo();
+        this.iniciarExorcismo(mediumAExorcizar); // posible foreach entre listas
+    }
+
+    private void validarExorcismo() throws ExorcistaSinAngelesException {
+        if (!this.tengoAlgunEspirituAngel()){
+            throw new ExorcistaSinAngelesException("El medium no cuenta con espiritus angeles");
+        }
+    }
+
+    private List<Angelical> espiritusAngelicales() {
+        return espiritus.stream()
+                .filter(e -> e instanceof Angelical)
+                .map(e -> (Angelical) e)
+                .toList();
+    }
+
+    private List<Demonio> espiritusDemonios() {
+        return espiritus.stream()
+                .filter(e -> e instanceof Demonio)
+                .map(e -> (Angelical) e)
+                .toList();
+    }
+
+
+
+    private boolean tengoAlgunEspirituAngel(){
+        return espiritus.stream().anyMatch( e -> e instanceof Angelical);
     }
 
 }
