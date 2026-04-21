@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.modelo;
 
+import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,5 +23,19 @@ public class UbicacionTest {
     @Test
     public void debeCrearUbicacionConIdNulo() {
         assertNull(this.ubicacion.getId());
+    }
+
+    @Test
+    public void debeCrearUbicacionSinEspiritus() {
+        assertEquals(0, this.ubicacion.getEspiritus().size());
+    }
+
+    @Test
+    public void debeAgregarEspirituALaUbicacion() {
+        Espiritu espiritu = new Espiritu("Guerrero", "Espíritu de la Luz");
+        this.ubicacion.agregarEspiritu(espiritu);
+
+        assertEquals(1, this.ubicacion.getEspiritus().size());
+        assertEquals(this.ubicacion, espiritu.getUbicacion());
     }
 }
