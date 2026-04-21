@@ -44,4 +44,30 @@ public class Medium implements Serializable {
         espiritu.setMediumCon(this);
     }
 
+    public void descansar() {
+
+    }
+
+    /*
+    El de MediumService es Espiritu invocar(Long id, Long idMedium);
+    Recibe ambos id, recupera los 2, y se debería fijar que ambos no sean cosas nulas.
+    Si son nulas ¿ErrorAlInvocar("Se intentó invocar con una entidad no existente.")?
+    Si no lo son, y tenemos medium y espiritu, mandamos medium.invocar(espiritu);
+
+    Espiritu invocar(Espiritu espiritu) {
+        if(this.mana < 10) {
+            return;
+        }
+
+        if(!espiritu.estaLibre()) {
+            throw ErrorAlInvocar("El espiritu dado no está libre, por lo que no puede ser invocado por otro medium.");
+        }
+
+        this.mana -= 10; //en realidad hay que fijarse que quede en eso o en un mínimo de 0, pero NO en negativo
+        //usar Math.min
+
+        espiritu.setUbicacion(this.ubicacion);
+    }
+     */
+
 }
