@@ -44,17 +44,38 @@ public class Medium implements Serializable {
         espiritu.setMediumCon(this);
     }
 
+    //El de service es public void descansar(Long mediumId)
     public void descansar() {
+        this.recuperarMana(Medium.manaDescansoMedium);
+        this.espiritusRecuperanMana(Medium.manaDescansoEspiritus);
+    }
 
+    public static final int manaDescansoMedium = 15;
+    public static final int manaDescansoEspiritus = 5;
+
+    private void recuperarMana(int cantidad) {
+        this.mana = Math.min(Medium.limiteConexion, this.nuevaCantidad(cantidad));
+    }
+
+    public static final int limiteConexion = 100;
+
+    private int nuevaCantidad(int cantidad){
+        return this.mana + cantidad;
+    }
+
+    private void espiritusRecuperanMana(int cantidad) {
+        for (Espiritu espiritu : espiritus) {
+            espiritu.fortalecerConexion(cantidad);
+        }
     }
 
     /*
-    El de MediumService es Espiritu invocar(Long id, Long idMedium);
+    El de MediumService es public Espiritu invocar(Long id, Long idMedium);
     Recibe ambos id, recupera los 2, y se debería fijar que ambos no sean cosas nulas.
     Si son nulas ¿ErrorAlInvocar("Se intentó invocar con una entidad no existente.")?
     Si no lo son, y tenemos medium y espiritu, mandamos medium.invocar(espiritu);
 
-    Espiritu invocar(Espiritu espiritu) {
+    public Espiritu invocar(Espiritu espiritu) {
         if(this.mana < 10) {
             return;
         }
