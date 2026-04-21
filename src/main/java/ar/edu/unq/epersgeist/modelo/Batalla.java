@@ -13,6 +13,7 @@ public class Batalla {
     Medium atacante;
     Medium atacado;
     public Batalla(Medium medium, Medium mediumAExorcizar) {
+        this.ganoAtacante=false;
         this.atacante=medium;
         this.atacado=mediumAExorcizar;
     }
@@ -28,7 +29,7 @@ public class Batalla {
 
            Demonio demonioAtacado = demoniosAtacado.get(indexDemonio);
            if (demoniosAtacado.isEmpty()) {
-               this.ganoAtacante=false;
+               this.ganoAtacante=true;
                break;
            }
 
@@ -36,29 +37,27 @@ public class Batalla {
            int defensaDemonio = demonioAtacado.capacidadDefensiva();
 
            if(porcentajeDeEXITO>defensaDemonio){
-               demonioAtacado.recibirAtaque();
+               demonioAtacado.recibirAtaque(angel.getNivelDeConexion() / 2);
                if(!demonioAtacado.estaActivo()){
                    demoniosAtacado.remove(indexDemonio);
+                   indexDemonio++;
                }
            }
            else {
-               angel.recibirAtaque();
+               angel.recibirAtaque(5);
            }
 
 
-
-           indexDemonio++;
        }
 
     }
 
-    public int cantidadAPerder(){
-        return 0;
-    }
+
 
     public int porcentajeDeAtaqueExitoso(Espiritu espiritu){
         return (int) Math.max(Random.numeroGenerado() + espiritu.getNivelDeConexion(),100);
     }
+
 
 
 
