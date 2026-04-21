@@ -42,7 +42,6 @@ public class Espiritu implements Serializable {
 
     public void fortalecerConexion(int cantidad) {
         this.nivelDeConexion = Math.min(Espiritu.limiteConexion,this.nuevaConexion(cantidad));
-
     }
 
     private int nuevaConexion(int cantidad){

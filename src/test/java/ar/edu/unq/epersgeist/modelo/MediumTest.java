@@ -51,5 +51,41 @@ public class MediumTest {
         assertTrue(mediumM.getEspiritus().contains(espirituM2));
     }
 
+    @Test
+    public void descansar() {
+        assertEquals(50, mediumM.getMana());
+        assertEquals(0, espirituM.getNivelDeConexion());
+        assertEquals(0, espirituM2.getNivelDeConexion());
+
+        mediumM.agregarEspiritu(espirituM);
+        mediumM.agregarEspiritu(espirituM2);
+
+        mediumM.descansar();
+
+        assertEquals(65, mediumM.getMana());
+        assertEquals(5, espirituM.getNivelDeConexion());
+        assertEquals(5, espirituM2.getNivelDeConexion());
+    }
+
+    @Test
+    public void noSeExcedenLimitesEnDescansar() {
+        assertEquals(50, mediumM.getMana());
+        assertEquals(0, espirituM.getNivelDeConexion());
+        assertEquals(0, espirituM2.getNivelDeConexion());
+
+        mediumM.agregarEspiritu(espirituM);
+        mediumM.agregarEspiritu(espirituM2);
+
+        mediumM.setMana(89); //tiene un manaMax de 100
+        espirituM.setNivelDeConexion(94);
+        espirituM2.setNivelDeConexion(97);
+
+        mediumM.descansar();
+
+        assertEquals(100, mediumM.getMana());
+        assertEquals(99, espirituM.getNivelDeConexion());
+        assertEquals(100, espirituM2.getNivelDeConexion());
+    }
+
 
 }

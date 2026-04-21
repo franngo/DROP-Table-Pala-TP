@@ -54,10 +54,8 @@ public class Medium implements Serializable {
     public static final int manaDescansoEspiritus = 5;
 
     private void recuperarMana(int cantidad) {
-        this.mana = Math.min(Medium.limiteConexion, this.nuevaCantidad(cantidad));
+        this.mana = Math.min(this.manaMax, this.nuevaCantidad(cantidad));
     }
-
-    public static final int limiteConexion = 100;
 
     private int nuevaCantidad(int cantidad){
         return this.mana + cantidad;
