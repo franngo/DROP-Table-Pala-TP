@@ -68,6 +68,7 @@ public class Medium implements Serializable {
             //ATAQUE ENTRE ANGEL ACTUAL Y EL DEMONIO ACTUAL
             this.ataqueADemonio(angelActual,demonioActualAtacado);
 
+           // seguir simulando pelea
 
 
             // si el demonio murió lo saco de la lista de atacados
