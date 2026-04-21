@@ -26,8 +26,10 @@ public class Espiritu implements Serializable {
     @ManyToOne
     private Ubicacion ubicacion;
 
-    public Espiritu(@NonNull String tipo, @NonNull String nombre) {
+    @ManyToOne
+    private Medium mediumCon;
 
+    public Espiritu(@NonNull String tipo, @NonNull String nombre) {
         this.tipo = tipo;
         this.nivelDeConexion = 0;
         this.nombre = nombre;

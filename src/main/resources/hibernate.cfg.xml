@@ -20,6 +20,7 @@
         <!-- Classes - Persistence -->
         <mapping class="ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu" />
         <mapping class="ar.edu.unq.epersgeist.modelo.Ubicacion"/>
+        <mapping class="ar.edu.unq.epersgeist.modelo.Medium" />
 
     </session-factory>
 </hibernate-configuration>
