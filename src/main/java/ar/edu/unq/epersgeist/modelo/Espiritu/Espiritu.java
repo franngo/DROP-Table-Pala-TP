@@ -1,10 +1,8 @@
 package ar.edu.unq.epersgeist.modelo.Espiritu;
 
 import ar.edu.unq.epersgeist.modelo.Medium;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import ar.edu.unq.epersgeist.modelo.Ubicacion;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -24,6 +22,9 @@ public class Espiritu implements Serializable {
     private String tipo;
     private Integer nivelDeConexion;
     private String nombre;
+
+    @ManyToOne
+    private Ubicacion ubicacion;
 
     public Espiritu(@NonNull String tipo, @NonNull String nombre) {
 
