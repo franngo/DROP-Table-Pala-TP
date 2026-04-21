@@ -35,6 +35,16 @@ public class Batalla {
            int porcentajeDeEXITO = this.porcentajeDeAtaqueExitoso(angel);
            int defensaDemonio = demonioAtacado.capacidadDefensiva();
 
+           if(porcentajeDeEXITO>defensaDemonio){
+               demonioAtacado.recibirAtaque();
+               if(!demonioAtacado.estaActivo()){
+                   demoniosAtacado.remove(indexDemonio);
+               }
+           }
+           else {
+               angel.recibirAtaque();
+           }
+
 
 
            indexDemonio++;
@@ -42,14 +52,15 @@ public class Batalla {
 
     }
 
+    public int cantidadAPerder(){
+        return 0;
+    }
+
     public int porcentajeDeAtaqueExitoso(Espiritu espiritu){
         return (int) Math.max(Random.numeroGenerado() + espiritu.getNivelDeConexion(),100);
     }
 
-    private void ataqueADemonio(Angelical angelActual, Demonio demonioAtacado) {
-        int porcentajeExito = this.porcentajeDeAtaqueExitoso(angelActual);
-        int defensaDemonio = demonioAtacado.capacidadDefensiva();
-    }
+
 
     public void accionesPostBatalla() {
         if(this.ganoAtacante){

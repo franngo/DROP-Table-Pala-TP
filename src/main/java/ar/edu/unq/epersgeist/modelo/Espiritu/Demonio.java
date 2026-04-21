@@ -9,4 +9,8 @@ public class Demonio extends Espiritu {
     public boolean estaActivo() {
         return this.getNivelDeConexion() > 0;
     }
+
+    public void perderConexion() {
+
+    }
 }
