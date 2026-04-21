@@ -1,0 +1,52 @@
+package ar.edu.unq.epersgeist.modelo;
+
+import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.random.Random;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Batalla {
+    boolean ganoAtacante;
+    Medium atacante;
+    Medium atacado;
+    public Batalla(Medium medium, Medium mediumAExorcizar) {
+        this.atacante=medium;
+        this.atacado=mediumAExorcizar;
+    }
+
+    void iniciarBatalla(){
+
+        //angeles medium que ataca
+       List<Angelical> angelesAtacante = atacante.espiritusAngelicales();
+       List<Demonio> demoniosAtacado = new ArrayList<>(atacado.espiritusDemonios());
+
+        int indexDemonio = 0;
+       for (Angelical angel : angelesAtacante){
+           if (demoniosAtacado.isEmpty()) {
+               this.ganoAtacante=false;
+           }
+       }
+
+    }
+
+    public int porcentajeDeAtaqueExitoso(Espiritu espiritu){
+        return (int) Math.max(Random.numeroGenerado() + espiritu.getNivelDeConexion(),100);
+    }
+
+    private void ataqueADemonio(Angelical angelActual, Demonio demonioAtacado) {
+        int porcentajeExito = this.porcentajeDeAtaqueExitoso(angelActual);
+        int defensaDemonio = demonioAtacado.capacidadDefensiva();
+    }
+
+    public void accionesPostBatalla() {
+        if(this.ganoAtacante){
+            atacado.desvincularDemonios();
+        }
+        else{
+            atacante.desvincularAngeles();
+        }
+    }
+}

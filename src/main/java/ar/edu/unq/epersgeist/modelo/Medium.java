@@ -47,49 +47,46 @@ public class Medium implements Serializable {
 
     public void exorcizar(Medium mediumAExorcizar) throws ExorcistaSinAngelesException {
         this.validarExorcismo();
-        this.iniciarExorcismo(mediumAExorcizar); // posible foreach entre listas
+
+        Batalla batalla = new Batalla(this,mediumAExorcizar);
+        batalla.iniciarBatalla();
+        batalla.accionesPostBatalla();// posible foreach entre listas
     }
 
-    private void iniciarExorcismo(Medium mediumAExorcizar) {
-        //mis angeles
-        List<Angelical> espiritusAngelicales = this.espiritusAngelicales();
-        // demonios enemigos
-        List<Demonio> demoniosMedium = new ArrayList<>(mediumAExorcizar.espiritusDemonios());
+//    private void iniciarExorcismo(Medium mediumAExorcizar) {
+//        //mis angeles
+//        List<Angelical> espiritusAngelicales = this.espiritusAngelicales();
+//        // demonios enemigos
+//        List<Demonio> demoniosMedium = new ArrayList<>(mediumAExorcizar.espiritusDemonios());
+//
+//
+//        int indexDemonio = 0;
+//
+//        for (Angelical angelActual : espiritusAngelicales) {
+//
+//            if (demoniosMedium.isEmpty()) break;
+//
+//            Demonio demonioActualAtacado = demoniosMedium.get(indexDemonio);
+//
+//            //ATAQUE ENTRE ANGEL ACTUAL Y EL DEMONIO ACTUAL
+//            this.ataqueADemonio(angelActual,demonioActualAtacado);
+//
+//           // seguir simulando pelea
+//
+//
+//            // si el demonio murió lo saco de la lista de atacados
+//            if (!demonioActualAtacado.estaActivo()) {
+//                demoniosMedium.remove(demonioActualAtacado);
+//            } else {
+//                indexDemonio = (indexDemonio + 1) % demoniosMedium.size();
+//            }
+//        }
+//
+//
+//
+//    }
 
 
-        int indexDemonio = 0;
-
-        for (Angelical angelActual : espiritusAngelicales) {
-
-            if (demoniosMedium.isEmpty()) break;
-
-            Demonio demonioActualAtacado = demoniosMedium.get(indexDemonio);
-
-            //ATAQUE ENTRE ANGEL ACTUAL Y EL DEMONIO ACTUAL
-            this.ataqueADemonio(angelActual,demonioActualAtacado);
-
-           // seguir simulando pelea
-
-
-            // si el demonio murió lo saco de la lista de atacados
-            if (!demonioActualAtacado.estaActivo()) {
-                demoniosMedium.remove(demonioActualAtacado);
-            } else {
-                indexDemonio = (indexDemonio + 1) % demoniosMedium.size();
-            }
-        }
-
-        
-
-    }
-
-    private void ataqueADemonio(Angelical angelActual, Demonio demonioAtacado) {
-        int porcentajeExito = this.porcentajeDeAtaqueExitoso(angelActual);
-        int defensaDemonio = demonioAtacado.capacidadDefensiva();
-
-
-
-    }
 
 //    private void iniciarExorcismo(Medium mediumAExorcizar) {
 //        List<Angelical> espiritusAngelicales = this.espiritusAngelicales();
@@ -138,14 +135,14 @@ public class Medium implements Serializable {
         }
     }
 
-    private List<Angelical> espiritusAngelicales() {
+    public List<Angelical> espiritusAngelicales() {
         return espiritus.stream()
                 .filter(e -> e instanceof Angelical)
                 .map(e -> (Angelical) e)
                 .toList();
     }
 
-    private List<Demonio> espiritusDemonios() {
+    public List<Demonio> espiritusDemonios() {
         return espiritus.stream()
                 .filter(e -> e instanceof Demonio)
                 .map(e -> (Demonio) e)
@@ -158,15 +155,15 @@ public class Medium implements Serializable {
         return espiritus.stream().anyMatch( e -> e instanceof Angelical);
     }
 
-    public int porcentajeDeAtaqueExitoso(Espiritu espiritu){
-        return (int) Math.max(Random.numeroGenerado() + espiritu.getNivelDeConexion(),100);
-    }
-
-    public boolean superaDefensaDemonio(){
-        return
-    }
-
     public void desvincularseDe(Espiritu espiritu) {
         this.espiritus.remove(espiritu);
+    }
+
+    public void desvincularAngeles() {
+         this.espiritus.removeIf(esp -> esp instanceof Angelical);
+    }
+
+    public void desvincularDemonios() {
+        this.espiritus.removeIf(esp -> esp instanceof Demonio);
     }
 }
