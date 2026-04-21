@@ -7,7 +7,7 @@ public class EstrategiaAleatoria10 implements EstrategiaNumero {
 
     @Override
     public int numeroGenerado() {
-        return RandomGenerator.getDefault().nextInt(1, 10);
+        return RandomGenerator.getDefault().nextInt(1, 11);
     }
 }
 

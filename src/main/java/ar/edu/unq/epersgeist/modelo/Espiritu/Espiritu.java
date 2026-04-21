@@ -1,6 +1,7 @@
 package ar.edu.unq.epersgeist.modelo.Espiritu;
 
 import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.random.RandomDefensa;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -49,4 +50,12 @@ public class Espiritu implements Serializable {
     private int limiteConexion() {
         return 100;
     }
+
+    /*
+    * Por ahora tanto espiritus como demonios tienen capacidad defensiva un random entre 1 al 100
+    * */
+    public int capacidadDefensiva() {
+        return (int) RandomDefensa.numeroGenerado();
+    }
+}
 }

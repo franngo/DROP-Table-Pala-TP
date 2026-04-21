@@ -65,7 +65,9 @@ public class Medium implements Serializable {
 
             Demonio demonioActualAtacado = demoniosMedium.get(indexDemonio);
 
-            this.ataqueADemonio(angelActual, demonioActualAtacado);
+            //ATAQUE ENTRE ANGEL ACTUAL Y EL DEMONIO ACTUAL
+            this.ataqueADemonio(angelActual,demonioActualAtacado);
+
 
             // si el demonio murió lo saco
             if (!demonioActualAtacado.estaActivo()) {
@@ -79,7 +81,9 @@ public class Medium implements Serializable {
 
     }
 
-    private void ataqueADemonio(Angelical angelActual, Demonio demonioActualAtacado) {
+    private void ataqueADemonio(Angelical angelActual, Demonio demonioAtacado) {
+        int porcentajeExito = this.porcentajeDeAtaqueExitoso(angelActual);
+        int defensaDemonio = demonioAtacado.capacidadDefensiva();
     }
 
 //    private void iniciarExorcismo(Medium mediumAExorcizar) {

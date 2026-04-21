@@ -4,7 +4,6 @@ import jakarta.persistence.Entity;
 
 @Entity
 public class Demonio extends Espiritu {
-    public boolean estaActivo() {
-        return true;
-    }
+
+
 }

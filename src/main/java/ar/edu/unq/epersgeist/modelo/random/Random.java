@@ -4,8 +4,7 @@ import lombok.Setter;
 
 @Setter
 public class Random {
-
-    @Setter
+    
     private static EstrategiaNumero estrategiaNumero = new EstrategiaAleatoria10();
 
     public static int numeroGenerado() {
