@@ -25,9 +25,19 @@ public class Batalla {
 
         int indexDemonio = 0;
        for (Angelical angel : angelesAtacante){
+
+           Demonio demonioAtacado = demoniosAtacado.get(indexDemonio);
            if (demoniosAtacado.isEmpty()) {
                this.ganoAtacante=false;
+               break;
            }
+
+           int porcentajeDeEXITO = this.porcentajeDeAtaqueExitoso(angel);
+           int defensaDemonio = demonioAtacado.capacidadDefensiva();
+
+
+
+           indexDemonio++;
        }
 
     }
