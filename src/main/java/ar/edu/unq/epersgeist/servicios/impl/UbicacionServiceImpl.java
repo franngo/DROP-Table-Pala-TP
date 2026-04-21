@@ -1,8 +1,10 @@
 package ar.edu.unq.epersgeist.servicios.impl;
 
+import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.IdUbicacionInvalidoException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.NombreUbicacionInvalidoException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
@@ -53,6 +55,23 @@ public class UbicacionServiceImpl implements UbicacionService {
     @Override
     public List<Ubicacion> recuperarTodos() {
         return ubicacionDAO.recuperarTodos();
+    }
+
+    // --------------------------------------------------------------------------------
+
+    @Override
+    public List<Espiritu> espiritusEn(Long ubicacionId) {
+        if (ubicacionId == null) {
+            throw new IdUbicacionInvalidoException();
+        }
+
+        Ubicacion ubicacion = this.ubicacionDAO.recuperar(ubicacionId);
+
+        if (ubicacion == null) {
+            throw new UbicacionNoEncontradaException(ubicacionId);
+        }
+
+        return ubicacion.getEspiritus();
     }
 
     // --------------------------------------------------------------------------------
