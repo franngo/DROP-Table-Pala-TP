@@ -1,11 +1,15 @@
 package ar.edu.unq.epersgeist.servicios;
 
 import ar.edu.unq.epersgeist.HibernateTest;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.IdUbicacionInvalidoException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.NombreUbicacionInvalidoException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
+import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.impl.UbicacionServiceImpl;
 import org.junit.jupiter.api.AfterEach;
@@ -17,11 +21,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HibernateUbicacionServiceTest extends HibernateTest {
+    private EspirituDAO espirituDAO;
     private UbicacionDAO ubicacionDAO;
     private UbicacionService ubicacionService;
 
     @BeforeEach
     void setUp() {
+        this.espirituDAO = new HibernateEspirituDAO();
         this.ubicacionDAO = new HibernateUbicacionDAO();
         this.ubicacionService = new UbicacionServiceImpl(this.ubicacionDAO);
     }
@@ -66,25 +72,25 @@ public class HibernateUbicacionServiceTest extends HibernateTest {
     @Test
     void debeLanzarExcepcionSiElNombreEsNull() {
         this.runTrx(() ->
-            assertThrows(NombreUbicacionInvalidoException.class, () ->
-                    ubicacionService.crear(null)
-            ));
+                assertThrows(NombreUbicacionInvalidoException.class, () ->
+                        ubicacionService.crear(null)
+                ));
     }
 
     @Test
     void debeLanzarExcepcionSiElNombreEsVacio() {
         this.runTrx(() ->
-            assertThrows(NombreUbicacionInvalidoException.class, () ->
-                    ubicacionService.crear("")
-            ));
+                assertThrows(NombreUbicacionInvalidoException.class, () ->
+                        ubicacionService.crear("")
+                ));
     }
 
     @Test
     void debeLanzarExcepcionSiElNombreEsSoloEspacios() {
         this.runTrx(() ->
-            assertThrows(NombreUbicacionInvalidoException.class, () ->
-                    ubicacionService.crear("   ")
-            ));
+                assertThrows(NombreUbicacionInvalidoException.class, () ->
+                        ubicacionService.crear("   ")
+                ));
     }
 
     @Test
@@ -115,9 +121,9 @@ public class HibernateUbicacionServiceTest extends HibernateTest {
     @Test
     void debeLanzarExcepcionSiElIdEsNull() {
         this.runTrx(() ->
-            assertThrows(IdUbicacionInvalidoException.class, () ->
-                    ubicacionService.recuperar(null)
-            ));
+                assertThrows(IdUbicacionInvalidoException.class, () ->
+                        ubicacionService.recuperar(null)
+                ));
     }
 
     @Test
@@ -143,10 +149,61 @@ public class HibernateUbicacionServiceTest extends HibernateTest {
         });
     }
 
+    @Test
+    void debeRecuperarUnaListaVaciaSiNoHayUbicaciones() {
+        this.runTrx(() -> {
+            List<Ubicacion> ubicaciones = ubicacionService.recuperarTodos();
+
+            assertEquals(0, ubicaciones.size());
+        });
+    }
+
+    // ============================== ESPIRITUS EN ==============================
+
+    @Test
+    void espiritusEnRetornaListaDeEspiritus() {
+        this.runTrx(() -> {
+            Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
+
+            Espiritu guerrero = espirituDAO.guardar(new Espiritu("Guerrero", "Espíritu de la Luz"));
+            Espiritu mago = espirituDAO.guardar(new Espiritu("Mago", "Espíritu de la Oscuridad"));
+
+            ubicacion.agregarEspiritu(guerrero);
+            ubicacion.agregarEspiritu(mago);
+
+            List<Espiritu> espiritusEnUbicacion = ubicacionService.espiritusEn(ubicacion.getId());
+
+            assertEquals(2, espiritusEnUbicacion.size());
+            assertTrue(espiritusEnUbicacion.contains(guerrero));
+            assertTrue(espiritusEnUbicacion.contains(mago));
+        });
+    }
+
+    @Test
+    void espiritusEnLanzaExcepcionSiUbicacionNoExiste() {
+        this.runTrx(() ->
+            assertThrows(UbicacionNoEncontradaException.class, () ->
+                    ubicacionService.espiritusEn(999L)
+            )
+        );
+    }
+
+    @Test
+    void espiritusEnLanzaExcepcionSiIdEsNull() {
+        this.runTrx(() ->
+            assertThrows(IdUbicacionInvalidoException.class, () ->
+                    ubicacionService.espiritusEn(null)
+            )
+        );
+    }
+
     // ============================== TEARDOWN ==============================
 
     @AfterEach
     void tearDown() {
-        this.runTrx(() -> ubicacionDAO.eliminarTodos());
+        this.runTrx(() -> {
+            espirituDAO.eliminarTodos();
+            ubicacionDAO.eliminarTodos();
+        });
     }
 }

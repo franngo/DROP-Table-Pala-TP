@@ -1,8 +1,11 @@
 package ar.edu.unq.epersgeist.persistencia;
 
 import ar.edu.unq.epersgeist.HibernateTest;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
+import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,10 +17,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class HibernateUbicacionDAOTest extends HibernateTest {
     private UbicacionDAO ubicacionDAO;
+    private EspirituDAO espirituDAO;
 
     @BeforeEach
     public void setUp() {
         ubicacionDAO = new HibernateUbicacionDAO();
+        espirituDAO = new HibernateEspirituDAO();
     }
 
     // ============================== GUARDAR ==============================
@@ -45,6 +50,15 @@ public class HibernateUbicacionDAOTest extends HibernateTest {
             assertNotNull(ubicacionRecuperada);
             assertEquals(ubicacionGuardada.getId(), ubicacionRecuperada.getId());
             assertEquals("Santuario de la Luz", ubicacionRecuperada.getNombre());
+        });
+    }
+
+    @Test
+    void debeRetornarNullSiNoExisteUbicacionConEseId() {
+        this.runTrx(() -> {
+            Ubicacion ubicacionRecuperada = ubicacionDAO.recuperar(999L);
+
+            assertNull(ubicacionRecuperada);
         });
     }
 
@@ -140,10 +154,66 @@ public class HibernateUbicacionDAOTest extends HibernateTest {
         });
     }
 
+    // ============================== EXTRAS ==============================
+
+    @Test
+    void debePersistirCambioDeRelacionSinUpdateExplcito() {
+        final Long[] ubicacionId = new Long[1];
+
+        // Primera transacción: se crea la relación y Hibernate la persiste al commit
+        this.runTrx(() -> {
+            Ubicacion ubicacion = ubicacionDAO.guardar(new Ubicacion("Santuario de la Luz"));
+            Espiritu guerrero = espirituDAO.guardar(new Espiritu("Guerrero", "Espíritu de la Luz"));
+
+            ubicacion.agregarEspiritu(guerrero);
+
+            // No se invoca guardar ni actualizar explícitamente
+            // Hibernate detecta el cambio en la relación (dirty checking)
+            // y lo sincroniza automáticamente al hacer commit
+
+            ubicacionId[0] = ubicacion.getId();
+        });
+
+        // Segunda transacción: se recupera desde la DB y se verifica que se guardó
+        this.runTrx(() -> {
+            Ubicacion ubicacion = ubicacionDAO.recuperar(ubicacionId[0]);
+
+            assertEquals(1, ubicacion.getEspiritus().size());
+        });
+    }
+
+    @Test
+    void debePersistirVariosEspiritusEnUnaUbicacion() {
+        final Ubicacion[] ubicacion = new Ubicacion[1];
+
+        this.runTrx(() ->
+            ubicacion[0] = ubicacionDAO.guardar(new Ubicacion("Santuario de la Luz"))
+        );
+
+        this.runTrx(() -> {
+            Espiritu guerrero = espirituDAO.guardar(new Espiritu("Guerrero", "Espíritu de la Luz"));
+            ubicacion[0].agregarEspiritu(guerrero);
+        });
+
+        this.runTrx(() -> {
+            Espiritu mago = espirituDAO.guardar(new Espiritu("Mago", "Espíritu de la Oscuridad"));
+            ubicacion[0].agregarEspiritu(mago);
+        });
+
+        this.runTrx(() -> {
+            Ubicacion ubicacionGuardada = ubicacionDAO.recuperar(ubicacion[0].getId());
+
+            assertEquals(2, ubicacionGuardada.getEspiritus().size());
+        });
+    }
+
     // ============================== TEARDOWN ==============================
 
     @AfterEach
     void tearDown() {
-        this.runTrx(() -> ubicacionDAO.eliminarTodos());
+        this.runTrx(() -> {
+            espirituDAO.eliminarTodos();
+            ubicacionDAO.eliminarTodos();
+        });
     }
 }
