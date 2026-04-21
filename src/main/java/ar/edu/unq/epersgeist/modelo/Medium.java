@@ -50,6 +50,38 @@ public class Medium implements Serializable {
         this.iniciarExorcismo(mediumAExorcizar); // posible foreach entre listas
     }
 
+    private void iniciarExorcismo(Medium mediumAExorcizar) {
+        //mis angeles
+        List<Angelical> espiritusAngelicales = this.espiritusAngelicales();
+        // demonios enemigos
+        List<Demonio> demoniosMedium = new ArrayList<>(mediumAExorcizar.espiritusDemonios());
+
+
+        int indexDemonio = 0;
+
+        for (Angelical angelActual : espiritusAngelicales) {
+
+            if (demoniosMedium.isEmpty()) break;
+
+            Demonio demonioActualAtacado = demoniosMedium.get(indexDemonio);
+
+            this.ataqueADemonio(angelActual, demonioActualAtacado);
+
+            // si el demonio murió lo saco
+            if (!demonioActualAtacado.estaActivo()) {
+                demoniosMedium.remove(demonioActualAtacado);
+            } else {
+                indexDemonio = (indexDemonio + 1) % demoniosMedium.size();
+            }
+        }
+
+        
+
+    }
+
+    private void ataqueADemonio(Angelical angelActual, Demonio demonioActualAtacado) {
+    }
+
 //    private void iniciarExorcismo(Medium mediumAExorcizar) {
 //        List<Angelical> espiritusAngelicales = this.espiritusAngelicales();
 //        List<Demonio> demoniosMediumAExorcizar = mediumAExorcizar.espiritusDemonios();
@@ -89,7 +121,7 @@ public class Medium implements Serializable {
 //            }
 //        }
 //    }
-    }
+    
 
     private void validarExorcismo() throws ExorcistaSinAngelesException {
         if (!this.tengoAlgunEspirituAngel()){
