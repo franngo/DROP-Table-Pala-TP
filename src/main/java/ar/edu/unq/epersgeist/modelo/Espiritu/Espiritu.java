@@ -1,6 +1,7 @@
 package ar.edu.unq.epersgeist.modelo.Espiritu;
 
 import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,8 @@ public class Espiritu implements Serializable {
 
     @ManyToOne
     private Medium mediumCon;
+    @ManyToOne
+    private Ubicacion ubicacion;
 
     public Espiritu(@NonNull String tipo, @NonNull String nombre) {
         this.tipo = tipo;

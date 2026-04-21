@@ -25,9 +25,11 @@ public class Medium implements Serializable {
     private Integer mana;
     private int cantFortalece;
 
-    //¿sería @OneToMany acá y @ManyToOne del lado del Espiritu?
-     @OneToMany(mappedBy = "mediumCon", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "mediumCon", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Espiritu> espiritus;
+
+    @ManyToOne
+    private Ubicacion ubicacion;
 
     public Medium(@NonNull String nombre, @NonNull Integer manaMax, @NonNull Integer mana) {
         this.espiritus = new ArrayList<Espiritu>();
@@ -39,6 +41,7 @@ public class Medium implements Serializable {
 
     public void agregarEspiritu(Espiritu espiritu) {
         espiritus.add(espiritu);
+        espiritu.setMediumCon(this);
     }
 
 }

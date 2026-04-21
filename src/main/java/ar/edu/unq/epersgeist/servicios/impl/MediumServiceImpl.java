@@ -62,7 +62,7 @@ public class MediumServiceImpl implements MediumService {
     }
 
     @Override
-    public void descanzar(Long id) {
+    public void descansar(Long id) {
 
     }
 
