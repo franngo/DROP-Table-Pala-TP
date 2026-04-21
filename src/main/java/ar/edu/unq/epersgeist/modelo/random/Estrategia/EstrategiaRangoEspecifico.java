@@ -1,10 +1,11 @@
-package ar.edu.unq.epersgeist.modelo.random;
+package ar.edu.unq.epersgeist.modelo.random.Estrategia;
 
 import lombok.Getter;
 
 import java.util.random.RandomGenerator;
+
 @Getter
-public class EstrategiaRangoEspecifico implements  EstrategiaNumero{
+public class EstrategiaRangoEspecifico implements EstrategiaNumero {
     private final int min;
     private final int max;
 

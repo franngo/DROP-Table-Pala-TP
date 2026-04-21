@@ -10,7 +10,9 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
 
 @Entity
 public class Espiritu implements Serializable {
@@ -22,7 +24,7 @@ public class Espiritu implements Serializable {
     private String tipo;
     private Integer nivelDeConexion;
     private String nombre;
-
+    private boolean libre;
     @ManyToOne
     private Medium mediumCon;
 
@@ -39,11 +41,11 @@ public class Espiritu implements Serializable {
     }
 
     public void fortalecerConexion(int cantidad) {
-        this.nivelDeConexion = Math.min(this.limiteConexion(),this.nuevaConexion(cantidad));
+        this.nivelDeConexion = Math.min(this.limiteConexion(), this.nuevaConexion(cantidad));
 
     }
 
-    private int nuevaConexion(int cantidad){
+    private int nuevaConexion(int cantidad) {
         return this.getNivelDeConexion() + cantidad;
     }
 
@@ -52,10 +54,21 @@ public class Espiritu implements Serializable {
     }
 
     /*
-    * Por ahora tanto espiritus como demonios tienen capacidad defensiva un random entre 1 al 100
-    * */
+     * Por ahora tanto espiritus como demonios tienen capacidad defensiva un random entre 1 al 100
+     * y tendran los metodos capacidad defensiva,desvincularse y recibir ataque
+     * */
     public int capacidadDefensiva() {
         return (int) RandomDefensa.numeroGenerado();
     }
+
+    public void desvincularse() {
+        this.libre = true;
+        this.mediumCon.desvincularseDe(this);
+    }
+
+    public void recibirAtaque(int cantidad) {
+        // le baja el nivel de conexion segun el calculo en el ataque y la deja en un valor o en 0
+        this.nivelDeConexion = Math.max(0, this.nivelDeConexion - cantidad);
+    }
 }
-}
+

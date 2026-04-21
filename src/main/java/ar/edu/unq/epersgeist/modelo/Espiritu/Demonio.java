@@ -6,4 +6,7 @@ import jakarta.persistence.Entity;
 public class Demonio extends Espiritu {
 
 
+    public boolean estaActivo() {
+        return this.getNivelDeConexion() > 0;
+    }
 }

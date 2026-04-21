@@ -69,7 +69,8 @@ public class Medium implements Serializable {
             this.ataqueADemonio(angelActual,demonioActualAtacado);
 
 
-            // si el demonio murió lo saco
+
+            // si el demonio murió lo saco de la lista de atacados
             if (!demonioActualAtacado.estaActivo()) {
                 demoniosMedium.remove(demonioActualAtacado);
             } else {
@@ -84,6 +85,9 @@ public class Medium implements Serializable {
     private void ataqueADemonio(Angelical angelActual, Demonio demonioAtacado) {
         int porcentajeExito = this.porcentajeDeAtaqueExitoso(angelActual);
         int defensaDemonio = demonioAtacado.capacidadDefensiva();
+
+
+
     }
 
 //    private void iniciarExorcismo(Medium mediumAExorcizar) {
@@ -161,4 +165,7 @@ public class Medium implements Serializable {
         return
     }
 
+    public void desvincularseDe(Espiritu espiritu) {
+        this.espiritus.remove(espiritu);
+    }
 }
