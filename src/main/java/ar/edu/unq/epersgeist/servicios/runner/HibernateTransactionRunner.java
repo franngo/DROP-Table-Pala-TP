@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.servicios.runner;
 
+import ar.edu.unq.epersgeist.modelo.exceptions.ExorcistaSinAngelesException;
 import org.hibernate.Session;
 
 public class HibernateTransactionRunner {
@@ -8,7 +9,7 @@ public class HibernateTransactionRunner {
         Session session = HibernateSessionFactoryProvider.getInstance().createSession();
         HibernateSessionContext.setCurrentSession(session);
         var tx = session.beginTransaction();
-        
+
         try {
             T resultado = bloque.execute();
             tx.commit();
@@ -24,6 +25,6 @@ public class HibernateTransactionRunner {
 
     @FunctionalInterface
     public interface TransactionBlock<T> {
-        T execute();
+        T execute() throws ExorcistaSinAngelesException;
     }
 }

@@ -69,17 +69,5 @@ public class HibernateMediumDAO extends HibernateDAO<Medium> implements MediumDA
         return query.getResultList();
     }
 
-    @Override
-    public void exorcizar(Long idMediumExorcista, Long idMediumAExorcizar) {
-        //TODO COMPLETAR URGENTE
-        /*
-         * preguntas, los espiritus que quedan libres despues del exorcismo, ¿como los persisto?
-         * quien se encarga de persistir los espiritus
-         *
-         * */
-        Medium atacante = recuperar(idMediumExorcista);
-
-    }
-
 
 }

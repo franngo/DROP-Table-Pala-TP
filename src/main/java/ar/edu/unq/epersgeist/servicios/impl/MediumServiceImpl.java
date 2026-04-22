@@ -73,11 +73,20 @@ public class MediumServiceImpl implements MediumService {
             throw new ExorcismoPropioNoPermitidoException("Un medium no puede exorcizarse a si mismo");
         }
         HibernateTransactionRunner.runTrx(() -> {
-            mediumDao.exorcizar(idMediumExorcista, idMediumAExorcizar);
+            Medium mediumAtacante = mediumDao.recuperar(idMediumExorcista);
+            Medium mediumAExorcizar = mediumDao.recuperar(idMediumAExorcizar);
+            // aplico logica de modelo
+            mediumAtacante.exorcizar(mediumAExorcizar);
+            // persisto los cambios
+            mediumDao.actualizar(mediumAtacante);
+            mediumDao.actualizar(mediumAExorcizar);
+
             return null;
+
         });
 
     }
+
 
     @Override
     public List<Espiritu> espiritus(Long mediumId) {

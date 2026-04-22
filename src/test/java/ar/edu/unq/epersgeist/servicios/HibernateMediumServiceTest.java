@@ -34,7 +34,6 @@ public class HibernateMediumServiceTest {
     }
 
 
-
     @Test
     void deberiaRecuperarCorrectamenteLosDatosDelEspiritu() {
         Medium mediumRecuperado = HibernateTransactionRunner.runTrx(() -> {
@@ -97,25 +96,25 @@ public class HibernateMediumServiceTest {
     @Test
     void noDeberiaActualizarConIdNulo() {
         ErrorAlActualizarMediumException exception =
-        assertThrows(ErrorAlActualizarMediumException.class, () -> {
-            HibernateTransactionRunner.runTrx(() -> {
-                serviceMedium.actualizar(epifanio); //comienza sin id
-                return null;
-            });
-        });
+                assertThrows(ErrorAlActualizarMediumException.class, () -> {
+                    HibernateTransactionRunner.runTrx(() -> {
+                        serviceMedium.actualizar(epifanio); //comienza sin id
+                        return null;
+                    });
+                });
         assertEquals("No se puede actualizar un medium que no tiene id.", exception.getMessage());
     }
 
     @Test
     void noDeberiaActualizarConIdQueNoSeEncuentraEnBD() {
         ErrorAlActualizarMediumException exception =
-        assertThrows(ErrorAlActualizarMediumException.class, () -> {
-            HibernateTransactionRunner.runTrx(() -> {
-                epifanio.setId(1L); //no hay nada en la DB con id 1, porque arranca vacía
-                serviceMedium.actualizar(epifanio);
-                return null;
-            });
-        });
+                assertThrows(ErrorAlActualizarMediumException.class, () -> {
+                    HibernateTransactionRunner.runTrx(() -> {
+                        epifanio.setId(1L); //no hay nada en la DB con id 1, porque arranca vacía
+                        serviceMedium.actualizar(epifanio);
+                        return null;
+                    });
+                });
         assertEquals("No existe en la BD el medium con id: 1", exception.getMessage());
     }
 
@@ -137,6 +136,15 @@ public class HibernateMediumServiceTest {
         assertThrows(ErrorAlRecuperarMediumException.class, () -> {
             serviceMedium.recuperar(id);
         });
+    }
+
+    @Test
+    void exorcismoDeberiaDesvincularDemoniosDerrotados() {
+
+        Medium mediumExorcizador = HibernateTransactionRunner.runTrx(() -> serviceMedium.crear(ubeda));
+        Medium mediumAtacado = HibernateTransactionRunner.runTrx(() -> serviceMedium.crear(epifanio));
+
+
     }
 
     private void executeBlockInPersistentContext(Runnable block) {
