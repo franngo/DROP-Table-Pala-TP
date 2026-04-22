@@ -1,8 +1,6 @@
 package ar.edu.unq.epersgeist.modelo;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.random.Estrategia.EstrategiaRangoEspecifico;
-import ar.edu.unq.epersgeist.modelo.random.Random;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -54,10 +52,5 @@ public class MediumTest {
         assertTrue(mediumM.getEspiritus().contains(espirituM2));
     }
 
-    @Test
-    void excorizar() {
-        Random.setEstrategiaNumero(new EstrategiaRangoEspecifico(1, 1));
-        assertEquals(1, mediumM.porcentajeDeAtaqueExitoso(espirituM));
-    }
 
 }

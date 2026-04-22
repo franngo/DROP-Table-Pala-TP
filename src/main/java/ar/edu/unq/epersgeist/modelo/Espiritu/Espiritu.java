@@ -63,9 +63,6 @@ public class Espiritu implements Serializable {
         this.mediumCon.desvincularseDe(this);
     }
 
-    public void recibirAtaque(int cantidad) {
-        // le baja el nivel de conexion segun el calculo en el ataque y la deja en un valor o en 0
-        this.nivelDeConexion = Math.max(0, this.nivelDeConexion - cantidad);
-    }
+
 }
 

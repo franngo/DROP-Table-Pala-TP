@@ -1,7 +1,8 @@
-package ar.edu.unq.epersgeist.modelo;
+package ar.edu.unq.epersgeist.modelo.Batalla;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
+import ar.edu.unq.epersgeist.modelo.Medium;
 
 import java.util.Iterator;
 import java.util.List;
@@ -39,49 +40,17 @@ public class Batalla {
             //batalla individual entre angel y demonio
             ronda.ataqueIndividual(angel, demonio);
 
+
             if (!demonio.estaActivo()) {
+                demonio.desvincularse();
                 itDemonios.remove();
             }
+
+            if (!angel.estaActivo()) {
+                angel.desvincularse();
+            }
         }
     }
-/*
-    public void iniciarBatalla() {
-
-        //angeles medium que ataca
-        List<Angelical> angelesAtacante = atacante.espiritusAngelicales();
-        List<Demonio> demoniosAtacados = atacado.espiritusDemonios();
-
-        int indexDemonio = 0;
-        for (Angelical angel : angelesAtacante) {
-
-            //si la lista de demonios esta vacia, ganó!!
-            if (demoniosAtacados.isEmpty()) {
-                this.ganoAtacante = true;
-                break;
-            }
-            //obtengo el demonio actual a atacar
-            Demonio demonioAtacado = demoniosAtacados.get(indexDemonio);
-
-            //Se calcula los porcentajes
-            int porcentajeDeEXITO = this.porcentajeDeAtaqueExitoso(angel);
-            int defensaDemonio = demonioAtacado.capacidadDefensiva();
-
-            if (porcentajeDeEXITO > defensaDemonio) {
-                demonioAtacado.recibirAtaque(angel.getNivelDeConexion() / 2);
-                if (!demonioAtacado.estaActivo()) {
-                    demoniosAtacados.remove(indexDemonio);
-                    indexDemonio++;
-                }
-            } else {
-                angel.recibirAtaque(5);
-            }
-
-
-        }
-
-    }
-*/
-
 
     public void accionesPostBatalla() {
         if (this.ganoAtacante) {

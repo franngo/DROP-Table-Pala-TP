@@ -1,4 +1,4 @@
-package ar.edu.unq.epersgeist.modelo;
+package ar.edu.unq.epersgeist.modelo.Batalla;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
@@ -11,14 +11,14 @@ public class RondaDeCombate {
     public void ataqueIndividual(Angelical angel, Demonio demonio) {
 
         if (ataqueExitoso(angel, demonio)) {
-            demonio.recibirAtaque(angel.poderDeAtaque());
+            demonio.recibirAtaqueDe(angel);
         } else {
-            angel.recibirAtaque(5);
+            angel.recibirAtaqueDe(demonio);
         }
     }
 
     private boolean ataqueExitoso(Angelical angel, Demonio demonio) {
-        return this.porcentajeDeAtaqueExitoso(angel) > this.capacidadDefensiva(demonio);
+        return this.porcentajeDeAtaqueExitoso(angel) > this.capacidadDefensiva();
     }
 
 
@@ -29,5 +29,6 @@ public class RondaDeCombate {
     public int capacidadDefensiva() {
         return (int) RandomDefensa.numeroGenerado();
     }
+
 
 }
