@@ -41,7 +41,9 @@ public class Medium implements Serializable {
         this.cantFortalece = 10;
     }
 
+    //por ahora este
     public void agregarEspiritu(Espiritu espiritu) {
+        espiritu.setMediumCon(this);
         espiritus.add(espiritu);
     }
 

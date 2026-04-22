@@ -1,9 +1,14 @@
 package ar.edu.unq.epersgeist.modelo.Espiritu;
 
 import jakarta.persistence.Entity;
+import lombok.NonNull;
 
 @Entity
 public class Angelical extends Espiritu implements Combatiente {
+    public Angelical(@NonNull String tipo, @NonNull String nombre) {
+        super(tipo, nombre);
+    }
+
     @Override
     public boolean estaActivo() {
         return this.getNivelDeConexion() > 0;

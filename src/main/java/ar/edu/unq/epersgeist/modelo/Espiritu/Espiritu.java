@@ -24,6 +24,7 @@ public class Espiritu implements Serializable {
     private Integer nivelDeConexion;
     private String nombre;
     private boolean libre;
+    private static final int NIVEL_MAXIMO_CONEXION = 100;
     @ManyToOne
     private Medium mediumCon;
 
@@ -40,7 +41,7 @@ public class Espiritu implements Serializable {
     }
 
     public void fortalecerConexion(int cantidad) {
-        this.nivelDeConexion = Math.min(this.limiteConexion(), this.nuevaConexion(cantidad));
+        this.nivelDeConexion = Math.min(NIVEL_MAXIMO_CONEXION, this.nuevaConexion(cantidad));
 
     }
 
@@ -48,19 +49,15 @@ public class Espiritu implements Serializable {
         return this.getNivelDeConexion() + cantidad;
     }
 
-    private int limiteConexion() {
-        return 100;
-    }
-
-    /*
-     * Por ahora tanto espiritus como demonios tienen capacidad defensiva un random entre 1 al 100
-     * y tendran los metodos capacidad defensiva,desvincularse y recibir ataque
-     * */
-
 
     public void desvincularse() {
         this.libre = true;
         this.mediumCon.desvincularseDe(this);
+    }
+
+
+    public boolean getLibre() {
+        return libre;
     }
 
 
