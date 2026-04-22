@@ -8,14 +8,14 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Batalla {
-    boolean ganoAtacante;
+
     Medium atacante;
     Medium atacado;
 
-    private RondaDeCombate ronda = new RondaDeCombate();
+    private RondaDeCombateStandard ronda = new RondaDeCombateStandard();
 
     public Batalla(Medium medium, Medium mediumAExorcizar) {
-        this.ganoAtacante = false;
+
         this.atacante = medium;
         this.atacado = mediumAExorcizar;
     }
@@ -31,7 +31,6 @@ public class Batalla {
 
             // si no hay mas demonios, se considera que ganó
             if (!itDemonios.hasNext()) {
-                ganoAtacante = true;
                 break;
             }
             // obtengo el demonio actual
@@ -52,11 +51,5 @@ public class Batalla {
         }
     }
 
-    public void accionesPostBatalla() {
-        if (this.ganoAtacante) {
-            atacado.desvincularDemonios();
-        } else {
-            atacante.desvincularAngeles();
-        }
-    }
+
 }

@@ -64,5 +64,7 @@ public class Espiritu implements Serializable {
     }
 
 
+    public void recibirAtaqueDe(Espiritu angel) {
+    }
 }
 

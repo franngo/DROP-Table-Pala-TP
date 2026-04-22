@@ -10,6 +10,7 @@ public class Demonio extends Espiritu implements Combatiente {
         return this.getNivelDeConexion() > 0;
     }
 
+    @Override
     public void recibirAtaqueDe(Espiritu angelAtacante) {
         int danhoARecibir = angelAtacante.getNivelDeConexion() / 2;
         // le baja el nivel de conexion segun el calculo en el ataque y la deja en un valor o en 0

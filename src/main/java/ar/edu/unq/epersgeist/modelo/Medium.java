@@ -50,83 +50,8 @@ public class Medium implements Serializable {
 
         Batalla batalla = new Batalla(this, mediumAExorcizar);
         batalla.iniciarBatalla();
-        batalla.accionesPostBatalla();// posible foreach entre listas
+
     }
-
-//    private void iniciarExorcismo(Medium mediumAExorcizar) {
-//        //mis angeles
-//        List<Angelical> espiritusAngelicales = this.espiritusAngelicales();
-//        // demonios enemigos
-//        List<Demonio> demoniosMedium = new ArrayList<>(mediumAExorcizar.espiritusDemonios());
-//
-//
-//        int indexDemonio = 0;
-//
-//        for (Angelical angelActual : espiritusAngelicales) {
-//
-//            if (demoniosMedium.isEmpty()) break;
-//
-//            Demonio demonioActualAtacado = demoniosMedium.get(indexDemonio);
-//
-//            //ATAQUE ENTRE ANGEL ACTUAL Y EL DEMONIO ACTUAL
-//            this.ataqueADemonio(angelActual,demonioActualAtacado);
-//
-//           // seguir simulando pelea
-//
-//
-//            // si el demonio murió lo saco de la lista de atacados
-//            if (!demonioActualAtacado.estaActivo()) {
-//                demoniosMedium.remove(demonioActualAtacado);
-//            } else {
-//                indexDemonio = (indexDemonio + 1) % demoniosMedium.size();
-//            }
-//        }
-//
-//
-//
-//    }
-
-
-//    private void iniciarExorcismo(Medium mediumAExorcizar) {
-//        List<Angelical> espiritusAngelicales = this.espiritusAngelicales();
-//        List<Demonio> demoniosMediumAExorcizar = mediumAExorcizar.espiritusDemonios();
-//
-//        for (Angelical angel : espiritusAngelicales) {
-//             int 0;
-//            // Si ya no quedan demonios, termina el exorcismo
-//            if (indiceDemonio >= demoniosMediumAExorcizar.size()) {
-//                break;
-//            }
-//
-//            Demonio demonio = demoniosMediumAExorcizar.get(indiceDemonio);
-//
-//            int porcentajeAtaque = Math.min(
-//                    Random.numeroGenerado(1, 10) + angel.nivelDeConexion(),
-//                    100
-//            );
-//
-//            int porcentajeDefensa = Random.numeroGenerado(1, 100);
-//
-//            if (porcentajeAtaque > porcentajeDefensa) {
-//
-//                demonio.perderConexion(angel.nivelDeConexion() / 2);
-//
-//                if (demonio.nivelDeConexion() <= 0) {
-//                    mediumAExorcizar.desvincular(demonio);
-//                    demonios.remove(indiceDemonio);
-//                }
-//
-//            } else {
-//
-//                angel.perderConexion(5);
-//
-//                if (angel.nivelDeConexion() <= 0) {
-//                    this.desvincular(angel);
-//                }
-//            }
-//        }
-//    }
-
 
     private void validarExorcismo() throws ExorcistaSinAngelesException {
         if (!this.tengoAlgunEspirituAngel()) {
@@ -160,11 +85,5 @@ public class Medium implements Serializable {
         this.espiritus.remove(espiritu);
     }
 
-    public void desvincularAngeles() {
-        this.espiritus.removeIf(esp -> esp instanceof Angelical);
-    }
 
-    public void desvincularDemonios() {
-        this.espiritus.removeIf(esp -> esp instanceof Demonio);
-    }
 }
