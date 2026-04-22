@@ -41,10 +41,10 @@ public class Espiritu implements Serializable {
     }
 
     public void fortalecerConexion(int cantidad) {
-        this.nivelDeConexion = Math.min(Espiritu.limiteConexion,this.nuevaConexion(cantidad));
+        this.nivelDeConexion = Math.min(Espiritu.limiteConexion,this.cantidadNuevaConexion(cantidad));
     }
 
-    private int nuevaConexion(int cantidad){
+    private int cantidadNuevaConexion(int cantidad){
         return this.getNivelDeConexion() + cantidad;
     }
 

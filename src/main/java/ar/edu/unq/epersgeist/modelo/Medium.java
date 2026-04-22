@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeInvocacionDeEspirituException;
 
 @Getter
 @Setter
@@ -54,10 +55,10 @@ public class Medium implements Serializable {
     public static final int manaDescansoEspiritus = 5;
 
     private void recuperarMana(int cantidad) {
-        this.mana = Math.min(this.manaMax, this.nuevaCantidad(cantidad));
+        this.mana = Math.min(this.manaMax, this.cantidadAlDescansar(cantidad));
     }
 
-    private int nuevaCantidad(int cantidad){
+    private int cantidadAlDescansar(int cantidad){
         return this.mana + cantidad;
     }
 
@@ -72,21 +73,29 @@ public class Medium implements Serializable {
     Recibe ambos id, recupera los 2, y se debería fijar que ambos no sean cosas nulas.
     Si son nulas ¿ErrorAlInvocar("Se intentó invocar con una entidad no existente.")?
     Si no lo son, y tenemos medium y espiritu, mandamos medium.invocar(espiritu);
+    */
 
     public Espiritu invocar(Espiritu espiritu) {
         if(this.mana < 10) {
-            return;
+            return espiritu; //no se hace nada
         }
 
-        if(!espiritu.estaLibre()) {
-            throw ErrorAlInvocar("El espiritu dado no está libre, por lo que no puede ser invocado por otro medium.");
+        if(espiritu.getMediumCon() != null) { //si el Espiritu NO está libre
+            throw new ErrorDeInvocacionDeEspirituException();
         }
 
-        this.mana -= 10; //en realidad hay que fijarse que quede en eso o en un mínimo de 0, pero NO en negativo
-        //usar Math.min
+        this.mana = Math.max(minimoMana, this.cantidadAlInvocar(manaRequeridoInvocacion));
 
         espiritu.setUbicacion(this.ubicacion);
+
+        return espiritu;
     }
-     */
+
+    public static final int minimoMana = 0;
+    public static final int manaRequeridoInvocacion = 10;
+
+    private int cantidadAlInvocar(int cantidad){
+        return this.mana - cantidad;
+    }
 
 }
