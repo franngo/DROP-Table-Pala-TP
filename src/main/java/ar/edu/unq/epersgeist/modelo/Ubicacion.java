@@ -30,4 +30,12 @@ public class Ubicacion {
     public Ubicacion(String nombre) {
         this.nombre = nombre;
     }
+
+    public void agregarEspiritu(Espiritu espiritu) {
+        this.espiritus.add(espiritu);
+    }
+
+    public void agregarMedium(Medium medium) {
+        this.mediums.add(medium);
+    }
 }
