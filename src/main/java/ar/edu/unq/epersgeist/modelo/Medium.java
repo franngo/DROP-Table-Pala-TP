@@ -68,12 +68,9 @@ public class Medium implements Serializable {
     }
 
     /*
-    El de MediumService es public Espiritu invocar(Long id, Long idMedium);
-    Recibe ambos id, recupera los 2, y se debería fijar que ambos no sean cosas nulas.
-    Si son nulas ¿ErrorAlInvocar("Se intentó invocar con una entidad no existente.")?
-    Si no lo son, y tenemos medium y espiritu, mandamos medium.invocar(espiritu);
+    Precondición = El Espiritu dado debe estar libre (no debe estar conectado con un Medium).
+    Observación = Si el medium no tiene al menos 10 de maná, no se lleva la operación a cabo (no sucede nada).
     */
-
     public Espiritu invocar(Espiritu espiritu) {
         if(this.mana < 10) {
             return espiritu; //si no hay suificiente maná, no se hace nada

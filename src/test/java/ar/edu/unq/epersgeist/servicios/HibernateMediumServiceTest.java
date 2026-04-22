@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.servicios;
 
+import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarMediumException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarMediumException;
@@ -19,11 +20,15 @@ public class HibernateMediumServiceTest {
     private final MediumServiceImpl serviceMedium = new MediumServiceImpl(mediumDao, espirituDao);
     private Medium epifanio;
     private Medium ubeda;
+    private Espiritu espirituM;
+    private Espiritu espirituM2;
 
     @BeforeEach
     public void setUp() {
         epifanio = new Medium("Epifanio el poderoso", 150, 50);
         ubeda = new Medium("Ubeda el dt", 100, 20);
+        espirituM = new Espiritu("Fuego", "Charizard");
+        espirituM2 = new Espiritu("Agua", "Bulbasor");
     }
 
     @Test
@@ -141,6 +146,55 @@ public class HibernateMediumServiceTest {
         });
     }
 
+    @Test
+    public void descansarCasoExitoso() {
+        assertEquals(50, epifanio.getMana());
+        assertEquals(0, espirituM.getNivelDeConexion());
+        assertEquals(0, espirituM2.getNivelDeConexion());
+
+        epifanio.agregarEspiritu(espirituM);
+        epifanio.agregarEspiritu(espirituM2);
+        this.executeBlockInPersistentContext(() -> {
+            mediumDao.crear(epifanio);
+            espirituDao.crear(espirituM);
+            espirituDao.crear(espirituM2);
+        });
+
+        serviceMedium.descansar(epifanio.getId());
+
+        this.executeBlockInPersistentContext(() -> {
+            Medium m = mediumDao.recuperar(epifanio.getId());
+            Espiritu e1 = espirituDao.recuperar(espirituM.getId());
+            Espiritu e2 = espirituDao.recuperar(espirituM2.getId());
+
+            assertEquals(65, m.getMana());
+            assertEquals(5, e1.getNivelDeConexion());
+            assertEquals(5, e2.getNivelDeConexion());
+        });
+
+    }
+
+        /*
+    //arreglar!!!!!!!!!!!!!! hay que hablarle al serviceMedium
+    @Test
+    public void descansarFallaPorMediumIdNulo() {
+        assertEquals(50, epifanio.getMana());
+        assertEquals(0, espirituM.getNivelDeConexion());
+        assertEquals(0, espirituM2.getNivelDeConexion());
+
+        epifanio.agregarEspiritu(espirituM);
+        epifanio.agregarEspiritu(espirituM2);
+
+        epifanio.descansar();
+
+        assertEquals(65, epifanio.getMana());
+        assertEquals(5, espirituM.getNivelDeConexion());
+        assertEquals(5, espirituM2.getNivelDeConexion());
+    }
+     */
+
+
+
     private void executeBlockInPersistentContext(Runnable block) {
         HibernateTransactionRunner.runTrx(() -> {
             block.run();
@@ -151,6 +205,7 @@ public class HibernateMediumServiceTest {
     @AfterEach
     void tearDown() {
         HibernateTransactionRunner.runTrx(() -> {
+            espirituDao.eliminarTodos();
             mediumDao.eliminarTodos();
             return null;
         });

@@ -64,17 +64,15 @@ public class MediumServiceImpl implements MediumService {
     public void descansar(Long id) {
         HibernateTransactionRunner.runTrx(() -> {
             Medium m = mediumDao.recuperar(id);
+
+            if(m==null) {
+                throw new ErrorAlRecuperarMediumException(id);
+            }
+
             m.descansar();
             return null;
         });
     }
-
-    /*
-El de MediumService es public Espiritu invocar(Long id, Long idMedium);
-Recibe ambos id, recupera los 2, y se debería fijar que ambos no sean cosas nulas.
-Si son nulas ¿ErrorAlInvocar("Se intentó invocar con una entidad no existente.")?
-Si no lo son, y tenemos medium y espiritu, mandamos medium.invocar(espiritu);
-*/
 
     @Override
     public Espiritu invocar(Long mediumId, Long espirituId) {
