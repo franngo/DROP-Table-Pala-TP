@@ -3,6 +3,7 @@ package ar.edu.unq.epersgeist.servicios.impl;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarMediumException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ExorcismoPropioNoPermitidoException;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.servicios.MediumService;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
@@ -67,7 +68,14 @@ public class MediumServiceImpl implements MediumService {
     }
 
     @Override
-    public void exorcizar(Long idMediumExorcista, Long idMediumAExorcizar) {
+    public void exorcizar(Long idMediumExorcista, Long idMediumAExorcizar) throws ExorcismoPropioNoPermitidoException {
+        if (idMediumExorcista == idMediumAExorcizar) {
+            throw new ExorcismoPropioNoPermitidoException("Un medium no puede exorcizarse a si mismo");
+        }
+        HibernateTransactionRunner.runTrx(() -> {
+            mediumDao.exorcizar(idMediumExorcista, idMediumAExorcizar);
+            return null;
+        });
 
     }
 

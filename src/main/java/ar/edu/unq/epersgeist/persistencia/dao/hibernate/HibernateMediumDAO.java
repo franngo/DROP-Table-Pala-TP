@@ -60,13 +60,25 @@ public class HibernateMediumDAO extends HibernateDAO<Medium> implements MediumDA
         session.remove(medium);
     }
 
-   
+
     @Override
     public List<Medium> recuperarTodos() {
         Session session = HibernateSessionContext.getCurrentSession();
         String hql = "select e from Medium e order by e.nombre asc";
         Query<Medium> query = session.createQuery(hql, Medium.class);
         return query.getResultList();
+    }
+
+    @Override
+    public void exorcizar(Long idMediumExorcista, Long idMediumAExorcizar) {
+        //TODO COMPLETAR URGENTE
+        /*
+         * preguntas, los espiritus que quedan libres despues del exorcismo, ¿como los persisto?
+         * quien se encarga de persistir los espiritus
+         *
+         * */
+        Medium atacante = recuperar(idMediumExorcista);
+
     }
 
 
