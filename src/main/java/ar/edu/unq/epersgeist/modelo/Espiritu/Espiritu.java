@@ -24,9 +24,6 @@ public class Espiritu implements Serializable {
     private String nombre;
 
     @ManyToOne
-    private Ubicacion ubicacion;
-
-    @ManyToOne
     private Medium mediumCon;
     @ManyToOne
     private Ubicacion ubicacion;
