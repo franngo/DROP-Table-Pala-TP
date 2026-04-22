@@ -4,12 +4,11 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.exceptions.ExorcistaSinAngelesException;
-import ar.edu.unq.epersgeist.modelo.random.Random;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,7 +29,7 @@ public class Medium implements Serializable {
     private int cantFortalece;
 
     //¿sería @OneToMany acá y @ManyToOne del lado del Espiritu?
-     @OneToMany(mappedBy = "mediumCon", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "mediumCon", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Espiritu> espiritus;
 
     public Medium(@NonNull String nombre, @NonNull Integer manaMax, @NonNull Integer mana) {
@@ -48,7 +47,7 @@ public class Medium implements Serializable {
     public void exorcizar(Medium mediumAExorcizar) throws ExorcistaSinAngelesException {
         this.validarExorcismo();
 
-        Batalla batalla = new Batalla(this,mediumAExorcizar);
+        Batalla batalla = new Batalla(this, mediumAExorcizar);
         batalla.iniciarBatalla();
         batalla.accionesPostBatalla();// posible foreach entre listas
     }
@@ -85,7 +84,6 @@ public class Medium implements Serializable {
 //
 //
 //    }
-
 
 
 //    private void iniciarExorcismo(Medium mediumAExorcizar) {
@@ -127,10 +125,10 @@ public class Medium implements Serializable {
 //            }
 //        }
 //    }
-    
+
 
     private void validarExorcismo() throws ExorcistaSinAngelesException {
-        if (!this.tengoAlgunEspirituAngel()){
+        if (!this.tengoAlgunEspirituAngel()) {
             throw new ExorcistaSinAngelesException("El medium no cuenta con espiritus angeles");
         }
     }
@@ -150,17 +148,19 @@ public class Medium implements Serializable {
     }
 
 
-
-    private boolean tengoAlgunEspirituAngel(){
-        return espiritus.stream().anyMatch( e -> e instanceof Angelical);
+    private boolean tengoAlgunEspirituAngel() {
+        return espiritus.stream().anyMatch(e -> e instanceof Angelical);
     }
 
+    /*
+     * el metodo desvncularseDe lo llama el espiritu cuando se libera
+     * */
     public void desvincularseDe(Espiritu espiritu) {
         this.espiritus.remove(espiritu);
     }
 
     public void desvincularAngeles() {
-         this.espiritus.removeIf(esp -> esp instanceof Angelical);
+        this.espiritus.removeIf(esp -> esp instanceof Angelical);
     }
 
     public void desvincularDemonios() {
