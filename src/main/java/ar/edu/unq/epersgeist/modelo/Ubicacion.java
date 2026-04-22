@@ -22,9 +22,13 @@ public class Ubicacion {
     private String nombre;
 
     @OneToMany(mappedBy = "ubicacion", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Espiritu> espiritus = new ArrayList<>();
+    private List<Espiritu> espiritus = new ArrayList<Espiritu>();
+    @OneToMany(mappedBy = "ubicacion", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Medium> mediums = new ArrayList<Medium>();
 
-    // --------------------------------------------------------------------------------
+    public Ubicacion () {
+        // Hibernate
+    }
 
     public Ubicacion(String nombre) {
         this.nombre = nombre;
@@ -33,5 +37,11 @@ public class Ubicacion {
     public void agregarEspiritu(Espiritu espiritu) {
         this.espiritus.add(espiritu);
         espiritu.setUbicacion(this);
+    }
+  
+  
+    public void agregarMedium(Medium medium) {
+        this.mediums.add(medium);
+        medium.setUbicacion(this);
     }
 }

@@ -28,6 +28,8 @@ public class Espiritu implements Serializable {
 
     @ManyToOne
     private Medium mediumCon;
+    @ManyToOne
+    private Ubicacion ubicacion;
 
     public Espiritu(@NonNull String tipo, @NonNull String nombre) {
         this.tipo = tipo;
@@ -42,15 +44,12 @@ public class Espiritu implements Serializable {
     }
 
     public void fortalecerConexion(int cantidad) {
-        this.nivelDeConexion = Math.min(this.limiteConexion(),this.nuevaConexion(cantidad));
-
+        this.nivelDeConexion = Math.min(Espiritu.limiteConexion,this.cantidadNuevaConexion(cantidad));
     }
 
-    private int nuevaConexion(int cantidad){
+    private int cantidadNuevaConexion(int cantidad){
         return this.getNivelDeConexion() + cantidad;
     }
 
-    private int limiteConexion() {
-        return 100;
-    }
+    public static final int limiteConexion = 100;
 }
