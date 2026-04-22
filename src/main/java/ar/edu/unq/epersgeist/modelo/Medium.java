@@ -77,7 +77,7 @@ public class Medium implements Serializable {
 
     public Espiritu invocar(Espiritu espiritu) {
         if(this.mana < 10) {
-            return espiritu; //no se hace nada
+            return espiritu; //si no hay suificiente maná, no se hace nada
         }
 
         if(espiritu.getMediumCon() != null) { //si el Espiritu NO está libre
