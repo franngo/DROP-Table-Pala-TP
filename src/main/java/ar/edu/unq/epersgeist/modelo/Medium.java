@@ -45,7 +45,6 @@ public class Medium implements Serializable {
         espiritu.setMediumCon(this);
     }
 
-    //El de service es public void descansar(Long mediumId)
     public void descansar() {
         this.recuperarMana(Medium.manaDescansoMedium);
         this.espiritusRecuperanMana(Medium.manaDescansoEspiritus);
