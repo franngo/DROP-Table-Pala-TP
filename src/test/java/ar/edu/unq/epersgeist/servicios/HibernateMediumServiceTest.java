@@ -197,7 +197,7 @@ public class HibernateMediumServiceTest {
         this.executeBlockInPersistentContext(() -> {
             mediumDao.crear(epifanio);
             espirituDao.crear(espirituM);
-            ubicacionDao.crear(ubicacion);
+            ubicacionDao.guardar(ubicacion);
         });
 
         serviceMedium.invocar(epifanio.getId(), espirituM.getId());

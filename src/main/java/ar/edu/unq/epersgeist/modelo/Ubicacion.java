@@ -26,10 +26,6 @@ public class Ubicacion {
     @OneToMany(mappedBy = "ubicacion", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Medium> mediums = new ArrayList<Medium>();
 
-    public Ubicacion () {
-        // Hibernate
-    }
-
     public Ubicacion(String nombre) {
         this.nombre = nombre;
     }
