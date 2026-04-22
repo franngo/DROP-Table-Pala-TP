@@ -1,14 +1,16 @@
 package ar.edu.unq.epersgeist.modelo.Espiritu;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.NonNull;
 
 @Entity
+@DiscriminatorValue("DEMONIO")
 public class Demonio extends Espiritu implements Combatiente {
 
 
-    public Demonio(@NonNull String tipo, @NonNull String nombre) {
-        super(tipo, nombre);
+    public Demonio(@NonNull String nombre) {
+        super(nombre);
     }
 
     public boolean estaActivo() {

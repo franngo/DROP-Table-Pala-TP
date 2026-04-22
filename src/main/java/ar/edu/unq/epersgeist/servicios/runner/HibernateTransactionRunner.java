@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.servicios.runner;
 
+import ar.edu.unq.epersgeist.modelo.exceptions.ExorcismoPropioNoPermitidoException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ExorcistaSinAngelesException;
 import org.hibernate.Session;
 
@@ -25,6 +26,6 @@ public class HibernateTransactionRunner {
 
     @FunctionalInterface
     public interface TransactionBlock<T> {
-        T execute() throws ExorcistaSinAngelesException;
+        T execute() throws ExorcistaSinAngelesException, ExorcismoPropioNoPermitidoException;
     }
 }

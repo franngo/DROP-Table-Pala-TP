@@ -1,12 +1,14 @@
 package ar.edu.unq.epersgeist.modelo.Espiritu;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.NonNull;
 
 @Entity
+@DiscriminatorValue("ANGEL")
 public class Angelical extends Espiritu implements Combatiente {
-    public Angelical(@NonNull String tipo, @NonNull String nombre) {
-        super(tipo, nombre);
+    public Angelical(@NonNull String nombre) {
+        super(nombre);
     }
 
     @Override

@@ -31,20 +31,20 @@ public class MediumTest {
     void setUp() {
         mediumM = new Medium("Juan", 100, 50);
         mediumM2 = new Medium("Matias", 80, 40);
-        espirituM = new Espiritu("Fuego", "Charizard");
-        espirituM2 = new Espiritu("Agua", "Bulbasor");
+        espirituM = new Angelical("Charizard");
+        espirituM2 = new Angelical("Bulbasor");
 
 
         //contexto de los espiritus y demonios en el exorcismo
-        rika = new Angelical("Angel", "Rika");
+        rika = new Angelical("Rika");
         rika.setNivelDeConexion(60);
-        ivaar = new Angelical("Angel", "Ivaar");
+        ivaar = new Angelical("Ivaar");
         ivaar.setNivelDeConexion(80);
-        hana = new Angelical("Angel", "Hana");
+        hana = new Angelical("Hana");
         hana.setNivelDeConexion(5);
-        jaeger = new Demonio("Demonio", "Jaeger");
+        jaeger = new Demonio("Jaeger");
         jaeger.setNivelDeConexion(50);
-        noroi = new Demonio("Demonio", "Noroi");
+        noroi = new Demonio("Noroi");
         noroi.setNivelDeConexion(66);
     }
 

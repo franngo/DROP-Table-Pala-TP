@@ -14,22 +14,25 @@ import java.io.Serializable;
 @NoArgsConstructor
 
 @Entity
-public class Espiritu implements Serializable {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "tipo")
+public abstract class Espiritu implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String tipo;
+
     private Integer nivelDeConexion;
     private String nombre;
     private boolean libre;
     private static final int NIVEL_MAXIMO_CONEXION = 100;
+
     @ManyToOne
+    @JoinColumn(name = "mediumCon_id")
     private Medium mediumCon;
 
-    public Espiritu(@NonNull String tipo, @NonNull String nombre) {
-        this.tipo = tipo;
+    public Espiritu(@NonNull String nombre) {
         this.nivelDeConexion = 0;
         this.nombre = nombre;
     }

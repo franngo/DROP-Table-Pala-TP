@@ -27,6 +27,17 @@ public class HibernateMediumDAO extends HibernateDAO<Medium> implements MediumDA
     }
 
     @Override
+    public Medium recuperar(Long id) {
+        Session session = HibernateSessionContext.getCurrentSession();
+
+        String hql = "select distinct m from Medium m left join fetch m.espiritus where m.id = :id";
+
+        return session.createQuery(hql, Medium.class)
+                .setParameter("id", id)
+                .uniqueResult();
+    }
+
+    @Override
     public void actualizar(Medium medium) {
         Session session = HibernateSessionContext.getCurrentSession();
 

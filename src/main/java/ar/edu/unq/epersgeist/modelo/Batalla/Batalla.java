@@ -37,17 +37,24 @@ public class Batalla {
 
             if (!demonioActual.estaActivo()) {
                 demonioActual.desvincularse();
+
+
+                atacado.desvincularseDe(demonioActual);
+
                 itDemonios.remove();
 
                 if (!itDemonios.hasNext()) {
                     break;
                 }
 
-                demonioActual = itDemonios.next(); // recién acá pasás al siguiente
+                demonioActual = itDemonios.next();
             }
 
             if (!angel.estaActivo()) {
                 angel.desvincularse();
+
+
+                atacante.desvincularseDe(angel);
             }
         }
     }
