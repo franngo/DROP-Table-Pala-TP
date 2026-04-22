@@ -4,6 +4,8 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Medium;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Batalla {
@@ -21,31 +23,27 @@ public class Batalla {
 
     public void iniciarBatalla() {
         List<Angelical> angeles = atacante.espiritusAngelicales();
-        List<Demonio> demonios = atacado.espiritusDemonios();
+        List<Demonio> demonios = new ArrayList<>(atacado.espiritusDemonios());
 
-        //Iterator<Demonio> itDemonios = demonios.iterator();
-        int indexDemonios = 0;
-        // por cada angel hay un ataque a la lista de demonios
+        Iterator<Demonio> itDemonios = demonios.iterator();
+
+        if (!itDemonios.hasNext()) return;
+
+        Demonio demonioActual = itDemonios.next();
+
         for (Angelical angel : angeles) {
 
-            // si no hay mas demonios, se considera terminado el exorcismo
-           /* if (!itDemonios.hasNext()) {
-                break;
-            }*/
-            if (demonios.isEmpty()) {
-                break;
-            }
-            // obtengo el demonio actual
-            Demonio demonio = demonios.get(indexDemonios);
+            ronda.ataqueIndividual(angel, demonioActual);
 
-            //batalla individual entre angel y demonio
-            ronda.ataqueIndividual(angel, demonio);
+            if (!demonioActual.estaActivo()) {
+                demonioActual.desvincularse();
+                itDemonios.remove();
 
+                if (!itDemonios.hasNext()) {
+                    break;
+                }
 
-            if (!demonio.estaActivo()) {
-                demonio.desvincularse();
-                demonios.remove(indexDemonios);
-                indexDemonios++;
+                demonioActual = itDemonios.next(); // recién acá pasás al siguiente
             }
 
             if (!angel.estaActivo()) {
@@ -53,6 +51,5 @@ public class Batalla {
             }
         }
     }
-
 
 }

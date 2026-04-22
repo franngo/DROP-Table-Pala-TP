@@ -6,6 +6,7 @@ import lombok.Setter;
 
 @Setter
 public class RandomDefensa {
+    @Setter
     private static EstrategiaNumero estrategiaNumero = new EstrategiaAleatoria100();
 
     public static int numeroGenerado() {

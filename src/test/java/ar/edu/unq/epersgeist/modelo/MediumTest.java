@@ -4,6 +4,9 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.exceptions.ExorcistaSinAngelesException;
+import ar.edu.unq.epersgeist.modelo.random.Estrategia.EstrategiaRangoEspecifico;
+import ar.edu.unq.epersgeist.modelo.random.Random;
+import ar.edu.unq.epersgeist.modelo.random.RandomDefensa;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -79,58 +82,56 @@ public class MediumTest {
     //Test de exorcismo
 
     @Test
-    void exorcismoDeberiaSeguirFlujoCorrecto() throws ExorcistaSinAngelesException {
+    void exorcismoDeberiaSeguirFlujoCorrectoCon1Espiritu() throws ExorcistaSinAngelesException {
+        //seteo los valores random para que el porcentaje de ataque siempre le gane al de defensa
+        Random.setEstrategiaNumero(new EstrategiaRangoEspecifico(10, 10));
+        RandomDefensa.setEstrategiaNumero(new EstrategiaRangoEspecifico(5, 5));
 
-
-        mediumM.agregarEspiritu(rika);
-        mediumM.agregarEspiritu(ivaar);
-        mediumM.agregarEspiritu(hana);
+        mediumM.agregarEspiritu(rika); // rika cuenta con 60 de conexion
 
         // Demonios
-
-
-        mediumM2.agregarEspiritu(jaeger);
-        mediumM2.agregarEspiritu(noroi);
-
-
+        mediumM2.agregarEspiritu(jaeger); // jaeger tiene 50 de conexion
         mediumM.exorcizar(mediumM2);
+        // Jaeger recibe daño 30
+        assertFalse(jaeger.getLibre());
+        assertEquals(20, jaeger.getNivelDeConexion());
 
-        // 🔍 Verificaciones
+    }
 
-        // Jaeger muere
+    @Test
+    void exorcismoDeberiaSeguirFlujoCorrectoCon2Espiritus() throws ExorcistaSinAngelesException {
+        Random.setEstrategiaNumero(new EstrategiaRangoEspecifico(10, 10));
+        RandomDefensa.setEstrategiaNumero(new EstrategiaRangoEspecifico(5, 5));
+
+        mediumM.agregarEspiritu(rika); // rika cuenta con 60 de conexion
+        mediumM.agregarEspiritu(ivaar); // ivaar cuenta con 80 de conexion
+        // Demonios
+        mediumM2.agregarEspiritu(jaeger); // jaeger tiene 50 de conexion
+        mediumM.exorcizar(mediumM2);
+        // Jaeger recibe primero 30 de daño y luego recibe 40 de daño, quedando en 0 y libre
         assertTrue(jaeger.getLibre());
         assertEquals(0, jaeger.getNivelDeConexion());
 
-        // Noroi sigue vivo
-        assertFalse(noroi.getLibre());
-        assertEquals(66, noroi.getNivelDeConexion());
-
-        // Hana es libre
-        assertFalse(hana.getLibre());
-        assertEquals(0, hana.getNivelDeConexion());
     }
-    /*
+
     @Test
-    void deberiaGanarAtacanteSiNoQuedanDemonios() {
+    void elMediumPierdeSuAngelSiPierdeLaBatalla() throws ExorcistaSinAngelesException {
+        //se inyecta que el porcentaje de defensa siempre sera mayor
+        Random.setEstrategiaNumero(new EstrategiaRangoEspecifico(10, 10));
+        RandomDefensa.setEstrategiaNumero(new EstrategiaRangoEspecifico(99, 99));
 
-        Angelical angel = new Angelical("Rika", 100);
-        Demonio demonio = new Demonio("Debil", 10);
+        mediumM.agregarEspiritu(hana);
 
-        Medium atacante = new Medium();
-        atacante.agregarEspiritu(angel);
 
-        Medium atacado = new Medium();
-        atacado.agregarEspiritu(demonio);
+        mediumM2.agregarEspiritu(jaeger);
 
-        Queue<Boolean> resultados = new LinkedList<>();
-        resultados.add(true); // lo mata
+        mediumM.exorcizar(mediumM2);
 
-        Batalla batalla = new Batalla(atacante, atacado, new RondaDeCombate(resultados));
+        assertTrue(hana.getLibre());
+        assertEquals(0, hana.getNivelDeConexion());
 
-        batalla.iniciarBatalla();
 
-        assertTrue(batalla.ganoAtacante());
-    }*/
+    }
 
     @Test
     void mediumNoPuedeExorcizarSinAngeles() {
