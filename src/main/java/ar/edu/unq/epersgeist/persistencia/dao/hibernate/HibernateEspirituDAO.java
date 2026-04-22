@@ -15,6 +15,21 @@ public class HibernateEspirituDAO extends HibernateDAO<Espiritu> implements Espi
     }
 
     @Override
+    public Espiritu guardar(Espiritu espiritu) {
+        return super.crear(espiritu);
+    }
+
+    @Override
+    public Espiritu recuperar(Long id) {
+        return super.recuperar(id);
+    }
+
+    @Override
+    public void eliminarTodos() {
+        super.eliminarTodos();
+    }
+
+    @Override
     public void actualizar(Espiritu espiritu) {
         Session session = HibernateSessionContext.getCurrentSession();
 
