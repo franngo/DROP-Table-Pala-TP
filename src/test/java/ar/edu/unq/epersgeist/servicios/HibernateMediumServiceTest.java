@@ -1,14 +1,22 @@
 package ar.edu.unq.epersgeist.servicios;
 
+import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarMediumException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarMediumException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ExorcismoPropioNoPermitidoException;
+import ar.edu.unq.epersgeist.modelo.random.Estrategia.EstrategiaRangoEspecifico;
+import ar.edu.unq.epersgeist.modelo.random.RandomDefensa;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
 import ar.edu.unq.epersgeist.servicios.impl.MediumServiceImpl;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,10 +26,20 @@ public class HibernateMediumServiceTest {
     private Medium epifanio;
     private Medium ubeda;
 
+    Angelical rika;
+    Demonio jaeger;
+
     @BeforeEach
     public void setUp() {
         epifanio = new Medium("Epifanio el poderoso", 150, 50);
         ubeda = new Medium("Ubeda el dt", 100, 20);
+
+        rika = new Angelical("Angel", "Rika");
+        rika.setNivelDeConexion(60);
+
+        jaeger = new Demonio("Demonio", "Jaeger");
+        jaeger.setNivelDeConexion(50);
+
     }
 
     @Test
@@ -139,10 +157,40 @@ public class HibernateMediumServiceTest {
     }
 
     @Test
-    void exorcismoDeberiaDesvincularDemoniosDerrotados() {
+    void exorcismoNoExitosoDeberiaAfectarElAngelDelMedium() throws ExorcismoPropioNoPermitidoException {
+        //setteo el porcentaje de defensa para que el demonio siempre gane
+        RandomDefensa.setEstrategiaNumero(new EstrategiaRangoEspecifico(99, 99));
 
+        //creo los medium en la base, para luego agregarles espiritus y actualizarlos
         Medium mediumExorcizador = HibernateTransactionRunner.runTrx(() -> serviceMedium.crear(ubeda));
         Medium mediumAtacado = HibernateTransactionRunner.runTrx(() -> serviceMedium.crear(epifanio));
+        mediumExorcizador.agregarEspiritu(rika);
+        mediumAtacado.agregarEspiritu(jaeger);
+
+        //actualizo los medium con sus nuevos espiritus
+        this.executeBlockInPersistentContext(() -> serviceMedium.actualizar(mediumExorcizador));
+        this.executeBlockInPersistentContext(() -> serviceMedium.actualizar(mediumAtacado));
+
+        //realizo exorcismo en el service
+
+        this.executeBlockInPersistentContext(() -> {
+            try {
+                serviceMedium.exorcizar(mediumExorcizador.getId(), mediumAtacado.getId());
+            } catch (ExorcismoPropioNoPermitidoException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        // en el exorcismo el mediumExorcizador perdio la batalla, su espiritu deberia reflejar lso cambios
+        List<Espiritu> espiritusDelExorcizador = HibernateTransactionRunner.runTrx(() -> serviceMedium.espiritus(mediumExorcizador.getId()));
+        Espiritu espirituRika = espiritusDelExorcizador.stream()
+                .filter(a -> a.getNombre().equals("Rika"))
+                .findFirst()
+                .orElse(null);
+
+        //perdio 5 de conexion
+        assertNotNull(espirituRika);
+        assertEquals(55, espirituRika.getNivelDeConexion());
 
 
     }

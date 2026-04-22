@@ -17,5 +17,5 @@ public interface MediumDAO {
 
     public void eliminarTodos();
 
-    
+
 }
