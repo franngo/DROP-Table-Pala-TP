@@ -3,6 +3,7 @@ package ar.edu.unq.epersgeist.servicios;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarMediumException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarMediumException;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
@@ -171,28 +172,65 @@ public class HibernateMediumServiceTest {
             assertEquals(5, e1.getNivelDeConexion());
             assertEquals(5, e2.getNivelDeConexion());
         });
-
     }
 
-        /*
-    //arreglar!!!!!!!!!!!!!! hay que hablarle al serviceMedium
+
     @Test
     public void descansarFallaPorMediumIdNulo() {
+        ErrorAlRecuperarMediumException exception = assertThrows(ErrorAlRecuperarMediumException.class,
+                () -> serviceMedium.descansar(2L));
+        assertEquals("No se pudo recuperar al medium con id " + "2" + ".", exception.getMessage());
+    }
+
+    /*
+    @Test
+    public void invocarCasoExitoso() {
         assertEquals(50, epifanio.getMana());
         assertEquals(0, espirituM.getNivelDeConexion());
         assertEquals(0, espirituM2.getNivelDeConexion());
 
         epifanio.agregarEspiritu(espirituM);
         epifanio.agregarEspiritu(espirituM2);
+        this.executeBlockInPersistentContext(() -> {
+            mediumDao.crear(epifanio);
+            espirituDao.crear(espirituM);
+            espirituDao.crear(espirituM2);
+        });
 
-        epifanio.descansar();
+        serviceMedium.descansar(epifanio.getId());
 
-        assertEquals(65, epifanio.getMana());
-        assertEquals(5, espirituM.getNivelDeConexion());
-        assertEquals(5, espirituM2.getNivelDeConexion());
+        this.executeBlockInPersistentContext(() -> {
+            Medium m = mediumDao.recuperar(epifanio.getId());
+            Espiritu e1 = espirituDao.recuperar(espirituM.getId());
+            Espiritu e2 = espirituDao.recuperar(espirituM2.getId());
+
+            assertEquals(65, m.getMana());
+            assertEquals(5, e1.getNivelDeConexion());
+            assertEquals(5, e2.getNivelDeConexion());
+        });
     }
+
      */
 
+    @Test
+    public void invocarFallaPorMediumIdNulo() {
+        ErrorAlRecuperarMediumException exception = assertThrows(ErrorAlRecuperarMediumException.class,
+                () -> serviceMedium.invocar(1L, 2L));
+        assertEquals("No se pudo recuperar al medium con id " + "1" + ".", exception.getMessage());
+    }
+
+
+    @Test
+    public void invocarFallaPorEspirituIdNulo() {
+        this.executeBlockInPersistentContext(() -> {
+            mediumDao.crear(epifanio);
+        });
+
+        Long idInexistente = epifanio.getId() + 1;
+        ErrorAlRecuperarEspirituException exception = assertThrows(ErrorAlRecuperarEspirituException.class,
+                () -> serviceMedium.invocar(epifanio.getId(), idInexistente));
+        assertEquals("No se pudo recuperar al espíritu con id " + idInexistente + ".", exception.getMessage());
+    }
 
 
     private void executeBlockInPersistentContext(Runnable block) {
