@@ -3,12 +3,15 @@ package ar.edu.unq.epersgeist.modelo;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter @Setter
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 public class Ubicacion {
     @Id
@@ -33,9 +36,12 @@ public class Ubicacion {
 
     public void agregarEspiritu(Espiritu espiritu) {
         this.espiritus.add(espiritu);
+        espiritu.setUbicacion(this);
     }
-
+  
+  
     public void agregarMedium(Medium medium) {
         this.mediums.add(medium);
+        medium.setUbicacion(this);
     }
 }
