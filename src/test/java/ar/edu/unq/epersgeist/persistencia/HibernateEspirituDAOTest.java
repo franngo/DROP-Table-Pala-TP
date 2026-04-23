@@ -20,7 +20,7 @@ public class HibernateEspirituDAOTest {
 
     @BeforeEach
     public void setUp() {
-        espirituM = new Angelical("das");
+        espirituM = new Espiritu("das");
     }
 
     @Test
@@ -86,7 +86,7 @@ public class HibernateEspirituDAOTest {
     public void recuperarTodosDevuelveUnEspiritu() {
 
         this.executeBlockInPersistentContext(() -> {
-            espirituDao.crear(new Angelical("Matias"));
+            espirituDao.crear(new Espiritu("Matias"));
 
             List<Espiritu> lista = espirituDao.recuperarTodos();
 
@@ -98,8 +98,8 @@ public class HibernateEspirituDAOTest {
     public void recuperarTodosDevuelveVariosElementos() {
 
         this.executeBlockInPersistentContext(() -> {
-            espirituDao.crear(new Angelical("Matias"));
-            espirituDao.crear(new Angelical("Juan"));
+            espirituDao.crear(new Espiritu("Matias"));
+            espirituDao.crear(new Espiritu("Juan"));
 
             List<Espiritu> lista = espirituDao.recuperarTodos();
 
@@ -111,9 +111,9 @@ public class HibernateEspirituDAOTest {
     public void recuperarTodosDevuelveListaOrdenadaPorNombre() {
 
         this.executeBlockInPersistentContext(() -> {
-            espirituDao.crear(new Angelical("Matias"));
-            espirituDao.crear(new Angelical("Juanchi el Pastelero"));
-            espirituDao.crear(new Angelical("Alberto"));
+            espirituDao.crear(new Espiritu("Matias"));
+            espirituDao.crear(new Espiritu("Juanchi el Pastelero"));
+            espirituDao.crear(new Espiritu("Alberto"));
 
             List<Espiritu> lista = espirituDao.recuperarTodos();
 
@@ -127,7 +127,7 @@ public class HibernateEspirituDAOTest {
     public void seActualizaUnEspirituExistente() {
 
         this.executeBlockInPersistentContext(() -> {
-            Espiritu creado = espirituDao.crear(new Angelical("Matias"));
+            Espiritu creado = espirituDao.crear(new Espiritu("Matias"));
             assertNotNull(creado.getId());
 
             creado.setNombre("NombreActualizado");

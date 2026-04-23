@@ -16,7 +16,7 @@ import java.io.Serializable;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "tipo")
-public abstract class Espiritu implements Serializable {
+public class Espiritu implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

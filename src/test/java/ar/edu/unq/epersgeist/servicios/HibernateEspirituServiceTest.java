@@ -1,6 +1,5 @@
 package ar.edu.unq.epersgeist.servicios;
 
-import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
@@ -36,7 +35,7 @@ public class HibernateEspirituServiceTest {
     @BeforeEach
     public void setUp() {
 
-        matias = new Angelical("Matias");
+        matias = new Espiritu("Matias");
     }
 
     @Test
@@ -67,7 +66,7 @@ public class HibernateEspirituServiceTest {
         Long id = HibernateTransactionRunner.runTrx(() -> serviceEspiritu.crear(matias).getId());
 
         // ⚠️ nueva instancia (no reutilizar la anterior)
-        Espiritu modificado = new Angelical("Juanchi el pastelero");
+        Espiritu modificado = new Espiritu("Juanchi el pastelero");
         modificado.setId(id);
         modificado.setNivelDeConexion(99);
 
