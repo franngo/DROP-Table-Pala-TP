@@ -3,6 +3,7 @@ package ar.edu.unq.epersgeist.persistencia.dao.hibernate;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.ErrorAlActualizarUbicacionException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.IdUbicacionInvalidoException;
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateSessionContext;
 import org.hibernate.Session;
@@ -21,7 +22,7 @@ public class HibernateUbicacionDAO implements UbicacionDAO {
     public void actualizar(Ubicacion ubicacion) {
         Session session = HibernateSessionContext.getCurrentSession();
 
-        if (ubicacion.getId() == null){
+        if (ubicacion == null || ubicacion.getId() == null){
             throw new ErrorAlActualizarUbicacionException("No se puede actualizar la ubicacion que no tiene id.");
         }
 
@@ -68,14 +69,4 @@ public class HibernateUbicacionDAO implements UbicacionDAO {
         }
         session.remove(ubicacion);
     }
-
-    @Override
-    public List<Medium> mediumsSinEspiritusEn(Long ubicacionId) {
-
-        return HibernateSessionContext.getCurrentSession()
-                .createQuery("FROM Medium m WHERE m.ubicacion.id = :ubicacionId", Medium.class)
-                .setParameter("ubicacionId", ubicacionId)
-                .list();
-    }
-
 }
