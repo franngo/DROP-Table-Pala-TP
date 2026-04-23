@@ -1,6 +1,7 @@
 package ar.edu.unq.epersgeist.modelo;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeInvocacionDeEspirituException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -51,5 +52,80 @@ public class MediumTest {
         assertTrue(mediumM.getEspiritus().contains(espirituM2));
     }
 
+    @Test
+    public void descansar() {
+        assertEquals(50, mediumM.getMana());
+        assertEquals(0, espirituM.getNivelDeConexion());
+        assertEquals(0, espirituM2.getNivelDeConexion());
+
+        mediumM.agregarEspiritu(espirituM);
+        mediumM.agregarEspiritu(espirituM2);
+
+        mediumM.descansar();
+
+        assertEquals(65, mediumM.getMana());
+        assertEquals(5, espirituM.getNivelDeConexion());
+        assertEquals(5, espirituM2.getNivelDeConexion());
+    }
+
+    @Test
+    public void noSeExcedenLimitesEnDescansar() {
+        assertEquals(50, mediumM.getMana());
+        assertEquals(0, espirituM.getNivelDeConexion());
+        assertEquals(0, espirituM2.getNivelDeConexion());
+
+        mediumM.agregarEspiritu(espirituM);
+        mediumM.agregarEspiritu(espirituM2);
+
+        mediumM.setMana(89); //tiene un manaMax de 100
+        espirituM.setNivelDeConexion(94); //el límite del nivelDeConexion es de 100
+        espirituM2.setNivelDeConexion(97); //el límite del nivelDeConexion es de 100
+
+        mediumM.descansar();
+
+        assertEquals(100, mediumM.getMana());
+        assertEquals(99, espirituM.getNivelDeConexion());
+        assertEquals(100, espirituM2.getNivelDeConexion());
+    }
+
+    @Test
+    public void invocarCasoExitoso() {
+        Ubicacion ubicacion = new Ubicacion("Quilmes");
+        mediumM.setUbicacion(ubicacion);
+
+        assertEquals(50, mediumM.getMana());
+        assertNull(espirituM.getUbicacion());
+
+        //mediumM tiene suficiente maná (50) y espirituM está libre
+
+        mediumM.invocar(espirituM);
+
+        assertEquals(40, mediumM.getMana());
+        assertEquals(mediumM.getUbicacion(), espirituM.getUbicacion());
+    }
+
+    @Test
+    public void invocarCasoManaInsuficiente() {
+        Ubicacion ubicacion = new Ubicacion("Quilmes");
+        mediumM.setUbicacion(ubicacion);
+
+        mediumM.setMana(5); //mana insuficiente para invocar()
+
+        mediumM.invocar(espirituM);
+
+        //no hay ningún cambio de estado
+        assertEquals(5, mediumM.getMana());
+        assertNull(espirituM.getUbicacion());
+    }
+
+    @Test
+    public void invocarCasoFallido() {
+        Ubicacion ubicacion = new Ubicacion("Quilmes");
+        mediumM.setUbicacion(ubicacion);
+
+        espirituM.setMediumCon(mediumM2); //espirituM pasa a NO estar libre, por lo que no puede ser invocado
+
+        assertThrows(ErrorDeInvocacionDeEspirituException.class, () -> mediumM.invocar(espirituM));
+    }
 
 }
