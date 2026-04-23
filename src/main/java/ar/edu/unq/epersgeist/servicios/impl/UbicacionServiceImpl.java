@@ -20,23 +20,26 @@ public class UbicacionServiceImpl implements UbicacionService {
     // --------------------------------------------------------------------------------
 
     @Override
-    public Ubicacion crear(String nombre) {
-        if (nombre == null) {
+    public Ubicacion crear(Ubicacion ubicacion) {
+        if (ubicacion == null) {
+            throw new UbicacionInvalidaException();
+        }
+
+        String nombre = ubicacion.getNombre();
+
+        if (nombre == null || nombre.isBlank()) {
             throw new NombreUbicacionInvalidoException();
         }
 
         String trimmed = nombre.trim();
-
-        if (trimmed.isEmpty()) {
-            throw new NombreUbicacionInvalidoException();
-        }
+        ubicacion.setNombre(trimmed);
 
         return HibernateTransactionRunner.runTrx(() -> {
             if (this.ubicacionDAO.recuperarPorNombre(trimmed) != null) {
                 throw new UbicacionYaExisteException(trimmed);
             }
 
-            return this.ubicacionDAO.guardar(new Ubicacion(trimmed));
+            return this.ubicacionDAO.guardar(ubicacion);
         });
     }
 
@@ -126,9 +129,7 @@ public class UbicacionServiceImpl implements UbicacionService {
                 throw new UbicacionNoEncontradaException(ubicacionId);
             }
 
-            return ubicacion.getMediums().stream()
-                    .filter(medium -> medium.getEspiritus().isEmpty())
-                    .toList();
+            return ubicacion.getMediums();
         });
     }
 

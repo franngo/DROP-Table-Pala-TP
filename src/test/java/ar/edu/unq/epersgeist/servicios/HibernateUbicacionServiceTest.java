@@ -26,9 +26,14 @@ public class HibernateUbicacionServiceTest {
     private EspirituDAO espirituDAO;
     private UbicacionDAO ubicacionDAO;
 
+    private static final String NOMBRE_TEMPLO = "Templo del Alba Eterna";
+    private static final String NOMBRE_CRIPTA = "Cripta de los Susurros";
+
+    private final Ubicacion templo = new Ubicacion(NOMBRE_TEMPLO);
+    private final Ubicacion cripta = new Ubicacion(NOMBRE_CRIPTA);
+
     private EspirituService espirituService;
     private UbicacionService ubicacionService;
-
 
     @BeforeEach
     void setUp() {
@@ -44,38 +49,38 @@ public class HibernateUbicacionServiceTest {
 
     @Test
     void debeCrearUbicacion() {
-        Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
+        Ubicacion ubicacionCreada = ubicacionService.crear(templo);
 
-        assertNotNull(ubicacion.getId());
-        assertEquals("Santuario de la Luz", ubicacion.getNombre());
+        assertNotNull(ubicacionCreada.getId());
+        assertEquals(NOMBRE_TEMPLO, ubicacionCreada.getNombre());
     }
 
     @Test
     void debeCrearMultiplesUbicacionesConNombresDistintos() {
-        Ubicacion ubicacion1 = ubicacionService.crear("Santuario de la Luz");
-        Ubicacion ubicacion2 = ubicacionService.crear("Catedral de la Oscuridad");
+        Ubicacion ubicacionCreada1 = ubicacionService.crear(templo);
+        Ubicacion ubicacionCreada2 = ubicacionService.crear(cripta);
 
-        assertNotNull(ubicacion1.getId());
-        assertNotNull(ubicacion2.getId());
+        assertNotNull(ubicacionCreada1.getId());
+        assertNotNull(ubicacionCreada2.getId());
 
-        assertEquals("Santuario de la Luz", ubicacion1.getNombre());
-        assertEquals("Catedral de la Oscuridad", ubicacion2.getNombre());
+        assertEquals(NOMBRE_TEMPLO, ubicacionCreada1.getNombre());
+        assertEquals(NOMBRE_CRIPTA, ubicacionCreada2.getNombre());
     }
 
     @Test
     void debeLanzarExcepcionSiElNombreYaExiste() {
-        ubicacionService.crear("Santuario de la Luz");
+        ubicacionService.crear(templo);
 
         assertThrows(
                 UbicacionYaExisteException.class,
-                () -> ubicacionService.crear("Santuario de la Luz")
+                () -> ubicacionService.crear(templo)
         );
     }
 
     @Test
-    void debeLanzarExcepcionSiElNombreEsNull() {
+    void debeLanzarExcepcionSiLaUbicacionEsNull() {
         assertThrows(
-                NombreUbicacionInvalidoException.class,
+                UbicacionInvalidaException.class,
                 () -> ubicacionService.crear(null)
         );
     }
@@ -84,7 +89,7 @@ public class HibernateUbicacionServiceTest {
     void debeLanzarExcepcionSiElNombreEsVacio() {
         assertThrows(
                 NombreUbicacionInvalidoException.class,
-                () -> ubicacionService.crear("")
+                () -> ubicacionService.crear(new Ubicacion(""))
         );
     }
 
@@ -92,17 +97,17 @@ public class HibernateUbicacionServiceTest {
     void debeLanzarExcepcionSiElNombreEsSoloEspacios() {
         assertThrows(
                 NombreUbicacionInvalidoException.class,
-                () -> ubicacionService.crear("   ")
+                () -> ubicacionService.crear(new Ubicacion("   "))
         );
     }
 
     @Test
     void debeLanzarExcepcionSiElNombreYaExisteAunqueTengaEspaciosAlrededor() {
-        ubicacionService.crear("Santuario de la Luz");
+        ubicacionService.crear(templo);
 
         assertThrows(
                 UbicacionYaExisteException.class,
-                () -> ubicacionService.crear("  Santuario de la Luz  ")
+                () -> ubicacionService.crear(new Ubicacion("   " + NOMBRE_TEMPLO + "   "))
         );
     }
 
@@ -110,12 +115,12 @@ public class HibernateUbicacionServiceTest {
 
     @Test
     void debeRecuperarUbicacionPorId() {
-        Ubicacion ubicacionCreada = ubicacionService.crear("Santuario de la Luz");
+        Ubicacion ubicacionCreada = ubicacionService.crear(templo);
 
         Ubicacion ubicacionRecuperada = ubicacionService.recuperar(ubicacionCreada.getId());
 
         assertNotNull(ubicacionRecuperada);
-        assertEquals("Santuario de la Luz", ubicacionRecuperada.getNombre());
+        assertEquals(NOMBRE_TEMPLO, ubicacionRecuperada.getNombre());
     }
 
     @Test
@@ -137,8 +142,8 @@ public class HibernateUbicacionServiceTest {
 
     @Test
     void debeRecuperarTodasLasUbicaciones() {
-        ubicacionService.crear("Santuario de la Luz");
-        ubicacionService.crear("Catedral de la Oscuridad");
+        ubicacionService.crear(templo);
+        ubicacionService.crear(cripta);
 
         List<Ubicacion> ubicaciones = ubicacionService.recuperarTodos();
 
@@ -156,24 +161,19 @@ public class HibernateUbicacionServiceTest {
 
     @Test
     void espiritusEnRetornaListaDeEspiritus() {
-        Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
+        Ubicacion ubicacionCreada = ubicacionService.crear(templo);
 
-        Espiritu guerrero = HibernateTransactionRunner.runTrx(() ->
-            espirituDAO.guardar(new Espiritu("Guerrero", "Espíritu de la Luz"))
-        );
+        Espiritu orion = espirituService.crear(new Espiritu("Orion el Errante"));
+        Espiritu neros = espirituService.crear(new Espiritu("Neros el Oscuro"));
 
-        Espiritu mago = HibernateTransactionRunner.runTrx(() ->
-                espirituDAO.guardar(new Espiritu("Mago", "Espíritu de la Oscuridad"))
-        );
+        ubicacionCreada.agregarEspiritu(orion);
+        ubicacionCreada.agregarEspiritu(neros);
 
-        ubicacion.agregarEspiritu(guerrero);
-        ubicacion.agregarEspiritu(mago);
-
-        List<Espiritu> espiritusEnUbicacion = ubicacionService.espiritusEn(ubicacion.getId());
+        List<Espiritu> espiritusEnUbicacion = ubicacionService.espiritusEn(ubicacionCreada.getId());
 
         assertEquals(2, espiritusEnUbicacion.size());
-        assertTrue(espiritusEnUbicacion.contains(guerrero));
-        assertTrue(espiritusEnUbicacion.contains(mago));
+        assertTrue(espiritusEnUbicacion.contains(orion));
+        assertTrue(espiritusEnUbicacion.contains(neros));
     }
 
     @Test
@@ -196,7 +196,7 @@ public class HibernateUbicacionServiceTest {
 
     @Test
     void deberiaActualizarSoloElNombre() {
-        Long id = HibernateTransactionRunner.runTrx(() -> ubicacionService.crear("Santuario de la Luz").getId());
+        Long id = HibernateTransactionRunner.runTrx(() -> ubicacionService.crear(templo).getId());
         Ubicacion ubicacionMod = new Ubicacion("Catedral de la Oscuridad");
         ubicacionMod.setId(id);
 
@@ -218,14 +218,15 @@ public class HibernateUbicacionServiceTest {
     // ============================== ELIMINAR ==============================
 
     @Test
-    void deberiaEliminarLaUbicacionYNoPoderRecuperarlaLuego() {
-        Long id = ubicacionService.crear("Santuario de la Luz").getId();
+    void debeliminarLaUbicacionYNoPoderRecuperarlaLuego() {
+        Ubicacion ubicacionCreada = ubicacionService.crear(templo);
+        Long ubicacionId = ubicacionCreada.getId();
 
-        Long id = HibernateTransactionRunner.runTrx(() -> ubicacionService.crear("Santuario de la Luz")).getId();
+        ubicacionService.eliminar(ubicacionId);
 
-
-        this.executeBlockInPersistentContext(() -> ubicacionService.eliminar(id));
-        Ubicacion ubicacion = HibernateTransactionRunner.runTrx(() -> ubicacionService.recuperar(id));
+        Ubicacion ubicacion = HibernateTransactionRunner.runTrx(
+                () -> ubicacionService.recuperar(ubicacionId)
+        );
 
         assertNull(ubicacion);
     }
@@ -233,48 +234,41 @@ public class HibernateUbicacionServiceTest {
     // ============================== MEDIUMSSINESPIRITUSEN ==============================
 
     @Test
-    void deberiaObtenerMediumsSinEspiritus() {
-         Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
+    void deberiaObtenerDosMediumsSinEspiritus() {
+        Ubicacion ubicacion = ubicacionService.crear(templo);
 
-         Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
-         Medium ubeda = new Medium("Ubeda el dt", 100, 20);
+        Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
+        Medium ubeda = new Medium("Ubeda el dt", 100, 20);
 
-         epifanio.setUbicacion(ubicacion);
-         ubeda.setUbicacion(ubicacion);
-         ubicacion.agregarMedium(epifanio);
-         ubicacion.agregarMedium(ubeda);
-         List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
+        epifanio.setUbicacion(ubicacion);
+        ubeda.setUbicacion(ubicacion);
 
-         assertEquals(2, resultado.size());
+        ubicacion.agregarMedium(epifanio);
+        ubicacion.agregarMedium(ubeda);
+        List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
+
+        assertEquals(2, resultado.size());
     }
 
     @Test
-    void deberiaObtener1MediumsSinEspiritus() {
-         Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
-         Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
-         Medium ubeda = new Medium("Ubeda el dt", 100, 20);
+    void deberiaObtenerUnMediumsSinEspiritus() {
+        Ubicacion ubicacion = ubicacionService.crear(templo);
+        Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
+        Medium ubeda = new Medium("Ubeda el dt", 100, 20);
+        Espiritu mago = espirituDAO.guardar(new Espiritu("Espíritu de la Oscuridad"));
+        ubeda.agregarEspiritu(mago);
 
-        this.runTrx(() -> {
-            Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
-            Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
-            Medium ubeda = new Medium("Ubeda el dt", 100, 20);
-            Espiritu mago = espirituDAO.guardar(new Espiritu("Espíritu de la Oscuridad"));
-            ubeda.agregarEspiritu(mago);
+        ubicacion.agregarMedium(epifanio);
+        ubicacion.agregarMedium(ubeda);
 
-            ubeda.agregarEspiritu(mago);
+        List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
 
-            ubicacion.agregarMedium(epifanio);
-            ubicacion.agregarMedium(ubeda);
-
-            List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
-
-            assertEquals(1, resultado.size());
-        });
+        assertEquals(1, resultado.size());
     }
 
     @Test
     void deberiaRetornarListaVaciaSiNoHayMediumsSinEspiritus() {
-         Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
+         Ubicacion ubicacion = ubicacionService.crear(templo);
 
          List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
 
