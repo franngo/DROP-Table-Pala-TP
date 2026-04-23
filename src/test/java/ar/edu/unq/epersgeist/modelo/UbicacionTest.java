@@ -32,7 +32,7 @@ public class UbicacionTest {
 
     @Test
     public void debeAgregarEspirituALaUbicacion() {
-        Espiritu espiritu = new Espiritu("Guerrero", "Espíritu de la Luz");
+        Espiritu espiritu = new Espiritu("Espíritu de la Luz");
         this.ubicacion.agregarEspiritu(espiritu);
 
         assertEquals(1, this.ubicacion.getEspiritus().size());

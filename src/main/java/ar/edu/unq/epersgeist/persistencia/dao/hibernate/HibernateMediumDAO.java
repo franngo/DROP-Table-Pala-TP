@@ -27,10 +27,22 @@ public class HibernateMediumDAO extends HibernateDAO<Medium> implements MediumDA
     }
 
     @Override
-    public void actualizar(Medium medium) {
+    public Medium recuperar(Long id) {
         Session session = HibernateSessionContext.getCurrentSession();
 
+        String hql = "select distinct m from Medium m left join fetch m.espiritus where m.id = :id";
 
+        return session.createQuery(hql, Medium.class)
+                .setParameter("id", id)
+                .uniqueResult();
+    }
+
+    @Override
+    public void actualizar(Medium medium) {
+        Session session = HibernateSessionContext.getCurrentSession();
+        // TODO borrar!!
+        System.out.println("EL ID DEL MEDIUM QUE LE PASO");
+        System.out.println(medium.getId());
         if (medium.getId() == null) {
             throw new ErrorAlActualizarMediumException("No se puede actualizar un medium que no tiene id.");
         }
@@ -60,7 +72,7 @@ public class HibernateMediumDAO extends HibernateDAO<Medium> implements MediumDA
         session.remove(medium);
     }
 
-   
+
     @Override
     public List<Medium> recuperarTodos() {
         Session session = HibernateSessionContext.getCurrentSession();

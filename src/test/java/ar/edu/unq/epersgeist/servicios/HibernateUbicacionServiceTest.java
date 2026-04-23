@@ -195,8 +195,8 @@ public class HibernateUbicacionServiceTest {
     // ============================== ACTUALIZAR ==============================
 
     @Test
-    void deberiaActualizarSoloElNombre(){
-        Long id = ubicacionService.crear("Santuario de la Luz").getId();
+    void deberiaActualizarSoloElNombre() {
+        Long id = HibernateTransactionRunner.runTrx(() -> ubicacionService.crear("Santuario de la Luz").getId());
         Ubicacion ubicacionMod = new Ubicacion("Catedral de la Oscuridad");
         ubicacionMod.setId(id);
 
@@ -221,8 +221,11 @@ public class HibernateUbicacionServiceTest {
     void deberiaEliminarLaUbicacionYNoPoderRecuperarlaLuego() {
         Long id = ubicacionService.crear("Santuario de la Luz").getId();
 
-        ubicacionService.eliminar(id);
-        Ubicacion ubicacion = ubicacionService.recuperar(id);
+        Long id = HibernateTransactionRunner.runTrx(() -> ubicacionService.crear("Santuario de la Luz")).getId();
+
+
+        this.executeBlockInPersistentContext(() -> ubicacionService.eliminar(id));
+        Ubicacion ubicacion = HibernateTransactionRunner.runTrx(() -> ubicacionService.recuperar(id));
 
         assertNull(ubicacion);
     }
@@ -251,18 +254,22 @@ public class HibernateUbicacionServiceTest {
          Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
          Medium ubeda = new Medium("Ubeda el dt", 100, 20);
 
-         Espiritu mago = HibernateTransactionRunner.runTrx(() ->
-                 espirituDAO.guardar(new Espiritu("Mago", "Espíritu de la Oscuridad"))
-         );
+        this.runTrx(() -> {
+            Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
+            Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
+            Medium ubeda = new Medium("Ubeda el dt", 100, 20);
+            Espiritu mago = espirituDAO.guardar(new Espiritu("Espíritu de la Oscuridad"));
+            ubeda.agregarEspiritu(mago);
 
-         ubeda.agregarEspiritu(mago);
+            ubeda.agregarEspiritu(mago);
 
-         ubicacion.agregarMedium(epifanio);
-         ubicacion.agregarMedium(ubeda);
+            ubicacion.agregarMedium(epifanio);
+            ubicacion.agregarMedium(ubeda);
 
-         List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
+            List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
 
-         assertEquals(1, resultado.size());
+            assertEquals(1, resultado.size());
+        });
     }
 
     @Test

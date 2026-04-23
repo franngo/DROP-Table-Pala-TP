@@ -16,4 +16,6 @@ public interface MediumDAO {
     public List<Medium> recuperarTodos();
 
     public void eliminarTodos();
+
+
 }
