@@ -22,6 +22,7 @@
         <mapping class="ar.edu.unq.epersgeist.modelo.Medium"/>
         <mapping class="ar.edu.unq.epersgeist.modelo.Espiritu.Angelical"/>
         <mapping class="ar.edu.unq.epersgeist.modelo.Espiritu.Demonio"/>
+        <mapping class="ar.edu.unq.epersgeist.modelo.Ubicacion"/>
 
     </session-factory>
 </hibernate-configuration>

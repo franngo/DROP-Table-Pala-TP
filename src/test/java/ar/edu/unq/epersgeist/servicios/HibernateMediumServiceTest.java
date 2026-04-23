@@ -6,6 +6,7 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarMediumException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarMediumException;
+import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
 import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
@@ -18,9 +19,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class HibernateMediumServiceTest {
 
-
-    private final MediumService serviceMedium = new MediumServiceImpl(new HibernateMediumDAO());
-    private final EspirituService espirituService = new EspirituServiceImpl(new HibernateEspirituDAO());
+    private final EspirituDAO espirituDao = new HibernateEspirituDAO();
+    private final EspirituService espirituService = new EspirituServiceImpl(espirituDao);
+    private final MediumService serviceMedium = new MediumServiceImpl(new HibernateMediumDAO(), espirituDao);
     private Medium epifanioM;
     private Medium ubedaM;
     private Medium epifanioP;

@@ -1,6 +1,7 @@
 package ar.edu.unq.epersgeist.modelo.Espiritu;
 
 import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,9 @@ public class Espiritu implements Serializable {
     @ManyToOne
     @JoinColumn(name = "mediumCon_id")
     private Medium mediumCon;
+
+    @ManyToOne
+    private Ubicacion ubicacion;
 
     public Espiritu(@NonNull String nombre) {
         this.nivelDeConexion = 0;
@@ -66,5 +70,7 @@ public class Espiritu implements Serializable {
 
     public void recibirAtaqueDe(Espiritu angel) {
     }
+
+    
 }
 
