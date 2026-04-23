@@ -231,10 +231,10 @@ public class HibernateUbicacionServiceTest {
         assertNull(ubicacion);
     }
 
-    // ============================== MEDIUMSSINESPIRITUSEN ==============================
+    // ============================== mediumsSinEspiritusEn ==============================
 
     @Test
-    void deberiaObtenerDosMediumsSinEspiritus() {
+    void deberiaObtenerMediumsSinEspiritus() {
         Ubicacion ubicacion = ubicacionService.crear(templo);
 
         Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
@@ -251,20 +251,21 @@ public class HibernateUbicacionServiceTest {
     }
 
     @Test
-    void deberiaObtenerUnMediumsSinEspiritus() {
-        Ubicacion ubicacion = ubicacionService.crear(templo);
-        Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
-        Medium ubeda = new Medium("Ubeda el dt", 100, 20);
-        Espiritu mago = espirituDAO.guardar(new Espiritu("Espíritu de la Oscuridad"));
-        ubeda.agregarEspiritu(mago);
+    void deberiaObtener1MediumsSinEspiritus() {
+         Ubicacion ubicacion = ubicacionService.crear(templo);
+         Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
+         Medium ubeda = new Medium("Ubeda el dt", 100, 20);
+         Espiritu mago = espirituDAO.guardar(new Espiritu("Espíritu de la Oscuridad"));
+         ubeda.agregarEspiritu(mago);
 
-        ubicacion.agregarMedium(epifanio);
-        ubicacion.agregarMedium(ubeda);
+         ubicacion.agregarMedium(epifanio);
+         ubicacion.agregarMedium(ubeda);
 
-        List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
+         List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
 
-        assertEquals(1, resultado.size());
+         assertEquals(1, resultado.size());
     }
+
 
     @Test
     void deberiaRetornarListaVaciaSiNoHayMediumsSinEspiritus() {
