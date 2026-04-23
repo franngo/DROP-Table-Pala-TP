@@ -5,6 +5,7 @@ import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarMediumException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
+import ar.edu.unq.epersgeist.modelo.exceptions.ExorcismoPropioNoPermitidoException;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.servicios.MediumService;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
@@ -79,6 +80,27 @@ public class MediumServiceImpl implements MediumService {
         return HibernateTransactionRunner.runTrx(() -> {
             Medium m = mediumDao.recuperar(mediumId);
             Espiritu e = espirituDao.recuperar(espirituId);
+    public void descansar(Long idMedium) {
+
+    }
+
+    @Override
+    public void exorcizar(Long idMediumExorcista, Long idMediumAExorcizar) throws ExorcismoPropioNoPermitidoException {
+        if (idMediumExorcista == idMediumAExorcizar) {
+            throw new ExorcismoPropioNoPermitidoException("Un medium no puede exorcizarse a si mismo");
+        }
+        HibernateTransactionRunner.runTrx(() -> {
+            Medium mediumAtacante = mediumDao.recuperar(idMediumExorcista);
+            Medium mediumAExorcizar = mediumDao.recuperar(idMediumAExorcizar);
+            // aplico logica de modelo
+            mediumAtacante.exorcizar(mediumAExorcizar);
+            // persisto los cambios
+            mediumDao.actualizar(mediumAtacante);
+            mediumDao.actualizar(mediumAExorcizar);
+
+            return null;
+
+        });
 
             if(m==null) {
                 throw new ErrorAlRecuperarMediumException(mediumId);
@@ -92,13 +114,26 @@ public class MediumServiceImpl implements MediumService {
     }
 
     @Override
-    public void exorcizar(Long idatacante, Long idAtacado) {
-
+    public List<Espiritu> espiritus(Long mediumId) {
+        return HibernateTransactionRunner.runTrx(() -> {
+            Medium recuperado = this.recuperar(mediumId);
+            return recuperado.getEspiritus();
+        });
     }
 
     @Override
-    public List<Medium> espiritus() {
-        return List.of();
+    public Espiritu invocar(Long mediumId, Long espirituId) {
+        return null;
     }
+
+    @Override
+    public void eliminarTodos() {
+        HibernateTransactionRunner.runTrx(() -> {
+
+            mediumDao.eliminarTodos();
+            return null;
+        });
+    }
+
 
 }

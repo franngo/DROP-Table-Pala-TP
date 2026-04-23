@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.modelo;
 
+import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,8 +16,8 @@ public class EspirituTest {
     @BeforeEach
     void setUp() {
 
-        espirituM = new Espiritu("Pokemon", "Matias");
-        espiritu = new Espiritu("Pokemon", "Matias");
+        espirituM = new Angelical("Matias");
+        espiritu = new Angelical("Matias");
         medium = new Medium("Juan", 100, 10);
     }
 
@@ -45,7 +46,6 @@ public class EspirituTest {
 
     @Test
     public void alAumentarConexionElMediumRecibeElEspiritu() {
-
 
 
         espirituM.aumentarConexion(medium);

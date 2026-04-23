@@ -3,16 +3,16 @@ package ar.edu.unq.epersgeist.servicios.impl;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
-import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 
 import java.util.List;
 
 public class EspirituServiceImpl implements EspirituService {
-    private HibernateEspirituDAO espirituDao;
+    private EspirituDAO espirituDao;
 
-    public EspirituServiceImpl(HibernateEspirituDAO espirituDao) {
+    public EspirituServiceImpl(EspirituDAO espirituDao) {
         this.espirituDao = espirituDao;
     }
 
@@ -76,6 +76,15 @@ public class EspirituServiceImpl implements EspirituService {
     @Override
     public List<Espiritu> espiritusDemoniacos() {
         return List.of();
+    }
+
+    @Override
+
+    public void eliminarTodos() {
+        HibernateTransactionRunner.runTrx(() -> {
+            espirituDao.eliminarTodos();
+            return null;
+        });
     }
 
 }

@@ -1,5 +1,10 @@
 package ar.edu.unq.epersgeist.servicios;
 
+<<<<<<< HEAD
+=======
+import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
+>>>>>>> feature/mediumModelo
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
@@ -8,9 +13,12 @@ import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarMediumException;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
+<<<<<<< HEAD
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
+=======
+import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
+>>>>>>> feature/mediumModelo
 import ar.edu.unq.epersgeist.servicios.impl.MediumServiceImpl;
-import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HibernateMediumServiceTest {
+<<<<<<< HEAD
     private final HibernateMediumDAO mediumDao = new HibernateMediumDAO();
     private final HibernateEspirituDAO espirituDao = new HibernateEspirituDAO();
     private final MediumServiceImpl serviceMedium = new MediumServiceImpl(mediumDao, espirituDao);
@@ -32,32 +41,61 @@ public class HibernateMediumServiceTest {
         ubeda = new Medium("Ubeda el dt", 100, 20);
         espirituM = new Espiritu("Fuego", "Charizard");
         espirituM2 = new Espiritu("Agua", "Bulbasor");
+=======
+
+
+    private final MediumService serviceMedium = new MediumServiceImpl(new HibernateMediumDAO());
+    private final EspirituService espirituService = new EspirituServiceImpl(new HibernateEspirituDAO());
+    private Medium epifanioM;
+    private Medium ubedaM;
+    private Medium epifanioP;
+    private Medium ubedaP;
+
+    Espiritu rikaM;
+    Espiritu jaegerM;
+
+    Espiritu rikaP;
+    Espiritu jaegerP;
+
+    @BeforeEach
+    public void setUp() {
+        epifanioM = new Medium("Epifanio el poderoso", 150, 50);
+        ubedaM = new Medium("Ubeda el dt", 100, 20);
+
+        epifanioP = serviceMedium.crear(epifanioM);
+        ubedaP = serviceMedium.crear(ubedaM);
+
+        rikaM = new Angelical("Rika");
+        rikaM.setNivelDeConexion(60);
+        rikaP = espirituService.crear(rikaM);
+
+        jaegerM = new Demonio("Jaeger");
+        jaegerM.setNivelDeConexion(50);
+        jaegerP = espirituService.crear(jaegerM);
+
+>>>>>>> feature/mediumModelo
     }
 
     @Test
-    void deberiaAsignarIdAlCrearUnEspiritu() {
-        Medium medium = HibernateTransactionRunner.runTrx(() ->
-                serviceMedium.crear(epifanio)
-        );
+    void deberiaAsignarIdAlCrearUnMedium() {
 
-        assertNotNull(medium.getId());
+
+        assertNotNull(epifanioP.getId());
+        assertNotNull(ubedaP.getId());
     }
 
 
-
     @Test
-    void deberiaRecuperarCorrectamenteLosDatosDelEspiritu() {
-        Medium mediumRecuperado = HibernateTransactionRunner.runTrx(() -> {
-            Medium mediumEpi = serviceMedium.crear(epifanio);
-            return serviceMedium.recuperar(mediumEpi.getId());
-        });
+    void deberiaRecuperarCorrectamenteLosDatosDelMedium() {
+        Medium mediumRecuperado = serviceMedium.recuperar(ubedaP.getId());
 
-        assertEquals(epifanio.getId(), mediumRecuperado.getId());
-        assertEquals(epifanio.getNombre(), mediumRecuperado.getNombre());
-        assertEquals(epifanio.getMana(), mediumRecuperado.getMana());
-        assertEquals(epifanio.getManaMax(), mediumRecuperado.getManaMax());
-        assertEquals(epifanio.getCantFortalece(), mediumRecuperado.getCantFortalece());
-        assertEquals(0, epifanio.getEspiritus().size());
+
+        assertEquals(ubedaP.getId(), mediumRecuperado.getId());
+        assertEquals(ubedaP.getNombre(), mediumRecuperado.getNombre());
+        assertEquals(ubedaP.getMana(), mediumRecuperado.getMana());
+        assertEquals(ubedaP.getManaMax(), mediumRecuperado.getManaMax());
+        assertEquals(ubedaP.getCantFortalece(), mediumRecuperado.getCantFortalece());
+        assertEquals(0, ubedaP.getEspiritus().size());
         assertEquals(0, mediumRecuperado.getEspiritus().size());
     }
 
@@ -65,16 +103,16 @@ public class HibernateMediumServiceTest {
     @Test
     void deberiaActualizarSoloLosCamposModificados1() {
 
-        Long id = HibernateTransactionRunner.runTrx(() -> serviceMedium.crear(epifanio).getId());
+        Long id = serviceMedium.crear(epifanioM).getId();
 
         Medium modificado = new Medium("Rolando el audaz", 120, 50);
         modificado.setId(id);
-        modificado.setCantFortalece(15);
+        modificado.setMana(15);
 
         //como modificado tiene el mismo id que epifanio, actualiza dicha fila en la BD
-        this.executeBlockInPersistentContext(() -> serviceMedium.actualizar(modificado));
+        serviceMedium.actualizar(modificado);
 
-        Medium actualizado = HibernateTransactionRunner.runTrx(() -> serviceMedium.recuperar(id));
+        Medium actualizado = serviceMedium.recuperar(id);
 
         assertEquals(modificado.getId(), actualizado.getId());
         assertEquals(modificado.getNombre(), actualizado.getNombre());
@@ -86,47 +124,47 @@ public class HibernateMediumServiceTest {
     @Test
     void deberiaActualizarSoloLosCamposModificados2() {
 
-        Long id = HibernateTransactionRunner.runTrx(() -> serviceMedium.crear(epifanio).getId());
+        Medium mediumRecuperado = serviceMedium.recuperar(epifanioP.getId());
 
-        epifanio.setNombre("Rolando el audaz");
-        epifanio.setMana(120);
-        epifanio.setCantFortalece(15);
+        mediumRecuperado.setNombre("Rolando el audaz");
+        mediumRecuperado.setMana(120);
 
-        //se actualiza la fila con el id de epifanio en la DB
-        this.executeBlockInPersistentContext(() -> serviceMedium.actualizar(epifanio));
 
-        Medium actualizado = HibernateTransactionRunner.runTrx(() -> serviceMedium.recuperar(id));
+        serviceMedium.actualizar(mediumRecuperado);
 
-        assertEquals(epifanio.getId(), actualizado.getId());
-        assertEquals(epifanio.getNombre(), actualizado.getNombre());
-        assertEquals(epifanio.getMana(), actualizado.getMana());
-        assertEquals(epifanio.getManaMax(), actualizado.getManaMax());
-        assertEquals(epifanio.getCantFortalece(), actualizado.getCantFortalece());
+        Medium actualizado = serviceMedium.recuperar(mediumRecuperado.getId());
+
+        assertEquals(mediumRecuperado.getId(), actualizado.getId());
+        assertEquals(mediumRecuperado.getNombre(), actualizado.getNombre());
+        assertEquals(mediumRecuperado.getMana(), actualizado.getMana());
+        assertEquals(mediumRecuperado.getManaMax(), actualizado.getManaMax());
+        assertEquals(mediumRecuperado.getCantFortalece(), actualizado.getCantFortalece());
     }
 
     @Test
     void noDeberiaActualizarConIdNulo() {
         ErrorAlActualizarMediumException exception =
-        assertThrows(ErrorAlActualizarMediumException.class, () -> {
-            HibernateTransactionRunner.runTrx(() -> {
-                serviceMedium.actualizar(epifanio); //comienza sin id
-                return null;
-            });
-        });
+                assertThrows(ErrorAlActualizarMediumException.class, () -> {
+
+                    serviceMedium.actualizar(new Medium("Julian", 12, 22));
+
+                });
+
+
         assertEquals("No se puede actualizar un medium que no tiene id.", exception.getMessage());
     }
 
     @Test
     void noDeberiaActualizarConIdQueNoSeEncuentraEnBD() {
         ErrorAlActualizarMediumException exception =
-        assertThrows(ErrorAlActualizarMediumException.class, () -> {
-            HibernateTransactionRunner.runTrx(() -> {
-                epifanio.setId(1L); //no hay nada en la DB con id 1, porque arranca vacía
-                serviceMedium.actualizar(epifanio);
-                return null;
-            });
-        });
-        assertEquals("No existe en la BD el medium con id: 1", exception.getMessage());
+                assertThrows(ErrorAlActualizarMediumException.class, () -> {
+                    Medium romanM = new Medium("a", 1, 2);
+                    romanM.setId(132L); //no hay nada en la DB con id 1, porque arranca vacía
+                    serviceMedium.actualizar(romanM);
+
+                });
+
+        assertEquals("No existe en la BD el medium con id: 132", exception.getMessage());
     }
 
     @Test
@@ -140,15 +178,20 @@ public class HibernateMediumServiceTest {
     @Test
     void deberiaEliminarYNoPoderRecuperarloLuego() {
 
-        Long id = HibernateTransactionRunner.runTrx(() -> serviceMedium.crear(ubeda).getId());
+        Long id = serviceMedium.crear(ubedaM).getId();
 
-        this.executeBlockInPersistentContext(() -> serviceMedium.eliminar(id));
+        serviceMedium.eliminar(id);
 
         assertThrows(ErrorAlRecuperarMediumException.class, () -> {
             serviceMedium.recuperar(id);
         });
     }
+/*
+    // TODO completar cuando haya conectar
+    @Test
+    void exorcismoNoExitosoDeberiaAfectarElAngelDelMedium() throws ExorcismoPropioNoPermitidoException {
 
+<<<<<<< HEAD
     @Test
     public void descansarCasoExitoso() {
         assertEquals(50, epifanio.getMana());
@@ -246,14 +289,49 @@ public class HibernateMediumServiceTest {
             block.run();
             return null;
         });
+=======
+        // el demonio siempre gana
+        RandomDefensa.setEstrategiaNumero(new EstrategiaRangoEspecifico(99, 99));
+
+        // creo y persisto mediums CON sus espíritus en la misma transacción
+        Long idExorcizador = serviceMedium.recuperar(ubedaP.getId()).getId();
+
+
+        // serviceMedium.conectar(rikaP.getId(),ubedaP.getId());
+
+
+        Long idAtacado = serviceMedium.recuperar(epifanioP.getId()).getId();
+        // serviceMedium.conectar(jaegerP.getId(),epifanioP.getId());
+
+        // ejecuto exorcismo
+
+        serviceMedium.exorcizar(idExorcizador, idAtacado);
+
+
+        // recupero desde DB
+        Medium mediumDerrotado = serviceMedium.recuperar(idExorcizador);
+        Espiritu rikaDerrotada = espirituService.recuperar(rikaP.getId());
+
+
+        assertEquals(55, rikaDerrotada.getNivelDeConexion());
+>>>>>>> feature/mediumModelo
     }
+*/
 
     @AfterEach
     void tearDown() {
+<<<<<<< HEAD
         HibernateTransactionRunner.runTrx(() -> {
             espirituDao.eliminarTodos();
             mediumDao.eliminarTodos();
             return null;
         });
+=======
+
+        espirituService.eliminarTodos();
+        serviceMedium.eliminarTodos();
+
+
+>>>>>>> feature/mediumModelo
     }
 }

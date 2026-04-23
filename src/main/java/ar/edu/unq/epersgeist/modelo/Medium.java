@@ -1,11 +1,15 @@
 package ar.edu.unq.epersgeist.modelo;
 
+import ar.edu.unq.epersgeist.modelo.Batalla.Batalla;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.exceptions.ExorcistaSinAngelesException;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -41,6 +45,7 @@ public class Medium implements Serializable {
     }
 
     public void agregarEspiritu(Espiritu espiritu) {
+        espiritu.setMediumCon(this);
         espiritus.add(espiritu);
         espiritu.setMediumCon(this);
     }
@@ -94,5 +99,46 @@ public class Medium implements Serializable {
     private int cantidadAlInvocar(int cantidad){
         return this.mana - cantidad;
     }
+
+    public void exorcizar(Medium mediumAExorcizar) throws ExorcistaSinAngelesException {
+        this.validarExorcismo();
+
+        Batalla batalla = new Batalla(this, mediumAExorcizar);
+        batalla.iniciarBatalla();
+
+    }
+
+    private void validarExorcismo() throws ExorcistaSinAngelesException {
+        if (!this.tengoAlgunEspirituAngel()) {
+            throw new ExorcistaSinAngelesException("El medium no cuenta con espiritus angeles");
+        }
+    }
+
+    public List<Angelical> espiritusAngelicales() {
+        return espiritus.stream()
+                .filter(e -> e instanceof Angelical)
+                .map(e -> (Angelical) e)
+                .toList();
+    }
+
+    public List<Demonio> espiritusDemonios() {
+        return espiritus.stream()
+                .filter(e -> e instanceof Demonio)
+                .map(e -> (Demonio) e)
+                .toList();
+    }
+
+
+    private boolean tengoAlgunEspirituAngel() {
+        return espiritus.stream().anyMatch(e -> e instanceof Angelical);
+    }
+
+    /*
+     * el metodo desvncularseDe lo llama el espiritu cuando se libera
+     * */
+    public void desvincularseDe(Espiritu espiritu) {
+        this.espiritus.remove(espiritu);
+    }
+
 
 }
