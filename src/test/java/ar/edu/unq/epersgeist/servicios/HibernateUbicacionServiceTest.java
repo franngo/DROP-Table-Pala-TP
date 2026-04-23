@@ -1,330 +1,297 @@
 package ar.edu.unq.epersgeist.servicios;
 
-import ar.edu.unq.epersgeist.HibernateTest;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarMediumException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.*;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
-import ar.edu.unq.epersgeist.servicios.impl.MediumServiceImpl;
+import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
 import ar.edu.unq.epersgeist.servicios.impl.UbicacionServiceImpl;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class HibernateUbicacionServiceTest extends HibernateTest {
+public class HibernateUbicacionServiceTest {
+    private MediumDAO mediumDao;
     private EspirituDAO espirituDAO;
     private UbicacionDAO ubicacionDAO;
+
+    private EspirituService espirituService;
     private UbicacionService ubicacionService;
-    private final HibernateMediumDAO mediumDao = new HibernateMediumDAO();
-    private final MediumServiceImpl serviceMedium = new MediumServiceImpl(mediumDao, espirituDAO);
+
 
     @BeforeEach
     void setUp() {
-        this.espirituDAO = new HibernateEspirituDAO();
-        this.ubicacionDAO = new HibernateUbicacionDAO();
-        this.ubicacionService = new UbicacionServiceImpl(this.ubicacionDAO);
+        mediumDao = new HibernateMediumDAO();
+        espirituDAO = new HibernateEspirituDAO();
+        ubicacionDAO = new HibernateUbicacionDAO();
+
+        ubicacionService = new UbicacionServiceImpl(ubicacionDAO);
+        espirituService = new EspirituServiceImpl(espirituDAO);
     }
 
     // ============================== CREAR ==============================
 
     @Test
     void debeCrearUbicacion() {
-        this.runTrx(() -> {
-            Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
+        Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
 
-            assertNotNull(ubicacion.getId());
-            assertEquals("Santuario de la Luz", ubicacion.getNombre());
-        });
+        assertNotNull(ubicacion.getId());
+        assertEquals("Santuario de la Luz", ubicacion.getNombre());
     }
 
     @Test
     void debeCrearMultiplesUbicacionesConNombresDistintos() {
-        this.runTrx(() -> {
-            Ubicacion ubicacion1 = ubicacionService.crear("Santuario de la Luz");
-            Ubicacion ubicacion2 = ubicacionService.crear("Catedral de la Oscuridad");
+        Ubicacion ubicacion1 = ubicacionService.crear("Santuario de la Luz");
+        Ubicacion ubicacion2 = ubicacionService.crear("Catedral de la Oscuridad");
 
-            assertNotNull(ubicacion1.getId());
-            assertNotNull(ubicacion2.getId());
+        assertNotNull(ubicacion1.getId());
+        assertNotNull(ubicacion2.getId());
 
-            assertEquals("Santuario de la Luz", ubicacion1.getNombre());
-            assertEquals("Catedral de la Oscuridad", ubicacion2.getNombre());
-        });
+        assertEquals("Santuario de la Luz", ubicacion1.getNombre());
+        assertEquals("Catedral de la Oscuridad", ubicacion2.getNombre());
     }
 
     @Test
     void debeLanzarExcepcionSiElNombreYaExiste() {
-        this.runTrx(() -> {
-            ubicacionService.crear("Santuario de la Luz");
+        ubicacionService.crear("Santuario de la Luz");
 
-            assertThrows(UbicacionYaExisteException.class, () ->
-                    ubicacionService.crear("Santuario de la Luz")
-            );
-        });
+        assertThrows(
+                UbicacionYaExisteException.class,
+                () -> ubicacionService.crear("Santuario de la Luz")
+        );
     }
 
     @Test
     void debeLanzarExcepcionSiElNombreEsNull() {
-        this.runTrx(() ->
-                assertThrows(NombreUbicacionInvalidoException.class, () ->
-                        ubicacionService.crear(null)
-                ));
+        assertThrows(
+                NombreUbicacionInvalidoException.class,
+                () -> ubicacionService.crear(null)
+        );
     }
 
     @Test
     void debeLanzarExcepcionSiElNombreEsVacio() {
-        this.runTrx(() ->
-                assertThrows(NombreUbicacionInvalidoException.class, () ->
-                        ubicacionService.crear("")
-                ));
+        assertThrows(
+                NombreUbicacionInvalidoException.class,
+                () -> ubicacionService.crear("")
+        );
     }
 
     @Test
     void debeLanzarExcepcionSiElNombreEsSoloEspacios() {
-        this.runTrx(() ->
-                assertThrows(NombreUbicacionInvalidoException.class, () ->
-                        ubicacionService.crear("   ")
-                ));
+        assertThrows(
+                NombreUbicacionInvalidoException.class,
+                () -> ubicacionService.crear("   ")
+        );
     }
 
     @Test
     void debeLanzarExcepcionSiElNombreYaExisteAunqueTengaEspaciosAlrededor() {
-        this.runTrx(() -> {
-            ubicacionService.crear("Santuario de la Luz");
+        ubicacionService.crear("Santuario de la Luz");
 
-            assertThrows(UbicacionYaExisteException.class, () ->
-                    ubicacionService.crear("  Santuario de la Luz  ")
-            );
-        });
+        assertThrows(
+                UbicacionYaExisteException.class,
+                () -> ubicacionService.crear("  Santuario de la Luz  ")
+        );
     }
 
     // ============================== RECUPERAR ==============================
 
     @Test
     void debeRecuperarUbicacionPorId() {
-        this.runTrx(() -> {
-            Ubicacion ubicacionCreada = ubicacionService.crear("Santuario de la Luz");
+        Ubicacion ubicacionCreada = ubicacionService.crear("Santuario de la Luz");
 
-            Ubicacion ubicacionRecuperada = ubicacionService.recuperar(ubicacionCreada.getId());
+        Ubicacion ubicacionRecuperada = ubicacionService.recuperar(ubicacionCreada.getId());
 
-            assertNotNull(ubicacionRecuperada);
-            assertEquals("Santuario de la Luz", ubicacionRecuperada.getNombre());
-        });
+        assertNotNull(ubicacionRecuperada);
+        assertEquals("Santuario de la Luz", ubicacionRecuperada.getNombre());
     }
 
     @Test
     void debeLanzarExcepcionSiElIdEsNull() {
-        this.runTrx(() ->
-                assertThrows(IdUbicacionInvalidoException.class, () ->
-                        ubicacionService.recuperar(null)
-                ));
+        assertThrows(
+                IdUbicacionInvalidoException.class,
+                () -> ubicacionService.recuperar(null)
+        );
     }
 
     @Test
     void debeRetornarNullSiNoExisteLaUbicacion() {
-        this.runTrx(() -> {
-            Ubicacion ubicacionRecuperada = ubicacionService.recuperar(999L);
+        Ubicacion ubicacionRecuperada = ubicacionService.recuperar(999L);
 
-            assertNull(ubicacionRecuperada);
-        });
+        assertNull(ubicacionRecuperada);
     }
 
     // ============================== RECUPERAR TODOS ==============================
 
     @Test
     void debeRecuperarTodasLasUbicaciones() {
-        this.runTrx(() -> {
-            ubicacionService.crear("Santuario de la Luz");
-            ubicacionService.crear("Catedral de la Oscuridad");
+        ubicacionService.crear("Santuario de la Luz");
+        ubicacionService.crear("Catedral de la Oscuridad");
 
-            List<Ubicacion> ubicaciones = ubicacionService.recuperarTodos();
+        List<Ubicacion> ubicaciones = ubicacionService.recuperarTodos();
 
-            assertEquals(2, ubicaciones.size());
-        });
+        assertEquals(2, ubicaciones.size());
     }
 
     @Test
     void debeRecuperarUnaListaVaciaSiNoHayUbicaciones() {
-        this.runTrx(() -> {
-            List<Ubicacion> ubicaciones = ubicacionService.recuperarTodos();
+        List<Ubicacion> ubicaciones = ubicacionService.recuperarTodos();
 
-            assertEquals(0, ubicaciones.size());
-        });
+        assertEquals(0, ubicaciones.size());
     }
 
     // ============================== ESPIRITUS EN ==============================
 
     @Test
     void espiritusEnRetornaListaDeEspiritus() {
-        this.runTrx(() -> {
-            Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
+        Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
 
-            Espiritu guerrero = espirituDAO.guardar(new Espiritu("Guerrero", "Espíritu de la Luz"));
-            Espiritu mago = espirituDAO.guardar(new Espiritu("Mago", "Espíritu de la Oscuridad"));
+        Espiritu guerrero = HibernateTransactionRunner.runTrx(() ->
+            espirituDAO.guardar(new Espiritu("Guerrero", "Espíritu de la Luz"))
+        );
 
-            ubicacion.agregarEspiritu(guerrero);
-            ubicacion.agregarEspiritu(mago);
+        Espiritu mago = HibernateTransactionRunner.runTrx(() ->
+                espirituDAO.guardar(new Espiritu("Mago", "Espíritu de la Oscuridad"))
+        );
 
-            List<Espiritu> espiritusEnUbicacion = ubicacionService.espiritusEn(ubicacion.getId());
+        ubicacion.agregarEspiritu(guerrero);
+        ubicacion.agregarEspiritu(mago);
 
-            assertEquals(2, espiritusEnUbicacion.size());
-            assertTrue(espiritusEnUbicacion.contains(guerrero));
-            assertTrue(espiritusEnUbicacion.contains(mago));
-        });
+        List<Espiritu> espiritusEnUbicacion = ubicacionService.espiritusEn(ubicacion.getId());
+
+        assertEquals(2, espiritusEnUbicacion.size());
+        assertTrue(espiritusEnUbicacion.contains(guerrero));
+        assertTrue(espiritusEnUbicacion.contains(mago));
     }
 
     @Test
     void espiritusEnLanzaExcepcionSiUbicacionNoExiste() {
-        this.runTrx(() ->
-            assertThrows(UbicacionNoEncontradaException.class, () ->
-                    ubicacionService.espiritusEn(999L)
-            )
+        assertThrows(
+                UbicacionNoEncontradaException.class,
+                () -> ubicacionService.espiritusEn(999L)
         );
     }
 
     @Test
     void espiritusEnLanzaExcepcionSiIdEsNull() {
-        this.runTrx(() ->
-            assertThrows(IdUbicacionInvalidoException.class, () ->
-                    ubicacionService.espiritusEn(null)
-            )
+        assertThrows(
+                IdUbicacionInvalidoException.class,
+                () -> ubicacionService.espiritusEn(null)
         );
     }
 
-    // ============================== Actualizar ==============================
+    // ============================== ACTUALIZAR ==============================
 
     @Test
     void deberiaActualizarSoloElNombre(){
-        Long id = HibernateTransactionRunner.runTrx(() -> ubicacionService.crear("Santuario de la Luz").getId());
+        Long id = ubicacionService.crear("Santuario de la Luz").getId();
         Ubicacion ubicacionMod = new Ubicacion("Catedral de la Oscuridad");
         ubicacionMod.setId(id);
 
-        this.executeBlockInPersistentContext(() -> ubicacionService.actualizar(ubicacionMod));
+        ubicacionService.actualizar(ubicacionMod);
 
-        Ubicacion ubicacionActualizada = HibernateTransactionRunner.runTrx(() -> ubicacionService.recuperar(id));
+        Ubicacion ubicacionActualizada = ubicacionService.recuperar(id);
 
         assertEquals(ubicacionMod.getId(), ubicacionActualizada.getId());
     }
 
     @Test
     void noDeberiaActualizarUbicacionSinId(){
-        this.runTrx(() ->
-                assertThrows(ErrorAlActualizarUbicacionException.class, () ->
-                        ubicacionService.actualizar(null)
-                )
+        assertThrows(
+                ErrorAlActualizarUbicacionException.class,
+                () -> ubicacionService.actualizar(null)
         );
     }
 
-
-    private void executeBlockInPersistentContext(Runnable block) {
-        HibernateTransactionRunner.runTrx(() -> {
-            block.run();
-            return null;
-        });
-    }
-
-    // ============================== Eliminar ==============================
+    // ============================== ELIMINAR ==============================
 
     @Test
     void deberiaEliminarLaUbicacionYNoPoderRecuperarlaLuego() {
+        Long id = ubicacionService.crear("Santuario de la Luz").getId();
 
-        Long id = HibernateTransactionRunner.runTrx(() -> ubicacionService.crear("Santuario de la Luz")).getId();
-
-
-
-        this.executeBlockInPersistentContext(() -> ubicacionService.eliminar(id));
-        Ubicacion ubicacion = HibernateTransactionRunner.runTrx(() -> ubicacionService.recuperar(id));
+        ubicacionService.eliminar(id);
+        Ubicacion ubicacion = ubicacionService.recuperar(id);
 
         assertNull(ubicacion);
     }
 
-    // ============================== mediumsSinEspiritusEn ==============================
+    // ============================== MEDIUMSSINESPIRITUSEN ==============================
 
     @Test
     void deberiaObtenerMediumsSinEspiritus() {
+         Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
 
-        this.runTrx(() -> {
-            Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
+         Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
+         Medium ubeda = new Medium("Ubeda el dt", 100, 20);
 
-            Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
-            Medium ubeda = new Medium("Ubeda el dt", 100, 20);
+         epifanio.setUbicacion(ubicacion);
+         ubeda.setUbicacion(ubicacion);
+         ubicacion.agregarMedium(epifanio);
+         ubicacion.agregarMedium(ubeda);
+         List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
 
-            epifanio.setUbicacion(ubicacion);
-            ubeda.setUbicacion(ubicacion);
-
-            ubicacion.agregarMedium(epifanio);
-            ubicacion.agregarMedium(ubeda);
-            List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
-
-            assertEquals(2, resultado.size());
-        });
+         assertEquals(2, resultado.size());
     }
 
     @Test
     void deberiaObtener1MediumsSinEspiritus() {
+         Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
+         Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
+         Medium ubeda = new Medium("Ubeda el dt", 100, 20);
 
-        this.runTrx(() -> {
-            Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
-            Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
-            Medium ubeda = new Medium("Ubeda el dt", 100, 20);
-            Espiritu mago = espirituDAO.guardar(new Espiritu("Mago", "Espíritu de la Oscuridad"));
-            ubeda.agregarEspiritu(mago);
+         Espiritu mago = HibernateTransactionRunner.runTrx(() ->
+                 espirituDAO.guardar(new Espiritu("Mago", "Espíritu de la Oscuridad"))
+         );
 
-            ubicacion.agregarMedium(epifanio);
-            ubicacion.agregarMedium(ubeda);
+         ubeda.agregarEspiritu(mago);
 
-            List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
+         ubicacion.agregarMedium(epifanio);
+         ubicacion.agregarMedium(ubeda);
 
-            assertEquals(1, resultado.size());
-        });
+         List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
+
+         assertEquals(1, resultado.size());
     }
 
     @Test
     void deberiaRetornarListaVaciaSiNoHayMediumsSinEspiritus() {
+         Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
 
-        this.runTrx(() -> {
-            Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
+         List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
 
-            List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
-
-            assertEquals(0, resultado.size());
-        });
+         assertEquals(0, resultado.size());
     }
 
     @Test
-    void mediumsSinEspiritusEnLanzaExceptionSiElIdNoExiste(){
-        this.runTrx(() ->
-                assertThrows(IdUbicacionInvalidoException.class, () ->
-                        ubicacionService.mediumsSinEspiritusEn(
-                                null)
-                )
+    void mediumsSinEspiritusEnLanzaExceptionSiElIdNoExiste() {
+        assertThrows(
+                IdUbicacionInvalidoException.class,
+                () -> ubicacionService.mediumsSinEspiritusEn(null)
         );
     }
 
-
-
     // ============================== TEARDOWN ==============================
-
-
-
 
     @AfterEach
     void tearDown() {
-        this.runTrx(() -> {
-            espirituDAO.eliminarTodos();
+        HibernateTransactionRunner.runTrx(() -> {
             mediumDao.eliminarTodos();
+            espirituDAO.eliminarTodos();
             ubicacionDAO.eliminarTodos();
+
+            return null;
         });
     }
 }
