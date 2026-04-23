@@ -4,16 +4,20 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
+import org.hibernate.Hibernate;
 
 import java.util.List;
 
 public class EspirituServiceImpl implements EspirituService {
     private HibernateEspirituDAO espirituDao;
+    private HibernateMediumDAO mediumDao;
 
-    public EspirituServiceImpl(HibernateEspirituDAO espirituDao) {
+    public EspirituServiceImpl(HibernateEspirituDAO espirituDao, HibernateMediumDAO mediumDao) {
         this.espirituDao = espirituDao;
+        this.mediumDao = mediumDao;
     }
 
     @Override
@@ -63,19 +67,20 @@ public class EspirituServiceImpl implements EspirituService {
      * Paso 3: persistir los cambios
      * */
     @Override
-    public Medium conectar(Long espirituId, Medium medium) {
+    public Medium conectar(Long espirituId, Long mediumId) {
         Espiritu espirituAConectar = espirituDao.recuperar(espirituId);
+        Medium mediumAConectar = mediumDao.recuperar(mediumId);
 
-        espirituAConectar.aumentarConexion(medium);
+        espirituAConectar.aumentarConexion(mediumAConectar);
 
         espirituDao.actualizar(espirituAConectar);
 
-        return medium;
+        return mediumAConectar;
     }
 
     @Override
     public List<Espiritu> espiritusDemoniacos() {
-        return List.of();
+        return HibernateTransactionRunner.runTrx(() ->
+                espirituDao.espiritusDemoniacos());
     }
-
 }

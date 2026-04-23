@@ -13,6 +13,8 @@ import java.io.Serializable;
 @Getter @Setter @NoArgsConstructor
 
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "tipo_espiritu")
 public class Espiritu implements Serializable {
 
     @Id

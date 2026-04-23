@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.persistencia.dao.hibernate;
 
+import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarEspirituException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
@@ -70,6 +71,14 @@ public class HibernateEspirituDAO extends HibernateDAO<Espiritu> implements Espi
     public List<Espiritu> recuperarTodos() {
         Session session = HibernateSessionContext.getCurrentSession();
         String hql = "select e from Espiritu e order by e.nombre asc";
+        Query<Espiritu> query = session.createQuery(hql, Espiritu.class);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Espiritu> espiritusDemoniacos() {
+        Session session = HibernateSessionContext.getCurrentSession();
+        String hql = "select e from Demonio e order by e.nivelDeConexion desc";
         Query<Espiritu> query = session.createQuery(hql, Espiritu.class);
         return query.getResultList();
     }
