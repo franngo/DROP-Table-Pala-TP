@@ -36,6 +36,7 @@ public class Espiritu implements Serializable {
     @ManyToOne
     private Ubicacion ubicacion;
 
+
     public Espiritu(@NonNull String nombre) {
         this.nivelDeConexion = 0;
         this.nombre = nombre;
@@ -71,5 +72,7 @@ public class Espiritu implements Serializable {
 
     public void recibirAtaqueDe(Espiritu angel) {
     }
+
+
 }
 

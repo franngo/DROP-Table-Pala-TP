@@ -2,10 +2,8 @@ package ar.edu.unq.epersgeist.persistencia;
 
 import ar.edu.unq.epersgeist.HibernateTest;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.ErrorAlActualizarUbicacionException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.IdUbicacionInvalidoException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
@@ -165,7 +163,7 @@ public class HibernateUbicacionDAOTest extends HibernateTest {
     // ============================== Actualizar ==============================
 
     @Test
-    void deberiaActualizarSoloElNombre(){
+    void deberiaActualizarSoloElNombre() {
         Ubicacion ubicacion = new Ubicacion("Santuario de la Luz");
 
         Long id = HibernateTransactionRunner.runTrx(() -> ubicacionDAO.guardar(ubicacion).getId());
@@ -181,7 +179,7 @@ public class HibernateUbicacionDAOTest extends HibernateTest {
     }
 
     @Test
-    void noDeberiaActualizarUbicacionSinId(){
+    void noDeberiaActualizarUbicacionSinId() {
         this.runTrx(() ->
                 assertThrows(ErrorAlActualizarUbicacionException.class, () ->
                         ubicacionDAO.actualizar(null)
@@ -237,7 +235,7 @@ public class HibernateUbicacionDAOTest extends HibernateTest {
         // Primera transacción: se crea la relación y Hibernate la persiste al commit
         this.runTrx(() -> {
             Ubicacion ubicacion = ubicacionDAO.guardar(new Ubicacion("Santuario de la Luz"));
-            Espiritu guerrero = espirituDAO.guardar(new Espiritu("Guerrero", "Espíritu de la Luz"));
+            Espiritu guerrero = espirituDAO.guardar(new Espiritu("Espíritu de la Luz"));
 
             ubicacion.agregarEspiritu(guerrero);
 
@@ -261,16 +259,16 @@ public class HibernateUbicacionDAOTest extends HibernateTest {
         final Ubicacion[] ubicacion = new Ubicacion[1];
 
         this.runTrx(() ->
-            ubicacion[0] = ubicacionDAO.guardar(new Ubicacion("Santuario de la Luz"))
+                ubicacion[0] = ubicacionDAO.guardar(new Ubicacion("Santuario de la Luz"))
         );
 
         this.runTrx(() -> {
-            Espiritu guerrero = espirituDAO.guardar(new Espiritu("Guerrero", "Espíritu de la Luz"));
+            Espiritu guerrero = espirituDAO.guardar(new Espiritu("Espíritu de la Luz"));
             ubicacion[0].agregarEspiritu(guerrero);
         });
 
         this.runTrx(() -> {
-            Espiritu mago = espirituDAO.guardar(new Espiritu("Mago", "Espíritu de la Oscuridad"));
+            Espiritu mago = espirituDAO.guardar(new Espiritu("Espíritu de la Oscuridad"));
             ubicacion[0].agregarEspiritu(mago);
         });
 

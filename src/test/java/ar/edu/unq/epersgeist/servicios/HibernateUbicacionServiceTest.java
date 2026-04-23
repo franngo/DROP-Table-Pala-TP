@@ -4,7 +4,6 @@ import ar.edu.unq.epersgeist.HibernateTest;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarMediumException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.*;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
@@ -18,7 +17,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -170,8 +168,8 @@ public class HibernateUbicacionServiceTest extends HibernateTest {
         this.runTrx(() -> {
             Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
 
-            Espiritu guerrero = espirituDAO.guardar(new Espiritu("Guerrero", "Espíritu de la Luz"));
-            Espiritu mago = espirituDAO.guardar(new Espiritu("Mago", "Espíritu de la Oscuridad"));
+            Espiritu guerrero = espirituDAO.guardar(new Espiritu("Espíritu de la Luz"));
+            Espiritu mago = espirituDAO.guardar(new Espiritu("Espíritu de la Oscuridad"));
 
             ubicacion.agregarEspiritu(guerrero);
             ubicacion.agregarEspiritu(mago);
@@ -187,25 +185,25 @@ public class HibernateUbicacionServiceTest extends HibernateTest {
     @Test
     void espiritusEnLanzaExcepcionSiUbicacionNoExiste() {
         this.runTrx(() ->
-            assertThrows(UbicacionNoEncontradaException.class, () ->
-                    ubicacionService.espiritusEn(999L)
-            )
+                assertThrows(UbicacionNoEncontradaException.class, () ->
+                        ubicacionService.espiritusEn(999L)
+                )
         );
     }
 
     @Test
     void espiritusEnLanzaExcepcionSiIdEsNull() {
         this.runTrx(() ->
-            assertThrows(IdUbicacionInvalidoException.class, () ->
-                    ubicacionService.espiritusEn(null)
-            )
+                assertThrows(IdUbicacionInvalidoException.class, () ->
+                        ubicacionService.espiritusEn(null)
+                )
         );
     }
 
     // ============================== Actualizar ==============================
 
     @Test
-    void deberiaActualizarSoloElNombre(){
+    void deberiaActualizarSoloElNombre() {
         Long id = HibernateTransactionRunner.runTrx(() -> ubicacionService.crear("Santuario de la Luz").getId());
         Ubicacion ubicacionMod = new Ubicacion("Catedral de la Oscuridad");
         ubicacionMod.setId(id);
@@ -218,7 +216,7 @@ public class HibernateUbicacionServiceTest extends HibernateTest {
     }
 
     @Test
-    void noDeberiaActualizarUbicacionSinId(){
+    void noDeberiaActualizarUbicacionSinId() {
         this.runTrx(() ->
                 assertThrows(ErrorAlActualizarUbicacionException.class, () ->
                         ubicacionService.actualizar(null)
@@ -240,7 +238,6 @@ public class HibernateUbicacionServiceTest extends HibernateTest {
     void deberiaEliminarLaUbicacionYNoPoderRecuperarlaLuego() {
 
         Long id = HibernateTransactionRunner.runTrx(() -> ubicacionService.crear("Santuario de la Luz")).getId();
-
 
 
         this.executeBlockInPersistentContext(() -> ubicacionService.eliminar(id));
@@ -278,7 +275,7 @@ public class HibernateUbicacionServiceTest extends HibernateTest {
             Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
             Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
             Medium ubeda = new Medium("Ubeda el dt", 100, 20);
-            Espiritu mago = espirituDAO.guardar(new Espiritu("Mago", "Espíritu de la Oscuridad"));
+            Espiritu mago = espirituDAO.guardar(new Espiritu("Espíritu de la Oscuridad"));
             ubeda.agregarEspiritu(mago);
 
             ubicacion.agregarMedium(epifanio);
@@ -303,7 +300,7 @@ public class HibernateUbicacionServiceTest extends HibernateTest {
     }
 
     @Test
-    void mediumsSinEspiritusEnLanzaExceptionSiElIdNoExiste(){
+    void mediumsSinEspiritusEnLanzaExceptionSiElIdNoExiste() {
         this.runTrx(() ->
                 assertThrows(IdUbicacionInvalidoException.class, () ->
                         ubicacionService.mediumsSinEspiritusEn(
@@ -313,10 +310,7 @@ public class HibernateUbicacionServiceTest extends HibernateTest {
     }
 
 
-
     // ============================== TEARDOWN ==============================
-
-
 
 
     @AfterEach

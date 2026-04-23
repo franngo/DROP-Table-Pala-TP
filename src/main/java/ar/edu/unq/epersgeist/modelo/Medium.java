@@ -4,6 +4,8 @@ import ar.edu.unq.epersgeist.modelo.Batalla.Batalla;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeInvocacionDeEspirituException;
+
 import ar.edu.unq.epersgeist.modelo.exceptions.ExorcistaSinAngelesException;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -14,7 +16,7 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeInvocacionDeEspirituException;
+
 
 @Getter
 @Setter
@@ -30,6 +32,7 @@ public class Medium implements Serializable {
     private Integer mana;
     private int cantFortalece;
 
+    //¿sería @OneToMany acá y @ManyToOne del lado del Espiritu?
     @OneToMany(mappedBy = "mediumCon", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Espiritu> espiritus;
 
@@ -55,6 +58,8 @@ public class Medium implements Serializable {
         this.espiritusRecuperanMana(Medium.manaDescansoEspiritus);
     }
 
+    public static final int minimoMana = 0;
+    public static final int manaRequeridoInvocacion = 10;
     public static final int manaDescansoMedium = 15;
     public static final int manaDescansoEspiritus = 5;
 
@@ -62,7 +67,7 @@ public class Medium implements Serializable {
         this.mana = Math.min(this.manaMax, this.cantidadAlDescansar(cantidad));
     }
 
-    private int cantidadAlDescansar(int cantidad){
+    private int cantidadAlDescansar(int cantidad) {
         return this.mana + cantidad;
     }
 
@@ -77,11 +82,11 @@ public class Medium implements Serializable {
     Observación = Si el medium no tiene al menos 10 de maná, no se lleva la operación a cabo (no sucede nada).
     */
     public Espiritu invocar(Espiritu espiritu) {
-        if(this.mana < 10) {
+        if (this.mana < 10) {
             return espiritu; //si no hay suificiente maná, no se hace nada
         }
 
-        if(espiritu.getMediumCon() != null) { //si el Espiritu NO está libre
+        if (espiritu.getMediumCon() != null) { //si el Espiritu NO está libre
             throw new ErrorDeInvocacionDeEspirituException();
         }
 
@@ -93,10 +98,8 @@ public class Medium implements Serializable {
         return espiritu;
     }
 
-    public static final int minimoMana = 0;
-    public static final int manaRequeridoInvocacion = 10;
 
-    private int cantidadAlInvocar(int cantidad){
+    private int cantidadAlInvocar(int cantidad) {
         return this.mana - cantidad;
     }
 

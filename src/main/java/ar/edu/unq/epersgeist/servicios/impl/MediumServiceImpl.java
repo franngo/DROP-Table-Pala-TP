@@ -4,14 +4,19 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarMediumException;
-import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.modelo.exceptions.ExorcismoPropioNoPermitidoException;
+import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.servicios.MediumService;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 
 import java.util.List;
 
+//TODO IMPLEMENTAR
+/*
+ *
+ * Servicio Medium
+ * */
 public class MediumServiceImpl implements MediumService {
     private MediumDAO mediumDao;
     private EspirituDAO espirituDao; //se requiere para usar en el invocar()
@@ -66,7 +71,7 @@ public class MediumServiceImpl implements MediumService {
         HibernateTransactionRunner.runTrx(() -> {
             Medium m = mediumDao.recuperar(id);
 
-            if(m==null) {
+            if (m == null) {
                 throw new ErrorAlRecuperarMediumException(id);
             }
 
@@ -75,14 +80,25 @@ public class MediumServiceImpl implements MediumService {
         });
     }
 
+
     @Override
     public Espiritu invocar(Long mediumId, Long espirituId) {
         return HibernateTransactionRunner.runTrx(() -> {
             Medium m = mediumDao.recuperar(mediumId);
             Espiritu e = espirituDao.recuperar(espirituId);
-    public void descansar(Long idMedium) {
 
+            if (m == null) {
+                throw new ErrorAlRecuperarMediumException(mediumId);
+            }
+            if (e == null) {
+                throw new ErrorAlRecuperarEspirituException(espirituId);
+            }
+
+            return m.invocar(e);
+
+        });
     }
+
 
     @Override
     public void exorcizar(Long idMediumExorcista, Long idMediumAExorcizar) throws ExorcismoPropioNoPermitidoException {
@@ -102,16 +118,8 @@ public class MediumServiceImpl implements MediumService {
 
         });
 
-            if(m==null) {
-                throw new ErrorAlRecuperarMediumException(mediumId);
-            }
-            if(e==null) {
-                throw new ErrorAlRecuperarEspirituException(espirituId);
-            }
-
-            return m.invocar(e);
-        });
     }
+
 
     @Override
     public List<Espiritu> espiritus(Long mediumId) {
@@ -121,10 +129,6 @@ public class MediumServiceImpl implements MediumService {
         });
     }
 
-    @Override
-    public Espiritu invocar(Long mediumId, Long espirituId) {
-        return null;
-    }
 
     @Override
     public void eliminarTodos() {

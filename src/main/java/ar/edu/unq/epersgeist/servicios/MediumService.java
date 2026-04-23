@@ -19,7 +19,6 @@ public interface MediumService {
 
     void descansar(Long id);
 
-    List<Medium> espiritus();
 
     Espiritu invocar(Long mediumId, Long espirituId);
 
