@@ -28,7 +28,7 @@ public class HibernateUbicacionServiceTest extends HibernateTest {
     private UbicacionDAO ubicacionDAO;
     private UbicacionService ubicacionService;
     private final HibernateMediumDAO mediumDao = new HibernateMediumDAO();
-    private final MediumServiceImpl serviceMedium = new MediumServiceImpl(mediumDao);
+    private final MediumServiceImpl serviceMedium = new MediumServiceImpl(mediumDao, espirituDAO);
 
     @BeforeEach
     void setUp() {

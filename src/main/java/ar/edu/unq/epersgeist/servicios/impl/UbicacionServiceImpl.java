@@ -109,7 +109,7 @@ public class UbicacionServiceImpl implements UbicacionService {
             throw new UbicacionNoEncontradaException(ubicacionId);
         }
 
-        return ubicacion.getMedium().stream()
+        return ubicacion.getMediums().stream()
                 .filter(medium -> medium.getEspiritus().isEmpty())
                 .toList();
     }
