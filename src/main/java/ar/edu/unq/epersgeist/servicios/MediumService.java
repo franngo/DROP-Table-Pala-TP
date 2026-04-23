@@ -24,4 +24,6 @@ public interface MediumService {
     List<Espiritu> espiritus(Long mediumId);
 
     Espiritu invocar(Long mediumId, Long espirituId);
+
+    void eliminarTodos();
 }

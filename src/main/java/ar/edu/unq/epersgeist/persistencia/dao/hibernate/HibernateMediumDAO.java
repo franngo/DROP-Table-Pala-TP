@@ -40,8 +40,9 @@ public class HibernateMediumDAO extends HibernateDAO<Medium> implements MediumDA
     @Override
     public void actualizar(Medium medium) {
         Session session = HibernateSessionContext.getCurrentSession();
-
-
+        // TODO borrar!!
+        System.out.println("EL ID DEL MEDIUM QUE LE PASO");
+        System.out.println(medium.getId());
         if (medium.getId() == null) {
             throw new ErrorAlActualizarMediumException("No se puede actualizar un medium que no tiene id.");
         }

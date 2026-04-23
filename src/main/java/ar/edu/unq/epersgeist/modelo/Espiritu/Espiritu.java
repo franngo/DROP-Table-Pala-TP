@@ -14,7 +14,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "tipo")
 public class Espiritu implements Serializable {
 

@@ -101,5 +101,14 @@ public class MediumServiceImpl implements MediumService {
         return null;
     }
 
+    @Override
+    public void eliminarTodos() {
+        HibernateTransactionRunner.runTrx(() -> {
+
+            mediumDao.eliminarTodos();
+            return null;
+        });
+    }
+
 
 }
