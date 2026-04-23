@@ -10,12 +10,8 @@ public interface UbicacionService {
     Ubicacion crear(String nombre);
     Ubicacion recuperar(Long id);
     List<Ubicacion> recuperarTodos();
-
     List<Espiritu> espiritusEn(Long id);
-
     void actualizar(Ubicacion ubicacionMod);
-
     void eliminar(Long id);
-
     List<Medium> mediumsSinEspiritusEn(Long ubicacionId);
 }

@@ -102,7 +102,16 @@ public class UbicacionServiceImpl implements UbicacionService {
         if (ubicacionId == null) {
             throw new IdUbicacionInvalidoException();
         }
-        return this.ubicacionDAO.mediumsSinEspiritusEn(ubicacionId);
+
+        Ubicacion ubicacion = this.ubicacionDAO.recuperar(ubicacionId);
+
+        if (ubicacion == null) {
+            throw new UbicacionNoEncontradaException(ubicacionId);
+        }
+
+        return ubicacion.getMedium().stream()
+                .filter(medium -> medium.getEspiritus().isEmpty())
+                .toList();
     }
 
     // --------------------------------------------------------------------------------
