@@ -272,6 +272,25 @@ public class HibernateUbicacionServiceTest extends HibernateTest {
     }
 
     @Test
+    void deberiaObtener1MediumsSinEspiritus() {
+
+        this.runTrx(() -> {
+            Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
+            Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
+            Medium ubeda = new Medium("Ubeda el dt", 100, 20);
+            Espiritu mago = espirituDAO.guardar(new Espiritu("Mago", "Espíritu de la Oscuridad"));
+            ubeda.agregarEspiritu(mago);
+
+            ubicacion.agregarMedium(epifanio);
+            ubicacion.agregarMedium(ubeda);
+
+            List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
+
+            assertEquals(1, resultado.size());
+        });
+    }
+
+    @Test
     void deberiaRetornarListaVaciaSiNoHayMediumsSinEspiritus() {
 
         this.runTrx(() -> {

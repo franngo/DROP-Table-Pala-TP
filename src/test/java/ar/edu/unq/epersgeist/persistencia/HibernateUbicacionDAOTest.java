@@ -227,45 +227,6 @@ public class HibernateUbicacionDAOTest extends HibernateTest {
 
     }
 
-    // ============================== mediumsSinEspiritusEn ==============================
-
-    @Test
-    void deberiaObtenerMediumsSinEspiritus() {
-
-        this.runTrx(() -> {
-            Ubicacion ubicacion = ubicacionDAO.guardar(new Ubicacion("Santuario de la Luz"));
-
-            Medium ubeda = mediumDAO.crear(new Medium("Ubeda el dt", 100, 20));
-
-            ubeda.setUbicacion(ubicacion);
-            ubicacion.agregarMedium(ubeda);
-            List<Medium> resultado = ubicacionDAO.mediumsSinEspiritusEn(ubicacion.getId());
-
-            assertEquals(1, resultado.size());
-        });
-    }
-
-    @Test
-    void deberiaRetornarListaVaciaSiNoHayMediumsSinEspiritus() {
-
-        this.runTrx(() -> {
-            Ubicacion ubicacion = ubicacionDAO.guardar(new Ubicacion("Santuario de la Luz"));
-
-            List<Medium> resultado = ubicacionDAO.mediumsSinEspiritusEn(ubicacion.getId());
-
-            assertEquals(0, resultado.size());
-        });
-    }
-
-    @Test
-    void mediumsSinEspiritusEnLanzaExceptionSiElIdNoExiste(){
-        this.runTrx(() ->
-                assertThrows(IdUbicacionInvalidoException.class, () ->
-                        ubicacionDAO.mediumsSinEspiritusEn(
-                                null)
-                )
-        );
-    }
 
     // ============================== EXTRAS ==============================
 
