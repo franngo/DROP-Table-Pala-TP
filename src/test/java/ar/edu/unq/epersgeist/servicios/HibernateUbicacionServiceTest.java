@@ -2,20 +2,23 @@ package ar.edu.unq.epersgeist.servicios;
 
 import ar.edu.unq.epersgeist.HibernateTest;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.IdUbicacionInvalidoException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.NombreUbicacionInvalidoException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarMediumException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.*;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
+import ar.edu.unq.epersgeist.servicios.impl.MediumServiceImpl;
 import ar.edu.unq.epersgeist.servicios.impl.UbicacionServiceImpl;
+import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,6 +27,8 @@ public class HibernateUbicacionServiceTest extends HibernateTest {
     private EspirituDAO espirituDAO;
     private UbicacionDAO ubicacionDAO;
     private UbicacionService ubicacionService;
+    private final HibernateMediumDAO mediumDao = new HibernateMediumDAO();
+    private final MediumServiceImpl serviceMedium = new MediumServiceImpl(mediumDao);
 
     @BeforeEach
     void setUp() {
@@ -197,12 +202,128 @@ public class HibernateUbicacionServiceTest extends HibernateTest {
         );
     }
 
+    // ============================== Actualizar ==============================
+
+    @Test
+    void deberiaActualizarSoloElNombre(){
+        Long id = HibernateTransactionRunner.runTrx(() -> ubicacionService.crear("Santuario de la Luz").getId());
+        Ubicacion ubicacionMod = new Ubicacion("Catedral de la Oscuridad");
+        ubicacionMod.setId(id);
+
+        this.executeBlockInPersistentContext(() -> ubicacionService.actualizar(ubicacionMod));
+
+        Ubicacion ubicacionActualizada = HibernateTransactionRunner.runTrx(() -> ubicacionService.recuperar(id));
+
+        assertEquals(ubicacionMod.getId(), ubicacionActualizada.getId());
+    }
+
+    @Test
+    void noDeberiaActualizarUbicacionSinId(){
+        this.runTrx(() ->
+                assertThrows(ErrorAlActualizarUbicacionException.class, () ->
+                        ubicacionService.actualizar(null)
+                )
+        );
+    }
+
+
+    private void executeBlockInPersistentContext(Runnable block) {
+        HibernateTransactionRunner.runTrx(() -> {
+            block.run();
+            return null;
+        });
+    }
+
+    // ============================== Eliminar ==============================
+
+    @Test
+    void deberiaEliminarLaUbicacionYNoPoderRecuperarlaLuego() {
+
+        Long id = HibernateTransactionRunner.runTrx(() -> ubicacionService.crear("Santuario de la Luz")).getId();
+
+
+
+        this.executeBlockInPersistentContext(() -> ubicacionService.eliminar(id));
+        Ubicacion ubicacion = HibernateTransactionRunner.runTrx(() -> ubicacionService.recuperar(id));
+
+        assertNull(ubicacion);
+    }
+
+    // ============================== mediumsSinEspiritusEn ==============================
+
+    @Test
+    void deberiaObtenerMediumsSinEspiritus() {
+
+        this.runTrx(() -> {
+            Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
+
+            Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
+            Medium ubeda = new Medium("Ubeda el dt", 100, 20);
+
+            epifanio.setUbicacion(ubicacion);
+            ubeda.setUbicacion(ubicacion);
+
+            ubicacion.agregarMedium(epifanio);
+            ubicacion.agregarMedium(ubeda);
+            List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
+
+            assertEquals(2, resultado.size());
+        });
+    }
+
+    @Test
+    void deberiaObtener1MediumsSinEspiritus() {
+
+        this.runTrx(() -> {
+            Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
+            Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
+            Medium ubeda = new Medium("Ubeda el dt", 100, 20);
+            Espiritu mago = espirituDAO.guardar(new Espiritu("Mago", "Espíritu de la Oscuridad"));
+            ubeda.agregarEspiritu(mago);
+
+            ubicacion.agregarMedium(epifanio);
+            ubicacion.agregarMedium(ubeda);
+
+            List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
+
+            assertEquals(1, resultado.size());
+        });
+    }
+
+    @Test
+    void deberiaRetornarListaVaciaSiNoHayMediumsSinEspiritus() {
+
+        this.runTrx(() -> {
+            Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
+
+            List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
+
+            assertEquals(0, resultado.size());
+        });
+    }
+
+    @Test
+    void mediumsSinEspiritusEnLanzaExceptionSiElIdNoExiste(){
+        this.runTrx(() ->
+                assertThrows(IdUbicacionInvalidoException.class, () ->
+                        ubicacionService.mediumsSinEspiritusEn(
+                                null)
+                )
+        );
+    }
+
+
+
     // ============================== TEARDOWN ==============================
+
+
+
 
     @AfterEach
     void tearDown() {
         this.runTrx(() -> {
             espirituDAO.eliminarTodos();
+            mediumDao.eliminarTodos();
             ubicacionDAO.eliminarTodos();
         });
     }
