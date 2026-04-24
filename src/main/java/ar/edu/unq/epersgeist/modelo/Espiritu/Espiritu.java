@@ -16,10 +16,10 @@ import java.io.Serializable;
 
 @Entity
 
-//@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.JOINED)
 //@DiscriminatorColumn(name = "tipo")
 
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+//@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "tipo_espiritu")
 
 public class Espiritu implements Serializable {
@@ -27,7 +27,6 @@ public class Espiritu implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
 
 
     private double nivelDeConexion;
@@ -61,7 +60,6 @@ public class Espiritu implements Serializable {
 
         this.nivelDeConexion = Math.min(Espiritu.limiteConexion, this.cantidadNuevaConexion(cantidad));
     }
-
 
 
     private double cantidadNuevaConexion(double cantidad) {

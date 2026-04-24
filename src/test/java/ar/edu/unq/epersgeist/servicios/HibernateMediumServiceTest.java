@@ -5,7 +5,9 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarMediumException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarMediumException;
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
@@ -15,6 +17,7 @@ import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
 
 import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
 import ar.edu.unq.epersgeist.servicios.impl.MediumServiceImpl;
+import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -177,98 +180,95 @@ public class HibernateMediumServiceTest {
     }
 
 
+    @Test
+    public void descansarCasoExitoso() {
+        assertEquals(50, epifanioM.getMana());
+        assertEquals(0, espirituM.getNivelDeConexion());
+        assertEquals(0, espirituM2.getNivelDeConexion());
+
+        epifanioM.agregarEspiritu(espirituM);
+        epifanioM.agregarEspiritu(espirituM2);
+        serviceMedium.crear(epifanioM);
+        this.executeBlockInPersistentContext(() -> {
+            espirituDao.crear(espirituM);
+            espirituDao.crear(espirituM2);
+        });
+        serviceMedium.descansar(epifanioM.getId());
+
+        Medium m = serviceMedium.recuperar(epifanioM.getId());
+        this.executeBlockInPersistentContext(() -> {
+            Espiritu e1 = espirituDao.recuperar(espirituM.getId());
+            Espiritu e2 = espirituDao.recuperar(espirituM2.getId());
+
+            assertEquals(65, m.getMana());
+            assertEquals(5, e1.getNivelDeConexion());
+            assertEquals(5, e2.getNivelDeConexion());
+        });
+    }
 
 
-      @Test
-      public void descansarCasoExitoso() {
-          assertEquals(50, epifanioM.getMana());
-          assertEquals(0, espirituM.getNivelDeConexion());
-          assertEquals(0, espirituM2.getNivelDeConexion());
+    @Test
+    public void descansarFallaPorMediumIdNulo() {
+        ErrorAlRecuperarMediumException exception = assertThrows(ErrorAlRecuperarMediumException.class,
+                () -> serviceMedium.descansar(2L));
+        assertEquals("No se pudo recuperar al medium con id " + "2" + ".", exception.getMessage());
+    }
 
-          epifanioM.agregarEspiritu(espirituM);
-          epifanioM.agregarEspiritu(espirituM2);
-          serviceMedium.crear(epifanioM);
-          this.executeBlockInPersistentContext(() -> {
-              espirituDao.crear(espirituM);
-              espirituDao.crear(espirituM2);
-          });
-          serviceMedium.descansar(epifanioM.getId());
+    @Test
+    public void invocarCasoExitoso() {
+        UbicacionDAO ubicacionDao = new HibernateUbicacionDAO();
+        Ubicacion ubicacion = new Ubicacion("Quilmes");
+        epifanioM.setUbicacion(ubicacion);
 
-          Medium m = serviceMedium.recuperar(epifanioM.getId());
-          this.executeBlockInPersistentContext(() -> {
-              Espiritu e1 = espirituDao.recuperar(espirituM.getId());
-              Espiritu e2 = espirituDao.recuperar(espirituM2.getId());
+        assertEquals(50, epifanioM.getMana());
+        assertNull(espirituM.getUbicacion());
+        assertEquals(0, ubicacion.getEspiritus().size());
 
-              assertEquals(65, m.getMana());
-              assertEquals(5, e1.getNivelDeConexion());
-              assertEquals(5, e2.getNivelDeConexion());
-          });
-      }
+        this.executeBlockInPersistentContext(() -> {
+            mediumDao.crear(epifanioM);
+            espirituDao.crear(espirituM);
+            ubicacionDao.guardar(ubicacion);
+        });
 
+        serviceMedium.invocar(epifanioM.getId(), espirituM.getId());
 
+        this.executeBlockInPersistentContext(() -> {
+            Ubicacion u = ubicacionDao.recuperar(ubicacion.getId());
+            Medium m = mediumDao.recuperar(epifanioM.getId());
+            Espiritu e = espirituDao.recuperar(espirituM.getId());
 
-         @Test
-         public void descansarFallaPorMediumIdNulo() {
-             ErrorAlRecuperarMediumException exception = assertThrows(ErrorAlRecuperarMediumException.class,
-                     () -> serviceMedium.descansar(2L));
-             assertEquals("No se pudo recuperar al medium con id " + "2" + ".", exception.getMessage());
-         }
+            assertEquals(40, m.getMana());
+            assertEquals(m.getUbicacion(), e.getUbicacion());
+            assertEquals(1, u.getEspiritus().size());
+            assertTrue(u.getEspiritus().contains(e));
+        });
 
-         @Test
-         public void invocarCasoExitoso() {
-             UbicacionDAO ubicacionDao = new HibernateUbicacionDAO();
-             Ubicacion ubicacion = new Ubicacion("Quilmes");
-             epifanioM.setUbicacion(ubicacion);
+        this.executeBlockInPersistentContext(() -> {
+            espirituDao.eliminarTodos();
+            mediumDao.eliminarTodos();
+            ubicacionDao.eliminarTodos();
+        });
+    }
 
-             assertEquals(50, epifanioM.getMana());
-             assertNull(espirituM.getUbicacion());
-             assertEquals(0, ubicacion.getEspiritus().size());
-
-             this.executeBlockInPersistentContext(() -> {
-                 mediumDao.crear(epifanioM);
-                 espirituDao.crear(espirituM);
-                 ubicacionDao.guardar(ubicacion);
-             });
-
-             serviceMedium.invocar(epifanioM.getId(), espirituM.getId());
-
-             this.executeBlockInPersistentContext(() -> {
-                 Ubicacion u = ubicacionDao.recuperar(ubicacion.getId());
-                 Medium m = mediumDao.recuperar(epifanioM.getId());
-                 Espiritu e = espirituDao.recuperar(espirituM.getId());
-
-                 assertEquals(40, m.getMana());
-                 assertEquals(m.getUbicacion(), e.getUbicacion());
-                 assertEquals(1, u.getEspiritus().size());
-                 assertTrue(u.getEspiritus().contains(e));
-             });
-
-             this.executeBlockInPersistentContext(() -> {
-                 espirituDao.eliminarTodos();
-                 mediumDao.eliminarTodos();
-                 ubicacionDao.eliminarTodos();
-             });
-         }
-
-         @Test
-         public void invocarFallaPorMediumIdNulo() {
-             ErrorAlRecuperarMediumException exception = assertThrows(ErrorAlRecuperarMediumException.class,
-                     () -> serviceMedium.invocar(1L, 2L));
-             assertEquals("No se pudo recuperar al medium con id " + "1" + ".", exception.getMessage());
-         }
+    @Test
+    public void invocarFallaPorMediumIdNulo() {
+        ErrorAlRecuperarMediumException exception = assertThrows(ErrorAlRecuperarMediumException.class,
+                () -> serviceMedium.invocar(1L, 2L));
+        assertEquals("No se pudo recuperar al medium con id " + "1" + ".", exception.getMessage());
+    }
 
 
-         @Test
-         public void invocarFallaPorEspirituIdNulo() {
-             this.executeBlockInPersistentContext(() -> {
-                 mediumDao.crear(epifanioM);
-             });
+    @Test
+    public void invocarFallaPorEspirituIdNulo() {
+        this.executeBlockInPersistentContext(() -> {
+            mediumDao.crear(epifanioM);
+        });
 
-             Long idInexistente = epifanioM.getId() + 1;
-             ErrorAlRecuperarEspirituException exception = assertThrows(ErrorAlRecuperarEspirituException.class,
-                     () -> serviceMedium.invocar(epifanioM.getId(), idInexistente));
-             assertEquals("No se pudo recuperar al espíritu con id " + idInexistente + ".", exception.getMessage());
-         }
+        Long idInexistente = epifanioM.getId() + 1;
+        ErrorAlRecuperarEspirituException exception = assertThrows(ErrorAlRecuperarEspirituException.class,
+                () -> serviceMedium.invocar(epifanioM.getId(), idInexistente));
+        assertEquals("No se pudo recuperar al espíritu con id " + idInexistente + ".", exception.getMessage());
+    }
 
     private void executeBlockInPersistentContext(Runnable block) {
         HibernateTransactionRunner.runTrx(() -> {

@@ -5,12 +5,9 @@ import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
-
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
-
 import ar.edu.unq.epersgeist.servicios.EspirituService;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
-import org.hibernate.Hibernate;
 
 import java.util.List;
 
@@ -107,13 +104,5 @@ public class EspirituServiceImpl implements EspirituService {
         });
     }
 
-    @Override
-
-    public void eliminarTodos() {
-        HibernateTransactionRunner.runTrx(() -> {
-            espirituDao.eliminarTodos();
-            return null;
-        });
-    }
 
 }
