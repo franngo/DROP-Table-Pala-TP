@@ -4,6 +4,9 @@ import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarEspirituException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorCantidadPorPaginaInvalidaExcepcion;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDireccionNulaException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorNumeroPaginaInvalidoExcepcion;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateSessionContext;
 import org.hibernate.Session;
@@ -91,15 +94,15 @@ public class HibernateEspirituDAO extends HibernateDAO<Espiritu> implements Espi
         String hql;
 
         if(direccion == null) {
-            throw new RuntimeException("La dirección no debería ser nula");
+            throw new ErrorDireccionNulaException();
         }
 
         if(pag <= 0) {
-            throw new RuntimeException("El número de página debe ser mayor o igual a 1");
+            throw new ErrorNumeroPaginaInvalidoExcepcion();
         }
 
         if(cantPorPag <= 0) {
-            throw new RuntimeException("La cantidad por página debe ser mayor o igual a 1");
+            throw new ErrorCantidadPorPaginaInvalidaExcepcion();
         }
 
         if(direccion == Direccion.DESCENDENTE) {
