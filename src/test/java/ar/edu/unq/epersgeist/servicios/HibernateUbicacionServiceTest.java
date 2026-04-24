@@ -11,6 +11,7 @@ import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
+import ar.edu.unq.epersgeist.servicios.impl.MediumServiceImpl;
 import ar.edu.unq.epersgeist.servicios.impl.UbicacionServiceImpl;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.junit.jupiter.api.AfterEach;
@@ -39,6 +40,8 @@ public class HibernateUbicacionServiceTest {
     private final Medium ubeda = new Medium("ubeda", 100, 20);
 
     private UbicacionService ubicacionService;
+    private EspirituService espirituService;
+    private MediumService mediumService;
 
     @BeforeEach
     void setUp() {
@@ -47,6 +50,8 @@ public class HibernateUbicacionServiceTest {
         ubicacionDAO = new HibernateUbicacionDAO();
 
         ubicacionService = new UbicacionServiceImpl(ubicacionDAO);
+        espirituService = new EspirituServiceImpl(espirituDAO);
+        mediumService = new MediumServiceImpl(mediumDao, espirituDAO);
     }
 
     // ============================== CREAR ==============================

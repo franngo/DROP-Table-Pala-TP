@@ -22,37 +22,45 @@ public class UbicacionServiceImpl implements UbicacionService {
 
     @Override
     public Ubicacion crear(Ubicacion ubicacion) {
-        if (ubicacion == null) {
-            throw new UbicacionInvalidaException();
-        }
-
-        String nombre = ubicacion.getNombre();
-
-        if (nombre == null || nombre.isBlank()) {
-            throw new NombreUbicacionInvalidoException();
-        }
-
-        String trimmed = nombre.trim();
-        ubicacion.setNombre(trimmed);
-
         return HibernateTransactionRunner.runTrx(() -> {
+            if (ubicacion == null) {
+                throw new UbicacionInvalidaException();
+            }
+
+            String nombre = ubicacion.getNombre();
+
+            if (nombre == null || nombre.isBlank()) {
+                throw new NombreUbicacionInvalidoException();
+            }
+
+            String trimmed = nombre.trim();
+            ubicacion.setNombre(trimmed);
+
             if (this.ubicacionDAO.recuperarPorNombre(trimmed) != null) {
                 throw new UbicacionYaExisteException(trimmed);
             }
 
             return this.ubicacionDAO.guardar(ubicacion);
+
         });
     }
 
     // --------------------------------------------------------------------------------
+    /*
+            return HibernateTransactionRunner.runTrx(() -> {
+
+        });
+     */
 
     @Override
     public Ubicacion recuperar(Long id) {
-        if (id == null) {
-            throw new IdUbicacionInvalidoException();
-        }
+        return HibernateTransactionRunner.runTrx(() -> {
+            if (id == null) {
+                throw new IdUbicacionInvalidoException();
+            }
 
-        return HibernateTransactionRunner.runTrx(() -> this.ubicacionDAO.recuperar(id));
+            return this.ubicacionDAO.recuperar(id);
+        });
     }
 
     // --------------------------------------------------------------------------------
@@ -66,11 +74,11 @@ public class UbicacionServiceImpl implements UbicacionService {
 
     @Override
     public List<Espiritu> espiritusEn(Long ubicacionId) {
-        if (ubicacionId == null) {
-            throw new IdUbicacionInvalidoException();
-        }
-
         return HibernateTransactionRunner.runTrx(() -> {
+            if (ubicacionId == null) {
+                throw new IdUbicacionInvalidoException();
+            }
+
             Ubicacion ubicacion = this.ubicacionDAO.recuperar(ubicacionId);
 
             if (ubicacion == null) {
@@ -85,11 +93,11 @@ public class UbicacionServiceImpl implements UbicacionService {
 
     @Override
     public void actualizar(Ubicacion ubicacionMod) {
-        if (ubicacionMod == null || ubicacionMod.getId() == null) {
-            throw new ErrorAlActualizarUbicacionException("No se puede actualizar una ubicacion que no tiene id.");
-        }
-
         HibernateTransactionRunner.runTrx(() -> {
+            if (ubicacionMod == null || ubicacionMod.getId() == null) {
+                throw new ErrorAlActualizarUbicacionException("No se puede actualizar una ubicacion que no tiene id.");
+            }
+
             Ubicacion existente = ubicacionDAO.recuperar(ubicacionMod.getId());
 
             if (existente == null) {
@@ -119,20 +127,18 @@ public class UbicacionServiceImpl implements UbicacionService {
 
     @Override
     public List<Medium> mediumsSinEspiritusEn(Long ubicacionId) {
-        if (ubicacionId == null) {
-            throw new IdUbicacionInvalidoException();
-        }
-
         return HibernateTransactionRunner.runTrx(() -> {
+            if (ubicacionId == null) {
+                throw new IdUbicacionInvalidoException();
+            }
+
             Ubicacion ubicacion = this.ubicacionDAO.recuperar(ubicacionId);
 
             if (ubicacion == null) {
                 throw new UbicacionNoEncontradaException(ubicacionId);
             }
 
-            return ubicacion.getMediums().stream().
-                    filter(m -> m.getEspiritus().isEmpty()).
-                    collect(Collectors.toList());
+            return ubicacionDAO.mediumsSinEspiritusEn(ubicacion);
         });
     }
 

@@ -71,4 +71,12 @@ public class HibernateUbicacionDAO implements UbicacionDAO {
         }
         session.remove(ubicacion);
     }
+
+    public List<Medium> mediumsSinEspiritusEn(Ubicacion ubicacion) {
+        return HibernateSessionContext.getCurrentSession()
+                .createQuery("FROM Medium m WHERE m.ubicacion = :ubicacion AND m.espiritus IS EMPTY",
+                        Medium.class)
+                .setParameter("ubicacion", ubicacion)
+                .list();
+    }
 }
