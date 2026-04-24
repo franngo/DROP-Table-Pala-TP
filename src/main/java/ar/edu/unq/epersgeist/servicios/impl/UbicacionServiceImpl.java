@@ -10,7 +10,6 @@ import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class UbicacionServiceImpl implements UbicacionService {
     private final UbicacionDAO ubicacionDAO;
@@ -133,6 +132,15 @@ public class UbicacionServiceImpl implements UbicacionService {
             }
 
             return ubicacionDAO.mediumsSinEspiritusEn(ubicacion);
+        });
+    }
+
+    @Override
+    public void eliminarTodos() {
+        HibernateTransactionRunner.runTrx(() -> {
+
+            ubicacionDAO.eliminarTodos();
+            return null;
         });
     }
 

@@ -108,8 +108,8 @@ public class MediumServiceImpl implements MediumService {
             // aplico logica de modelo
             mediumAtacante.exorcizar(mediumAExorcizar);
             // persisto los cambios (opcional, ya que el session.flush() del final de la transacción ya se encarga de persistir los cambios de estado)
-            mediumDao.actualizar(mediumAtacante);
-            mediumDao.actualizar(mediumAExorcizar);
+            // mediumDao.actualizar(mediumAtacante);
+            // mediumDao.actualizar(mediumAExorcizar);
 
             return null;
 
