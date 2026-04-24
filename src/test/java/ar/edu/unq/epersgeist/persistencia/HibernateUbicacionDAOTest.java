@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.persistencia;
 
+import ar.edu.unq.epersgeist.HibernateTest;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.ErrorAlActualizarUbicacionException;
@@ -18,7 +19,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class HibernateUbicacionDAOTest {
+public class HibernateUbicacionDAOTest extends HibernateTest {
     private UbicacionDAO ubicacionDAO;
     private EspirituDAO espirituDAO;
     private MediumDAO mediumDAO;
@@ -275,15 +276,6 @@ public class HibernateUbicacionDAOTest {
             Ubicacion ubicacionGuardada = ubicacionDAO.recuperar(ubicacion[0].getId());
 
             assertEquals(2, ubicacionGuardada.getEspiritus().size());
-        });
-    }
-
-    // ============================== HELPER ==============================
-
-    protected final void runTrx(Runnable block) {
-        HibernateTransactionRunner.runTrx(() -> {
-            block.run();
-            return null;
         });
     }
 

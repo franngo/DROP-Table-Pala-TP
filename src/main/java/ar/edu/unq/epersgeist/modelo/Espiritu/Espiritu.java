@@ -15,13 +15,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 
 @Entity
-
-@Inheritance(strategy = InheritanceType.JOINED)
-//@DiscriminatorColumn(name = "tipo")
-
-//@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "tipo_espiritu")
-
 public class Espiritu implements Serializable {
 
     @Id
@@ -30,7 +25,6 @@ public class Espiritu implements Serializable {
 
 
     private double nivelDeConexion;
-
     private String nombre;
     private boolean libre;
     public static final int limiteConexion = 100;
@@ -54,16 +48,13 @@ public class Espiritu implements Serializable {
         medium.agregarEspiritu(this);
     }
 
-
     public void fortalecerConexion(double cantidad) {
-
 
         this.nivelDeConexion = Math.min(Espiritu.limiteConexion, this.cantidadNuevaConexion(cantidad));
     }
 
 
     private double cantidadNuevaConexion(double cantidad) {
-
         return this.getNivelDeConexion() + cantidad;
     }
 
@@ -82,10 +73,8 @@ public class Espiritu implements Serializable {
     public void recibirAtaqueDe(Espiritu angel) {
     }
 
-
     public boolean estaUbicadoEnElMismoLugarQue(Medium mediumAConectar) {
         return this.getUbicacion().tieneElMismoNombreQue(mediumAConectar.getUbicacion());
     }
-
 }
 

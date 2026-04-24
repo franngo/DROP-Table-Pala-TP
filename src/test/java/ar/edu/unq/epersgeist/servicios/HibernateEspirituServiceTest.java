@@ -4,6 +4,7 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
@@ -25,11 +26,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class HibernateEspirituServiceTest {
     private final EspirituDAO espirituDao = new HibernateEspirituDAO();
-
     private final MediumDAO mediumDao = new HibernateMediumDAO();
     private final UbicacionDAO ubicacionDao = new HibernateUbicacionDAO();
     private final EspirituService serviceEspiritu = new EspirituServiceImpl(espirituDao, mediumDao);
-
     private Espiritu matias;
 
      /*
@@ -226,8 +225,6 @@ public class HibernateEspirituServiceTest {
         assertTrue(!listOfDemons.isEmpty());
         assertEquals(listOfDemons.size(), 2);
     }
-
-    //TODO arreglar
 /*
     @Test
     public void seConectaUnEspirituConUnMedium() {
