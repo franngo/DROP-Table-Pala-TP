@@ -7,8 +7,10 @@ import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
+
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
+
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
@@ -26,9 +28,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class HibernateEspirituServiceTest {
     private final EspirituDAO espirituDao = new HibernateEspirituDAO();
+
     private final MediumDAO mediumDao = new HibernateMediumDAO();
     private final UbicacionDAO ubicacionDao = new HibernateUbicacionDAO();
     private final EspirituService serviceEspiritu = new EspirituServiceImpl(espirituDao, mediumDao);
+
     private Espiritu matias;
 
      /*

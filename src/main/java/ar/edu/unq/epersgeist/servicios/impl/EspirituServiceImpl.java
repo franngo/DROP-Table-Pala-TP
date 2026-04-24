@@ -5,7 +5,9 @@ import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
+
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
+
 import ar.edu.unq.epersgeist.servicios.EspirituService;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.hibernate.Hibernate;
@@ -14,9 +16,11 @@ import java.util.List;
 
 public class EspirituServiceImpl implements EspirituService {
     private EspirituDAO espirituDao;
+
     private MediumDAO mediumDao;
 
     public EspirituServiceImpl(EspirituDAO espirituDao, MediumDAO mediumDao) {
+
         this.espirituDao = espirituDao;
         this.mediumDao = mediumDao;
     }
@@ -92,6 +96,15 @@ public class EspirituServiceImpl implements EspirituService {
     public List<Espiritu> espiritusDemoniacos() {
         return HibernateTransactionRunner.runTrx(() ->
                 espirituDao.espiritusDemoniacos());
+    }
+
+    @Override
+
+    public void eliminarTodos() {
+        HibernateTransactionRunner.runTrx(() -> {
+            espirituDao.eliminarTodos();
+            return null;
+        });
     }
 
     @Override

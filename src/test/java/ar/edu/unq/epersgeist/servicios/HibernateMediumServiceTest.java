@@ -5,17 +5,16 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
-import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarMediumException;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarMediumException;
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
+
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
+
 import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
 import ar.edu.unq.epersgeist.servicios.impl.MediumServiceImpl;
-import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +25,9 @@ public class HibernateMediumServiceTest {
 
     private final HibernateMediumDAO mediumDao = new HibernateMediumDAO();
     private final HibernateEspirituDAO espirituDao = new HibernateEspirituDAO();
+
     private final EspirituService espirituService = new EspirituServiceImpl(espirituDao, mediumDao);
+
     private final MediumService serviceMedium = new MediumServiceImpl(mediumDao, espirituDao);
 
 
@@ -83,6 +84,7 @@ public class HibernateMediumServiceTest {
         assertEquals(ubedaP.getNombre(), mediumRecuperado.getNombre());
         assertEquals(ubedaP.getMana(), mediumRecuperado.getMana());
         assertEquals(ubedaP.getManaMax(), mediumRecuperado.getManaMax());
+
         assertEquals(0, ubedaP.getEspiritus().size());
         assertEquals(0, mediumRecuperado.getEspiritus().size());
     }
@@ -125,6 +127,7 @@ public class HibernateMediumServiceTest {
         assertEquals(mediumRecuperado.getNombre(), actualizado.getNombre());
         assertEquals(mediumRecuperado.getMana(), actualizado.getMana());
         assertEquals(mediumRecuperado.getManaMax(), actualizado.getManaMax());
+
     }
 
     @Test
@@ -172,6 +175,7 @@ public class HibernateMediumServiceTest {
             serviceMedium.recuperar(id);
         });
     }
+
 
 
 
@@ -280,6 +284,7 @@ public class HibernateMediumServiceTest {
         serviceMedium.eliminarTodos();
 
     }
+
 }
 /*
     // TODO completar cuando haya conectar
@@ -288,11 +293,21 @@ public class HibernateMediumServiceTest {
         // el demonio siempre gana
         RandomDefensa.setEstrategiaNumero(new EstrategiaRangoEspecifico(99, 99));
 
+
         // creo y persisto mediums CON sus espíritus en la misma transacción
         Long idExorcizador = serviceMedium.recuperar(ubedaP.getId()).getId();
 
 
         // serviceMedium.conectar(rikaP.getId(),ubedaP.getId());
+
+
+
+        // creo y persisto mediums CON sus espíritus en la misma transacción
+        Long idExorcizador = serviceMedium.recuperar(ubedaP.getId()).getId();
+
+
+        // serviceMedium.conectar(rikaP.getId(),ubedaP.getId());
+
 
         Long idAtacado = serviceMedium.recuperar(epifanioP.getId()).getId();
         // serviceMedium.conectar(jaegerP.getId(),epifanioP.getId());
