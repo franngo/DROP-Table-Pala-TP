@@ -111,8 +111,8 @@ public class MediumServiceImpl implements MediumService {
             // aplico logica de modelo
             mediumAtacante.exorcizar(mediumAExorcizar);
             // persisto los cambios
-            mediumDao.actualizar(mediumAtacante);
-            mediumDao.actualizar(mediumAExorcizar);
+            // mediumDao.actualizar(mediumAtacante);
+            // mediumDao.actualizar(mediumAExorcizar);
 
             return null;
 
