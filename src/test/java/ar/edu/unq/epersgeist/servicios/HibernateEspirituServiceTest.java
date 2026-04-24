@@ -330,7 +330,6 @@ public class HibernateEspirituServiceTest {
         Medium mediumActualizado = mediumService.recuperar(mediumP.getId());
         assertEquals(2, mediumActualizado.getEspiritus().size());
     }
-/*
 
 
     @Test
@@ -340,23 +339,30 @@ public class HibernateEspirituServiceTest {
 
         Medium medium = new Medium("Juan", 120, 10);
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(ErrorAlConectarEspirituConMedium.class, () -> {
             serviceEspiritu.conectar(espiritu.getId(), medium.getId());
         });
     }
 
+
     @Test
     void deberiaMantenerLosDatosOriginalesDelEspirituLuegoDeConectar() {
+        Medium medium = new Medium("Juan", 120, 10);
+        // agregamos la ubicacion de los actores
+        Ubicacion ubicacion = new Ubicacion("Tailandia");
+        ubicacion.agregarEspiritu(matias);
+        // ubicacion.agregarEspiritu(raul);
+        ubicacion.agregarMedium(medium);
+        Ubicacion ubiPersistida = ubicacionService.crear(ubicacion);
+
         Espiritu espiritu = serviceEspiritu.crear(matias);
         String nombreOriginal = espiritu.getNombre();
-        Medium medium = new Medium("Juan", 120, 10);
 
         serviceEspiritu.conectar(espiritu.getId(), medium.getId());
         Espiritu recuperado = serviceEspiritu.recuperar(espiritu.getId());
 
         assertEquals(nombreOriginal, recuperado.getNombre());
     }
-*/
 
 
     private void executeBlockInPersistentContext(Runnable block) {
@@ -366,9 +372,13 @@ public class HibernateEspirituServiceTest {
         });
     }
 
+
     @AfterEach
     void tearDown() {
-        this.executeBlockInPersistentContext(espirituDao::eliminarTodos);
+        serviceEspiritu.eliminarTodos();
+        mediumService.eliminarTodos();
+        ubicacionService.eliminarTodos();
+
     }
 
 
