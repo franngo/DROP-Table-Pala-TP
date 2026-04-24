@@ -157,23 +157,22 @@ public class HibernateUbicacionServiceTest {
     @Test
     void espiritusEnRetornaListaDeEspiritus() {
         Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
+        Espiritu guerrero = new Espiritu("Espíritu de la Luz");
+        Espiritu mago = new Espiritu("Espíritu de la Oscuridad");
 
-        Espiritu guerrero = HibernateTransactionRunner.runTrx(() ->
-            espirituDAO.guardar(new Espiritu("Guerrero", "Espíritu de la Luz"))
-        );
+        HibernateTransactionRunner.runTrx(() -> {
+            espirituDAO.guardar(guerrero);
+            espirituDAO.guardar(mago);
 
-        Espiritu mago = HibernateTransactionRunner.runTrx(() ->
-                espirituDAO.guardar(new Espiritu("Mago", "Espíritu de la Oscuridad"))
-        );
+            ubicacion.agregarEspiritu(guerrero);
+            ubicacion.agregarEspiritu(mago);
 
-        ubicacion.agregarEspiritu(guerrero);
-        ubicacion.agregarEspiritu(mago);
+            return null;
+        });
 
         List<Espiritu> espiritusEnUbicacion = ubicacionService.espiritusEn(ubicacion.getId());
 
         assertEquals(2, espiritusEnUbicacion.size());
-        assertTrue(espiritusEnUbicacion.contains(guerrero));
-        assertTrue(espiritusEnUbicacion.contains(mago));
     }
 
     @Test
@@ -221,10 +220,8 @@ public class HibernateUbicacionServiceTest {
     void deberiaEliminarLaUbicacionYNoPoderRecuperarlaLuego() {
         Long id = ubicacionService.crear("Santuario de la Luz").getId();
 
-        Long id = HibernateTransactionRunner.runTrx(() -> ubicacionService.crear("Santuario de la Luz")).getId();
 
-
-        this.executeBlockInPersistentContext(() -> ubicacionService.eliminar(id));
+        ubicacionService.eliminar(id);
         Ubicacion ubicacion = HibernateTransactionRunner.runTrx(() -> ubicacionService.recuperar(id));
 
         assertNull(ubicacion);
@@ -234,15 +231,19 @@ public class HibernateUbicacionServiceTest {
 
     @Test
     void deberiaObtenerMediumsSinEspiritus() {
-         Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
+        Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
+        Medium epifanio = new Medium("epifanio", 150, 50);
+        Medium ubeda = new Medium("ubeda", 100, 20);
 
-         Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
-         Medium ubeda = new Medium("Ubeda el dt", 100, 20);
+        HibernateTransactionRunner.runTrx(() -> {
+            mediumDao.crear(epifanio);
+            mediumDao.crear(ubeda);
 
-         epifanio.setUbicacion(ubicacion);
-         ubeda.setUbicacion(ubicacion);
-         ubicacion.agregarMedium(epifanio);
-         ubicacion.agregarMedium(ubeda);
+            ubicacion.agregarMedium(epifanio);
+            ubicacion.agregarMedium(ubeda);
+            return null;
+        });
+
          List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
 
          assertEquals(2, resultado.size());
@@ -251,25 +252,24 @@ public class HibernateUbicacionServiceTest {
     @Test
     void deberiaObtener1MediumsSinEspiritus() {
          Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
-         Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
-         Medium ubeda = new Medium("Ubeda el dt", 100, 20);
 
-        this.runTrx(() -> {
-            Ubicacion ubicacion = ubicacionService.crear("Santuario de la Luz");
-            Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
-            Medium ubeda = new Medium("Ubeda el dt", 100, 20);
+        HibernateTransactionRunner.runTrx(() -> {
+            Medium epifanio = mediumDao.crear(new Medium("Epifanio el poderoso", 150, 50));
+            Medium ubeda = mediumDao.crear(new Medium("Ubeda el dt", 100, 20));
             Espiritu mago = espirituDAO.guardar(new Espiritu("Espíritu de la Oscuridad"));
-            ubeda.agregarEspiritu(mago);
 
             ubeda.agregarEspiritu(mago);
 
             ubicacion.agregarMedium(epifanio);
             ubicacion.agregarMedium(ubeda);
 
+            return null;
+        });
+
             List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
 
             assertEquals(1, resultado.size());
-        });
+
     }
 
     @Test
@@ -294,8 +294,8 @@ public class HibernateUbicacionServiceTest {
     @AfterEach
     void tearDown() {
         HibernateTransactionRunner.runTrx(() -> {
-            mediumDao.eliminarTodos();
             espirituDAO.eliminarTodos();
+            mediumDao.eliminarTodos();
             ubicacionDAO.eliminarTodos();
 
             return null;

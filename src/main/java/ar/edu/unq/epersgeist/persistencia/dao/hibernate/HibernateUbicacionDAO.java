@@ -33,6 +33,8 @@ public class HibernateUbicacionDAO implements UbicacionDAO {
         }
 
         u.setNombre(ubicacion.getNombre());
+        u.setEspiritus(ubicacion.getEspiritus());
+        u.setMediums(ubicacion.getMediums());
     }
 
     @Override
