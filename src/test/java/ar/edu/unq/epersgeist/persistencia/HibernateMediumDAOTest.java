@@ -42,7 +42,6 @@ public class HibernateMediumDAOTest {
 
         Medium modificado = new Medium("Rolando el audaz", 120, 50);
         modificado.setId(id);
-        modificado.setCantFortalece(15);
 
         //como modificado tiene el mismo id que mediumM, actualiza dicha fila en la BD
         this.executeBlockInPersistentContext(() -> mediumDao.actualizar(modificado));
@@ -53,7 +52,6 @@ public class HibernateMediumDAOTest {
         assertEquals(modificado.getNombre(), actualizado.getNombre());
         assertEquals(modificado.getMana(), actualizado.getMana());
         assertEquals(modificado.getManaMax(), actualizado.getManaMax());
-        assertEquals(modificado.getCantFortalece(), actualizado.getCantFortalece());
     }
 
     @Test
@@ -63,7 +61,7 @@ public class HibernateMediumDAOTest {
 
         mediumM.setNombre("Rolando el audaz");
         mediumM.setMana(120);
-        mediumM.setCantFortalece(15);
+
 
         //se actualiza la fila con el id de epifanio en la DB
         this.executeBlockInPersistentContext(() -> mediumDao.actualizar(mediumM));
@@ -74,7 +72,6 @@ public class HibernateMediumDAOTest {
         assertEquals(mediumM.getNombre(), actualizado.getNombre());
         assertEquals(mediumM.getMana(), actualizado.getMana());
         assertEquals(mediumM.getManaMax(), actualizado.getManaMax());
-        assertEquals(mediumM.getCantFortalece(), actualizado.getCantFortalece());
     }
 
     @Test

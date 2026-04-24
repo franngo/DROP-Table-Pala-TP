@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.persistencia.dao;
 
+import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 
 import java.util.List;
@@ -13,4 +14,5 @@ public interface EspirituDAO {
     void eliminar(Long idDelEspiritu);
     List<Espiritu> recuperarTodos();
     void eliminarTodos();
+    List<Espiritu> espiritusDemoniacos();
 }

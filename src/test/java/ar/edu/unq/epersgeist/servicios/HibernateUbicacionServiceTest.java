@@ -172,9 +172,11 @@ public class HibernateUbicacionServiceTest {
     void espiritusEnRetornaListaDeEspiritus() {
         Ubicacion ubicacion = ubicacionService.crear(cripta);
 
+
         HibernateTransactionRunner.runTrx(() -> {
             espirituDAO.guardar(guerrero);
             espirituDAO.guardar(mago);
+
 
             ubicacion.agregarEspiritu(guerrero);
             ubicacion.agregarEspiritu(mago);
@@ -189,17 +191,21 @@ public class HibernateUbicacionServiceTest {
 
     @Test
     void espiritusEnLanzaExcepcionSiUbicacionNoExiste() {
+
         assertThrows(
                 UbicacionNoEncontradaException.class,
                 () -> ubicacionService.espiritusEn(999L)
+
         );
     }
 
     @Test
     void espiritusEnLanzaExcepcionSiIdEsNull() {
+
         assertThrows(
                 IdUbicacionInvalidoException.class,
                 () -> ubicacionService.espiritusEn(null)
+
         );
     }
 
@@ -207,7 +213,9 @@ public class HibernateUbicacionServiceTest {
 
     @Test
     void deberiaActualizarSoloElNombre() {
+
         Long id = HibernateTransactionRunner.runTrx(() -> ubicacionService.crear(templo).getId());
+
         Ubicacion ubicacionMod = new Ubicacion("Catedral de la Oscuridad");
         ubicacionMod.setId(id);
 
@@ -219,26 +227,30 @@ public class HibernateUbicacionServiceTest {
     }
 
     @Test
+
     void noDeberiaActualizarUbicacionSinId(){
         assertThrows(
                 ErrorAlActualizarUbicacionException.class,
                 () -> ubicacionService.actualizar(null)
+
         );
     }
 
     // ============================== ELIMINAR ==============================
 
     @Test
-    void debeliminarLaUbicacionYNoPoderRecuperarlaLuego() {
+    void debeEliminarLaUbicacionYNoPoderRecuperarlaLuego() {
         Ubicacion ubicacionCreada = ubicacionService.crear(templo);
         Long ubicacionId = ubicacionCreada.getId();
 
 
         ubicacionService.eliminar(ubicacionId);
 
+
         Ubicacion ubicacion = HibernateTransactionRunner.runTrx(
                 () -> ubicacionService.recuperar(ubicacionId)
         );
+
 
         assertNull(ubicacion);
     }
@@ -271,12 +283,14 @@ public class HibernateUbicacionServiceTest {
         Medium ubeda = new Medium("ubeda", 100, 20);
         Espiritu guerrero = new Espiritu("Espíritu de la Luz");
 
+
         HibernateTransactionRunner.runTrx(() -> {
             mediumDao.crear(epifanio);
             mediumDao.crear(ubeda);
             espirituDAO.guardar(guerrero);
 
             epifanio.agregarEspiritu(guerrero);
+
 
             ubicacion.agregarMedium(epifanio);
             ubicacion.agregarMedium(ubeda);
@@ -302,6 +316,7 @@ public class HibernateUbicacionServiceTest {
 
     @Test
     void mediumsSinEspiritusEnLanzaExceptionSiElIdNoExiste() {
+
         assertThrows(
                 IdUbicacionInvalidoException.class,
                 () -> ubicacionService.mediumsSinEspiritusEn(null)
@@ -309,6 +324,7 @@ public class HibernateUbicacionServiceTest {
     }
 
     // ============================== TEARDOWN ==============================
+
 
     @AfterEach
     void tearDown() {

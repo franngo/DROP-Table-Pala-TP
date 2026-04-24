@@ -2,18 +2,27 @@ package ar.edu.unq.epersgeist.servicios.impl;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
+
+import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
+
 import ar.edu.unq.epersgeist.servicios.EspirituService;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
+import org.hibernate.Hibernate;
 
 import java.util.List;
 
 public class EspirituServiceImpl implements EspirituService {
     private EspirituDAO espirituDao;
 
-    public EspirituServiceImpl(EspirituDAO espirituDao) {
+    private MediumDAO mediumDao;
+
+    public EspirituServiceImpl(EspirituDAO espirituDao, MediumDAO mediumDao) {
+
         this.espirituDao = espirituDao;
+        this.mediumDao = mediumDao;
     }
 
     @Override
@@ -63,19 +72,39 @@ public class EspirituServiceImpl implements EspirituService {
      * Paso 3: persistir los cambios
      * */
     @Override
-    public Medium conectar(Long espirituId, Medium medium) {
-        Espiritu espirituAConectar = espirituDao.recuperar(espirituId);
+    public Medium conectar(Long espirituId, Long mediumId) {
+        return HibernateTransactionRunner.runTrx(() -> {
+            Espiritu espirituAConectar = espirituDao.recuperar(espirituId);
+            Medium mediumAConectar = mediumDao.recuperar(mediumId);
 
-        espirituAConectar.aumentarConexion(medium);
+            if (!espirituAConectar.getLibre()) {
+                throw new ErrorAlConectarEspirituConMedium("El espiritu no se encuentra libre");
+            }
+            if (!espirituAConectar.estaUbicadoEnElMismoLugarQue(mediumAConectar)) {
+                throw new ErrorAlConectarEspirituConMedium("El espiritu se encuentra en una ubicacion diferente al medium");
+            }
 
-        espirituDao.actualizar(espirituAConectar);
+            espirituAConectar.aumentarConexion(mediumAConectar);
 
-        return medium;
+            mediumDao.actualizar(mediumAConectar);
+
+            return mediumAConectar;
+        });
     }
 
     @Override
     public List<Espiritu> espiritusDemoniacos() {
-        return List.of();
+        return HibernateTransactionRunner.runTrx(() ->
+                espirituDao.espiritusDemoniacos());
+    }
+
+    @Override
+
+    public void eliminarTodos() {
+        HibernateTransactionRunner.runTrx(() -> {
+            espirituDao.eliminarTodos();
+            return null;
+        });
     }
 
     @Override

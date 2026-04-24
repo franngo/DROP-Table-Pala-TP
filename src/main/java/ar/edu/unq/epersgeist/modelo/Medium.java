@@ -30,7 +30,6 @@ public class Medium implements Serializable {
     private String nombre;
     private Integer manaMax;
     private Integer mana;
-    private int cantFortalece;
 
     //¿sería @OneToMany acá y @ManyToOne del lado del Espiritu?
     @OneToMany(mappedBy = "mediumCon", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -44,10 +43,10 @@ public class Medium implements Serializable {
         this.nombre = nombre;
         this.manaMax = manaMax;
         this.mana = mana;
-        this.cantFortalece = 10;
     }
 
     public void agregarEspiritu(Espiritu espiritu) {
+        espiritu.setMediumCon(this);
         espiritus.add(espiritu);
         espiritu.setMediumCon(this);
     }
@@ -61,6 +60,7 @@ public class Medium implements Serializable {
     public static final int manaRequeridoInvocacion = 10;
     public static final int manaDescansoMedium = 15;
     public static final int manaDescansoEspiritus = 5;
+    public static final double porcentajeAFortalecer = 0.20;
 
     private void recuperarMana(int cantidad) {
         this.mana = Math.min(this.manaMax, this.cantidadAlDescansar(cantidad));
@@ -74,6 +74,10 @@ public class Medium implements Serializable {
         for (Espiritu espiritu : espiritus) {
             espiritu.fortalecerConexion(cantidad);
         }
+    }
+
+    public Double cantidadDeFortalecimientoDeConexion() {
+        return this.mana * porcentajeAFortalecer;
     }
 
     /*

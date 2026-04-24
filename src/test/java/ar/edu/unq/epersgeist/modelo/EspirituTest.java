@@ -28,20 +28,22 @@ public class EspirituTest {
     }
 
     @Test
-    public void aumentarConexionIncrementaElNivelEnDiez() {
+    public void seAumentaLaConexionEnUn20PorCientoDelManaDelMedium() {
 
         espiritu.aumentarConexion(medium);
 
-        assertEquals(10, espiritu.getNivelDeConexion());
+        assertEquals(2, espiritu.getNivelDeConexion());
     }
 
     @Test
-    public void aumentarConexionSeAcumulaCorrectamente() {
+    public void alAumentarConexionMasDeUnaVezLosNivelesDeConexionSeSuman() {
+
+        medium = new Medium("Juan", 10000, 10);
 
         espirituM.aumentarConexion(medium);
         espirituM.aumentarConexion(medium);
 
-        assertEquals(20, espirituM.getNivelDeConexion());
+        assertEquals(4, espirituM.getNivelDeConexion());
     }
 
     @Test
@@ -54,10 +56,11 @@ public class EspirituTest {
     }
 
     @Test
-    public void alAumentarMuchaConexionNoDebePasarDeCien() {
+    public void laConexionDelEspirituNoSobrepasaLos100Niveles() {
 
-        medium.setCantFortalece(120);
+        medium = new Medium("Juan", 100, 100000);
         espirituM.aumentarConexion(medium);
+
         assertEquals(100, espirituM.getNivelDeConexion());
 
     }
