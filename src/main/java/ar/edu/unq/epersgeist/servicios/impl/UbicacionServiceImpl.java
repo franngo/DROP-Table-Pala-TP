@@ -20,98 +20,134 @@ public class UbicacionServiceImpl implements UbicacionService {
     // --------------------------------------------------------------------------------
 
     @Override
-    public Ubicacion crear(String nombre) {
-        if (nombre == null) {
-            throw new NombreUbicacionInvalidoException();
-        }
+    public Ubicacion crear(Ubicacion ubicacion) {
+        return HibernateTransactionRunner.runTrx(() -> {
+            if (ubicacion == null) {
+                throw new UbicacionInvalidaException();
+            }
 
-        nombre = nombre.trim();
+            String nombre = ubicacion.getNombre();
 
-        if (nombre.isEmpty()) {
-            throw new NombreUbicacionInvalidoException();
-        }
+            if (nombre == null || nombre.isBlank()) {
+                throw new NombreUbicacionInvalidoException();
+            }
 
-        if (this.ubicacionDAO.recuperarPorNombre(nombre) != null) {
-            throw new UbicacionYaExisteException(nombre);
-        }
+            String trimmed = nombre.trim();
+            ubicacion.setNombre(trimmed);
 
-        return this.ubicacionDAO.guardar(new Ubicacion(nombre));
+            if (this.ubicacionDAO.recuperarPorNombre(trimmed) != null) {
+                throw new UbicacionYaExisteException(trimmed);
+            }
+
+            return this.ubicacionDAO.guardar(ubicacion);
+
+        });
     }
 
     // --------------------------------------------------------------------------------
+    /*
+            return HibernateTransactionRunner.runTrx(() -> {
+
+        });
+     */
 
     @Override
     public Ubicacion recuperar(Long id) {
-        if (id == null) {
-            throw new IdUbicacionInvalidoException();
-        }
+        return HibernateTransactionRunner.runTrx(() -> {
+            if (id == null) {
+                throw new IdUbicacionInvalidoException();
+            }
 
-        return this.ubicacionDAO.recuperar(id);
+            return this.ubicacionDAO.recuperar(id);
+        });
     }
 
     // --------------------------------------------------------------------------------
 
     @Override
     public List<Ubicacion> recuperarTodos() {
-        return ubicacionDAO.recuperarTodos();
+        return HibernateTransactionRunner.runTrx(this.ubicacionDAO::recuperarTodos);
     }
+
+    // --------------------------------------------------------------------------------
 
     @Override
     public List<Espiritu> espiritusEn(Long ubicacionId) {
-        if (ubicacionId == null) {
-            throw new IdUbicacionInvalidoException();
-        }
+        return HibernateTransactionRunner.runTrx(() -> {
+            if (ubicacionId == null) {
+                throw new IdUbicacionInvalidoException();
+            }
 
-        Ubicacion ubicacion = this.ubicacionDAO.recuperar(ubicacionId);
+            Ubicacion ubicacion = this.ubicacionDAO.recuperar(ubicacionId);
 
-        if (ubicacion == null) {
-            throw new UbicacionNoEncontradaException(ubicacionId);
-        }
+            if (ubicacion == null) {
+                throw new UbicacionNoEncontradaException(ubicacionId);
+            }
 
-        return ubicacion.getEspiritus();
+            return ubicacion.getEspiritus();
+        });
     }
+
+    // --------------------------------------------------------------------------------
 
     @Override
     public void actualizar(Ubicacion ubicacionMod) {
-        if (ubicacionMod == null || ubicacionMod.getId() == null) {
-            throw new ErrorAlActualizarUbicacionException("No se puede actualizar una ubicacion que no tiene id.");
-        }
+        HibernateTransactionRunner.runTrx(() -> {
+            if (ubicacionMod == null || ubicacionMod.getId() == null) {
+                throw new ErrorAlActualizarUbicacionException("No se puede actualizar una ubicacion que no tiene id.");
+            }
 
-        Ubicacion existente = ubicacionDAO.recuperar(ubicacionMod.getId());
+            Ubicacion existente = ubicacionDAO.recuperar(ubicacionMod.getId());
 
-        if (existente == null) {
-            throw new ErrorAlActualizarUbicacionException(
-                    "No existe en la BD la ubicacion con id: " + ubicacionMod.getId()
-            );
-        }
+            if (existente == null) {
+                throw new ErrorAlActualizarUbicacionException(
+                        "No existe en la BD la ubicacion con id: " + ubicacionMod.getId()
+                );
+            }
 
-        this.ubicacionDAO.actualizar(ubicacionMod);
-        return;
+            this.ubicacionDAO.actualizar(ubicacionMod);
+
+            return null;
+        });
     }
+
+    // --------------------------------------------------------------------------------
 
     @Override
     public void eliminar(Long id) {
         HibernateTransactionRunner.runTrx(() -> {
             ubicacionDAO.eliminar(id);
+
             return null;
         });
     }
 
+    // --------------------------------------------------------------------------------
+
     @Override
     public List<Medium> mediumsSinEspiritusEn(Long ubicacionId) {
-        if (ubicacionId == null) {
-            throw new IdUbicacionInvalidoException();
-        }
+        return HibernateTransactionRunner.runTrx(() -> {
+            if (ubicacionId == null) {
+                throw new IdUbicacionInvalidoException();
+            }
 
-        Ubicacion ubicacion = this.ubicacionDAO.recuperar(ubicacionId);
+            Ubicacion ubicacion = this.ubicacionDAO.recuperar(ubicacionId);
 
-        if (ubicacion == null) {
-            throw new UbicacionNoEncontradaException(ubicacionId);
-        }
+            if (ubicacion == null) {
+                throw new UbicacionNoEncontradaException(ubicacionId);
+            }
 
-        return ubicacion.getMediums().stream()
-                .filter(medium -> medium.getEspiritus().isEmpty())
-                .toList();
+            return ubicacionDAO.mediumsSinEspiritusEn(ubicacion);
+        });
+    }
+
+    @Override
+    public void eliminarTodos() {
+        HibernateTransactionRunner.runTrx(() -> {
+
+            ubicacionDAO.eliminarTodos();
+            return null;
+        });
     }
 
     // --------------------------------------------------------------------------------
