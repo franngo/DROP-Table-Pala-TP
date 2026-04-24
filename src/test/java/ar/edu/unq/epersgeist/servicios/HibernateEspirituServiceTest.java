@@ -6,6 +6,7 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarEspirituException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
@@ -237,14 +238,13 @@ public class HibernateEspirituServiceTest {
 
         assertEquals(2.0, espirituActualizado.getNivelDeConexion());
     }
-/*
 
 
     @Test
     void noDeberiaConectarUnEspirituInexistenteConUnMedium() {
         Medium medium = new Medium("Juan", 120, 10);
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(ErrorAlConectarEspirituConMedium.class, () -> {
             serviceEspiritu.conectar(9999L, medium.getId());
         });
     }
@@ -253,17 +253,18 @@ public class HibernateEspirituServiceTest {
     void noDeberiaConectarUnEspirituConUnMediumNulo() {
         Espiritu espiritu = serviceEspiritu.crear(matias);
 
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(ErrorAlConectarEspirituConMedium.class, () -> {
             serviceEspiritu.conectar(espiritu.getId(), null);
         });
     }
 
     @Test
     void noDeberiaConectarConIdNulo() {
+        //Usamo RuntimeExeption ya que es por pasar un objeto null
         Medium medium = new Medium("Juan", 120, 10);
-
+        Medium mediumP = mediumService.crear(medium);
         assertThrows(RuntimeException.class, () -> {
-            serviceEspiritu.conectar(null, medium.getId());
+            serviceEspiritu.conectar(null, mediumP.getId());
         });
     }
 
@@ -275,10 +276,10 @@ public class HibernateEspirituServiceTest {
         Ubicacion ubicacion = new Ubicacion("Tailandia");
         ubicacion.agregarMedium(mediumJuan);
         ubicacion.agregarEspiritu(espirituP);
-        this.executeBlockInPersistentContext(() -> {
-            mediumDao.crear(mediumJuan);
-            ubicacionDao.guardar(ubicacion);
-        });
+//        this.executeBlockInPersistentContext(() -> {
+//            mediumDao.crear(mediumJuan);
+//            ubicacionDao.guardar(ubicacion);
+//        });
         Medium mediumConectado = serviceEspiritu.conectar(espirituP.getId(), mediumJuan.getId());
 
         assertEquals(1, mediumJuan.getEspiritus().size());
@@ -288,6 +289,7 @@ public class HibernateEspirituServiceTest {
         );
     }
 
+/*
     @Test
     void deberiaPersistirElNivelDeConexionLuegoDeConectar() {
         Espiritu espiritu = serviceEspiritu.crear(matias);

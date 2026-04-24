@@ -68,7 +68,12 @@ public class EspirituServiceImpl implements EspirituService {
         return HibernateTransactionRunner.runTrx(() -> {
             Espiritu espirituAConectar = espirituDao.recuperar(espirituId);
             Medium mediumAConectar = mediumDao.recuperar(mediumId);
-
+            if (espirituAConectar == null) {
+                throw new ErrorAlConectarEspirituConMedium("El espiritu no existe en la bbdd");
+            }
+            if (mediumAConectar == null) {
+                throw new ErrorAlConectarEspirituConMedium("El medium no existe en la bbdd");
+            }
             if (!espirituAConectar.getLibre()) {
                 throw new ErrorAlConectarEspirituConMedium("El espiritu no se encuentra libre");
             }
