@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.persistencia;
 
+import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarEspirituException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
@@ -19,7 +20,7 @@ public class HibernateEspirituDAOTest {
 
     @BeforeEach
     public void setUp() {
-        espirituM = new Espiritu("Pokemon", "das");
+        espirituM = new Espiritu("das");
     }
 
     @Test
@@ -46,13 +47,13 @@ public class HibernateEspirituDAOTest {
     @Test
     public void seEliminaUnEspirituExistente() {
 
-        this.executeBlockInPersistentContext(()-> {
+        this.executeBlockInPersistentContext(() -> {
             Espiritu espirituPersistido = espirituDao.crear(espirituM);
 
             espirituDao.eliminar(espirituPersistido.getId());
 
             assertNull(espirituDao.recuperar(espirituPersistido.getId()));
-            });
+        });
     }
 
     @Test
@@ -61,8 +62,11 @@ public class HibernateEspirituDAOTest {
         Long idInexistente = 999L;
 
         assertDoesNotThrow(() -> {
-            this.executeBlockInPersistentContext(() -> {espirituDao.eliminar(idInexistente);})
-            ;}
+                    this.executeBlockInPersistentContext(() -> {
+                        espirituDao.eliminar(idInexistente);
+                    })
+                    ;
+                }
         );
 
     }
@@ -82,7 +86,7 @@ public class HibernateEspirituDAOTest {
     public void recuperarTodosDevuelveUnEspiritu() {
 
         this.executeBlockInPersistentContext(() -> {
-            espirituDao.crear(new Espiritu("Pokemon", "Matias"));
+            espirituDao.crear(new Espiritu("Matias"));
 
             List<Espiritu> lista = espirituDao.recuperarTodos();
 
@@ -93,9 +97,9 @@ public class HibernateEspirituDAOTest {
     @Test
     public void recuperarTodosDevuelveVariosElementos() {
 
-        this.executeBlockInPersistentContext(()-> {
-            espirituDao.crear(new Espiritu("Pokemon", "Matias"));
-            espirituDao.crear(new Espiritu("Pokemon", "Juan"));
+        this.executeBlockInPersistentContext(() -> {
+            espirituDao.crear(new Espiritu("Matias"));
+            espirituDao.crear(new Espiritu("Juan"));
 
             List<Espiritu> lista = espirituDao.recuperarTodos();
 
@@ -107,9 +111,9 @@ public class HibernateEspirituDAOTest {
     public void recuperarTodosDevuelveListaOrdenadaPorNombre() {
 
         this.executeBlockInPersistentContext(() -> {
-            espirituDao.crear(new Espiritu("Pokemon", "Matias"));
-            espirituDao.crear(new Espiritu("Pokemon", "Juanchi el Pastelero"));
-            espirituDao.crear(new Espiritu("Pokemon", "Alberto"));
+            espirituDao.crear(new Espiritu("Matias"));
+            espirituDao.crear(new Espiritu("Juanchi el Pastelero"));
+            espirituDao.crear(new Espiritu("Alberto"));
 
             List<Espiritu> lista = espirituDao.recuperarTodos();
 
@@ -123,7 +127,7 @@ public class HibernateEspirituDAOTest {
     public void seActualizaUnEspirituExistente() {
 
         this.executeBlockInPersistentContext(() -> {
-            Espiritu creado = espirituDao.crear(new Espiritu("Pokemon", "Matias"));
+            Espiritu creado = espirituDao.crear(new Espiritu("Matias"));
             assertNotNull(creado.getId());
 
             creado.setNombre("NombreActualizado");
@@ -139,37 +143,39 @@ public class HibernateEspirituDAOTest {
     @Test
     public void fallaAlActualizarUnEspirituInexistente() {
 
-            Long idInexistente = 999L;
-            Espiritu inexistente = new Espiritu("Pokemon", "NoExisto");
+        Long idInexistente = 999L;
+        Espiritu inexistente = new Angelical("NoExisto");
 
-            inexistente.setId(idInexistente);
-            ErrorAlActualizarEspirituException exception =
-            assertThrows(ErrorAlActualizarEspirituException.class, () -> {
-                this.executeBlockInPersistentContext(() -> {
-                espirituDao.actualizar(inexistente); });
-            });
+        inexistente.setId(idInexistente);
+        ErrorAlActualizarEspirituException exception =
+                assertThrows(ErrorAlActualizarEspirituException.class, () -> {
+                    this.executeBlockInPersistentContext(() -> {
+                        espirituDao.actualizar(inexistente);
+                    });
+                });
         assertEquals("No existe el espiritu con id: 999", exception.getMessage());
     }
 
     @Test
     public void fallaAlActualizarUnEspirituSinId() {
 
-            Espiritu espirituNoPersistido = new Espiritu("Pokemon", "NoEstoyPersistido");
+        Espiritu espirituNoPersistido = new Angelical("NoEstoyPersistido");
 
         ErrorAlActualizarEspirituException exception =
-            assertThrows(ErrorAlActualizarEspirituException.class, () -> {
-                this.executeBlockInPersistentContext(() -> {
-                    espirituDao.actualizar(espirituNoPersistido);});
-            });
+                assertThrows(ErrorAlActualizarEspirituException.class, () -> {
+                    this.executeBlockInPersistentContext(() -> {
+                        espirituDao.actualizar(espirituNoPersistido);
+                    });
+                });
         assertEquals("No se puede actualizar un espiritu sin id", exception.getMessage());
     }
 
     // Support message
     private void executeBlockInPersistentContext(Runnable aBlock) {
         HibernateTransactionRunner.runTrx(() -> {
-            aBlock.run();
-            return null;
-            }
+                    aBlock.run();
+                    return null;
+                }
         );
     }
 

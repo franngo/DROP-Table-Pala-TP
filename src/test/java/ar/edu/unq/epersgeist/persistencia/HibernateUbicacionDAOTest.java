@@ -3,10 +3,14 @@ package ar.edu.unq.epersgeist.persistencia;
 import ar.edu.unq.epersgeist.HibernateTest;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.ErrorAlActualizarUbicacionException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
+import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,11 +22,13 @@ import static org.junit.jupiter.api.Assertions.*;
 public class HibernateUbicacionDAOTest extends HibernateTest {
     private UbicacionDAO ubicacionDAO;
     private EspirituDAO espirituDAO;
+    private MediumDAO mediumDAO;
 
     @BeforeEach
     public void setUp() {
         ubicacionDAO = new HibernateUbicacionDAO();
         espirituDAO = new HibernateEspirituDAO();
+        mediumDAO = new HibernateMediumDAO();
     }
 
     // ============================== GUARDAR ==============================
@@ -154,6 +160,72 @@ public class HibernateUbicacionDAOTest extends HibernateTest {
         });
     }
 
+    // ============================== Actualizar ==============================
+
+    @Test
+    void deberiaActualizarSoloElNombre() {
+        Ubicacion ubicacion = new Ubicacion("Santuario de la Luz");
+
+        Long id = HibernateTransactionRunner.runTrx(() -> ubicacionDAO.guardar(ubicacion).getId());
+
+        Ubicacion ubicacionMod = new Ubicacion("Catedral de la Oscuridad");
+        ubicacionMod.setId(id);
+
+        this.executeBlockInPersistentContext(() -> ubicacionDAO.actualizar(ubicacionMod));
+
+        Ubicacion ubicacionActualizado = HibernateTransactionRunner.runTrx(() -> ubicacionDAO.recuperar(id));
+
+        assertEquals(ubicacionMod.getId(), ubicacionActualizado.getId());
+    }
+
+    @Test
+    void noDeberiaActualizarUbicacionSinId() {
+        this.runTrx(() ->
+                assertThrows(ErrorAlActualizarUbicacionException.class, () ->
+                        ubicacionDAO.actualizar(null)
+                )
+        );
+    }
+
+    private void executeBlockInPersistentContext(Runnable block) {
+        HibernateTransactionRunner.runTrx(() -> {
+            block.run();
+            return null;
+        });
+    }
+
+    // ============================== Eliminar ==============================
+
+    @Test
+    public void seEliminaUnMaUbicacionExistente() {
+
+        Ubicacion ubicacion = new Ubicacion("Santuario de la Luz");
+
+        this.executeBlockInPersistentContext(() -> {
+            Ubicacion ubicacionPersistida = ubicacionDAO.guardar(ubicacion);
+
+            ubicacionDAO.eliminar(ubicacionPersistida.getId());
+
+            assertNull(ubicacionDAO.recuperar(ubicacionPersistida.getId()));
+        });
+    }
+
+    @Test
+    public void noFallaAlEliminarUnaUbicacionInexistente() {
+
+        Long idInexistente = 999L;
+
+        assertDoesNotThrow(() -> {
+                    this.executeBlockInPersistentContext(() -> {
+                        ubicacionDAO.eliminar(idInexistente);
+                    })
+                    ;
+                }
+        );
+
+    }
+
+
     // ============================== EXTRAS ==============================
 
     @Test
@@ -163,7 +235,7 @@ public class HibernateUbicacionDAOTest extends HibernateTest {
         // Primera transacción: se crea la relación y Hibernate la persiste al commit
         this.runTrx(() -> {
             Ubicacion ubicacion = ubicacionDAO.guardar(new Ubicacion("Santuario de la Luz"));
-            Espiritu guerrero = espirituDAO.guardar(new Espiritu("Guerrero", "Espíritu de la Luz"));
+            Espiritu guerrero = espirituDAO.guardar(new Espiritu("Espíritu de la Luz"));
 
             ubicacion.agregarEspiritu(guerrero);
 
@@ -187,16 +259,16 @@ public class HibernateUbicacionDAOTest extends HibernateTest {
         final Ubicacion[] ubicacion = new Ubicacion[1];
 
         this.runTrx(() ->
-            ubicacion[0] = ubicacionDAO.guardar(new Ubicacion("Santuario de la Luz"))
+                ubicacion[0] = ubicacionDAO.guardar(new Ubicacion("Santuario de la Luz"))
         );
 
         this.runTrx(() -> {
-            Espiritu guerrero = espirituDAO.guardar(new Espiritu("Guerrero", "Espíritu de la Luz"));
+            Espiritu guerrero = espirituDAO.guardar(new Espiritu("Espíritu de la Luz"));
             ubicacion[0].agregarEspiritu(guerrero);
         });
 
         this.runTrx(() -> {
-            Espiritu mago = espirituDAO.guardar(new Espiritu("Mago", "Espíritu de la Oscuridad"));
+            Espiritu mago = espirituDAO.guardar(new Espiritu("Espíritu de la Oscuridad"));
             ubicacion[0].agregarEspiritu(mago);
         });
 
@@ -213,6 +285,7 @@ public class HibernateUbicacionDAOTest extends HibernateTest {
     void tearDown() {
         this.runTrx(() -> {
             espirituDAO.eliminarTodos();
+            mediumDAO.eliminarTodos();
             ubicacionDAO.eliminarTodos();
         });
     }

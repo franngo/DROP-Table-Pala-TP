@@ -5,6 +5,7 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
+import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
 import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
@@ -42,7 +43,7 @@ public class HibernateEspirituServiceTest {
     @BeforeEach
     public void setUp() {
 
-        matias = new Espiritu("Pokemon", "Matias");
+        matias = new Espiritu("Matias");
     }
 
     @Test
@@ -61,7 +62,7 @@ public class HibernateEspirituServiceTest {
             return serviceEspiritu.recuperar(espirituP.getId());
         });
 
-        assertEquals(matias.getTipo(), espirituRecuperado.getTipo());
+
         assertEquals(matias.getNombre(), espirituRecuperado.getNombre());
         assertEquals(matias.getNivelDeConexion(), espirituRecuperado.getNivelDeConexion());
     }
@@ -73,7 +74,7 @@ public class HibernateEspirituServiceTest {
         Long id = HibernateTransactionRunner.runTrx(() -> serviceEspiritu.crear(matias).getId());
 
         // ⚠️ nueva instancia (no reutilizar la anterior)
-        Espiritu modificado = new Espiritu("Otro Pokemon", "Juanchi el pastelero");
+        Espiritu modificado = new Espiritu("Juanchi el pastelero");
         modificado.setId(id);
         modificado.setNivelDeConexion(99);
 
@@ -81,7 +82,7 @@ public class HibernateEspirituServiceTest {
 
         Espiritu actualizado = HibernateTransactionRunner.runTrx(() -> serviceEspiritu.recuperar(id));
 
-        assertEquals("Otro Pokemon", actualizado.getTipo());
+
         assertEquals("Juanchi el pastelero", actualizado.getNombre());
         assertEquals(99, actualizado.getNivelDeConexion());
     }
@@ -96,7 +97,7 @@ public class HibernateEspirituServiceTest {
         });
     }
 
-   
+
     @Test
     void deberiaEliminarYNoPoderRecuperarloLuego() {
 
@@ -115,7 +116,7 @@ public class HibernateEspirituServiceTest {
         Espiritu espirituP = serviceEspiritu.crear(matias);
         var otroEspiritu = serviceEspiritu.recuperar(espirituP.getId());
 
-        assertEquals(espirituP.getTipo(), otroEspiritu.getTipo());
+
         assertEquals(espirituP.getNivelDeConexion(), otroEspiritu.getNivelDeConexion());
         assertEquals(espirituP.getNombre(), otroEspiritu.getNombre());
         assertEquals(espirituP.getId(), otroEspiritu.getId());
@@ -208,7 +209,7 @@ public class HibernateEspirituServiceTest {
     }
 
     @Test
-    void recuperarTodosTraeAAmbosTiposDeEspiritus() {
+    void recuperarTodosRetornaATodosLosEspiritusDeDistintaNaturaleza() {
         Demonio modelDaemon = new Demonio("Demoniaco","Dam");
         Angelical modelAngelical = new Angelical("Tipazo","Snap");
 

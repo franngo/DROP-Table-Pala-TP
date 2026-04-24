@@ -1,13 +1,12 @@
 package ar.edu.unq.epersgeist.servicios.impl;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.IdUbicacionInvalidoException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.NombreUbicacionInvalidoException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.*;
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
+import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 
 import java.util.List;
 
@@ -57,8 +56,6 @@ public class UbicacionServiceImpl implements UbicacionService {
         return ubicacionDAO.recuperarTodos();
     }
 
-    // --------------------------------------------------------------------------------
-
     @Override
     public List<Espiritu> espiritusEn(Long ubicacionId) {
         if (ubicacionId == null) {
@@ -72,6 +69,49 @@ public class UbicacionServiceImpl implements UbicacionService {
         }
 
         return ubicacion.getEspiritus();
+    }
+
+    @Override
+    public void actualizar(Ubicacion ubicacionMod) {
+        if (ubicacionMod == null || ubicacionMod.getId() == null) {
+            throw new ErrorAlActualizarUbicacionException("No se puede actualizar una ubicacion que no tiene id.");
+        }
+
+        Ubicacion existente = ubicacionDAO.recuperar(ubicacionMod.getId());
+
+        if (existente == null) {
+            throw new ErrorAlActualizarUbicacionException(
+                    "No existe en la BD la ubicacion con id: " + ubicacionMod.getId()
+            );
+        }
+
+        this.ubicacionDAO.actualizar(ubicacionMod);
+        return;
+    }
+
+    @Override
+    public void eliminar(Long id) {
+        HibernateTransactionRunner.runTrx(() -> {
+            ubicacionDAO.eliminar(id);
+            return null;
+        });
+    }
+
+    @Override
+    public List<Medium> mediumsSinEspiritusEn(Long ubicacionId) {
+        if (ubicacionId == null) {
+            throw new IdUbicacionInvalidoException();
+        }
+
+        Ubicacion ubicacion = this.ubicacionDAO.recuperar(ubicacionId);
+
+        if (ubicacion == null) {
+            throw new UbicacionNoEncontradaException(ubicacionId);
+        }
+
+        return ubicacion.getMediums().stream()
+                .filter(medium -> medium.getEspiritus().isEmpty())
+                .toList();
     }
 
     // --------------------------------------------------------------------------------

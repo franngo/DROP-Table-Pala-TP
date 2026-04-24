@@ -10,7 +10,9 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -21,17 +23,21 @@ public class Espiritu implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String tipo;
+
     private Integer nivelDeConexion;
     private String nombre;
+    private boolean libre;
+    public static final int limiteConexion = 100;
+
 
     @ManyToOne
+    @JoinColumn(name = "mediumCon_id")
     private Medium mediumCon;
     @ManyToOne
     private Ubicacion ubicacion;
 
-    public Espiritu(@NonNull String tipo, @NonNull String nombre) {
-        this.tipo = tipo;
+
+    public Espiritu(@NonNull String nombre) {
         this.nivelDeConexion = 0;
         this.nombre = nombre;
     }
@@ -43,12 +49,30 @@ public class Espiritu implements Serializable {
     }
 
     public void fortalecerConexion(int cantidad) {
-        this.nivelDeConexion = Math.min(Espiritu.limiteConexion,this.cantidadNuevaConexion(cantidad));
+
+        this.nivelDeConexion = Math.min(Espiritu.limiteConexion, this.cantidadNuevaConexion(cantidad));
     }
 
-    private int cantidadNuevaConexion(int cantidad){
+
+    private int cantidadNuevaConexion(int cantidad) {
         return this.getNivelDeConexion() + cantidad;
     }
 
-    public static final int limiteConexion = 100;
+
+    public void desvincularse() {
+        this.libre = true;
+        this.mediumCon.desvincularseDe(this);
+    }
+
+
+    public boolean getLibre() {
+        return libre;
+    }
+
+
+    public void recibirAtaqueDe(Espiritu angel) {
+    }
+
+
 }
+
