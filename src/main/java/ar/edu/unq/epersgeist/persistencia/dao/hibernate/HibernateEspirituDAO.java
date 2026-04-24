@@ -103,12 +103,14 @@ public class HibernateEspirituDAO extends HibernateDAO<Espiritu> implements Espi
         }
 
         if(direccion == Direccion.DESCENDENTE) {
-            hql = "select e from Demonio e order by e.nivelDeConexion desc limit :cantPorPag offset (:pag - 1) * cantPorPag";
+            hql = "select e from Demonio e order by e.nivelDeConexion desc limit :limit offset :offset";
         } else { //caso ascendente
-            hql = "select e from Demonio e order by e.nivelDeConexion asc limit :cantPorPag offset (:pag - 1) * cantPorPag";
+            hql = "select e from Demonio e order by e.nivelDeConexion asc limit :limit offset :offset";
         }
 
         Query<Espiritu> query = session.createQuery(hql, Espiritu.class);
+        query.setParameter("limit", cantPorPag);
+        query.setParameter("offset", (pag - 1) * cantPorPag);
         return query.getResultList();
     }
 

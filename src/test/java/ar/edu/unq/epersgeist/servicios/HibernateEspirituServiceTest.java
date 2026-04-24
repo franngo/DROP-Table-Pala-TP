@@ -218,7 +218,46 @@ public class HibernateEspirituServiceTest {
         assertEquals(listOfDemons.size(), 2);
     }
 
-    //TODO arreglar
+    /*
+    @Test
+    void losDemoniosSeDevuelvenOrdenadosPorNivelDeConexionDeFormaDescendente2() {
+        Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
+        Medium ubeda = new Medium("Ubeda el dt", 100, 20);
+        Medium chiquiTapia = new Medium("Tapiales", 60, 40);
+        Demonio charizard = new Demonio("Charizard");
+        Demonio pikuatico = new Demonio("Pikachu Acuatico");
+        Demonio bulbasaurio = new Demonio("Bulbasaurio");
+
+        epifanio.agregarEspiritu(charizard);
+        chiquiTapia.agregarEspiritu(pikuatico);
+        ubeda.agregarEspiritu(bulbasaurio);
+        ubeda.descansar();
+        ubeda.descansar();
+        epifanio.descansar();
+        this.executeBlockInPersistentContext(() -> {
+            mediumDao.crear(epifanio);
+            mediumDao.crear(ubeda);
+            mediumDao.crear(chiquiTapia);
+            espirituDao.crear(charizard);
+            espirituDao.crear(bulbasaurio);
+            espirituDao.crear(pikuatico);
+        });
+
+        List<Espiritu> daemons = serviceEspiritu.espiritusDemoniacos();
+
+        // No encontré mejor forma usando streams de revisar que cada demonio tenga un nivel mayor
+        // o igual de conexión que su consecuente, la clásica es el for pero se vuelve ilegible. -dpolverigiani
+        assertEquals(daemons.size(), 3);
+        assertTrue(
+                IntStream.range(0, daemons.size() - 1)
+                        .allMatch(i ->
+                                daemons.get(i).getNivelDeConexion() >= daemons.get(i + 1).getNivelDeConexion()
+                        )
+        );
+    }
+    */
+
+
     @Test
     public void seConectaUnEspirituConUnMedium() {
         Ubicacion bernalM = new Ubicacion("Bernal");
