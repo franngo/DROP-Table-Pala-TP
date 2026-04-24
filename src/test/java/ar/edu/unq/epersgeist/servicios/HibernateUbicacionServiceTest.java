@@ -169,28 +169,24 @@ public class HibernateUbicacionServiceTest {
     }
 
     // ============================== ESPIRITUS EN ==============================
- /*
+
     @Test
     void espiritusEnRetornaListaDeEspiritus() {
         Ubicacion ubicacion = ubicacionService.crear(cripta);
 
+        espirituService.crear(guerrero);
+        espirituService.crear(mago);
 
-        HibernateTransactionRunner.runTrx(() -> {
-            espirituDAO.guardar(guerrero);
-            espirituDAO.guardar(mago);
+        ubicacion.agregarEspiritu(guerrero);
+        ubicacion.agregarEspiritu(mago);
+        ubicacionService.actualizar(ubicacion);
 
-
-            ubicacion.agregarEspiritu(guerrero);
-            ubicacion.agregarEspiritu(mago);
-
-            return null;
-        });
-
-        List<Espiritu> espiritusEnUbicacion = ubicacionService.espiritusEn(ubicacion.getId());
+        List<Espiritu> espiritusEnUbicacion;
+        espiritusEnUbicacion = ubicacionService.espiritusEn(ubicacion.getId());
 
         assertEquals(2, espiritusEnUbicacion.size());
     }
-*/
+
     @Test
     void espiritusEnLanzaExcepcionSiUbicacionNoExiste() {
 
