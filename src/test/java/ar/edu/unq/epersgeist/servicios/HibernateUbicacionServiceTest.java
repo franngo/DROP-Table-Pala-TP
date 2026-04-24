@@ -13,20 +13,16 @@ import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
 import ar.edu.unq.epersgeist.servicios.impl.MediumServiceImpl;
 import ar.edu.unq.epersgeist.servicios.impl.UbicacionServiceImpl;
-import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HibernateUbicacionServiceTest {
-    private MediumDAO mediumDao;
-    private EspirituDAO espirituDAO;
-    private UbicacionDAO ubicacionDAO;
-
     private static final String NOMBRE_TEMPLO = "Templo del Alba Eterna";
     private static final String NOMBRE_CRIPTA = "Cripta de los Susurros";
 
@@ -45,9 +41,9 @@ public class HibernateUbicacionServiceTest {
 
     @BeforeEach
     void setUp() {
-        mediumDao = new HibernateMediumDAO();
-        espirituDAO = new HibernateEspirituDAO();
-        ubicacionDAO = new HibernateUbicacionDAO();
+        MediumDAO mediumDao = new HibernateMediumDAO();
+        EspirituDAO espirituDAO = new HibernateEspirituDAO();
+        UbicacionDAO ubicacionDAO = new HibernateUbicacionDAO();
 
         ubicacionService = new UbicacionServiceImpl(ubicacionDAO);
         espirituService = new EspirituServiceImpl(espirituDAO, mediumDao);
@@ -157,8 +153,8 @@ public class HibernateUbicacionServiceTest {
         List<Ubicacion> ubicaciones = ubicacionService.recuperarTodos();
 
         assertEquals(2, ubicaciones.size());
-        assertTrue(ubicaciones.stream().anyMatch(u -> u.getId() == templo.getId()));
-        assertTrue(ubicaciones.stream().anyMatch(u -> u.getId() == cripta.getId()));
+        assertTrue(ubicaciones.stream().anyMatch(u -> Objects.equals(u.getId(), templo.getId())));
+        assertTrue(ubicaciones.stream().anyMatch(u -> Objects.equals(u.getId(), cripta.getId())));
     }
 
     @Test
@@ -276,8 +272,8 @@ public class HibernateUbicacionServiceTest {
         List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
 
         assertEquals(2, resultado.size());
-        assertTrue(resultado.stream().anyMatch(u -> u.getId() == epifanio.getId()));
-        assertTrue(resultado.stream().anyMatch(u -> u.getId() == ubeda.getId()));
+        assertTrue(resultado.stream().anyMatch(u -> Objects.equals(u.getId(), epifanio.getId())));
+        assertTrue(resultado.stream().anyMatch(u -> Objects.equals(u.getId(), ubeda.getId())));
     }
 
     @Test
@@ -297,8 +293,8 @@ public class HibernateUbicacionServiceTest {
         List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
 
         assertEquals(1, resultado.size());
-        assertTrue(resultado.stream().noneMatch(u -> u.getId() == epifanio.getId()));
-        assertTrue(resultado.stream().anyMatch(u -> u.getId() == ubeda.getId()));
+        assertTrue(resultado.stream().noneMatch(u -> Objects.equals(u.getId(), epifanio.getId())));
+        assertTrue(resultado.stream().anyMatch(u -> Objects.equals(u.getId(), ubeda.getId())));
     }
 
 
@@ -313,7 +309,6 @@ public class HibernateUbicacionServiceTest {
 
     @Test
     void mediumsSinEspiritusEnLanzaExceptionSiElIdNoExiste() {
-
         assertThrows(
                 IdUbicacionInvalidoException.class,
                 () -> ubicacionService.mediumsSinEspiritusEn(null)
@@ -322,15 +317,10 @@ public class HibernateUbicacionServiceTest {
 
     // ============================== TEARDOWN ==============================
 
-
     @AfterEach
     void tearDown() {
-        HibernateTransactionRunner.runTrx(() -> {
-            espirituDAO.eliminarTodos();
-            mediumDao.eliminarTodos();
-            ubicacionDAO.eliminarTodos();
-
-            return null;
-        });
+        espirituService.eliminarTodos();
+        mediumService.eliminarTodos();
+        ubicacionService.eliminarTodos();
     }
 }
