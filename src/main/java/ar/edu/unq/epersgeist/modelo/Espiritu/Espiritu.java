@@ -15,8 +15,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "tipo")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "tipo_espiritu")
 public class Espiritu implements Serializable {
 
     @Id

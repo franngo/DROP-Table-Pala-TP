@@ -1,9 +1,13 @@
 package ar.edu.unq.epersgeist.servicios;
 
+import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
 import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.junit.jupiter.api.AfterEach;
@@ -11,11 +15,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+import java.util.stream.IntStream;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HibernateEspirituServiceTest {
-    private final EspirituDAO espirituDao = new HibernateEspirituDAO();
-    private final EspirituService serviceEspiritu = new EspirituServiceImpl(espirituDao);
+    private final HibernateEspirituDAO espirituDao = new HibernateEspirituDAO();
+    private final HibernateMediumDAO mediumDao = new HibernateMediumDAO();
+    private final EspirituService serviceEspiritu = new EspirituServiceImpl(espirituDao, mediumDao);
     private Espiritu matias;
 
      /*
@@ -132,6 +140,86 @@ public class HibernateEspirituServiceTest {
         });
     }
 
+    @Test
+    void alNoExistirDemoniosElServicioDevuelveUnaListaVacia() {
+        assertTrue(serviceEspiritu.espiritusDemoniacos().isEmpty());
+    }
+
+    @Test
+    void alExistirAlMenosUnDemonioElServicioDevuelveUnaListaConEllos() {
+        Demonio modelDaemon = new Demonio("Demoniaco","Dam");
+        Demonio anotherModelDaemon = new Demonio("Tipazo","Snap");
+
+        serviceEspiritu.crear(modelDaemon);
+        serviceEspiritu.crear(anotherModelDaemon);
+
+        List<Espiritu> listOfDemons = serviceEspiritu.espiritusDemoniacos();
+        assertTrue(!listOfDemons.isEmpty());
+        assertEquals(listOfDemons.size(), 2);
+    }
+
+    @Test
+    void losDemoniosSeDevuelvenOrdenadosPorNivelDeConexionDeFormaDescendente() {
+        Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
+        Medium ubeda = new Medium("Ubeda el dt", 100, 20);
+        Medium chiquiTapia = new Medium("Tapiales", 60, 40);
+        Demonio charizard = new Demonio("Fuego", "Charizard");
+        Demonio pikuatico = new Demonio("Agua", "Pikachu Acuatico");
+        Demonio bulbasaurio = new Demonio("Planta", "Bulbasaurio");
+
+        epifanio.agregarEspiritu(charizard);
+        chiquiTapia.agregarEspiritu(pikuatico);
+        ubeda.agregarEspiritu(bulbasaurio);
+        ubeda.descansar();
+        ubeda.descansar();
+        epifanio.descansar();
+        this.executeBlockInPersistentContext(() -> {
+            mediumDao.crear(epifanio);
+            mediumDao.crear(ubeda);
+            mediumDao.crear(chiquiTapia);
+            espirituDao.crear(charizard);
+            espirituDao.crear(bulbasaurio);
+            espirituDao.crear(pikuatico);
+        });
+
+        List<Espiritu> daemons = serviceEspiritu.espiritusDemoniacos();
+
+        // No encontré mejor forma usando streams de revisar que cada demonio tenga un nivel mayor
+        // o igual de conexión que su consecuente, la clásica es el for pero se vuelve ilegible. -dpolverigiani
+        assertEquals(daemons.size(), 3);
+        assertTrue(
+                IntStream.range(0, daemons.size() - 1)
+                        .allMatch(i ->
+                                daemons.get(i).getNivelDeConexion() >= daemons.get(i + 1).getNivelDeConexion()
+                        )
+        );
+    }
+
+    @Test
+    void losAngelesNoSonRetornadosEnLaListaDeDemonios() {
+        Demonio modelDaemon = new Demonio("Demoniaco","Dam");
+        Angelical modelAngelical = new Angelical("Tipazo","Snap");
+
+        serviceEspiritu.crear(modelDaemon);
+        serviceEspiritu.crear(modelAngelical);
+
+        List<Espiritu> listOfDemons = serviceEspiritu.espiritusDemoniacos();
+        assertTrue(!listOfDemons.isEmpty());
+        assertEquals(listOfDemons.size(), 1);
+    }
+
+    @Test
+    void recuperarTodosRetornaATodosLosEspiritusDeDistintaNaturaleza() {
+        Demonio modelDaemon = new Demonio("Demoniaco","Dam");
+        Angelical modelAngelical = new Angelical("Tipazo","Snap");
+
+        serviceEspiritu.crear(modelDaemon);
+        serviceEspiritu.crear(modelAngelical);
+
+        List<Espiritu> listOfDemons = serviceEspiritu.recuperarTodos();
+        assertTrue(!listOfDemons.isEmpty());
+        assertEquals(listOfDemons.size(), 2);
+    }
 /*
     @Test
     public void seConectaUnEspirituConUnMedium() {
