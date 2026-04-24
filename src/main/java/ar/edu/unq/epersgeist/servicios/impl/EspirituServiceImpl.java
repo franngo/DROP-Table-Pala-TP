@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.servicios.impl;
 
+import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
@@ -95,6 +96,13 @@ public class EspirituServiceImpl implements EspirituService {
                 espirituDao.espiritusDemoniacos());
     }
 
+    //versión que implementa la paginación
+    @Override
+    public List<Espiritu> espiritusDemoniacos(Direccion direccion, int pag, int cantPorPag) {
+        return HibernateTransactionRunner.runTrx(() ->
+                espirituDao.espiritusDemoniacos(direccion, pag, cantPorPag));
+    }
+
     @Override
 
     public void eliminarTodos() {
@@ -103,6 +111,5 @@ public class EspirituServiceImpl implements EspirituService {
             return null;
         });
     }
-
 
 }

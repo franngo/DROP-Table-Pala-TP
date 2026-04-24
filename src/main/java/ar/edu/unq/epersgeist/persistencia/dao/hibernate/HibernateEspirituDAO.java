@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.persistencia.dao.hibernate;
 
+import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarEspirituException;
@@ -80,6 +81,36 @@ public class HibernateEspirituDAO extends HibernateDAO<Espiritu> implements Espi
         Session session = HibernateSessionContext.getCurrentSession();
         String hql = "select e from Demonio e order by e.nivelDeConexion desc";
         Query<Espiritu> query = session.createQuery(hql, Espiritu.class);
+        return query.getResultList();
+    }
+
+    //versión que implementa la paginación
+    @Override
+    public List<Espiritu> espiritusDemoniacos(Direccion direccion, int pag, int cantPorPag) {
+        Session session = HibernateSessionContext.getCurrentSession();
+        String hql;
+
+        if(direccion == null) {
+            throw new RuntimeException("La dirección no debería ser nula");
+        }
+
+        if(pag <= 0) {
+            throw new RuntimeException("El número de página debe ser mayor o igual a 1");
+        }
+
+        if(cantPorPag <= 0) {
+            throw new RuntimeException("La cantidad por página debe ser mayor o igual a 1");
+        }
+
+        if(direccion == Direccion.DESCENDENTE) {
+            hql = "select e from Demonio e order by e.nivelDeConexion desc limit :limit offset :offset";
+        } else { //caso ascendente
+            hql = "select e from Demonio e order by e.nivelDeConexion asc limit :limit offset :offset";
+        }
+
+        Query<Espiritu> query = session.createQuery(hql, Espiritu.class);
+        query.setParameter("limit", cantPorPag);
+        query.setParameter("offset", (pag - 1) * cantPorPag);
         return query.getResultList();
     }
 

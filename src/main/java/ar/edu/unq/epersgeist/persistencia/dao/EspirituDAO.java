@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.persistencia.dao;
 
+import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 
@@ -15,4 +16,5 @@ public interface EspirituDAO {
     List<Espiritu> recuperarTodos();
     void eliminarTodos();
     List<Espiritu> espiritusDemoniacos();
+    List<Espiritu> espiritusDemoniacos(Direccion direccion, int pag, int cantPorPag);
 }

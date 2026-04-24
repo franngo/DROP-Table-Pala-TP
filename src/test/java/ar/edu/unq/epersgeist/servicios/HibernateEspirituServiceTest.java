@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.servicios;
 
+import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
@@ -218,7 +219,53 @@ public class HibernateEspirituServiceTest {
         assertEquals(listOfDemons.size(), 2);
     }
 
-    //TODO arreglar
+    @Test
+    void losDemoniosSeDevuelvenOrdenadosPorNivelDeConexionDeFormaAscendenteYPaginados() {
+        Espiritu charizard = new Demonio("Charizard");
+        charizard.setNivelDeConexion(95);
+        serviceEspiritu.crear(charizard);
+
+        Espiritu bulbasaur = new Demonio("bulbasaur");
+        bulbasaur.setNivelDeConexion(90);
+        serviceEspiritu.crear(bulbasaur);
+
+        Espiritu pikachu = new Demonio("pikachu");
+        pikachu.setNivelDeConexion(80);
+        serviceEspiritu.crear(pikachu);
+
+        Espiritu ghastly = new Demonio("ghastly");
+        ghastly.setNivelDeConexion(65);
+        serviceEspiritu.crear(ghastly);
+
+        Espiritu pichu = new Demonio("pichu");
+        pichu.setNivelDeConexion(55);
+        serviceEspiritu.crear(pichu);
+
+        Espiritu raichu = new Demonio("raichu");
+        raichu.setNivelDeConexion(45);
+        serviceEspiritu.crear(raichu);
+
+        Espiritu magikarp = new Demonio("magikarp");
+        magikarp.setNivelDeConexion(5);
+        serviceEspiritu.crear(magikarp);
+
+
+        List<Espiritu> daemons = serviceEspiritu.espiritusDemoniacos(Direccion.ASCENDENTE, 1, 3);
+
+        assertEquals(3, daemons.size());
+        assertEquals(daemons.get(0).getId(), magikarp.getId());
+        assertEquals(daemons.get(1).getId(), raichu.getId());
+        assertEquals(daemons.get(2).getId(), pichu.getId());
+
+        List<Espiritu> daemons2 = serviceEspiritu.espiritusDemoniacos(Direccion.ASCENDENTE, 2, 3);
+
+        assertEquals(3, daemons.size());
+        assertEquals(daemons2.get(0).getId(), ghastly.getId());
+        assertEquals(daemons2.get(1).getId(), pikachu.getId());
+        assertEquals(daemons2.get(2).getId(), bulbasaur.getId());
+    }
+
+
     @Test
     public void seConectaUnEspirituConUnMedium() {
         Ubicacion bernalM = new Ubicacion("Bernal");
