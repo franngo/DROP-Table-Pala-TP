@@ -157,6 +157,8 @@ public class HibernateUbicacionServiceTest {
         List<Ubicacion> ubicaciones = ubicacionService.recuperarTodos();
 
         assertEquals(2, ubicaciones.size());
+        assertTrue(ubicaciones.stream().anyMatch(u -> u.getId() == templo.getId()));
+        assertTrue(ubicaciones.stream().anyMatch(u -> u.getId() == cripta.getId()));
     }
 
     @Test

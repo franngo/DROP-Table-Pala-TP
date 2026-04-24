@@ -45,13 +45,6 @@ public class UbicacionServiceImpl implements UbicacionService {
         });
     }
 
-    // --------------------------------------------------------------------------------
-    /*
-            return HibernateTransactionRunner.runTrx(() -> {
-
-        });
-     */
-
     @Override
     public Ubicacion recuperar(Long id) {
         return HibernateTransactionRunner.runTrx(() -> {
