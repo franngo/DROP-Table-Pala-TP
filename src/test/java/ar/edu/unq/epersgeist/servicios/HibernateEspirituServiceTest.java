@@ -5,7 +5,7 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
@@ -144,7 +144,7 @@ public class HibernateEspirituServiceTest {
 
         serviceEspiritu.eliminar(espirituEliminar.getId());
 
-        assertThrows(ErrorAlRecuperarEspirituException.class, () -> {
+        assertThrows(ErrorDeEspirituNoEncontradoException.class, () -> {
             serviceEspiritu.recuperar(espirituEliminar.getId());
         });
     }

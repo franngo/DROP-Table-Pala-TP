@@ -3,7 +3,7 @@ package ar.edu.unq.epersgeist.servicios.impl;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
@@ -34,7 +34,7 @@ public class EspirituServiceImpl implements EspirituService {
             Espiritu espiritu = espirituDao.recuperar(espirituId);
 
             if (espiritu == null) {
-                throw new ErrorAlRecuperarEspirituException(espirituId);
+                throw new ErrorDeEspirituNoEncontradoException(espirituId);
             }
 
             return espiritu;

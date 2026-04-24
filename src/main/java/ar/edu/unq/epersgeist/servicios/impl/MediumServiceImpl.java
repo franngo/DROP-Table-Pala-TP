@@ -2,8 +2,8 @@ package ar.edu.unq.epersgeist.servicios.impl;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarMediumException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeMediumNoEncontradoException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ExorcismoPropioNoPermitidoException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
@@ -34,7 +34,7 @@ public class MediumServiceImpl implements MediumService {
             Medium mediumRecuperado = mediumDao.recuperar(idMedium);
 
             if (mediumRecuperado == null) {
-                throw new ErrorAlRecuperarMediumException(idMedium);
+                throw new ErrorDeMediumNoEncontradoException(idMedium);
             }
 
             return mediumRecuperado;
@@ -69,7 +69,7 @@ public class MediumServiceImpl implements MediumService {
             Medium m = mediumDao.recuperar(id);
 
             if (m == null) {
-                throw new ErrorAlRecuperarMediumException(id);
+                throw new ErrorDeMediumNoEncontradoException(id);
             }
 
             m.descansar();
@@ -85,10 +85,10 @@ public class MediumServiceImpl implements MediumService {
             Espiritu e = espirituDao.recuperar(espirituId);
 
             if (m == null) {
-                throw new ErrorAlRecuperarMediumException(mediumId);
+                throw new ErrorDeMediumNoEncontradoException(mediumId);
             }
             if (e == null) {
-                throw new ErrorAlRecuperarEspirituException(espirituId);
+                throw new ErrorDeEspirituNoEncontradoException(espirituId);
             }
 
             return m.invocar(e);
