@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.servicios;
 
+import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
@@ -218,44 +219,51 @@ public class HibernateEspirituServiceTest {
         assertEquals(listOfDemons.size(), 2);
     }
 
-    /*
     @Test
-    void losDemoniosSeDevuelvenOrdenadosPorNivelDeConexionDeFormaDescendente2() {
-        Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
-        Medium ubeda = new Medium("Ubeda el dt", 100, 20);
-        Medium chiquiTapia = new Medium("Tapiales", 60, 40);
-        Demonio charizard = new Demonio("Charizard");
-        Demonio pikuatico = new Demonio("Pikachu Acuatico");
-        Demonio bulbasaurio = new Demonio("Bulbasaurio");
+    void losDemoniosSeDevuelvenOrdenadosPorNivelDeConexionDeFormaAscendenteYPaginados() {
+        Espiritu charizard = new Demonio("Charizard");
+        charizard.setNivelDeConexion(95);
+        serviceEspiritu.crear(charizard);
 
-        epifanio.agregarEspiritu(charizard);
-        chiquiTapia.agregarEspiritu(pikuatico);
-        ubeda.agregarEspiritu(bulbasaurio);
-        ubeda.descansar();
-        ubeda.descansar();
-        epifanio.descansar();
-        this.executeBlockInPersistentContext(() -> {
-            mediumDao.crear(epifanio);
-            mediumDao.crear(ubeda);
-            mediumDao.crear(chiquiTapia);
-            espirituDao.crear(charizard);
-            espirituDao.crear(bulbasaurio);
-            espirituDao.crear(pikuatico);
-        });
+        Espiritu bulbasaur = new Demonio("bulbasaur");
+        bulbasaur.setNivelDeConexion(90);
+        serviceEspiritu.crear(bulbasaur);
 
-        List<Espiritu> daemons = serviceEspiritu.espiritusDemoniacos();
+        Espiritu pikachu = new Demonio("pikachu");
+        pikachu.setNivelDeConexion(80);
+        serviceEspiritu.crear(pikachu);
 
-        // No encontré mejor forma usando streams de revisar que cada demonio tenga un nivel mayor
-        // o igual de conexión que su consecuente, la clásica es el for pero se vuelve ilegible. -dpolverigiani
-        assertEquals(daemons.size(), 3);
-        assertTrue(
-                IntStream.range(0, daemons.size() - 1)
-                        .allMatch(i ->
-                                daemons.get(i).getNivelDeConexion() >= daemons.get(i + 1).getNivelDeConexion()
-                        )
-        );
+        Espiritu ghastly = new Demonio("ghastly");
+        ghastly.setNivelDeConexion(65);
+        serviceEspiritu.crear(ghastly);
+
+        Espiritu pichu = new Demonio("pichu");
+        pichu.setNivelDeConexion(55);
+        serviceEspiritu.crear(pichu);
+
+        Espiritu raichu = new Demonio("raichu");
+        raichu.setNivelDeConexion(45);
+        serviceEspiritu.crear(raichu);
+
+        Espiritu magikarp = new Demonio("magikarp");
+        magikarp.setNivelDeConexion(5);
+        serviceEspiritu.crear(magikarp);
+
+
+        List<Espiritu> daemons = serviceEspiritu.espiritusDemoniacos(Direccion.ASCENDENTE, 1, 3);
+
+        assertEquals(3, daemons.size());
+        assertEquals(daemons.get(0).getId(), magikarp.getId());
+        assertEquals(daemons.get(1).getId(), raichu.getId());
+        assertEquals(daemons.get(2).getId(), pichu.getId());
+
+        List<Espiritu> daemons2 = serviceEspiritu.espiritusDemoniacos(Direccion.ASCENDENTE, 2, 3);
+
+        assertEquals(3, daemons.size());
+        assertEquals(daemons2.get(0).getId(), ghastly.getId());
+        assertEquals(daemons2.get(1).getId(), pikachu.getId());
+        assertEquals(daemons2.get(2).getId(), bulbasaur.getId());
     }
-    */
 
 
     @Test
