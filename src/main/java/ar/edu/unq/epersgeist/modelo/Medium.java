@@ -134,7 +134,6 @@ public class Medium implements Serializable {
                 .toList();
     }
 
-
     private boolean tengoAlgunEspirituAngel() {
         return espiritus.stream().anyMatch(e -> e instanceof Angelical);
     }

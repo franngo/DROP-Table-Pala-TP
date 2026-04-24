@@ -22,22 +22,19 @@ public class Ubicacion {
     private String nombre;
 
     @OneToMany(mappedBy = "ubicacion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Espiritu> espiritus;
+    private List<Espiritu> espiritus = new ArrayList<Espiritu>();
     @OneToMany(mappedBy = "ubicacion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Medium> mediums;
+    private List<Medium> mediums = new ArrayList<Medium>();
 
     public Ubicacion(String nombre) {
-
         this.nombre = nombre;
-        this.espiritus = new ArrayList<>();
-        this.mediums = new ArrayList<>();
     }
 
     public void agregarEspiritu(Espiritu espiritu) {
         this.espiritus.add(espiritu);
         espiritu.setUbicacion(this);
     }
-
+  
     public boolean tieneElMismoNombreQue(Ubicacion ubicacion) {
         return this.getNombre() == ubicacion.getNombre();
     }
