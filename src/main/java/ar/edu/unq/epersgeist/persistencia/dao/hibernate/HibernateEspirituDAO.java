@@ -84,7 +84,9 @@ public class HibernateEspirituDAO extends HibernateDAO<Espiritu> implements Espi
         return query.getResultList();
     }
 
-    List<Espiritu> espiritusDemoniacos(Direccion direccion, int pag, int cantPorPag) {
+    //versión que implementa la paginación
+    @Override
+    public List<Espiritu> espiritusDemoniacos(Direccion direccion, int pag, int cantPorPag) {
         Session session = HibernateSessionContext.getCurrentSession();
         String hql;
 
