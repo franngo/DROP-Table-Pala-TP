@@ -32,7 +32,12 @@ public class HibernateUbicacionServiceTest {
     private final Ubicacion templo = new Ubicacion(NOMBRE_TEMPLO);
     private final Ubicacion cripta = new Ubicacion(NOMBRE_CRIPTA);
 
-    private EspirituService espirituService;
+    private final Espiritu guerrero = new Espiritu("Espíritu de la Luz");
+    private final Espiritu mago = new Espiritu("Espíritu de la Oscuridad");
+
+    private final Medium epifanio = new Medium("epifanio", 150, 50);
+    private final Medium ubeda = new Medium("ubeda", 100, 20);
+
     private UbicacionService ubicacionService;
 
     @BeforeEach
@@ -42,7 +47,6 @@ public class HibernateUbicacionServiceTest {
         ubicacionDAO = new HibernateUbicacionDAO();
 
         ubicacionService = new UbicacionServiceImpl(ubicacionDAO);
-        espirituService = new EspirituServiceImpl(espirituDAO);
     }
 
     // ============================== CREAR ==============================
@@ -162,8 +166,6 @@ public class HibernateUbicacionServiceTest {
     @Test
     void espiritusEnRetornaListaDeEspiritus() {
         Ubicacion ubicacion = ubicacionService.crear(cripta);
-        Espiritu guerrero = new Espiritu("Espíritu de la Luz");
-        Espiritu mago = new Espiritu("Espíritu de la Oscuridad");
 
         HibernateTransactionRunner.runTrx(() -> {
             espirituDAO.guardar(guerrero);
@@ -242,8 +244,6 @@ public class HibernateUbicacionServiceTest {
     void deberiaObtenerMediumsSinEspiritus() {
 
         Ubicacion ubicacion = ubicacionService.crear(cripta);
-        Medium epifanio = new Medium("epifanio", 150, 50);
-        Medium ubeda = new Medium("ubeda", 100, 20);
 
         HibernateTransactionRunner.runTrx(() -> {
             mediumDao.crear(epifanio);
