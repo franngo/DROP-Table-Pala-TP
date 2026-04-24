@@ -132,10 +132,10 @@ public class HibernateMediumServiceTest {
 
         Medium actualizado = serviceMedium.recuperar(id);
 
-        assertEquals(mediumRecuperado.getId(), actualizado.getId());
-        assertEquals(mediumRecuperado.getNombre(), actualizado.getNombre());
-        assertEquals(mediumRecuperado.getMana(), actualizado.getMana());
-        assertEquals(mediumRecuperado.getManaMax(), actualizado.getManaMax());
+        assertEquals(epifanioM.getId(), actualizado.getId());
+        assertEquals(epifanioM.getNombre(), actualizado.getNombre());
+        assertEquals(epifanioM.getMana(), actualizado.getMana());
+        assertEquals(epifanioM.getManaMax(), actualizado.getManaMax());
     }
 
     @Test
@@ -257,7 +257,7 @@ public class HibernateMediumServiceTest {
         Medium epifanioP = serviceMedium.crear(epifanioM);
 
         Long idInexistente = epifanioP.getId() + 1;
-        ErrorAlRecuperarEspirituException exception = assertThrows(ErrorAlRecuperarEspirituException.class,
+        ErrorDeEspirituNoEncontradoException exception = assertThrows(ErrorDeEspirituNoEncontradoException.class,
                 () -> serviceMedium.invocar(epifanioM.getId(), idInexistente));
         assertEquals("No se pudo recuperar al espíritu con id " + idInexistente + ".", exception.getMessage());
     }
