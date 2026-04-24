@@ -107,7 +107,7 @@ public class MediumServiceImpl implements MediumService {
             Medium mediumAExorcizar = mediumDao.recuperar(idMediumAExorcizar);
             // aplico logica de modelo
             mediumAtacante.exorcizar(mediumAExorcizar);
-            // persisto los cambios
+            // persisto los cambios (opcional, ya que el session.flush() del final de la transacción ya se encarga de persistir los cambios de estado)
             mediumDao.actualizar(mediumAtacante);
             mediumDao.actualizar(mediumAExorcizar);
 

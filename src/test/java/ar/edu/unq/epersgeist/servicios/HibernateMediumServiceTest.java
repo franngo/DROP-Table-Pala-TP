@@ -116,20 +116,20 @@ public class HibernateMediumServiceTest {
     @Test
     void deberiaActualizarSoloLosCamposModificados2() {
 
-        Medium mediumRecuperado = serviceMedium.recuperar(epifanioP.getId());
+        Long id = serviceMedium.crear(epifanioM).getId();
 
-        mediumRecuperado.setNombre("Rolando el audaz");
-        mediumRecuperado.setMana(120);
+        epifanioM.setNombre("Rolando el audaz");
+        epifanioM.setMana(120);
 
+        //se actualiza la fila con el id de epifanio en la DB
+        serviceMedium.actualizar(epifanioM);
 
-        serviceMedium.actualizar(mediumRecuperado);
+        Medium actualizado = serviceMedium.recuperar(id);
 
-        Medium actualizado = serviceMedium.recuperar(mediumRecuperado.getId());
-
-        assertEquals(mediumRecuperado.getId(), actualizado.getId());
-        assertEquals(mediumRecuperado.getNombre(), actualizado.getNombre());
-        assertEquals(mediumRecuperado.getMana(), actualizado.getMana());
-        assertEquals(mediumRecuperado.getManaMax(), actualizado.getManaMax());
+        assertEquals(epifanioM.getId(), actualizado.getId());
+        assertEquals(epifanioM.getNombre(), actualizado.getNombre());
+        assertEquals(epifanioM.getMana(), actualizado.getMana());
+        assertEquals(epifanioM.getManaMax(), actualizado.getManaMax());
 
     }
 
