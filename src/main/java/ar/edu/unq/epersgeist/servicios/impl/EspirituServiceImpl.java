@@ -81,6 +81,11 @@ public class EspirituServiceImpl implements EspirituService {
                 throw new ErrorAlConectarEspirituConMedium("El espiritu se encuentra en una ubicacion diferente al medium");
             }
 
+            espirituAConectar.setMediumCon(mediumAConectar);
+
+
+            espirituAConectar.setUbicacion(mediumAConectar.getUbicacion());
+
             espirituAConectar.aumentarConexion(mediumAConectar);
 
             mediumDao.actualizar(mediumAConectar);
