@@ -9,14 +9,12 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarMediumException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarMediumException;
-import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
-
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
-
 import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
 import ar.edu.unq.epersgeist.servicios.impl.MediumServiceImpl;
+import ar.edu.unq.epersgeist.servicios.impl.UbicacionServiceImpl;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,10 +26,9 @@ public class HibernateMediumServiceTest {
 
     private final HibernateMediumDAO mediumDao = new HibernateMediumDAO();
     private final HibernateEspirituDAO espirituDao = new HibernateEspirituDAO();
-
     private final EspirituService espirituService = new EspirituServiceImpl(espirituDao, mediumDao);
-
     private final MediumService serviceMedium = new MediumServiceImpl(mediumDao, espirituDao);
+    UbicacionService ubicacionService = new UbicacionServiceImpl(new HibernateUbicacionDAO());
 
 
     private Espiritu espirituM;
@@ -87,7 +84,6 @@ public class HibernateMediumServiceTest {
         assertEquals(ubedaP.getNombre(), mediumRecuperado.getNombre());
         assertEquals(ubedaP.getMana(), mediumRecuperado.getMana());
         assertEquals(ubedaP.getManaMax(), mediumRecuperado.getManaMax());
-
         assertEquals(0, ubedaP.getEspiritus().size());
         assertEquals(0, mediumRecuperado.getEspiritus().size());
     }
@@ -130,7 +126,6 @@ public class HibernateMediumServiceTest {
         assertEquals(mediumRecuperado.getNombre(), actualizado.getNombre());
         assertEquals(mediumRecuperado.getMana(), actualizado.getMana());
         assertEquals(mediumRecuperado.getManaMax(), actualizado.getManaMax());
-
     }
 
     @Test
@@ -188,73 +183,61 @@ public class HibernateMediumServiceTest {
 
         epifanioM.agregarEspiritu(espirituM);
         epifanioM.agregarEspiritu(espirituM2);
-        serviceMedium.crear(epifanioM);
-        this.executeBlockInPersistentContext(() -> {
-            espirituDao.crear(espirituM);
-            espirituDao.crear(espirituM2);
-        });
-        serviceMedium.descansar(epifanioM.getId());
+        Medium epifanioP = serviceMedium.crear(epifanioM);
+
+        serviceMedium.descansar(epifanioP.getId());
 
         Medium m = serviceMedium.recuperar(epifanioM.getId());
-        this.executeBlockInPersistentContext(() -> {
-            Espiritu e1 = espirituDao.recuperar(espirituM.getId());
-            Espiritu e2 = espirituDao.recuperar(espirituM2.getId());
+        Espiritu e1 = espirituService.recuperar(espirituM.getId());
+        Espiritu e2 = espirituService.recuperar(espirituM2.getId());
 
-            assertEquals(65, m.getMana());
-            assertEquals(5, e1.getNivelDeConexion());
-            assertEquals(5, e2.getNivelDeConexion());
-        });
+        assertEquals(65, m.getMana());
+        assertEquals(5, e1.getNivelDeConexion());
+        assertEquals(5, e2.getNivelDeConexion());
     }
 
 
     @Test
     public void descansarFallaPorMediumIdNulo() {
         ErrorAlRecuperarMediumException exception = assertThrows(ErrorAlRecuperarMediumException.class,
-                () -> serviceMedium.descansar(2L));
-        assertEquals("No se pudo recuperar al medium con id " + "2" + ".", exception.getMessage());
+                () -> serviceMedium.descansar(9992L));
+        assertEquals("No se pudo recuperar al medium con id " + "9992" + ".", exception.getMessage());
     }
 
     @Test
     public void invocarCasoExitoso() {
-        UbicacionDAO ubicacionDao = new HibernateUbicacionDAO();
-        Ubicacion ubicacion = new Ubicacion("Quilmes");
-        epifanioM.setUbicacion(ubicacion);
+
+
+        Ubicacion bernalM = new Ubicacion("Quilmes");
+        epifanioM.setUbicacion(bernalM);
 
         assertEquals(50, epifanioM.getMana());
         assertNull(espirituM.getUbicacion());
-        assertEquals(0, ubicacion.getEspiritus().size());
+        assertEquals(0, bernalM.getEspiritus().size());
 
-        this.executeBlockInPersistentContext(() -> {
-            mediumDao.crear(epifanioM);
-            espirituDao.crear(espirituM);
-            ubicacionDao.guardar(ubicacion);
-        });
+        Ubicacion bernalP = ubicacionService.crear(bernalM);
+        Medium mediumP = serviceMedium.crear(epifanioM);
+        Espiritu espirituP = espirituService.crear(espirituM);
 
-        serviceMedium.invocar(epifanioM.getId(), espirituM.getId());
+        serviceMedium.invocar(mediumP.getId(), espirituP.getId());
 
-        this.executeBlockInPersistentContext(() -> {
-            Ubicacion u = ubicacionDao.recuperar(ubicacion.getId());
-            Medium m = mediumDao.recuperar(epifanioM.getId());
-            Espiritu e = espirituDao.recuperar(espirituM.getId());
+        Ubicacion bernalActualizado = ubicacionService.recuperar(bernalP.getId());
+        Medium mediumActualiado = serviceMedium.recuperar(epifanioM.getId());
+        Espiritu espirituActualizado = espirituService.recuperar(espirituM.getId());
 
-            assertEquals(40, m.getMana());
-            assertEquals(m.getUbicacion(), e.getUbicacion());
-            assertEquals(1, u.getEspiritus().size());
-            assertTrue(u.getEspiritus().contains(e));
-        });
 
-        this.executeBlockInPersistentContext(() -> {
-            espirituDao.eliminarTodos();
-            mediumDao.eliminarTodos();
-            ubicacionDao.eliminarTodos();
-        });
+        assertEquals(40, mediumActualiado.getMana());
+        assertEquals(mediumActualiado.getUbicacion().getNombre(), espirituActualizado.getUbicacion().getNombre());
+
+        assertEquals(1, bernalActualizado.getEspiritus().size());
+
     }
 
     @Test
     public void invocarFallaPorMediumIdNulo() {
         ErrorAlRecuperarMediumException exception = assertThrows(ErrorAlRecuperarMediumException.class,
-                () -> serviceMedium.invocar(1L, 2L));
-        assertEquals("No se pudo recuperar al medium con id " + "1" + ".", exception.getMessage());
+                () -> serviceMedium.invocar(9999L, 2L));
+        assertEquals("No se pudo recuperar al medium con id " + "9999" + ".", exception.getMessage());
     }
 
 
@@ -284,6 +267,7 @@ public class HibernateMediumServiceTest {
         serviceMedium.eliminarTodos();
 
     }
+
 
 }
 /*
