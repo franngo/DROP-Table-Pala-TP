@@ -1,5 +1,7 @@
 package ar.edu.unq.epersgeist.modelo;
 
+import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,8 +16,8 @@ public class EspirituTest {
     @BeforeEach
     void setUp() {
 
-        espirituM = new Espiritu("Pokemon", "Matias");
-        espiritu = new Espiritu("Pokemon", "Matias");
+        espirituM = new Angelical("Matias");
+        espiritu = new Angelical("Matias");
         medium = new Medium("Juan", 100, 10);
     }
 
@@ -26,25 +28,26 @@ public class EspirituTest {
     }
 
     @Test
-    public void aumentarConexionIncrementaElNivelEnDiez() {
+    public void seAumentaLaConexionEnUn20PorCientoDelManaDelMedium() {
 
         espiritu.aumentarConexion(medium);
 
-        assertEquals(10, espiritu.getNivelDeConexion());
+        assertEquals(2, espiritu.getNivelDeConexion());
     }
 
     @Test
-    public void aumentarConexionSeAcumulaCorrectamente() {
+    public void alAumentarConexionMasDeUnaVezLosNivelesDeConexionSeSuman() {
+
+        medium = new Medium("Juan", 10000, 10);
 
         espirituM.aumentarConexion(medium);
         espirituM.aumentarConexion(medium);
 
-        assertEquals(20, espirituM.getNivelDeConexion());
+        assertEquals(4, espirituM.getNivelDeConexion());
     }
 
     @Test
     public void alAumentarConexionElMediumRecibeElEspiritu() {
-
 
 
         espirituM.aumentarConexion(medium);
@@ -53,10 +56,11 @@ public class EspirituTest {
     }
 
     @Test
-    public void alAumentarMuchaConexionNoDebePasarDeCien() {
+    public void laConexionDelEspirituNoSobrepasaLos100Niveles() {
 
-        medium.setCantFortalece(120);
+        medium = new Medium("Juan", 100, 100000);
         espirituM.aumentarConexion(medium);
+
         assertEquals(100, espirituM.getNivelDeConexion());
 
     }

@@ -1,60 +1,106 @@
 package ar.edu.unq.epersgeist.servicios.impl;
 
-import ar.edu.unq.epersgeist.modelo.Espiritu;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
-import ar.edu.unq.epersgeist.persistencia.dao.jdbc.JDBCEspirituDAO;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
+import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
+import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
+import org.hibernate.Hibernate;
 
 import java.util.List;
 
 public class EspirituServiceImpl implements EspirituService {
-    private JDBCEspirituDAO espirituDao;
+    private EspirituDAO espirituDao;
+    private MediumDAO mediumDao;
 
-    public EspirituServiceImpl(JDBCEspirituDAO espirituDao) {
+    public EspirituServiceImpl(EspirituDAO espirituDao, MediumDAO mediumDao) {
         this.espirituDao = espirituDao;
+        this.mediumDao = mediumDao;
     }
 
     @Override
     public Espiritu crear(Espiritu espiritu) {
-        return espirituDao.crear(espiritu);
+        return
+                HibernateTransactionRunner.runTrx(() -> espirituDao.crear(espiritu));
     }
 
     @Override
     public Espiritu recuperar(Long espirituId) {
+        return HibernateTransactionRunner.runTrx(() -> {
+            Espiritu espiritu = espirituDao.recuperar(espirituId);
 
-        return espirituDao.recuperar(espirituId);
+            if (espiritu == null) {
+                throw new ErrorAlRecuperarEspirituException(espirituId);
+            }
 
+            return espiritu;
+        });
     }
 
     @Override
     public void actualizar(Espiritu espiritu) {
-        espirituDao.actualizar(espiritu);
+        HibernateTransactionRunner.runTrx(() -> {
+            espirituDao.actualizar(espiritu);
+            return null;
+        });
     }
 
     @Override
     public void eliminar(Long espirituId) {
-        espirituDao.eliminar(espirituId);
-
+        HibernateTransactionRunner.runTrx(() -> {
+            espirituDao.eliminar(espirituId);
+            return null;
+        });
     }
 
     @Override
     public List<Espiritu> recuperarTodos() {
-        return espirituDao.recuperarTodos();
+        return HibernateTransactionRunner.runTrx(() ->
+                espirituDao.recuperarTodos());
     }
+
     /*
      * Paso 1: pedir el espiritu a la BBDD
      * Paso 2: aplicar logica de negocio entre MODELOS
      * Paso 3: persistir los cambios
      * */
     @Override
-    public Medium conectar(Long espirituId, Medium medium) {
-        Espiritu espirituAConectar = espirituDao.recuperar(espirituId);
+    public Medium conectar(Long espirituId, Long mediumId) {
+        return HibernateTransactionRunner.runTrx(() -> {
+            Espiritu espirituAConectar = espirituDao.recuperar(espirituId);
+            Medium mediumAConectar = mediumDao.recuperar(mediumId);
 
-        espirituAConectar.aumentarConexion(medium);
+            if (!espirituAConectar.getLibre()) {
+                throw new ErrorAlConectarEspirituConMedium("El espiritu no se encuentra libre");
+            }
+            if (!espirituAConectar.estaUbicadoEnElMismoLugarQue(mediumAConectar)) {
+                throw new ErrorAlConectarEspirituConMedium("El espiritu se encuentra en una ubicacion diferente al medium");
+            }
 
-        espirituDao.actualizar(espirituAConectar);
+            espirituAConectar.aumentarConexion(mediumAConectar);
 
-        return medium;
+            mediumDao.actualizar(mediumAConectar);
+
+            return mediumAConectar;
+        });
+    }
+
+    @Override
+    public List<Espiritu> espiritusDemoniacos() {
+        return HibernateTransactionRunner.runTrx(() ->
+                espirituDao.espiritusDemoniacos());
+    }
+
+    @Override
+
+    public void eliminarTodos() {
+        HibernateTransactionRunner.runTrx(() -> {
+            espirituDao.eliminarTodos();
+            return null;
+        });
     }
 
 }
