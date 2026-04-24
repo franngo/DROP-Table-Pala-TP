@@ -307,20 +307,30 @@ public class HibernateEspirituServiceTest {
 
         assertEquals(medium.cantidadDeFortalecimientoDeConexion(), recuperado.getNivelDeConexion());
     }
-/*
 
     @Test
     void deberiaPermitirConectarVariosEspiritusAlMismoMedium() {
-        Espiritu espiritu1 = serviceEspiritu.crear(new Espiritu("Matias"));
-        Espiritu espiritu2 = serviceEspiritu.crear(new Espiritu("Juanchi el Pastelero"));
-
+        Ubicacion ubicacion = new Ubicacion("Tailandia");
         Medium medium = new Medium("Juan", 120, 10);
+        Espiritu pepe = new Espiritu("Pepe");
+        Espiritu raul = new Espiritu("Raul");
+        ubicacion.agregarEspiritu(pepe);
+        ubicacion.agregarEspiritu(raul);
+        ubicacion.agregarMedium(medium);
+        Ubicacion ubiPersistida = ubicacionService.crear(ubicacion);
 
-        serviceEspiritu.conectar(espiritu1.getId(), medium.getId());
-        Medium mediumActualizado = serviceEspiritu.conectar(espiritu2.getId(), medium.getId());
+        Espiritu espiritu1 = serviceEspiritu.crear(pepe);
+        Espiritu espiritu2 = serviceEspiritu.crear(raul);
 
+        Medium mediumP = mediumService.crear(medium);
+        serviceEspiritu.conectar(espiritu1.getId(), mediumP.getId());
+        serviceEspiritu.conectar(espiritu2.getId(), mediumP.getId());
+
+        // Medium mediumActualizado = serviceEspiritu.conectar(espiritu2.getId(), mediumP.getId());
+        Medium mediumActualizado = mediumService.recuperar(mediumP.getId());
         assertEquals(2, mediumActualizado.getEspiritus().size());
     }
+/*
 
 
     @Test
