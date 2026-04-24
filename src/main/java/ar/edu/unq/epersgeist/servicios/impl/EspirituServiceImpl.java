@@ -8,15 +8,16 @@ import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
-import org.hibernate.Hibernate;
 
 import java.util.List;
 
 public class EspirituServiceImpl implements EspirituService {
     private EspirituDAO espirituDao;
+
     private MediumDAO mediumDao;
 
     public EspirituServiceImpl(EspirituDAO espirituDao, MediumDAO mediumDao) {
+
         this.espirituDao = espirituDao;
         this.mediumDao = mediumDao;
     }
@@ -80,6 +81,11 @@ public class EspirituServiceImpl implements EspirituService {
                 throw new ErrorAlConectarEspirituConMedium("El espiritu se encuentra en una ubicacion diferente al medium");
             }
 
+            espirituAConectar.setMediumCon(mediumAConectar);
+
+
+            espirituAConectar.setUbicacion(mediumAConectar.getUbicacion());
+
             espirituAConectar.aumentarConexion(mediumAConectar);
 
             mediumDao.actualizar(mediumAConectar);
@@ -102,5 +108,6 @@ public class EspirituServiceImpl implements EspirituService {
             return null;
         });
     }
+
 
 }

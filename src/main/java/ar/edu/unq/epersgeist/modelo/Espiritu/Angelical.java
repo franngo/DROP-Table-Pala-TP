@@ -2,12 +2,14 @@ package ar.edu.unq.epersgeist.modelo.Espiritu;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 
 @Getter @Setter @NoArgsConstructor
+
 
 @Entity
 @DiscriminatorValue("ANGEL")
