@@ -8,6 +8,7 @@ import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UbicacionServiceImpl implements UbicacionService {
@@ -44,13 +45,6 @@ public class UbicacionServiceImpl implements UbicacionService {
         });
     }
 
-    // --------------------------------------------------------------------------------
-    /*
-            return HibernateTransactionRunner.runTrx(() -> {
-
-        });
-     */
-
     @Override
     public Ubicacion recuperar(Long id) {
         return HibernateTransactionRunner.runTrx(() -> {
@@ -84,7 +78,7 @@ public class UbicacionServiceImpl implements UbicacionService {
                 throw new UbicacionNoEncontradaException(ubicacionId);
             }
 
-            return ubicacion.getEspiritus();
+            return new ArrayList<Espiritu>(ubicacion.getEspiritus()); //de esta forma para que Hibernate lo inicialize, ya que tiene fetch type lazy
         });
     }
 

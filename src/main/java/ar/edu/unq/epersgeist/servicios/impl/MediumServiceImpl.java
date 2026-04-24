@@ -2,21 +2,18 @@ package ar.edu.unq.epersgeist.servicios.impl;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarMediumException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeMediumNoEncontradoException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ExorcismoPropioNoPermitidoException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.servicios.MediumService;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 
+import java.util.ArrayList;
 import java.util.List;
 
-//TODO IMPLEMENTAR
-/*
- *
- * Servicio Medium
- * */
+
 public class MediumServiceImpl implements MediumService {
     private MediumDAO mediumDao;
     private EspirituDAO espirituDao; //se requiere para usar en el invocar()
@@ -37,7 +34,7 @@ public class MediumServiceImpl implements MediumService {
             Medium mediumRecuperado = mediumDao.recuperar(idMedium);
 
             if (mediumRecuperado == null) {
-                throw new ErrorAlRecuperarMediumException(idMedium);
+                throw new ErrorDeMediumNoEncontradoException(idMedium);
             }
 
             return mediumRecuperado;
@@ -72,7 +69,7 @@ public class MediumServiceImpl implements MediumService {
             Medium m = mediumDao.recuperar(id);
 
             if (m == null) {
-                throw new ErrorAlRecuperarMediumException(id);
+                throw new ErrorDeMediumNoEncontradoException(id);
             }
 
             m.descansar();
@@ -88,10 +85,10 @@ public class MediumServiceImpl implements MediumService {
             Espiritu e = espirituDao.recuperar(espirituId);
 
             if (m == null) {
-                throw new ErrorAlRecuperarMediumException(mediumId);
+                throw new ErrorDeMediumNoEncontradoException(mediumId);
             }
             if (e == null) {
-                throw new ErrorAlRecuperarEspirituException(espirituId);
+                throw new ErrorDeEspirituNoEncontradoException(espirituId);
             }
 
             return m.invocar(e);
@@ -110,7 +107,7 @@ public class MediumServiceImpl implements MediumService {
             Medium mediumAExorcizar = mediumDao.recuperar(idMediumAExorcizar);
             // aplico logica de modelo
             mediumAtacante.exorcizar(mediumAExorcizar);
-            // persisto los cambios
+            // persisto los cambios (opcional, ya que el session.flush() del final de la transacción ya se encarga de persistir los cambios de estado)
             // mediumDao.actualizar(mediumAtacante);
             // mediumDao.actualizar(mediumAExorcizar);
 
@@ -125,7 +122,7 @@ public class MediumServiceImpl implements MediumService {
     public List<Espiritu> espiritus(Long mediumId) {
         return HibernateTransactionRunner.runTrx(() -> {
             Medium recuperado = this.recuperar(mediumId);
-            return recuperado.getEspiritus();
+            return new ArrayList<Espiritu>(recuperado.getEspiritus());
         });
     }
 

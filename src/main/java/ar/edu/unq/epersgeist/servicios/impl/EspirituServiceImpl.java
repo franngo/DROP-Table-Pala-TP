@@ -3,7 +3,7 @@ package ar.edu.unq.epersgeist.servicios.impl;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
@@ -34,7 +34,7 @@ public class EspirituServiceImpl implements EspirituService {
             Espiritu espiritu = espirituDao.recuperar(espirituId);
 
             if (espiritu == null) {
-                throw new ErrorAlRecuperarEspirituException(espirituId);
+                throw new ErrorDeEspirituNoEncontradoException(espirituId);
             }
 
             return espiritu;
@@ -63,11 +63,6 @@ public class EspirituServiceImpl implements EspirituService {
                 espirituDao.recuperarTodos());
     }
 
-    /*
-     * Paso 1: pedir el espiritu a la BBDD
-     * Paso 2: aplicar logica de negocio entre MODELOS
-     * Paso 3: persistir los cambios
-     * */
     @Override
     public Medium conectar(Long espirituId, Long mediumId) {
         return HibernateTransactionRunner.runTrx(() -> {
@@ -81,12 +76,7 @@ public class EspirituServiceImpl implements EspirituService {
                 throw new ErrorAlConectarEspirituConMedium("El espiritu se encuentra en una ubicacion diferente al medium");
             }
 
-            espirituAConectar.setMediumCon(mediumAConectar);
-
-
-            espirituAConectar.setUbicacion(mediumAConectar.getUbicacion());
-
-            espirituAConectar.aumentarConexion(mediumAConectar);
+            espirituAConectar.aumentarConexionYConectar(mediumAConectar);
 
             mediumDao.actualizar(mediumAConectar);
 

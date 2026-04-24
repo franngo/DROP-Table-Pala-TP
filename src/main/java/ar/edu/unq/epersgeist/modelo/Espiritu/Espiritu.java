@@ -16,10 +16,7 @@ import java.io.Serializable;
 
 @Entity
 
-@Inheritance(strategy = InheritanceType.JOINED)
-//@DiscriminatorColumn(name = "tipo")
-
-//@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "tipo_espiritu")
 
 public class Espiritu implements Serializable {
@@ -28,13 +25,9 @@ public class Espiritu implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-
     private double nivelDeConexion;
-
     private String nombre;
     private boolean libre;
-    public static final int limiteConexion = 100;
-
 
     @ManyToOne
     @JoinColumn(name = "mediumCon_id")
@@ -42,6 +35,7 @@ public class Espiritu implements Serializable {
     @ManyToOne
     private Ubicacion ubicacion;
 
+    public static final int limiteConexion = 100;
 
     public Espiritu(@NonNull String nombre) {
         this.nivelDeConexion = 0;
@@ -49,21 +43,19 @@ public class Espiritu implements Serializable {
         this.libre = true;
     }
 
-    public void aumentarConexion(Medium medium) {
+
+    public void aumentarConexionYConectar(Medium medium) {
         this.fortalecerConexion(medium.cantidadDeFortalecimientoDeConexion());
         medium.agregarEspiritu(this);
     }
 
 
     public void fortalecerConexion(double cantidad) {
-
-
         this.nivelDeConexion = Math.min(Espiritu.limiteConexion, this.cantidadNuevaConexion(cantidad));
     }
 
 
     private double cantidadNuevaConexion(double cantidad) {
-
         return this.getNivelDeConexion() + cantidad;
     }
 

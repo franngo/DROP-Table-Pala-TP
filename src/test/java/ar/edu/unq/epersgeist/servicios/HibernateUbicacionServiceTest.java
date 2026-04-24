@@ -157,6 +157,8 @@ public class HibernateUbicacionServiceTest {
         List<Ubicacion> ubicaciones = ubicacionService.recuperarTodos();
 
         assertEquals(2, ubicaciones.size());
+        assertTrue(ubicaciones.stream().anyMatch(u -> u.getId() == templo.getId()));
+        assertTrue(ubicaciones.stream().anyMatch(u -> u.getId() == cripta.getId()));
     }
 
     @Test
@@ -167,28 +169,24 @@ public class HibernateUbicacionServiceTest {
     }
 
     // ============================== ESPIRITUS EN ==============================
- /*
+
     @Test
     void espiritusEnRetornaListaDeEspiritus() {
         Ubicacion ubicacion = ubicacionService.crear(cripta);
 
+        espirituService.crear(guerrero);
+        espirituService.crear(mago);
 
-        HibernateTransactionRunner.runTrx(() -> {
-            espirituDAO.guardar(guerrero);
-            espirituDAO.guardar(mago);
+        ubicacion.agregarEspiritu(guerrero);
+        ubicacion.agregarEspiritu(mago);
+        ubicacionService.actualizar(ubicacion);
 
-
-            ubicacion.agregarEspiritu(guerrero);
-            ubicacion.agregarEspiritu(mago);
-
-            return null;
-        });
-
-        List<Espiritu> espiritusEnUbicacion = ubicacionService.espiritusEn(ubicacion.getId());
+        List<Espiritu> espiritusEnUbicacion;
+        espiritusEnUbicacion = ubicacionService.espiritusEn(ubicacion.getId());
 
         assertEquals(2, espiritusEnUbicacion.size());
     }
-*/
+
     @Test
     void espiritusEnLanzaExcepcionSiUbicacionNoExiste() {
 
@@ -214,7 +212,7 @@ public class HibernateUbicacionServiceTest {
     @Test
     void deberiaActualizarSoloElNombre() {
 
-        Long id = HibernateTransactionRunner.runTrx(() -> ubicacionService.crear(templo).getId());
+        Long id = ubicacionService.crear(templo).getId();
 
         Ubicacion ubicacionMod = new Ubicacion("Catedral de la Oscuridad");
         ubicacionMod.setId(id);
@@ -224,6 +222,7 @@ public class HibernateUbicacionServiceTest {
         Ubicacion ubicacionActualizada = ubicacionService.recuperar(id);
 
         assertEquals(ubicacionMod.getId(), ubicacionActualizada.getId());
+        assertEquals(ubicacionMod.getNombre(), ubicacionActualizada.getNombre());
     }
 
     @Test
@@ -231,6 +230,15 @@ public class HibernateUbicacionServiceTest {
         assertThrows(
                 ErrorAlActualizarUbicacionException.class,
                 () -> ubicacionService.actualizar(null)
+
+        );
+    }
+
+    @Test
+    void noDeberiaActualizarUbicacionNoPersistida() {
+        assertThrows(
+                ErrorAlActualizarUbicacionException.class,
+                () -> ubicacionService.actualizar(templo)
 
         );
     }
@@ -246,10 +254,7 @@ public class HibernateUbicacionServiceTest {
         ubicacionService.eliminar(ubicacionId);
 
 
-        Ubicacion ubicacion = HibernateTransactionRunner.runTrx(
-                () -> ubicacionService.recuperar(ubicacionId)
-        );
-
+        Ubicacion ubicacion = ubicacionService.recuperar(ubicacionId);
 
         assertNull(ubicacion);
     }
@@ -257,50 +262,43 @@ public class HibernateUbicacionServiceTest {
     // ============================== mediumsSinEspiritusEn ==============================
 
     @Test
-    void deberiaObtenerMediumsSinEspiritus() {
+    void deberiaObtenerTodosMediumsSinEspiritus() {
 
         Ubicacion ubicacion = ubicacionService.crear(cripta);
+        espirituService.crear(guerrero);
+        mediumService.crear(epifanio);
+        mediumService.crear(ubeda);
 
-        HibernateTransactionRunner.runTrx(() -> {
-            mediumDao.crear(epifanio);
-            mediumDao.crear(ubeda);
-
-            ubicacion.agregarMedium(epifanio);
-            ubicacion.agregarMedium(ubeda);
-            return null;
-        });
+        ubicacion.agregarMedium(epifanio);
+        ubicacion.agregarMedium(ubeda);
+        ubicacionService.actualizar(ubicacion);
 
         List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
 
         assertEquals(2, resultado.size());
+        assertTrue(resultado.stream().anyMatch(u -> u.getId() == epifanio.getId()));
+        assertTrue(resultado.stream().anyMatch(u -> u.getId() == ubeda.getId()));
     }
 
     @Test
-    void deberiaObtener1MediumsSinEspiritus() {
+    void deberiaObtener1MediumSinEspiritus() {
         Ubicacion ubicacion = ubicacionService.crear(cripta);
-        Medium epifanio = new Medium("epifanio", 150, 50);
-        Medium ubeda = new Medium("ubeda", 100, 20);
-        Espiritu guerrero = new Espiritu("Espíritu de la Luz");
+        espirituService.crear(guerrero);
+        mediumService.crear(epifanio);
+        mediumService.crear(ubeda);
 
+        ubicacion.agregarMedium(epifanio);
+        ubicacion.agregarMedium(ubeda);
+        epifanio.agregarEspiritu(guerrero);
+        mediumService.actualizar(epifanio);
+        ubicacionService.actualizar(ubicacion);
 
-        HibernateTransactionRunner.runTrx(() -> {
-            mediumDao.crear(epifanio);
-            mediumDao.crear(ubeda);
-            espirituDAO.guardar(guerrero);
-
-            epifanio.agregarEspiritu(guerrero);
-
-
-            ubicacion.agregarMedium(epifanio);
-            ubicacion.agregarMedium(ubeda);
-
-            return null;
-        });
 
         List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
 
         assertEquals(1, resultado.size());
-
+        assertTrue(resultado.stream().noneMatch(u -> u.getId() == epifanio.getId()));
+        assertTrue(resultado.stream().anyMatch(u -> u.getId() == ubeda.getId()));
     }
 
 

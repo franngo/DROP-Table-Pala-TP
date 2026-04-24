@@ -30,7 +30,7 @@ public class EspirituTest {
     @Test
     public void seAumentaLaConexionEnUn20PorCientoDelManaDelMedium() {
 
-        espiritu.aumentarConexion(medium);
+        espiritu.aumentarConexionYConectar(medium);
 
         assertEquals(2, espiritu.getNivelDeConexion());
     }
@@ -40,8 +40,8 @@ public class EspirituTest {
 
         medium = new Medium("Juan", 10000, 10);
 
-        espirituM.aumentarConexion(medium);
-        espirituM.aumentarConexion(medium);
+        espirituM.aumentarConexionYConectar(medium);
+        espirituM.aumentarConexionYConectar(medium);
 
         assertEquals(4, espirituM.getNivelDeConexion());
     }
@@ -50,7 +50,7 @@ public class EspirituTest {
     public void alAumentarConexionElMediumRecibeElEspiritu() {
 
 
-        espirituM.aumentarConexion(medium);
+        espirituM.aumentarConexionYConectar(medium);
 
         assertTrue(medium.getEspiritus().contains(espirituM));
     }
@@ -59,7 +59,7 @@ public class EspirituTest {
     public void laConexionDelEspirituNoSobrepasaLos100Niveles() {
 
         medium = new Medium("Juan", 100, 100000);
-        espirituM.aumentarConexion(medium);
+        espirituM.aumentarConexionYConectar(medium);
 
         assertEquals(100, espirituM.getNivelDeConexion());
 
@@ -69,7 +69,7 @@ public class EspirituTest {
     public void fallaSiElMediumEsNull() {
 
         assertThrows(RuntimeException.class, () -> {
-            espirituM.aumentarConexion(null);
+            espirituM.aumentarConexionYConectar(null);
         });
     }
 }

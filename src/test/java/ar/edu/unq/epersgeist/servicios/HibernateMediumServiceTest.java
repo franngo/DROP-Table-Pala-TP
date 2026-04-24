@@ -7,8 +7,9 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarMediumException;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarMediumException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeMediumNoEncontradoException;
+import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.modelo.exceptions.ExorcismoPropioNoPermitidoException;
 import ar.edu.unq.epersgeist.modelo.random.Estrategia.EstrategiaRangoEspecifico;
 import ar.edu.unq.epersgeist.modelo.random.RandomDefensa;
@@ -121,15 +122,15 @@ public class HibernateMediumServiceTest {
     @Test
     void deberiaActualizarSoloLosCamposModificados2() {
 
-        Medium mediumRecuperado = serviceMedium.recuperar(epifanioP.getId());
+        Long id = serviceMedium.crear(epifanioM).getId();
 
-        mediumRecuperado.setNombre("Rolando el audaz");
-        mediumRecuperado.setMana(120);
+        epifanioM.setNombre("Rolando el audaz");
+        epifanioM.setMana(120);
 
+        //se actualiza la fila con el id de epifanio en la DB
+        serviceMedium.actualizar(epifanioM);
 
-        serviceMedium.actualizar(mediumRecuperado);
-
-        Medium actualizado = serviceMedium.recuperar(mediumRecuperado.getId());
+        Medium actualizado = serviceMedium.recuperar(id);
 
         assertEquals(mediumRecuperado.getId(), actualizado.getId());
         assertEquals(mediumRecuperado.getNombre(), actualizado.getNombre());
@@ -166,7 +167,7 @@ public class HibernateMediumServiceTest {
     @Test
     void noSeEncuentraElMediumNoPersistido() {
         Long id = 999L;
-        assertThrows(ErrorAlRecuperarMediumException.class, () -> {
+        assertThrows(ErrorDeMediumNoEncontradoException.class, () -> {
             serviceMedium.recuperar(id);
         });
     }
@@ -178,7 +179,7 @@ public class HibernateMediumServiceTest {
 
         serviceMedium.eliminar(id);
 
-        assertThrows(ErrorAlRecuperarMediumException.class, () -> {
+        assertThrows(ErrorDeMediumNoEncontradoException.class, () -> {
             serviceMedium.recuperar(id);
         });
     }
@@ -208,9 +209,9 @@ public class HibernateMediumServiceTest {
 
     @Test
     public void descansarFallaPorMediumIdNulo() {
-        ErrorAlRecuperarMediumException exception = assertThrows(ErrorAlRecuperarMediumException.class,
-                () -> serviceMedium.descansar(9992L));
-        assertEquals("No se pudo recuperar al medium con id " + "9992" + ".", exception.getMessage());
+        ErrorDeMediumNoEncontradoException exception = assertThrows(ErrorDeMediumNoEncontradoException.class,
+                () -> serviceMedium.descansar(2L));
+        assertEquals("No se pudo recuperar al medium con id " + "2" + ".", exception.getMessage());
     }
 
     @Test
@@ -244,9 +245,9 @@ public class HibernateMediumServiceTest {
 
     @Test
     public void invocarFallaPorMediumIdNulo() {
-        ErrorAlRecuperarMediumException exception = assertThrows(ErrorAlRecuperarMediumException.class,
-                () -> serviceMedium.invocar(9999L, 2L));
-        assertEquals("No se pudo recuperar al medium con id " + "9999" + ".", exception.getMessage());
+        ErrorDeMediumNoEncontradoException exception = assertThrows(ErrorDeMediumNoEncontradoException.class,
+                () -> serviceMedium.invocar(1L, 2L));
+        assertEquals("No se pudo recuperar al medium con id " + "1" + ".", exception.getMessage());
     }
 
 

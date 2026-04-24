@@ -1,6 +1,8 @@
 package ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion;
 
-public class UbicacionYaExisteException extends RuntimeException {
+import ar.edu.unq.epersgeist.modelo.exceptions.EpergeistException;
+
+public class UbicacionYaExisteException extends EpergeistException {
     public UbicacionYaExisteException(String nombre) {
         super("Ya existe una ubicación con el nombre '" + nombre + "'.");
     }
