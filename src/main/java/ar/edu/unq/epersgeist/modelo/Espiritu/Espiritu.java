@@ -24,7 +24,7 @@ public class Espiritu implements Serializable {
     private Long id;
 
 
-    private Integer nivelDeConexion;
+    private double nivelDeConexion;
     private String nombre;
     private boolean libre;
     public static final int limiteConexion = 100;
@@ -40,21 +40,21 @@ public class Espiritu implements Serializable {
     public Espiritu(@NonNull String nombre) {
         this.nivelDeConexion = 0;
         this.nombre = nombre;
+        this.libre = true;
     }
 
     public void aumentarConexion(Medium medium) {
-        this.fortalecerConexion(medium.getCantFortalece());
+        this.fortalecerConexion(medium.cantidadDeFortalecimientoDeConexion());
         medium.agregarEspiritu(this);
-
     }
 
-    public void fortalecerConexion(int cantidad) {
+    public void fortalecerConexion(double cantidad) {
 
         this.nivelDeConexion = Math.min(Espiritu.limiteConexion, this.cantidadNuevaConexion(cantidad));
     }
 
 
-    private int cantidadNuevaConexion(int cantidad) {
+    private double cantidadNuevaConexion(double cantidad) {
         return this.getNivelDeConexion() + cantidad;
     }
 
@@ -73,6 +73,8 @@ public class Espiritu implements Serializable {
     public void recibirAtaqueDe(Espiritu angel) {
     }
 
-
+    public boolean estaUbicadoEnElMismoLugarQue(Medium mediumAConectar) {
+        return this.getUbicacion().tieneElMismoNombreQue(mediumAConectar.getUbicacion());
+    }
 }
 

@@ -21,9 +21,9 @@ public class Ubicacion {
     @Column(unique = true, nullable = false)
     private String nombre;
 
-    @OneToMany(mappedBy = "ubicacion", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "ubicacion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Espiritu> espiritus = new ArrayList<Espiritu>();
-    @OneToMany(mappedBy = "ubicacion", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "ubicacion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Medium> mediums = new ArrayList<Medium>();
 
     public Ubicacion(String nombre) {
@@ -35,7 +35,10 @@ public class Ubicacion {
         espiritu.setUbicacion(this);
     }
   
-  
+    public boolean tieneElMismoNombreQue(Ubicacion ubicacion) {
+        return this.getNombre() == ubicacion.getNombre();
+    }
+
     public void agregarMedium(Medium medium) {
         this.mediums.add(medium);
         medium.setUbicacion(this);

@@ -56,7 +56,6 @@ public class HibernateMediumDAO extends HibernateDAO<Medium> implements MediumDA
         m.setNombre(medium.getNombre());
         m.setManaMax(medium.getManaMax());
         m.setMana(medium.getMana());
-        m.setCantFortalece(medium.getCantFortalece());
         m.setEspiritus(medium.getEspiritus());
 
         session.flush();

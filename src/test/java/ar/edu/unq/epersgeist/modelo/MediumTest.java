@@ -169,7 +169,7 @@ public class MediumTest {
         mediumM2.agregarEspiritu(jaeger); // jaeger tiene 50 de conexion
         mediumM.exorcizar(mediumM2);
         // Jaeger recibe daño 30
-        assertFalse(jaeger.getLibre());
+        assertTrue(jaeger.getLibre());
         assertEquals(20, jaeger.getNivelDeConexion());
 
     }

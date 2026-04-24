@@ -2,6 +2,7 @@ package ar.edu.unq.epersgeist.servicios.impl;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
@@ -68,14 +69,23 @@ public class EspirituServiceImpl implements EspirituService {
      * */
     @Override
     public Medium conectar(Long espirituId, Long mediumId) {
-        Espiritu espirituAConectar = espirituDao.recuperar(espirituId);
-        Medium mediumAConectar = mediumDao.recuperar(mediumId);
+        return HibernateTransactionRunner.runTrx(() -> {
+            Espiritu espirituAConectar = espirituDao.recuperar(espirituId);
+            Medium mediumAConectar = mediumDao.recuperar(mediumId);
 
-        espirituAConectar.aumentarConexion(mediumAConectar);
+            if (!espirituAConectar.getLibre()) {
+                throw new ErrorAlConectarEspirituConMedium("El espiritu no se encuentra libre");
+            }
+            if (!espirituAConectar.estaUbicadoEnElMismoLugarQue(mediumAConectar)) {
+                throw new ErrorAlConectarEspirituConMedium("El espiritu se encuentra en una ubicacion diferente al medium");
+            }
 
-        espirituDao.actualizar(espirituAConectar);
+            espirituAConectar.aumentarConexion(mediumAConectar);
 
-        return mediumAConectar;
+            mediumDao.actualizar(mediumAConectar);
+
+            return mediumAConectar;
+        });
     }
 
     @Override
