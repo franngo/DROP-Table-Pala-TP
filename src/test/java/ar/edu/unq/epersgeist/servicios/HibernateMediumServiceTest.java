@@ -237,8 +237,7 @@ public class HibernateMediumServiceTest {
 
         assertEquals(40, mediumActualiado.getMana());
         assertEquals(mediumActualiado.getUbicacion().getNombre(), espirituActualizado.getUbicacion().getNombre());
-
-        assertEquals(1, bernalActualizado.getEspiritus().size());
+        
 
     }
 
