@@ -21,9 +21,9 @@ public class Ubicacion {
     @Column(unique = true, nullable = false)
     private String nombre;
 
-    @OneToMany(mappedBy = "ubicacion", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "ubicacion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Espiritu> espiritus;
-    @OneToMany(mappedBy = "ubicacion", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "ubicacion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Medium> mediums;
 
     public Ubicacion(String nombre) {

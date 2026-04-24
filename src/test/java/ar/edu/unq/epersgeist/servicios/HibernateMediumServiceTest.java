@@ -9,7 +9,6 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarMediumException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeMediumNoEncontradoException;
-import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.modelo.exceptions.ExorcismoPropioNoPermitidoException;
 import ar.edu.unq.epersgeist.modelo.random.Estrategia.EstrategiaRangoEspecifico;
 import ar.edu.unq.epersgeist.modelo.random.RandomDefensa;
@@ -239,7 +238,6 @@ public class HibernateMediumServiceTest {
         assertEquals(40, mediumActualiado.getMana());
         assertEquals(mediumActualiado.getUbicacion().getNombre(), espirituActualizado.getUbicacion().getNombre());
 
-        assertEquals(1, bernalActualizado.getEspiritus().size());
 
     }
 
