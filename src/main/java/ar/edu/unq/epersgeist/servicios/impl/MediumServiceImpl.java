@@ -10,13 +10,10 @@ import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.servicios.MediumService;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 
+import java.util.ArrayList;
 import java.util.List;
 
-//TODO IMPLEMENTAR
-/*
- *
- * Servicio Medium
- * */
+
 public class MediumServiceImpl implements MediumService {
     private MediumDAO mediumDao;
     private EspirituDAO espirituDao; //se requiere para usar en el invocar()
@@ -125,7 +122,7 @@ public class MediumServiceImpl implements MediumService {
     public List<Espiritu> espiritus(Long mediumId) {
         return HibernateTransactionRunner.runTrx(() -> {
             Medium recuperado = this.recuperar(mediumId);
-            return recuperado.getEspiritus();
+            return new ArrayList<Espiritu>(recuperado.getEspiritus());
         });
     }
 

@@ -63,11 +63,6 @@ public class EspirituServiceImpl implements EspirituService {
                 espirituDao.recuperarTodos());
     }
 
-    /*
-     * Paso 1: pedir el espiritu a la BBDD
-     * Paso 2: aplicar logica de negocio entre MODELOS
-     * Paso 3: persistir los cambios
-     * */
     @Override
     public Medium conectar(Long espirituId, Long mediumId) {
         return HibernateTransactionRunner.runTrx(() -> {
@@ -81,7 +76,7 @@ public class EspirituServiceImpl implements EspirituService {
                 throw new ErrorAlConectarEspirituConMedium("El espiritu se encuentra en una ubicacion diferente al medium");
             }
 
-            espirituAConectar.aumentarConexion(mediumAConectar);
+            espirituAConectar.aumentarConexionYConectar(mediumAConectar);
 
             mediumDao.actualizar(mediumAConectar);
 

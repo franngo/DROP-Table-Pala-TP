@@ -31,8 +31,7 @@ public class Medium implements Serializable {
     private Integer manaMax;
     private Integer mana;
 
-    //¿sería @OneToMany acá y @ManyToOne del lado del Espiritu?
-    @OneToMany(mappedBy = "mediumCon", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "mediumCon", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Espiritu> espiritus;
 
     @ManyToOne
@@ -46,7 +45,6 @@ public class Medium implements Serializable {
     }
 
     public void agregarEspiritu(Espiritu espiritu) {
-        espiritu.setMediumCon(this);
         espiritus.add(espiritu);
         espiritu.setMediumCon(this);
     }
@@ -101,7 +99,6 @@ public class Medium implements Serializable {
         return espiritu;
     }
 
-
     private int cantidadAlInvocar(int cantidad) {
         return this.mana - cantidad;
     }
@@ -140,7 +137,7 @@ public class Medium implements Serializable {
     }
 
     /*
-     * el metodo desvncularseDe lo llama el espiritu cuando se libera
+     * El metodo desvincularseDe lo llama el Espiritu cuando se libera
      * */
     public void desvincularseDe(Espiritu espiritu) {
         this.espiritus.remove(espiritu);
