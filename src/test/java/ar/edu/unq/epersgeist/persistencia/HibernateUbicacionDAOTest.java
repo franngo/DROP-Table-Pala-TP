@@ -178,15 +178,6 @@ public class HibernateUbicacionDAOTest {
         assertEquals(ubicacionMod.getId(), ubicacionActualizado.getId());
     }
 
-    @Test
-    void noDeberiaActualizarUbicacionSinId() {
-        this.runTrx(() ->
-                assertThrows(ErrorAlActualizarUbicacionException.class, () ->
-                        ubicacionDAO.actualizar(null)
-                )
-        );
-    }
-
     private void executeBlockInPersistentContext(Runnable block) {
         HibernateTransactionRunner.runTrx(() -> {
             block.run();

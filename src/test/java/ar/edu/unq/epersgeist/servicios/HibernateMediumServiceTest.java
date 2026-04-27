@@ -73,6 +73,8 @@ public class HibernateMediumServiceTest {
 
     }
 
+    //crear
+
     @Test
     void deberiaAsignarIdAlCrearUnMedium() {
 
@@ -98,6 +100,8 @@ public class HibernateMediumServiceTest {
         });
     }
 
+    //recuperar
+
     @Test
     void deberiaRecuperarCorrectamenteLosDatosDelMedium() {
         Medium mediumRecuperado = serviceMedium.recuperar(ubedaP.getId());
@@ -111,6 +115,23 @@ public class HibernateMediumServiceTest {
         assertEquals(0, mediumRecuperado.getEspiritus().size());
     }
 
+    @Test
+    void noSeEncuentraElMediumNoPersistido() {
+        Long id = 999L;
+        assertThrows(ErrorDeMediumNoEncontradoException.class, () -> {
+            serviceMedium.recuperar(id);
+        });
+    }
+
+    @Test
+    void debeLanzarExcepcionSiElIdEsNull() {
+        assertThrows(
+                IdMediumInvalidoException.class,
+                () -> serviceMedium.recuperar(null)
+        );
+    }
+
+    //actualizar
 
     @Test
     void deberiaActualizarSoloLosCamposModificados1() {
@@ -181,13 +202,7 @@ public class HibernateMediumServiceTest {
         assertEquals("No existe en la BD el medium con id: 132", exception.getMessage());
     }
 
-    @Test
-    void noSeEncuentraElMediumNoPersistido() {
-        Long id = 999L;
-        assertThrows(ErrorDeMediumNoEncontradoException.class, () -> {
-            serviceMedium.recuperar(id);
-        });
-    }
+    //eliminar
 
     @Test
     void deberiaEliminarYNoPoderRecuperarloLuego() {
@@ -201,6 +216,7 @@ public class HibernateMediumServiceTest {
         });
     }
 
+    //descansar
 
     @Test
     public void descansarCasoExitoso() {
@@ -233,32 +249,31 @@ public class HibernateMediumServiceTest {
         assertEquals("No se pudo recuperar al medium con id " + "2" + ".", exception.getMessage());
     }
 
+    //invocar
+
     @Test
     public void invocarCasoExitoso() {
 
         Medium mediumPrueba = new Medium("MediumTest", 100, 50);
+        Medium mediumP = serviceMedium.crear(mediumPrueba);
         Ubicacion bernalM = new Ubicacion("Quilmes");
-        mediumPrueba.setUbicacion(bernalM);
+        Ubicacion bernalP = ubicacionService.crear(bernalM);
+        bernalM.agregarMedium(mediumPrueba);
+        ubicacionService.actualizar(bernalM);
 
+        assertEquals(0, bernalM.getEspiritus().size());
         assertEquals(50, mediumPrueba.getMana());
         assertNull(espirituM.getUbicacion());
-        assertEquals(0, bernalM.getEspiritus().size());
 
-        Ubicacion bernalP = ubicacionService.crear(bernalM);
-        Medium mediumP = serviceMedium.crear(mediumPrueba);
         Espiritu espirituP = espirituService.crear(espirituM);
 
         serviceMedium.invocar(mediumP.getId(), espirituP.getId());
 
-        Ubicacion bernalActualizado = ubicacionService.recuperar(bernalP.getId());
         Medium mediumActualiado = serviceMedium.recuperar(mediumPrueba.getId());
         Espiritu espirituActualizado = espirituService.recuperar(espirituM.getId());
 
-
         assertEquals(40, mediumActualiado.getMana());
         assertEquals(mediumActualiado.getUbicacion().getNombre(), espirituActualizado.getUbicacion().getNombre());
-
-
     }
 
     @Test
@@ -280,6 +295,7 @@ public class HibernateMediumServiceTest {
         assertEquals("No se pudo recuperar al espíritu con id " + idInexistente + ".", exception.getMessage());
     }
 
+    //exorcizar
 
     @Test
     void exorcismoNoExitosoDeberiaAfectarElAngelDelMedium() throws ExorcismoPropioNoPermitidoException {
@@ -320,6 +336,8 @@ public class HibernateMediumServiceTest {
 
         assertEquals(65.0, omnimanDerrotado.getNivelDeConexion());
     }
+
+    //conectar
 
     @Test
     void conectarUnEspirituYaConectadoDebeRechazarse() {

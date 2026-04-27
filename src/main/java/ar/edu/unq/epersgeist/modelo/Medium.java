@@ -92,8 +92,8 @@ public class Medium implements Serializable {
         }
 
         this.mana = Math.max(minimoMana, this.cantidadAlInvocar(manaRequeridoInvocacion));
-        espiritu.salirDeUbicacionActual();
 
+        espiritu.salirDeUbicacionActual();
         this.ubicacion.agregarEspiritu(espiritu);
 
         return espiritu;

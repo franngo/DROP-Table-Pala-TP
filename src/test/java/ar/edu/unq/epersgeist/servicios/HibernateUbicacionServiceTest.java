@@ -125,17 +125,14 @@ public class HibernateUbicacionServiceTest {
         );
     }
 
-    /*
         @Test
     void noSeCreaUnaUbicacionPorqueYaTieneIdAsignado() {
-        Medium matiasM = new Medium("Matias", 150, 50);
-        matiasM.setId(1L);
+        cripta.setId(1L);
 
-        assertThrows(ErrorAlCrearUbicacionException.class, () -> {
-            ubicacionService.crear(matiasM);
+        assertThrows(UbicacionNoPuedeTenerIdAlCrear.class, () -> {
+            ubicacionService.crear(cripta);
         });
     }
-     */
 
 
     // ============================== RECUPERAR ==============================
@@ -159,10 +156,11 @@ public class HibernateUbicacionServiceTest {
     }
 
     @Test
-    void debeRetornarNullSiNoExisteLaUbicacion() {
-        Ubicacion ubicacionRecuperada = ubicacionService.recuperar(999L);
-
-        assertNull(ubicacionRecuperada);
+    void debeLanzarExcepcionSiNoExisteLaUbicacion() {
+        assertThrows(
+                ErrorDeUbicacionNoEncontradaException.class,
+                () -> ubicacionService.recuperar(999L)
+        );
     }
 
     // ============================== RECUPERAR TODOS ==============================
@@ -271,10 +269,10 @@ public class HibernateUbicacionServiceTest {
 
         ubicacionService.eliminar(ubicacionId);
 
-
-        Ubicacion ubicacion = ubicacionService.recuperar(ubicacionId);
-
-        assertNull(ubicacion);
+        assertThrows(
+                ErrorDeUbicacionNoEncontradaException.class,
+                () -> ubicacionService.recuperar(ubicacionId)
+        );
     }
 
     // ============================== mediumsSinEspiritusEn ==============================
