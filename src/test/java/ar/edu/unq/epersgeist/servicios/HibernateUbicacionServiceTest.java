@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.servicios;
 
+import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
@@ -29,8 +30,8 @@ public class HibernateUbicacionServiceTest {
     private final Ubicacion templo = new Ubicacion(NOMBRE_TEMPLO);
     private final Ubicacion cripta = new Ubicacion(NOMBRE_CRIPTA);
 
-    private final Espiritu guerrero = new Espiritu("Espíritu de la Luz");
-    private final Espiritu mago = new Espiritu("Espíritu de la Oscuridad");
+    private final Espiritu guerrero = new Angelical("Espíritu de la Luz");
+    private final Espiritu mago = new Angelical("Espíritu de la Oscuridad");
 
     private final Medium epifanio = new Medium("epifanio", 150, 50);
     private final Medium ubeda = new Medium("ubeda", 100, 20);

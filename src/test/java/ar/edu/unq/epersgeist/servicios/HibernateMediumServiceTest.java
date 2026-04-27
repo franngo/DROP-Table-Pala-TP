@@ -50,8 +50,8 @@ public class HibernateMediumServiceTest {
     @BeforeEach
     public void setUp() {
         //bernal = ubicacionService.crear(new Ubicacion("Bernal"));
-        espirituM = new Espiritu("Charizard");
-        espirituM2 = new Espiritu("Bulbasor");
+        espirituM = new Angelical("Charizard");
+        espirituM2 = new Angelical("Bulbasor");
 
         epifanioM = new Medium("Epifanio el poderoso", 150, 50);
         // epifanioM.setUbicacion(bernal);

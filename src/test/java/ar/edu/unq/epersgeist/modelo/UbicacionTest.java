@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.modelo;
 
+import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ public class UbicacionTest {
 
     @Test
     public void debeAgregarEspirituALaUbicacion() {
-        Espiritu espiritu = new Espiritu("Espíritu de la Luz");
+        Espiritu espiritu = new Angelical("Espíritu de la Luz");
         this.ubicacion.agregarEspiritu(espiritu);
 
         assertEquals(1, this.ubicacion.getEspiritus().size());

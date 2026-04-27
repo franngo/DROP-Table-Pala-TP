@@ -20,7 +20,7 @@ public class HibernateEspirituDAOTest {
 
     @BeforeEach
     public void setUp() {
-        espirituM = new Espiritu("das");
+        espirituM = new Angelical("das");
     }
 
     @Test
@@ -86,7 +86,7 @@ public class HibernateEspirituDAOTest {
     public void recuperarTodosDevuelveUnEspiritu() {
 
         this.executeBlockInPersistentContext(() -> {
-            espirituDao.crear(new Espiritu("Matias"));
+            espirituDao.crear(new Angelical("Matias"));
 
             List<Espiritu> lista = espirituDao.recuperarTodos();
 
@@ -98,8 +98,8 @@ public class HibernateEspirituDAOTest {
     public void recuperarTodosDevuelveVariosElementos() {
 
         this.executeBlockInPersistentContext(() -> {
-            espirituDao.crear(new Espiritu("Matias"));
-            espirituDao.crear(new Espiritu("Juan"));
+            espirituDao.crear(new Angelical("Matias"));
+            espirituDao.crear(new Angelical("Juanchi el Pastelero"));
 
             List<Espiritu> lista = espirituDao.recuperarTodos();
 
@@ -111,9 +111,9 @@ public class HibernateEspirituDAOTest {
     public void recuperarTodosDevuelveListaOrdenadaPorNombre() {
 
         this.executeBlockInPersistentContext(() -> {
-            espirituDao.crear(new Espiritu("Matias"));
-            espirituDao.crear(new Espiritu("Juanchi el Pastelero"));
-            espirituDao.crear(new Espiritu("Alberto"));
+            espirituDao.crear(new Angelical("Matias"));
+            espirituDao.crear(new Angelical("Juanchi el Pastelero"));
+            espirituDao.crear(new Angelical("Alberto"));
 
             List<Espiritu> lista = espirituDao.recuperarTodos();
 
@@ -127,7 +127,7 @@ public class HibernateEspirituDAOTest {
     public void seActualizaUnEspirituExistente() {
 
         this.executeBlockInPersistentContext(() -> {
-            Espiritu creado = espirituDao.crear(new Espiritu("Matias"));
+            Espiritu creado = espirituDao.crear(new Angelical("Matias"));
             assertNotNull(creado.getId());
 
             creado.setNombre("NombreActualizado");

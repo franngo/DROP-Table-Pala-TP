@@ -87,4 +87,6 @@ public class EspirituTest {
         assertNull(angel.getMediumCon(),
                 "Después de desvincularse, mediumCon debe ser null");
     }
+
+
 }

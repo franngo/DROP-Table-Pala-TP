@@ -43,7 +43,7 @@ public class HibernateEspirituServiceTest {
     @BeforeEach
     public void setUp() {
 
-        matias = new Espiritu("Matias");
+        matias = new Angelical("Matias");
     }
 
     @Test
@@ -73,7 +73,7 @@ public class HibernateEspirituServiceTest {
         Long id = serviceEspiritu.crear(matias).getId();
 
         // ⚠ nueva instancia (no reutilizar la anterior)
-        Espiritu modificado = new Espiritu("Juanchi el pastelero");
+        Espiritu modificado = new Angelical("Juanchi el pastelero");
         modificado.setId(id);
         modificado.setNivelDeConexion(99);
 
@@ -359,8 +359,8 @@ public class HibernateEspirituServiceTest {
     void deberiaPermitirConectarVariosEspiritusAlMismoMedium() {
         Ubicacion ubicacion = new Ubicacion("Tailandia");
         Medium medium = new Medium("Juan", 120, 10);
-        Espiritu pepe = new Espiritu("Pepe");
-        Espiritu raul = new Espiritu("Raul");
+        Espiritu pepe = new Angelical("Pepe");
+        Espiritu raul = new Angelical("Raul");
         ubicacion.agregarEspiritu(pepe);
         ubicacion.agregarEspiritu(raul);
         ubicacion.agregarMedium(medium);

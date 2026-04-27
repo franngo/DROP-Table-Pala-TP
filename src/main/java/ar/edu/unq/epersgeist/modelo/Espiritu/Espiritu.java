@@ -19,7 +19,7 @@ import java.io.Serializable;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "tipo_espiritu")
 
-public class Espiritu implements Serializable {
+public abstract class Espiritu implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -70,8 +70,7 @@ public class Espiritu implements Serializable {
     }
 
 
-    public void recibirAtaqueDe(Espiritu angel) {
-    }
+    public abstract void recibirAtaqueDe(Espiritu angel);
 
 
     public boolean estaUbicadoEnElMismoLugarQue(Medium mediumAConectar) {
