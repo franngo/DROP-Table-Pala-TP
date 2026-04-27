@@ -46,12 +46,36 @@ public class HibernateEspirituServiceTest {
     }
 
     @Test
+    void seCreaUnEspirituCorrectamente() {
+        Espiritu espirituP = serviceEspiritu.crear(matias);
+        assertNotNull(espirituP.getId());
+    }
+
+//    @Test
+//    void fallaAlCrearEspirituNulo() {
+//        assertThrows(ErrorAlCrearEspirituException.class, () -> {
+//            Espiritu espirituP = serviceEspiritu.crear(null);
+//        });
+//    }
+
+    @Test
     void deberiaAsignarIdAlCrearUnEspiritu() {
 
         Espiritu espirituP = serviceEspiritu.crear(matias);
 
         assertNotNull(espirituP.getId());
     }
+
+//    @Test
+//    void noSeCreaUnEspirituPorqueYaTieneIdAsignado() {
+//        matias.setId(1L);
+//        assertThrows(ErrorAlCrearEspirituException.class, () -> {
+//            serviceEspiritu.crear(matias);
+//        });
+//
+//
+//    }
+
 
     @Test
     void deberiaRecuperarCorrectamenteLosDatosDelEspiritu() {

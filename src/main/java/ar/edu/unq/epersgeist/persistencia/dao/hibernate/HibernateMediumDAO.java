@@ -17,13 +17,16 @@ public class HibernateMediumDAO extends HibernateDAO<Medium> implements MediumDA
 
     @Override
     public Medium crear(Medium medium) {
-        Medium m = super.crear(medium);
 
-        if (m == null || m.getId() == null) {
+        if (medium == null) {
             throw new ErrorAlCrearMediumException();
         }
 
-        return m;
+        if (medium.getId() != null) {
+            throw new ErrorAlCrearMediumException();
+        }
+
+        return super.crear(medium);
     }
 
     @Override
