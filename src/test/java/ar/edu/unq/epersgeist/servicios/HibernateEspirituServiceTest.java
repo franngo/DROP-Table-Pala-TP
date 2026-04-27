@@ -8,6 +8,7 @@ import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarEspirituException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlCrearEspirituException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
@@ -18,7 +19,6 @@ import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
 import ar.edu.unq.epersgeist.servicios.impl.MediumServiceImpl;
 import ar.edu.unq.epersgeist.servicios.impl.UbicacionServiceImpl;
-import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,12 +51,13 @@ public class HibernateEspirituServiceTest {
         assertNotNull(espirituP.getId());
     }
 
-//    @Test
-//    void fallaAlCrearEspirituNulo() {
-//        assertThrows(ErrorAlCrearEspirituException.class, () -> {
-//            Espiritu espirituP = serviceEspiritu.crear(null);
-//        });
-//    }
+    @Test
+    void fallaAlCrearEspirituNulo() {
+        Espiritu espiritu = null;
+        assertThrows(ErrorAlCrearEspirituException.class, () -> {
+            Espiritu espirituP = serviceEspiritu.crear(espiritu);
+        });
+    }
 
     @Test
     void deberiaAsignarIdAlCrearUnEspiritu() {
@@ -66,15 +67,15 @@ public class HibernateEspirituServiceTest {
         assertNotNull(espirituP.getId());
     }
 
-//    @Test
-//    void noSeCreaUnEspirituPorqueYaTieneIdAsignado() {
-//        matias.setId(1L);
-//        assertThrows(ErrorAlCrearEspirituException.class, () -> {
-//            serviceEspiritu.crear(matias);
-//        });
-//
-//
-//    }
+    @Test
+    void noSeCreaUnEspirituPorqueYaTieneIdAsignado() {
+        matias.setId(1L);
+        assertThrows(ErrorAlCrearEspirituException.class, () -> {
+            serviceEspiritu.crear(matias);
+        });
+
+
+    }
 
 
     @Test
@@ -414,30 +415,21 @@ public class HibernateEspirituServiceTest {
     @Test
     void deberiaMantenerLosDatosOriginalesDelEspirituLuegoDeConectar() {
         Medium medium = new Medium("Juan", 120, 10);
+        mediumService.crear(medium);
+        serviceEspiritu.crear(matias);
         // agregamos la ubicacion de los actores
         Ubicacion ubicacion = new Ubicacion("Tailandia");
         ubicacion.agregarEspiritu(matias);
-        // ubicacion.agregarEspiritu(raul);
         ubicacion.agregarMedium(medium);
-        Ubicacion ubiPersistida = ubicacionService.crear(ubicacion);
+        ubicacionService.crear(ubicacion);
 
-        Espiritu espiritu = serviceEspiritu.crear(matias);
-        String nombreOriginal = espiritu.getNombre();
+        String nombreOriginal = matias.getNombre();
 
-        serviceEspiritu.conectar(espiritu.getId(), medium.getId());
-        Espiritu recuperado = serviceEspiritu.recuperar(espiritu.getId());
+        serviceEspiritu.conectar(matias.getId(), medium.getId());
+        Espiritu recuperado = serviceEspiritu.recuperar(matias.getId());
 
         assertEquals(nombreOriginal, recuperado.getNombre());
     }
-
-
-    private void executeBlockInPersistentContext(Runnable block) {
-        HibernateTransactionRunner.runTrx(() -> {
-            block.run();
-            return null;
-        });
-    }
-
 
     @AfterEach
     void tearDown() {

@@ -3,7 +3,7 @@ package ar.edu.unq.epersgeist.persistencia.dao.hibernate;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.ErrorAlActualizarUbicacionException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.IdUbicacionInvalidoException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.ErrorAlCrearUbicacionException;
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateSessionContext;
 import org.hibernate.Session;
@@ -15,6 +15,14 @@ public class HibernateUbicacionDAO implements UbicacionDAO {
 
     @Override
     public Ubicacion guardar(Ubicacion ubicacion) {
+        if (ubicacion == null) {
+            throw new ErrorAlCrearUbicacionException("ubicación nula.");
+        }
+
+        if (ubicacion.getId() != null) {
+            throw new ErrorAlCrearUbicacionException("ya tiene un id asignado.");
+        }
+
         return this.hibernateDAO.crear(ubicacion);
     }
 
