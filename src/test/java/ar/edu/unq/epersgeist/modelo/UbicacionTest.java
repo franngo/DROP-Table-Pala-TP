@@ -38,4 +38,13 @@ public class UbicacionTest {
         assertEquals(1, this.ubicacion.getEspiritus().size());
         assertEquals(this.ubicacion, espiritu.getUbicacion());
     }
+
+    @Test
+    public void debeAgregarMediumALaUbicacion() {
+        Medium medium = new Medium("matias", 10, 10);
+        this.ubicacion.agregarMedium(medium);
+
+        assertEquals(1, this.ubicacion.getMediums().size());
+        assertEquals(this.ubicacion, medium.getUbicacion());
+    }
 }

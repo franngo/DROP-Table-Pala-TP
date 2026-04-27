@@ -27,7 +27,7 @@ public class Espiritu implements Serializable {
 
     private double nivelDeConexion;
     private String nombre;
-    private boolean libre;
+
 
     @ManyToOne
     @JoinColumn(name = "mediumCon_id")
@@ -40,9 +40,12 @@ public class Espiritu implements Serializable {
     public Espiritu(@NonNull String nombre) {
         this.nivelDeConexion = 0;
         this.nombre = nombre;
-        this.libre = true;
+
     }
 
+    public boolean estaLibre() {
+        return mediumCon == null;
+    }
 
     public void aumentarConexionYConectar(Medium medium) {
         this.fortalecerConexion(medium.cantidadDeFortalecimientoDeConexion());
@@ -61,13 +64,9 @@ public class Espiritu implements Serializable {
 
 
     public void desvincularse() {
-        this.libre = true;
+
         this.mediumCon.desvincularseDe(this);
-    }
-
-
-    public boolean getLibre() {
-        return libre;
+        this.mediumCon = null;
     }
 
 
@@ -79,5 +78,8 @@ public class Espiritu implements Serializable {
         return this.getUbicacion().tieneElMismoNombreQue(mediumAConectar.getUbicacion());
     }
 
+    public void vincular(Medium medium) {
+        this.mediumCon = medium;
+    }
 }
 

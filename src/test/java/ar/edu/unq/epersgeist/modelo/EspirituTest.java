@@ -72,4 +72,19 @@ public class EspirituTest {
             espirituM.aumentarConexionYConectar(null);
         });
     }
+
+    @Test
+    void elEspirituDesvinculadoDebeLiberarMediumCon() {
+        Medium medium = new Medium("Juan", 100, 50);
+        Angelical angel = new Angelical("Tyrael");
+        medium.agregarEspiritu(angel);
+
+        assertNotNull(angel.getMediumCon());
+
+        angel.desvincularse();
+        assertTrue(angel.estaLibre());
+        // FALLA
+        assertNull(angel.getMediumCon(),
+                "Después de desvincularse, mediumCon debe ser null");
+    }
 }

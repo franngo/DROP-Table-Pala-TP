@@ -46,7 +46,7 @@ public class Medium implements Serializable {
 
     public void agregarEspiritu(Espiritu espiritu) {
         espiritus.add(espiritu);
-        espiritu.setMediumCon(this);
+        espiritu.vincular(this);
     }
 
     public void descansar() {
@@ -92,7 +92,7 @@ public class Medium implements Serializable {
         }
 
         this.mana = Math.max(minimoMana, this.cantidadAlInvocar(manaRequeridoInvocacion));
-
+        
         espiritu.setUbicacion(this.ubicacion);
         this.ubicacion.agregarEspiritu(espiritu);
 

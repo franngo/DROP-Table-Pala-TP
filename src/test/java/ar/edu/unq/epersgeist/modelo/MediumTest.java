@@ -170,7 +170,7 @@ public class MediumTest {
         mediumM.exorcizar(mediumM2);
         // Jaeger recibe daño 30
 
-        assertTrue(jaeger.getLibre());
+        assertTrue(jaeger.estaLibre());
 
         assertEquals(20, jaeger.getNivelDeConexion());
 
@@ -187,7 +187,7 @@ public class MediumTest {
         mediumM2.agregarEspiritu(jaeger); // jaeger tiene 50 de conexion
         mediumM.exorcizar(mediumM2);
         // Jaeger recibe primero 30 de daño y luego recibe 40 de daño, quedando en 0 y libre
-        assertTrue(jaeger.getLibre());
+        assertTrue(jaeger.estaLibre());
         assertEquals(0, jaeger.getNivelDeConexion());
 
     }
@@ -205,7 +205,7 @@ public class MediumTest {
 
         mediumM.exorcizar(mediumM2);
 
-        assertTrue(hana.getLibre());
+        assertTrue(hana.estaLibre());
         assertEquals(0, hana.getNivelDeConexion());
 
 

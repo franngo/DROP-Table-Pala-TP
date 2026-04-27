@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -22,21 +22,22 @@ public class Ubicacion {
     private String nombre;
 
     @OneToMany(mappedBy = "ubicacion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Espiritu> espiritus;
+    private Set<Espiritu> espiritus;
     @OneToMany(mappedBy = "ubicacion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Medium> mediums;
+    private Set<Medium> mediums;
 
     public Ubicacion(String nombre) {
 
         this.nombre = nombre;
-        this.espiritus = new ArrayList<>();
-        this.mediums = new ArrayList<>();
+        this.espiritus = new HashSet<>();
+        this.mediums = new HashSet<>();
     }
 
     public void agregarEspiritu(Espiritu espiritu) {
         this.espiritus.add(espiritu);
         espiritu.setUbicacion(this);
     }
+
 
     public boolean tieneElMismoNombreQue(Ubicacion ubicacion) {
         return this.getNombre() == ubicacion.getNombre();
