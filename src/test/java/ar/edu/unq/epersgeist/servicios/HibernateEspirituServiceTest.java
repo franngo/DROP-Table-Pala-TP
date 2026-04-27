@@ -328,59 +328,67 @@ public class HibernateEspirituServiceTest {
 
     @Test
     void deberiaAsociarElEspirituAlMedium() {
+        Espiritu nuevoEspiritu = new Angelical("Matias");
+        Espiritu nuevoEspirituP = serviceEspiritu.crear(nuevoEspiritu);
 
-        Espiritu espirituP = serviceEspiritu.crear(matias);
         Medium mediumJuan = new Medium("Juan", 120, 10);
         Ubicacion ubicacion = new Ubicacion("Tailandia");
-        ubicacion.agregarMedium(mediumJuan);
-        ubicacion.agregarEspiritu(espirituP);
         Ubicacion ubicacionP = ubicacionService.crear(ubicacion);
 
+        ubicacion.agregarMedium(mediumJuan);
+        ubicacion.agregarEspiritu(nuevoEspirituP);
+
         Medium mediumJuanP = mediumService.crear(mediumJuan);
-        Medium mediumConectado = serviceEspiritu.conectar(espirituP.getId(), mediumJuanP.getId());
+        ubicacionService.actualizar(ubicacionP);
+
+        Medium mediumConectado = serviceEspiritu.conectar(nuevoEspirituP.getId(), mediumJuanP.getId());
 
         Medium mediumJuanActualizadoP = mediumService.recuperar(mediumJuanP.getId());
         assertEquals(1, mediumJuanActualizadoP.getEspiritus().size());
         assertTrue(
                 mediumConectado.getEspiritus().stream()
-                        .allMatch(e -> e.getId().equals(espirituP.getId()))
+                        .allMatch(e -> e.getId().equals(nuevoEspirituP.getId()))
         );
     }
 
     @Test
     void deberiaPersistirElNivelDeConexionLuegoDeConectar() {
         Ubicacion ubicacion = new Ubicacion("Tailandia");
+        Ubicacion ubicacionP = ubicacionService.crear(ubicacion);
         Medium medium = new Medium("Juan", 120, 25);
+        Espiritu nuevoEspiritu = new Angelical("Juan");
+
 
         ubicacion.agregarMedium(medium);
-        ubicacion.agregarEspiritu(matias);
-        Ubicacion ubicacionP = ubicacionService.crear(ubicacion);
-
-        Espiritu espiritu = serviceEspiritu.crear(matias);
+        ubicacion.agregarEspiritu(nuevoEspiritu);
         Medium mediumP = mediumService.crear(medium);
+        Espiritu espirituP = serviceEspiritu.crear(nuevoEspiritu);
+        ubicacionService.actualizar(ubicacionP);
 
-        serviceEspiritu.conectar(espiritu.getId(), mediumP.getId());
 
-        Espiritu recuperado = serviceEspiritu.recuperar(espiritu.getId());
+        serviceEspiritu.conectar(espirituP.getId(), mediumP.getId());
 
-        assertEquals(medium.cantidadDeFortalecimientoDeConexion(), recuperado.getNivelDeConexion());
+        Espiritu recuperado = serviceEspiritu.recuperar(espirituP.getId());
+
+        assertEquals(mediumP.cantidadDeFortalecimientoDeConexion(), recuperado.getNivelDeConexion());
     }
 
     @Test
     void deberiaPermitirConectarVariosEspiritusAlMismoMedium() {
         Ubicacion ubicacion = new Ubicacion("Tailandia");
+        Ubicacion ubiPersistida = ubicacionService.crear(ubicacion);
         Medium medium = new Medium("Juan", 120, 10);
         Espiritu pepe = new Angelical("Pepe");
         Espiritu raul = new Angelical("Raul");
         ubicacion.agregarEspiritu(pepe);
         ubicacion.agregarEspiritu(raul);
         ubicacion.agregarMedium(medium);
-        Ubicacion ubiPersistida = ubicacionService.crear(ubicacion);
 
         Espiritu espiritu1 = serviceEspiritu.crear(pepe);
         Espiritu espiritu2 = serviceEspiritu.crear(raul);
 
         Medium mediumP = mediumService.crear(medium);
+        ubicacionService.actualizar(ubiPersistida);
         serviceEspiritu.conectar(espiritu1.getId(), mediumP.getId());
         serviceEspiritu.conectar(espiritu2.getId(), mediumP.getId());
 

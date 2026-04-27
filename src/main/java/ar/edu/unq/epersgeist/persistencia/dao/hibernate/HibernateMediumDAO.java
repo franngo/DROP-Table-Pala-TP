@@ -19,11 +19,11 @@ public class HibernateMediumDAO extends HibernateDAO<Medium> implements MediumDA
     public Medium crear(Medium medium) {
 
         if (medium == null) {
-            throw new ErrorAlCrearMediumException();
+            throw new ErrorAlCrearMediumException("medium nulo.");
         }
 
         if (medium.getId() != null) {
-            throw new ErrorAlCrearMediumException();
+            throw new ErrorAlCrearMediumException("ya tiene un id asignado.");
         }
 
         return super.crear(medium);
