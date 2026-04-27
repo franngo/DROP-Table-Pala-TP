@@ -163,14 +163,16 @@ public class MediumTest {
         Random.setEstrategiaNumero(new EstrategiaRangoEspecifico(10, 10));
         RandomDefensa.setEstrategiaNumero(new EstrategiaRangoEspecifico(5, 5));
 
-        mediumM.agregarEspiritu(rika); // rika cuenta con 60 de conexion
+        mediumM.agregarEspiritu(rika);
+        assertEquals(60, rika.getNivelDeConexion());// rika cuenta con 60 de conexion
 
         // Demonios
-        mediumM2.agregarEspiritu(jaeger); // jaeger tiene 50 de conexion
+        mediumM2.agregarEspiritu(jaeger);
+        assertEquals(50, jaeger.getNivelDeConexion());// jaeger tiene 50 de conexion
         mediumM.exorcizar(mediumM2);
-        // Jaeger recibe daño 30
-
-        assertTrue(jaeger.estaLibre());
+        // Jaeger recibe daño 30 pero sigue conectado al medium2
+        
+        assertFalse(jaeger.estaLibre());
 
         assertEquals(20, jaeger.getNivelDeConexion());
 
@@ -220,6 +222,9 @@ public class MediumTest {
         });
     }
 
+    /*
+     *
+     * */
     @Test
     public void invocarCasoExitosoCORRECCION() {
         Ubicacion quilmes = new Ubicacion("Quilmes");

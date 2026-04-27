@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,20 +22,22 @@ public class Ubicacion {
     private String nombre;
 
     @OneToMany(mappedBy = "ubicacion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Espiritu> espiritus;
+    private List<Espiritu> espiritus;
     @OneToMany(mappedBy = "ubicacion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Medium> mediums;
+    private List<Medium> mediums;
 
     public Ubicacion(String nombre) {
 
         this.nombre = nombre;
-        this.espiritus = new HashSet<>();
-        this.mediums = new HashSet<>();
+        this.espiritus = new ArrayList<>();
+        this.mediums = new ArrayList<>();
     }
 
     public void agregarEspiritu(Espiritu espiritu) {
-        this.espiritus.add(espiritu);
-        espiritu.setUbicacion(this);
+        if (!espiritus.contains(espiritu)) {
+            this.espiritus.add(espiritu);
+            espiritu.setUbicacion(this);
+        }
     }
 
 
@@ -44,8 +46,10 @@ public class Ubicacion {
     }
 
     public void agregarMedium(Medium medium) {
-        this.mediums.add(medium);
-        medium.setUbicacion(this);
+        if (!mediums.contains(medium)) {
+            this.mediums.add(medium);
+            medium.setUbicacion(this);
+        }
     }
 
     public void salirDeUbicacion(Espiritu espiritu) {
