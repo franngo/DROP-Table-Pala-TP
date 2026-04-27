@@ -25,7 +25,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -152,45 +151,33 @@ public class HibernateEspirituServiceTest {
         serviceEspiritu.crear(anotherModelDaemon);
 
         List<Espiritu> listOfDemons = serviceEspiritu.espiritusDemoniacos();
-        assertTrue(!listOfDemons.isEmpty());
-        assertEquals(listOfDemons.size(), 2);
+        assertFalse(listOfDemons.isEmpty());
+        assertEquals(2, listOfDemons.size());
     }
 
     @Test
     void losDemoniosSeDevuelvenOrdenadosPorNivelDeConexionDeFormaDescendente() {
-        Medium epifanio = new Medium("Epifanio el poderoso", 150, 50);
-        Medium ubeda = new Medium("Ubeda el dt", 100, 20);
-        Medium chiquiTapia = new Medium("Tapiales", 60, 40);
+//
         Demonio charizard = new Demonio("Charizard");
         Demonio pikuatico = new Demonio("Pikachu Acuatico");
         Demonio bulbasaurio = new Demonio("Bulbasaurio");
 
-        epifanio.agregarEspiritu(charizard);
-        chiquiTapia.agregarEspiritu(pikuatico);
-        ubeda.agregarEspiritu(bulbasaurio);
-        ubeda.descansar();
-        ubeda.descansar();
-        epifanio.descansar();
-        this.executeBlockInPersistentContext(() -> {
-            mediumDao.crear(epifanio);
-            mediumDao.crear(ubeda);
-            mediumDao.crear(chiquiTapia);
-            espirituDao.crear(charizard);
-            espirituDao.crear(bulbasaurio);
-            espirituDao.crear(pikuatico);
-        });
+        charizard.setNivelDeConexion(30);
+        pikuatico.setNivelDeConexion(20);
+        bulbasaurio.setNivelDeConexion(50);
+
+        Espiritu charizardP = serviceEspiritu.crear(charizard);
+        Espiritu bulbasaurioP = serviceEspiritu.crear(bulbasaurio);
+        Espiritu pikuaticoP = serviceEspiritu.crear(pikuatico);
 
         List<Espiritu> daemons = serviceEspiritu.espiritusDemoniacos();
 
-        // No encontré mejor forma usando streams de revisar que cada demonio tenga un nivel mayor
-        // o igual de conexión que su consecuente, la clásica es el for pero se vuelve ilegible. -dpolverigiani
-        assertEquals(daemons.size(), 3);
-        assertTrue(
-                IntStream.range(0, daemons.size() - 1)
-                        .allMatch(i ->
-                                daemons.get(i).getNivelDeConexion() >= daemons.get(i + 1).getNivelDeConexion()
-                        )
-        );
+        // compruebo que el orden sea correcto
+        assertEquals(3, daemons.size());
+        assertEquals(daemons.get(0).getId(), bulbasaurioP.getId());
+        assertEquals(daemons.get(1).getId(), charizardP.getId());
+        assertEquals(daemons.get(2).getId(), pikuaticoP.getId());
+
     }
 
     @Test
@@ -202,8 +189,8 @@ public class HibernateEspirituServiceTest {
         serviceEspiritu.crear(modelAngelical);
 
         List<Espiritu> listOfDemons = serviceEspiritu.espiritusDemoniacos();
-        assertTrue(!listOfDemons.isEmpty());
-        assertEquals(listOfDemons.size(), 1);
+        assertFalse(listOfDemons.isEmpty());
+        assertEquals(1, listOfDemons.size());
     }
 
     @Test
@@ -215,8 +202,8 @@ public class HibernateEspirituServiceTest {
         serviceEspiritu.crear(modelAngelical);
 
         List<Espiritu> listOfDemons = serviceEspiritu.recuperarTodos();
-        assertTrue(!listOfDemons.isEmpty());
-        assertEquals(listOfDemons.size(), 2);
+        assertFalse(listOfDemons.isEmpty());
+        assertEquals(2, listOfDemons.size());
     }
 
     @Test
