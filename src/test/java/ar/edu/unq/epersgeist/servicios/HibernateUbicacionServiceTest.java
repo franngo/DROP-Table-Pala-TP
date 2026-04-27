@@ -62,6 +62,13 @@ public class HibernateUbicacionServiceTest {
     }
 
     @Test
+    void fallaAlCrearUbicacionNula() {
+        assertThrows(UbicacionInvalidaException.class, () -> {
+            Ubicacion ubicacion = ubicacionService.crear(null);
+        });
+    }
+
+    @Test
     void debeCrearMultiplesUbicacionesConNombresDistintos() {
         Ubicacion ubicacionCreada1 = ubicacionService.crear(templo);
         Ubicacion ubicacionCreada2 = ubicacionService.crear(cripta);
@@ -75,11 +82,12 @@ public class HibernateUbicacionServiceTest {
 
     @Test
     void debeLanzarExcepcionSiElNombreYaExiste() {
-        ubicacionService.crear(templo);
+        ubicacionService.crear(templo); //nombre: "Templo del Alba Eterna" (y está persistido en la DB)
+        Ubicacion temploDup = new Ubicacion("Templo del Alba Eterna");
 
         assertThrows(
-                UbicacionYaExisteException.class,
-                () -> ubicacionService.crear(templo)
+                UbicacionYaExisteConEseNombreException.class,
+                () -> ubicacionService.crear(temploDup)
         );
     }
 
@@ -112,10 +120,23 @@ public class HibernateUbicacionServiceTest {
         ubicacionService.crear(templo);
 
         assertThrows(
-                UbicacionYaExisteException.class,
+                UbicacionYaExisteConEseNombreException.class,
                 () -> ubicacionService.crear(new Ubicacion("   " + NOMBRE_TEMPLO + "   "))
         );
     }
+
+    /*
+        @Test
+    void noSeCreaUnaUbicacionPorqueYaTieneIdAsignado() {
+        Medium matiasM = new Medium("Matias", 150, 50);
+        matiasM.setId(1L);
+
+        assertThrows(ErrorAlCrearUbicacionException.class, () -> {
+            ubicacionService.crear(matiasM);
+        });
+    }
+     */
+
 
     // ============================== RECUPERAR ==============================
 

@@ -27,6 +27,10 @@ public class UbicacionServiceImpl implements UbicacionService {
                 throw new UbicacionInvalidaException();
             }
 
+            if (ubicacion.getId() != null) {
+                throw new UbicacionNoPuedeTenerIdAlCrear();
+            }
+
             String nombre = ubicacion.getNombre();
 
             if (nombre == null || nombre.isBlank()) {
@@ -36,8 +40,8 @@ public class UbicacionServiceImpl implements UbicacionService {
             String trimmed = nombre.trim();
             ubicacion.setNombre(trimmed);
 
-            if (this.ubicacionDAO.recuperarPorNombre(trimmed) != null) {
-                throw new UbicacionYaExisteException(trimmed);
+            if (ubicacionDAO.recuperarPorNombre(trimmed) != null) {
+                throw new UbicacionYaExisteConEseNombreException(trimmed);
             }
 
             return this.ubicacionDAO.guardar(ubicacion);

@@ -15,13 +15,8 @@ public class HibernateUbicacionDAO implements UbicacionDAO {
 
     @Override
     public Ubicacion guardar(Ubicacion ubicacion) {
-        if (ubicacion == null) {
-            throw new ErrorAlCrearUbicacionException("ubicación nula.");
-        }
 
-        if (ubicacion.getId() != null) {
-            throw new ErrorAlCrearUbicacionException("ya tiene un id asignado.");
-        }
+        //Ya se ataja el caso null y el caso id null en service
 
         return this.hibernateDAO.crear(ubicacion);
     }

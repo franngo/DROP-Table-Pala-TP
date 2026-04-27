@@ -48,6 +48,7 @@ public class HibernateEspirituServiceTest {
     @Test
     void seCreaUnEspirituCorrectamente() {
         Espiritu espirituP = serviceEspiritu.crear(matias);
+
         assertNotNull(espirituP.getId());
     }
 
@@ -60,21 +61,12 @@ public class HibernateEspirituServiceTest {
     }
 
     @Test
-    void deberiaAsignarIdAlCrearUnEspiritu() {
-
-        Espiritu espirituP = serviceEspiritu.crear(matias);
-
-        assertNotNull(espirituP.getId());
-    }
-
-    @Test
     void noSeCreaUnEspirituPorqueYaTieneIdAsignado() {
         matias.setId(1L);
+
         assertThrows(ErrorAlCrearEspirituException.class, () -> {
             serviceEspiritu.crear(matias);
         });
-
-
     }
 
 

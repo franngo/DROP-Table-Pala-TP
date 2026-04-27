@@ -56,12 +56,7 @@ public class HibernateMediumServiceTest {
         ubedaM = new Medium("Ubeda el dt", 100, 20);
         ubedaM.setUbicacion(bernal);
 
-
         epifanioP = serviceMedium.crear(epifanioM);
-
-        System.out.println(epifanioP.hashCode());
-
-        System.out.println(epifanioM.hashCode());
 
         ubedaP = serviceMedium.crear(ubedaM);
 
@@ -90,6 +85,16 @@ public class HibernateMediumServiceTest {
     void fallaAlCrearMediumNulo() {
         assertThrows(ErrorAlCrearMediumException.class, () -> {
             Medium mediumP = serviceMedium.crear(null);
+        });
+    }
+
+    @Test
+    void noSeCreaUnMediumPorqueYaTieneIdAsignado() {
+        Medium matiasM = new Medium("Matias", 150, 50);
+        matiasM.setId(1L);
+
+        assertThrows(ErrorAlCrearMediumException.class, () -> {
+            serviceMedium.crear(matiasM);
         });
     }
 
