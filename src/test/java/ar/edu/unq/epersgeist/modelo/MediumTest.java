@@ -220,5 +220,35 @@ public class MediumTest {
         });
     }
 
+    @Test
+    public void invocarCasoExitosoCORRECCION() {
+        Ubicacion quilmes = new Ubicacion("Quilmes");
+        Ubicacion bernal = new Ubicacion("Bernal");
+        Medium unmedium = new Medium("UnMedium", 50, 50);
+        Medium otromedium = new Medium("OtroMedium", 50, 50);
+
+        unmedium.setUbicacion(quilmes);
+        otromedium.setUbicacion(bernal);
+
+
+        unmedium.invocar(espirituM);
+
+        // La ubicacion del espiritu cambia a unmedium.ubicacion (Quilmes)
+        assertEquals(unmedium.getUbicacion(), espirituM.getUbicacion());
+
+        otromedium.invocar(espirituM);
+
+        // La ubicacion del espiritu cambia a otromedium.ubicacion (Bernal)
+        assertEquals(otromedium.getUbicacion(), espirituM.getUbicacion());
+
+        // Pero.. Quilmes sigue incluyendo al espiritu en su lista
+        //assertTrue(quilmes.getEspiritus().contains(espirituM));
+
+        // Cuando Bernal tambien lo conoce
+        assertTrue(bernal.getEspiritus().contains(espirituM));
+
+        // El Espiritu está en dos ubicaciones distintas a la vez
+    }
+
 
 }

@@ -47,4 +47,8 @@ public class Ubicacion {
         this.mediums.add(medium);
         medium.setUbicacion(this);
     }
+
+    public void salirDeUbicacion(Espiritu espiritu) {
+        this.espiritus.remove(espiritu);
+    }
 }

@@ -81,5 +81,14 @@ public class Espiritu implements Serializable {
     public void vincular(Medium medium) {
         this.mediumCon = medium;
     }
+
+    public void salirDeUbicacionActual() {
+        if (ubicacion != null) {
+            this.ubicacion.salirDeUbicacion(this);
+            this.ubicacion = null;
+        }
+
+
+    }
 }
 

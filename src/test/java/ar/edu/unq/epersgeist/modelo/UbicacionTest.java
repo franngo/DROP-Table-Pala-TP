@@ -47,4 +47,6 @@ public class UbicacionTest {
         assertEquals(1, this.ubicacion.getMediums().size());
         assertEquals(this.ubicacion, medium.getUbicacion());
     }
+
+
 }

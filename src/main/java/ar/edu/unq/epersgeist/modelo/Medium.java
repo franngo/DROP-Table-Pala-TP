@@ -87,13 +87,13 @@ public class Medium implements Serializable {
             return espiritu; //si no hay suificiente maná, no se hace nada
         }
 
-        if (espiritu.getMediumCon() != null) { //si el Espiritu NO está libre
+        if (!espiritu.estaLibre()) { //El Espiritu dado debe estar libre
             throw new ErrorDeInvocacionDeEspirituException();
         }
 
         this.mana = Math.max(minimoMana, this.cantidadAlInvocar(manaRequeridoInvocacion));
-        
-        espiritu.setUbicacion(this.ubicacion);
+        espiritu.salirDeUbicacionActual();
+
         this.ubicacion.agregarEspiritu(espiritu);
 
         return espiritu;
