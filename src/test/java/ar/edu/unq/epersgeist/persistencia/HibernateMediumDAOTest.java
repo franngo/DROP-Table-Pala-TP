@@ -4,7 +4,9 @@ import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarMediumException;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,10 +21,14 @@ public class HibernateMediumDAOTest {
     MediumDAO mediumDao = new HibernateMediumDAO();
     Medium mediumM;
     Ubicacion bernal;
+    UbicacionDAO ubicacionDao = new HibernateUbicacionDAO();
+
 
     @BeforeEach
     void setUp() {
-        bernal = new Ubicacion("Bernal");
+        this.executeBlockInPersistentContext(() -> {
+            bernal = ubicacionDao.guardar(new Ubicacion("Bernal"));
+        });
         mediumM = new Medium("Matias", 200, 100, bernal);
     }
 
@@ -208,6 +214,7 @@ public class HibernateMediumDAOTest {
     void tearDown() {
         executeBlockInPersistentContext(() -> {
             mediumDao.eliminarTodos();
+            ubicacionDao.eliminarTodos();
         });
     }
 

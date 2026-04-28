@@ -5,7 +5,9 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarEspirituException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,10 +21,13 @@ public class HibernateEspirituDAOTest {
     private EspirituDAO espirituDao = new HibernateEspirituDAO();
     private Espiritu espirituM;
     private Ubicacion bernal;
+    private UbicacionDAO ubicacionDao = new HibernateUbicacionDAO();
 
     @BeforeEach
     public void setUp() {
-        bernal = new Ubicacion("BERNAL");
+        this.executeBlockInPersistentContext(() -> {
+            bernal = ubicacionDao.guardar(new Ubicacion("Bernal"));
+        });
         espirituM = new Angelical("das", bernal);
     }
 
@@ -186,6 +191,7 @@ public class HibernateEspirituDAOTest {
     void tearDown() {
         executeBlockInPersistentContext(() -> {
             espirituDao.eliminarTodos();
+            ubicacionDao.eliminarTodos();
         });
     }
 }
