@@ -12,13 +12,14 @@ public class EspirituTest {
     Espiritu espirituM;
     Espiritu espiritu;
     Medium medium;
+    Ubicacion ubicacion;
 
     @BeforeEach
     void setUp() {
-
-        espirituM = new Angelical("Matias");
-        espiritu = new Angelical("Matias");
-        medium = new Medium("Juan", 100, 10);
+        ubicacion = new Ubicacion("Berazategui");
+        espirituM = new Angelical("Matias", ubicacion);
+        espiritu = new Angelical("Matias", ubicacion);
+        medium = new Medium("Juan", 100, 10, ubicacion);
     }
 
     @Test
@@ -38,7 +39,7 @@ public class EspirituTest {
     @Test
     public void alAumentarConexionMasDeUnaVezLosNivelesDeConexionSeSuman() {
 
-        medium = new Medium("Juan", 10000, 10);
+        medium = new Medium("Juan", 10000, 10, ubicacion);
 
         espirituM.aumentarConexionYConectar(medium);
         espirituM.aumentarConexionYConectar(medium);
@@ -58,7 +59,7 @@ public class EspirituTest {
     @Test
     public void laConexionDelEspirituNoSobrepasaLos100Niveles() {
 
-        medium = new Medium("Juan", 100, 100000);
+        medium = new Medium("Juan", 100, 100000, ubicacion);
         espirituM.aumentarConexionYConectar(medium);
 
         assertEquals(100, espirituM.getNivelDeConexion());
@@ -75,8 +76,8 @@ public class EspirituTest {
 
     @Test
     void elEspirituDesvinculadoDebeLiberarMediumCon() {
-        Medium medium = new Medium("Juan", 100, 50);
-        Angelical angel = new Angelical("Tyrael");
+        Medium medium = new Medium("Juan", 100, 50, ubicacion);
+        Angelical angel = new Angelical("Tyrael", ubicacion);
         medium.agregarEspiritu(angel);
 
         assertNotNull(angel.getMediumCon());

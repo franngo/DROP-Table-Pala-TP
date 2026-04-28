@@ -37,11 +37,14 @@ public abstract class Espiritu implements Serializable {
 
     public static final int limiteConexion = 100;
 
-    public Espiritu(@NonNull String nombre) {
+    public Espiritu(@NonNull String nombre, Ubicacion ubicacion) {
         this.nivelDeConexion = 0;
         this.nombre = nombre;
+        this.ubicacion = ubicacion;
+        this.ubicacion.agregarEspiritu(this);
 
     }
+
 
     public boolean estaLibre() {
         return mediumCon == null;

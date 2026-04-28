@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.modelo.Espiritu;
 
+import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
@@ -8,14 +9,16 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
 
 
 @Entity
 @DiscriminatorValue("ANGEL")
 public class Angelical extends Espiritu implements Combatiente {
-    public Angelical(@NonNull String nombre) {
-        super(nombre);
+    public Angelical(@NonNull String nombre, Ubicacion ubicacion) {
+        super(nombre, ubicacion);
     }
 
     @Override

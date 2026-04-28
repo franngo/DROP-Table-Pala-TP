@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.modelo.Espiritu;
 
+import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
@@ -8,7 +9,9 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
 
 
 @Entity
@@ -16,8 +19,8 @@ import lombok.Setter;
 public class Demonio extends Espiritu implements Combatiente {
 
 
-    public Demonio(@NonNull String nombre) {
-        super(nombre);
+    public Demonio(@NonNull String nombre, Ubicacion ubicacion) {
+        super(nombre, ubicacion);
     }
 
     public boolean estaActivo() {
@@ -27,7 +30,6 @@ public class Demonio extends Espiritu implements Combatiente {
     @Override
     public void recibirAtaqueDe(Espiritu angelAtacante) {
 
-        
 
         double danhoARecibir = angelAtacante.getNivelDeConexion() / 2;
 

@@ -24,17 +24,19 @@ import java.util.Objects;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HibernateUbicacionServiceTest {
+
     private static final String NOMBRE_TEMPLO = "Templo del Alba Eterna";
     private static final String NOMBRE_CRIPTA = "Cripta de los Susurros";
 
+    private Ubicacion berazategui = new Ubicacion("Berazategui");
     private final Ubicacion templo = new Ubicacion(NOMBRE_TEMPLO);
     private final Ubicacion cripta = new Ubicacion(NOMBRE_CRIPTA);
 
-    private final Espiritu guerrero = new Angelical("Espíritu de la Luz");
-    private final Espiritu mago = new Angelical("Espíritu de la Oscuridad");
+    private final Espiritu guerrero = new Angelical("Espíritu de la Luz", berazategui);
+    private final Espiritu mago = new Angelical("Espíritu de la Oscuridad", berazategui);
 
-    private final Medium epifanio = new Medium("epifanio", 150, 50);
-    private final Medium ubeda = new Medium("ubeda", 100, 20);
+    private final Medium epifanio = new Medium("epifanio", 150, 50, berazategui);
+    private final Medium ubeda = new Medium("ubeda", 100, 20, berazategui);
 
     private UbicacionService ubicacionService;
     private EspirituService espirituService;
@@ -125,7 +127,7 @@ public class HibernateUbicacionServiceTest {
         );
     }
 
-        @Test
+    @Test
     void noSeCreaUnaUbicacionPorqueYaTieneIdAsignado() {
         cripta.setId(1L);
 

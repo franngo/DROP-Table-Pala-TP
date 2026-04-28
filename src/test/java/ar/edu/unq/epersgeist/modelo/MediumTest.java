@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MediumTest {
-
+    Ubicacion bernal = new Ubicacion("Bernal");
     Medium mediumM;
     Medium mediumM2;
     Espiritu espirituM;
@@ -30,22 +30,22 @@ public class MediumTest {
 
     @BeforeEach
     void setUp() {
-        mediumM = new Medium("Juan", 100, 50);
-        mediumM2 = new Medium("Matias", 80, 40);
-        espirituM = new Angelical("Charizard");
-        espirituM2 = new Angelical("Bulbasor");
+        mediumM = new Medium("Juan", 100, 50, bernal);
+        mediumM2 = new Medium("Matias", 80, 40, bernal);
+        espirituM = new Angelical("Charizard", bernal);
+        espirituM2 = new Angelical("Bulbasor", bernal);
 
 
         //contexto de los espiritus y demonios en el exorcismo
-        rika = new Angelical("Rika");
+        rika = new Angelical("Rika", bernal);
         rika.setNivelDeConexion(60);
-        ivaar = new Angelical("Ivaar");
+        ivaar = new Angelical("Ivaar", bernal);
         ivaar.setNivelDeConexion(80);
-        hana = new Angelical("Hana");
+        hana = new Angelical("Hana", bernal);
         hana.setNivelDeConexion(5);
-        jaeger = new Demonio("Jaeger");
+        jaeger = new Demonio("Jaeger", bernal);
         jaeger.setNivelDeConexion(50);
-        noroi = new Demonio("Noroi");
+        noroi = new Demonio("Noroi", bernal);
         noroi.setNivelDeConexion(66);
     }
 
@@ -121,7 +121,7 @@ public class MediumTest {
         mediumM.setUbicacion(ubicacion);
 
         assertEquals(50, mediumM.getMana());
-        assertNull(espirituM.getUbicacion());
+
 
         //mediumM tiene suficiente maná (50) y espirituM está libre
 
@@ -137,12 +137,14 @@ public class MediumTest {
         mediumM.setUbicacion(ubicacion);
 
         mediumM.setMana(5); //mana insuficiente para invocar()
-
+        Ubicacion ubiActual = espirituM.getUbicacion();
         mediumM.invocar(espirituM);
 
         //no hay ningún cambio de estado
         assertEquals(5, mediumM.getMana());
-        assertNull(espirituM.getUbicacion());
+
+        // No cambio la ubicacion del espiritu
+        assertEquals(ubiActual.getNombre(), espirituM.getUbicacion().getNombre());
     }
 
     @Test
@@ -171,7 +173,7 @@ public class MediumTest {
         assertEquals(50, jaeger.getNivelDeConexion());// jaeger tiene 50 de conexion
         mediumM.exorcizar(mediumM2);
         // Jaeger recibe daño 30 pero sigue conectado al medium2
-        
+
         assertFalse(jaeger.estaLibre());
 
         assertEquals(20, jaeger.getNivelDeConexion());
@@ -229,8 +231,8 @@ public class MediumTest {
     public void invocarCasoExitosoCORRECCION() {
         Ubicacion quilmes = new Ubicacion("Quilmes");
         Ubicacion bernal = new Ubicacion("Bernal");
-        Medium unmedium = new Medium("UnMedium", 50, 50);
-        Medium otromedium = new Medium("OtroMedium", 50, 50);
+        Medium unmedium = new Medium("UnMedium", 50, 50, bernal);
+        Medium otromedium = new Medium("OtroMedium", 50, 50, bernal);
 
         unmedium.setUbicacion(quilmes);
         otromedium.setUbicacion(bernal);

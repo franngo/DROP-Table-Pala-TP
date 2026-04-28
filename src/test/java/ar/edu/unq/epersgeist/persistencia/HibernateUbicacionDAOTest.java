@@ -3,7 +3,6 @@ package ar.edu.unq.epersgeist.persistencia;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.ErrorAlActualizarUbicacionException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
@@ -226,7 +225,7 @@ public class HibernateUbicacionDAOTest {
         // Primera transacción: se crea la relación y Hibernate la persiste al commit
         this.runTrx(() -> {
             Ubicacion ubicacion = ubicacionDAO.guardar(new Ubicacion("Santuario de la Luz"));
-            Espiritu guerrero = espirituDAO.guardar(new Angelical("Espíritu de la Luz"));
+            Espiritu guerrero = espirituDAO.guardar(new Angelical("Espíritu de la Luz", ubicacion));
 
             ubicacion.agregarEspiritu(guerrero);
 
@@ -254,12 +253,12 @@ public class HibernateUbicacionDAOTest {
         );
 
         this.runTrx(() -> {
-            Espiritu guerrero = espirituDAO.guardar(new Angelical("Espíritu de la Luz"));
+            Espiritu guerrero = espirituDAO.guardar(new Angelical("Espíritu de la Luz", ubicacion[0]));
             ubicacion[0].agregarEspiritu(guerrero);
         });
 
         this.runTrx(() -> {
-            Espiritu mago = espirituDAO.guardar(new Angelical("Espíritu de la Oscuridad"));
+            Espiritu mago = espirituDAO.guardar(new Angelical("Espíritu de la Oscuridad", ubicacion[0]));
             ubicacion[0].agregarEspiritu(mago);
         });
 

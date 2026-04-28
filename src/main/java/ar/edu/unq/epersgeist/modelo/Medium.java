@@ -37,11 +37,13 @@ public class Medium implements Serializable {
     @ManyToOne
     private Ubicacion ubicacion;
 
-    public Medium(@NonNull String nombre, @NonNull Integer manaMax, @NonNull Integer mana) {
+    public Medium(@NonNull String nombre, @NonNull Integer manaMax, @NonNull Integer mana, Ubicacion ubicacion) {
         this.espiritus = new ArrayList<Espiritu>();
         this.nombre = nombre;
         this.manaMax = manaMax;
         this.mana = mana;
+        this.ubicacion = ubicacion;
+        this.ubicacion.agregarMedium(this);
     }
 
     public void agregarEspiritu(Espiritu espiritu) {

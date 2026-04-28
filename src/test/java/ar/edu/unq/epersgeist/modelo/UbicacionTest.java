@@ -33,7 +33,7 @@ public class UbicacionTest {
 
     @Test
     public void debeAgregarEspirituALaUbicacion() {
-        Espiritu espiritu = new Angelical("Espíritu de la Luz");
+        Espiritu espiritu = new Angelical("Espíritu de la Luz", ubicacion);
         this.ubicacion.agregarEspiritu(espiritu);
 
         assertEquals(1, this.ubicacion.getEspiritus().size());
@@ -42,7 +42,7 @@ public class UbicacionTest {
 
     @Test
     public void debeAgregarMediumALaUbicacion() {
-        Medium medium = new Medium("matias", 10, 10);
+        Medium medium = new Medium("matias", 10, 10, ubicacion);
         this.ubicacion.agregarMedium(medium);
 
         assertEquals(1, this.ubicacion.getMediums().size());

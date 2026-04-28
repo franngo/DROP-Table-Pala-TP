@@ -28,7 +28,7 @@ public class HibernateMediumServiceTest {
     private final EspirituService espirituService = new EspirituServiceImpl(espirituDao, mediumDao);
     private final MediumService serviceMedium = new MediumServiceImpl(mediumDao, espirituDao);
     UbicacionService ubicacionService = new UbicacionServiceImpl(new HibernateUbicacionDAO());
-
+    private Ubicacion berazategui;
 
     private Espiritu espirituM;
     private Espiritu espirituM2;
@@ -46,26 +46,27 @@ public class HibernateMediumServiceTest {
 
     @BeforeEach
     public void setUp() {
+        berazategui = new Ubicacion("Berazategui");
         bernal = ubicacionService.crear(new Ubicacion("Bernal"));
-        espirituM = new Angelical("Charizard");
-        espirituM2 = new Angelical("Bulbasor");
+        espirituM = new Angelical("Charizard", berazategui);
+        espirituM2 = new Angelical("Bulbasor", berazategui);
 
-        epifanioM = new Medium("Epifanio el poderoso", 150, 50);
+        epifanioM = new Medium("Epifanio el poderoso", 150, 50, berazategui);
         epifanioM.setUbicacion(bernal);
 
-        ubedaM = new Medium("Ubeda el dt", 100, 20);
+        ubedaM = new Medium("Ubeda el dt", 100, 20, berazategui);
         ubedaM.setUbicacion(bernal);
 
         epifanioP = serviceMedium.crear(epifanioM);
 
         ubedaP = serviceMedium.crear(ubedaM);
 
-        rikaM = new Angelical("Rika");
+        rikaM = new Angelical("Rika", berazategui);
         rikaM.setNivelDeConexion(60);
         rikaM.setUbicacion(bernal);
         rikaP = espirituService.crear(rikaM);
 
-        jaegerM = new Demonio("Jaeger");
+        jaegerM = new Demonio("Jaeger", berazategui);
         jaegerM.setNivelDeConexion(50);
         jaegerM.setUbicacion(bernal);
         jaegerP = espirituService.crear(jaegerM);
@@ -92,7 +93,7 @@ public class HibernateMediumServiceTest {
 
     @Test
     void noSeCreaUnMediumPorqueYaTieneIdAsignado() {
-        Medium matiasM = new Medium("Matias", 150, 50);
+        Medium matiasM = new Medium("Matias", 150, 50, berazategui);
         matiasM.setId(1L);
 
         assertThrows(ErrorAlCrearMediumException.class, () -> {
@@ -137,11 +138,11 @@ public class HibernateMediumServiceTest {
     void deberiaActualizarSoloLosCamposModificados1() {
 
 
-        Medium mediumPrueba = new Medium("MediumTest", 1, 1);
+        Medium mediumPrueba = new Medium("MediumTest", 1, 1, berazategui);
 
         Long id = serviceMedium.crear(mediumPrueba).getId();
 
-        Medium modificado = new Medium("Rolando el audaz", 120, 50);
+        Medium modificado = new Medium("Rolando el audaz", 120, 50, berazategui);
         modificado.setId(id);
         modificado.setMana(15);
 
@@ -159,7 +160,7 @@ public class HibernateMediumServiceTest {
     @Test
     void deberiaActualizarSoloLosCamposModificados2() {
 
-        Medium mediumPrueba = new Medium("MediumTest", 1, 1);
+        Medium mediumPrueba = new Medium("MediumTest", 1, 1, berazategui);
         Long id = serviceMedium.crear(mediumPrueba).getId();
 
         mediumPrueba.setNombre("Rolando el audaz");
@@ -181,7 +182,7 @@ public class HibernateMediumServiceTest {
         ErrorAlActualizarMediumException exception =
                 assertThrows(ErrorAlActualizarMediumException.class, () -> {
 
-                    serviceMedium.actualizar(new Medium("Julian", 12, 22));
+                    serviceMedium.actualizar(new Medium("Julian", 12, 22, berazategui));
 
                 });
 
@@ -193,7 +194,7 @@ public class HibernateMediumServiceTest {
     void noDeberiaActualizarConIdQueNoSeEncuentraEnBD() {
         ErrorAlActualizarMediumException exception =
                 assertThrows(ErrorAlActualizarMediumException.class, () -> {
-                    Medium romanM = new Medium("a", 1, 2);
+                    Medium romanM = new Medium("a", 1, 2, berazategui);
                     romanM.setId(132L); //no hay nada en la DB con id 1, porque arranca vacía
                     serviceMedium.actualizar(romanM);
 
@@ -206,7 +207,7 @@ public class HibernateMediumServiceTest {
 
     @Test
     void deberiaEliminarYNoPoderRecuperarloLuego() {
-        Medium mediumPrueba = new Medium("MediumTest", 1, 1);
+        Medium mediumPrueba = new Medium("MediumTest", 1, 1, berazategui);
         Long id = serviceMedium.crear(mediumPrueba).getId();
 
         serviceMedium.eliminar(id);
@@ -221,7 +222,7 @@ public class HibernateMediumServiceTest {
     @Test
     public void descansarCasoExitoso() {
 
-        Medium mediumPrueba = new Medium("MediumTest", 100, 50);
+        Medium mediumPrueba = new Medium("MediumTest", 100, 50, berazategui);
         assertEquals(50, mediumPrueba.getMana());
         assertEquals(0, espirituM.getNivelDeConexion());
         assertEquals(0, espirituM2.getNivelDeConexion());
@@ -254,7 +255,7 @@ public class HibernateMediumServiceTest {
     @Test
     public void invocarCasoExitoso() {
 
-        Medium mediumPrueba = new Medium("MediumTest", 100, 50);
+        Medium mediumPrueba = new Medium("MediumTest", 100, 50, berazategui);
         Medium mediumP = serviceMedium.crear(mediumPrueba);
         Ubicacion bernalM = new Ubicacion("Quilmes");
         Ubicacion bernalP = ubicacionService.crear(bernalM);
@@ -286,7 +287,7 @@ public class HibernateMediumServiceTest {
 
     @Test
     public void invocarFallaPorEspirituIdNulo() {
-        Medium mediumPrueba = new Medium("MediumTest", 100, 50);
+        Medium mediumPrueba = new Medium("MediumTest", 100, 50, berazategui);
         Medium mediumPruebaP = serviceMedium.crear(mediumPrueba);
 
         Long idInexistente = mediumPruebaP.getId() + 1;
@@ -303,21 +304,21 @@ public class HibernateMediumServiceTest {
         Ubicacion quilmes = ubicacionService.crear(new Ubicacion("Quilmes"));
 
 
-        Medium matiasM = new Medium("Matias", 150, 50);
+        Medium matiasM = new Medium("Matias", 150, 50, berazategui);
         matiasM.setUbicacion(quilmes);
 
-        Medium francoM = new Medium("Franco", 100, 20);
+        Medium francoM = new Medium("Franco", 100, 20, berazategui);
         francoM.setUbicacion(quilmes);
 
         Medium matiasP = serviceMedium.crear(matiasM);
         Medium francoP = serviceMedium.crear(francoM);
 
-        Espiritu omnimanM = new Angelical("Omniman");
+        Espiritu omnimanM = new Angelical("Omniman", berazategui);
         omnimanM.setNivelDeConexion(60);
         omnimanM.setUbicacion(quilmes);
         Espiritu omnimanP = espirituService.crear(omnimanM);
 
-        Espiritu markM = new Demonio("Mark");
+        Espiritu markM = new Demonio("Mark", berazategui);
         markM.setNivelDeConexion(50);
         markM.setUbicacion(quilmes);
         Espiritu markP = espirituService.crear(markM);
@@ -343,16 +344,16 @@ public class HibernateMediumServiceTest {
     void conectarUnEspirituYaConectadoDebeRechazarse() {
         Ubicacion quilmes = ubicacionService.crear(new Ubicacion("Quilmes"));
 
-        Angelical unAngel = new Angelical("Tyrael");
+        Angelical unAngel = new Angelical("Tyrael", berazategui);
         unAngel.setUbicacion(quilmes);
-        Medium unMedium = new Medium("Juan", 100, 50);
+        Medium unMedium = new Medium("Juan", 100, 50, berazategui);
         unMedium.setUbicacion(quilmes);
         unAngel.aumentarConexionYConectar(unMedium);
 
         // primera conexión OK: unAngel está vinculado con unMedium
         assertEquals(unAngel.getMediumCon(), unMedium);
 
-        Medium otroMedium = new Medium("Juan2", 100, 50);
+        Medium otroMedium = new Medium("Juan2", 100, 50, berazategui);
         otroMedium.setUbicacion(quilmes);
 
         // Conecto al mismo angel con otroMedium, sin estar libre
