@@ -25,10 +25,20 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class HibernateUbicacionServiceTest {
 
+    MediumDAO mediumDao = new HibernateMediumDAO();
+    EspirituDAO espirituDAO = new HibernateEspirituDAO();
+    UbicacionDAO ubicacionDAO = new HibernateUbicacionDAO();
+
+    private UbicacionService ubicacionService = new UbicacionServiceImpl(ubicacionDAO);
+    private EspirituService espirituService = new EspirituServiceImpl(espirituDAO, mediumDao);
+    private MediumService mediumService = new MediumServiceImpl(mediumDao, espirituDAO);
+
+
+    Ubicacion berazategui = ubicacionService.crear(new Ubicacion("Berazategui"));
     private static final String NOMBRE_TEMPLO = "Templo del Alba Eterna";
     private static final String NOMBRE_CRIPTA = "Cripta de los Susurros";
 
-    private Ubicacion berazategui = new Ubicacion("Berazategui");
+
     private final Ubicacion templo = new Ubicacion(NOMBRE_TEMPLO);
     private final Ubicacion cripta = new Ubicacion(NOMBRE_CRIPTA);
 
@@ -38,19 +48,11 @@ public class HibernateUbicacionServiceTest {
     private final Medium epifanio = new Medium("epifanio", 150, 50, berazategui);
     private final Medium ubeda = new Medium("ubeda", 100, 20, berazategui);
 
-    private UbicacionService ubicacionService;
-    private EspirituService espirituService;
-    private MediumService mediumService;
 
     @BeforeEach
     void setUp() {
-        MediumDAO mediumDao = new HibernateMediumDAO();
-        EspirituDAO espirituDAO = new HibernateEspirituDAO();
-        UbicacionDAO ubicacionDAO = new HibernateUbicacionDAO();
 
-        ubicacionService = new UbicacionServiceImpl(ubicacionDAO);
-        espirituService = new EspirituServiceImpl(espirituDAO, mediumDao);
-        mediumService = new MediumServiceImpl(mediumDao, espirituDAO);
+
     }
 
     // ============================== CREAR ==============================
@@ -174,7 +176,8 @@ public class HibernateUbicacionServiceTest {
 
         List<Ubicacion> ubicaciones = ubicacionService.recuperarTodos();
 
-        assertEquals(2, ubicaciones.size());
+        // hay una ubicacion existente
+        assertEquals(3, ubicaciones.size());
         assertTrue(ubicaciones.stream().anyMatch(u -> Objects.equals(u.getId(), templo.getId())));
         assertTrue(ubicaciones.stream().anyMatch(u -> Objects.equals(u.getId(), cripta.getId())));
     }
@@ -183,15 +186,16 @@ public class HibernateUbicacionServiceTest {
     void debeRecuperarUnaListaVaciaSiNoHayUbicaciones() {
         List<Ubicacion> ubicaciones = ubicacionService.recuperarTodos();
 
-        assertEquals(0, ubicaciones.size());
+        //Si o si existe berazategui, una lista vacia en este caso tiene solo berazategui
+        assertEquals(1, ubicaciones.size());
     }
 
     // ============================== ESPIRITUS EN ==============================
 
     @Test
     void espiritusEnRetornaListaDeEspiritus() {
-        Ubicacion ubicacion = ubicacionService.crear(cripta);
 
+        Ubicacion ubicacion = ubicacionService.crear(cripta);
         espirituService.crear(guerrero);
         espirituService.crear(mago);
 

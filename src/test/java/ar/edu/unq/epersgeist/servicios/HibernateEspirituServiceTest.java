@@ -38,7 +38,7 @@ public class HibernateEspirituServiceTest {
 
     @BeforeEach
     public void setUp() {
-        berazategui = new Ubicacion("Berazategui");
+        berazategui = ubicacionService.crear(new Ubicacion("Berazategui"));
         matias = new Angelical("Matias", berazategui);
     }
 

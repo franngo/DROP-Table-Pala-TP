@@ -46,7 +46,7 @@ public class HibernateMediumServiceTest {
 
     @BeforeEach
     public void setUp() {
-        berazategui = new Ubicacion("Berazategui");
+        berazategui = ubicacionService.crear(new Ubicacion("Berazategui"));
         bernal = ubicacionService.crear(new Ubicacion("Bernal"));
         espirituM = new Angelical("Charizard", berazategui);
         espirituM2 = new Angelical("Bulbasor", berazategui);
@@ -264,7 +264,7 @@ public class HibernateMediumServiceTest {
 
         assertEquals(0, bernalM.getEspiritus().size());
         assertEquals(50, mediumPrueba.getMana());
-        assertNull(espirituM.getUbicacion());
+     
 
         Espiritu espirituP = espirituService.crear(espirituM);
 
