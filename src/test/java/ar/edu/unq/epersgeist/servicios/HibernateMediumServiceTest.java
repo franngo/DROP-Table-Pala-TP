@@ -338,31 +338,6 @@ public class HibernateMediumServiceTest {
         assertEquals(65.0, omnimanDerrotado.getNivelDeConexion());
     }
 
-    //conectar
-
-    @Test
-    void conectarUnEspirituYaConectadoDebeRechazarse() {
-        Ubicacion quilmes = ubicacionService.crear(new Ubicacion("Quilmes"));
-
-        Angelical unAngel = new Angelical("Tyrael", berazategui);
-        unAngel.setUbicacion(quilmes);
-        Medium unMedium = new Medium("Juan", 100, 50, berazategui);
-        unMedium.setUbicacion(quilmes);
-        unAngel.aumentarConexionYConectar(unMedium);
-
-        // primera conexión OK: unAngel está vinculado con unMedium
-        assertEquals(unAngel.getMediumCon(), unMedium);
-
-        Medium otroMedium = new Medium("Juan2", 100, 50, berazategui);
-        otroMedium.setUbicacion(quilmes);
-
-        // Conecto al mismo angel con otroMedium, sin estar libre
-        unAngel.aumentarConexionYConectar(otroMedium);
-
-        // Lo logro perfectamente
-        assertEquals(unAngel.getMediumCon(), otroMedium);
-    }
-
     @AfterEach
     void tearDown() {
         espirituService.eliminarTodos();

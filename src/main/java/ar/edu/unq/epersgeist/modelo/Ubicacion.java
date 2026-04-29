@@ -42,7 +42,7 @@ public class Ubicacion {
 
 
     public boolean tieneElMismoNombreQue(Ubicacion ubicacion) {
-        return this.getNombre() == ubicacion.getNombre();
+        return this.getNombre().equals(ubicacion.getNombre());
     }
 
     public void agregarMedium(Medium medium) {

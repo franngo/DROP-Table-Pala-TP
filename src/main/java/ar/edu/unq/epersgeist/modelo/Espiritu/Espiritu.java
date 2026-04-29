@@ -2,6 +2,8 @@ package ar.edu.unq.epersgeist.modelo.Espiritu;
 
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionInvalidaException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,6 +40,8 @@ public abstract class Espiritu implements Serializable {
     public static final int limiteConexion = 100;
 
     public Espiritu(@NonNull String nombre, Ubicacion ubicacion) {
+        this.validarUbicacionNoNula(ubicacion);
+
         this.nivelDeConexion = 0;
         this.nombre = nombre;
         this.ubicacion = ubicacion;
@@ -45,12 +49,24 @@ public abstract class Espiritu implements Serializable {
 
     }
 
+    private void validarUbicacionNoNula(Ubicacion ubicacion) {
+        if(ubicacion==null) {
+            throw new UbicacionInvalidaException();
+        }
+    }
 
     public boolean estaLibre() {
         return mediumCon == null;
     }
 
     public void aumentarConexionYConectar(Medium medium) {
+        if (!this.estaLibre()) {
+            throw new ErrorAlConectarEspirituConMedium("El espiritu no se encuentra libre");
+        }
+        if (!this.estaUbicadoEnElMismoLugarQue(medium)) {
+            throw new ErrorAlConectarEspirituConMedium("El espiritu se encuentra en una ubicacion diferente al medium");
+        }
+
         this.fortalecerConexion(medium.cantidadDeFortalecimientoDeConexion());
         medium.agregarEspiritu(this);
     }
@@ -84,13 +100,9 @@ public abstract class Espiritu implements Serializable {
         this.mediumCon = medium;
     }
 
-    public void salirDeUbicacionActual() {
-        if (ubicacion != null) {
-            this.ubicacion.salirDeUbicacion(this);
-            this.ubicacion = null;
-        }
-
-
+    public void MoverseA(Ubicacion ubiNueva) {
+        this.ubicacion.salirDeUbicacion(this);
+        ubiNueva.agregarEspiritu(this);
     }
 }
 
