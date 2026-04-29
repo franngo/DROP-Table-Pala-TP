@@ -3,7 +3,6 @@ package ar.edu.unq.epersgeist.persistencia.dao.hibernate;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.ErrorAlActualizarUbicacionException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.IdUbicacionInvalidoException;
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateSessionContext;
 import org.hibernate.Session;
@@ -15,6 +14,9 @@ public class HibernateUbicacionDAO implements UbicacionDAO {
 
     @Override
     public Ubicacion guardar(Ubicacion ubicacion) {
+
+        //Ya se ataja el caso null y el caso id null en service
+
         return this.hibernateDAO.crear(ubicacion);
     }
 
@@ -22,9 +24,7 @@ public class HibernateUbicacionDAO implements UbicacionDAO {
     public void actualizar(Ubicacion ubicacion) {
         Session session = HibernateSessionContext.getCurrentSession();
 
-        if (ubicacion == null || ubicacion.getId() == null){
-            throw new ErrorAlActualizarUbicacionException("No se puede actualizar la ubicacion que no tiene id.");
-        }
+        //Ya se ataja el caso null y el caso id null en service
 
         Ubicacion u = session.get(Ubicacion.class, ubicacion.getId());
 

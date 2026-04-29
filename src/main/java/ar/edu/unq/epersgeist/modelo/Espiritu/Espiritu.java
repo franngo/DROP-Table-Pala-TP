@@ -2,6 +2,8 @@ package ar.edu.unq.epersgeist.modelo.Espiritu;
 
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionInvalidaException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +21,7 @@ import java.io.Serializable;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "tipo_espiritu")
 
-public class Espiritu implements Serializable {
+public abstract class Espiritu implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -27,7 +29,7 @@ public class Espiritu implements Serializable {
 
     private double nivelDeConexion;
     private String nombre;
-    private boolean libre;
+
 
     @ManyToOne
     @JoinColumn(name = "mediumCon_id")
@@ -37,14 +39,34 @@ public class Espiritu implements Serializable {
 
     public static final int limiteConexion = 100;
 
-    public Espiritu(@NonNull String nombre) {
+    public Espiritu(@NonNull String nombre, Ubicacion ubicacion) {
+        this.validarUbicacionNoNula(ubicacion);
+
         this.nivelDeConexion = 0;
         this.nombre = nombre;
-        this.libre = true;
+        this.ubicacion = ubicacion;
+        this.ubicacion.agregarEspiritu(this);
+
     }
 
+    private void validarUbicacionNoNula(Ubicacion ubicacion) {
+        if(ubicacion==null) {
+            throw new UbicacionInvalidaException();
+        }
+    }
+
+    public boolean estaLibre() {
+        return mediumCon == null;
+    }
 
     public void aumentarConexionYConectar(Medium medium) {
+        if (!this.estaLibre()) {
+            throw new ErrorAlConectarEspirituConMedium("El espiritu no se encuentra libre");
+        }
+        if (!this.estaUbicadoEnElMismoLugarQue(medium)) {
+            throw new ErrorAlConectarEspirituConMedium("El espiritu se encuentra en una ubicacion diferente al medium");
+        }
+
         this.fortalecerConexion(medium.cantidadDeFortalecimientoDeConexion());
         medium.agregarEspiritu(this);
     }
@@ -61,23 +83,26 @@ public class Espiritu implements Serializable {
 
 
     public void desvincularse() {
-        this.libre = true;
+
         this.mediumCon.desvincularseDe(this);
+        this.mediumCon = null;
     }
 
 
-    public boolean getLibre() {
-        return libre;
-    }
-
-
-    public void recibirAtaqueDe(Espiritu angel) {
-    }
+    public abstract void recibirAtaqueDe(Espiritu angel);
 
 
     public boolean estaUbicadoEnElMismoLugarQue(Medium mediumAConectar) {
         return this.getUbicacion().tieneElMismoNombreQue(mediumAConectar.getUbicacion());
     }
 
+    public void vincular(Medium medium) {
+        this.mediumCon = medium;
+    }
+
+    public void moverseA(Ubicacion ubiNueva) {
+        this.ubicacion.salirDeUbicacion(this);
+        ubiNueva.agregarEspiritu(this);
+    }
 }
 

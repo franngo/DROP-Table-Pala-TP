@@ -5,9 +5,11 @@ import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeMediumNoEncontradoException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ExorcismoPropioNoPermitidoException;
+import ar.edu.unq.epersgeist.modelo.exceptions.IdMediumInvalidoException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.servicios.MediumService;
+import ar.edu.unq.epersgeist.servicios.runner.HibernateSessionContext;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 
 import java.util.ArrayList;
@@ -31,6 +33,10 @@ public class MediumServiceImpl implements MediumService {
     @Override
     public Medium recuperar(Long idMedium) {
         return HibernateTransactionRunner.runTrx(() -> {
+            if (idMedium == null) {
+                throw new IdMediumInvalidoException();
+            }
+
             Medium mediumRecuperado = mediumDao.recuperar(idMedium);
 
             if (mediumRecuperado == null) {
@@ -92,7 +98,6 @@ public class MediumServiceImpl implements MediumService {
             }
 
             return m.invocar(e);
-
         });
     }
 

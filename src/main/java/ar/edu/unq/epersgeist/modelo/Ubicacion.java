@@ -34,16 +34,25 @@ public class Ubicacion {
     }
 
     public void agregarEspiritu(Espiritu espiritu) {
-        this.espiritus.add(espiritu);
-        espiritu.setUbicacion(this);
+        if (!espiritus.contains(espiritu)) {
+            this.espiritus.add(espiritu);
+            espiritu.setUbicacion(this);
+        }
     }
 
+
     public boolean tieneElMismoNombreQue(Ubicacion ubicacion) {
-        return this.getNombre() == ubicacion.getNombre();
+        return this.getNombre().equals(ubicacion.getNombre());
     }
 
     public void agregarMedium(Medium medium) {
-        this.mediums.add(medium);
-        medium.setUbicacion(this);
+        if (!mediums.contains(medium)) {
+            this.mediums.add(medium);
+            medium.setUbicacion(this);
+        }
+    }
+
+    public void salirDeUbicacion(Espiritu espiritu) {
+        this.espiritus.remove(espiritu);
     }
 }

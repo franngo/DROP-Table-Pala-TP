@@ -1,9 +1,12 @@
 package ar.edu.unq.epersgeist.persistencia;
 
 import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarMediumException;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,10 +20,16 @@ public class HibernateMediumDAOTest {
 
     MediumDAO mediumDao = new HibernateMediumDAO();
     Medium mediumM;
+    Ubicacion bernal;
+    UbicacionDAO ubicacionDao = new HibernateUbicacionDAO();
+
 
     @BeforeEach
     void setUp() {
-        mediumM = new Medium("Matias", 200, 100);
+        this.executeBlockInPersistentContext(() -> {
+            bernal = ubicacionDao.guardar(new Ubicacion("Bernal"));
+        });
+        mediumM = new Medium("Matias", 200, 100, bernal);
     }
 
     //tests de crear y actualizar
@@ -40,7 +49,7 @@ public class HibernateMediumDAOTest {
 
         Long id = HibernateTransactionRunner.runTrx(() -> mediumDao.crear(mediumM).getId());
 
-        Medium modificado = new Medium("Rolando el audaz", 120, 50);
+        Medium modificado = new Medium("Rolando el audaz", 120, 50, bernal);
         modificado.setId(id);
 
         //como modificado tiene el mismo id que mediumM, actualiza dicha fila en la BD
@@ -77,23 +86,23 @@ public class HibernateMediumDAOTest {
     @Test
     void noDeberiaActualizarConIdQueNoSeEncuentraEnBD() {
         ErrorAlActualizarMediumException exception =
-        assertThrows(ErrorAlActualizarMediumException.class, () -> {
-            this.executeBlockInPersistentContext(() -> {
-                mediumM.setId(1L); //no hay nada en la DB con id 1, porque arranca vacía
-                mediumDao.actualizar(mediumM);
-            });
-        });
+                assertThrows(ErrorAlActualizarMediumException.class, () -> {
+                    this.executeBlockInPersistentContext(() -> {
+                        mediumM.setId(1L); //no hay nada en la DB con id 1, porque arranca vacía
+                        mediumDao.actualizar(mediumM);
+                    });
+                });
         assertEquals("No existe en la BD el medium con id: 1", exception.getMessage());
     }
 
     @Test
     void noDeberiaActualizarConIdNulo() {
         ErrorAlActualizarMediumException exception =
-        assertThrows(ErrorAlActualizarMediumException.class, () -> {
-            this.executeBlockInPersistentContext(() -> {
-                mediumDao.actualizar(mediumM); //comienza sin id
-            });
-        });
+                assertThrows(ErrorAlActualizarMediumException.class, () -> {
+                    this.executeBlockInPersistentContext(() -> {
+                        mediumDao.actualizar(mediumM); //comienza sin id
+                    });
+                });
         assertEquals("No se puede actualizar un medium que no tiene id.", exception.getMessage());
     }
 
@@ -150,7 +159,7 @@ public class HibernateMediumDAOTest {
     public void recuperarTodosDevuelveUnEspiritu() {
 
         this.executeBlockInPersistentContext(() -> {
-            mediumDao.crear(new Medium("Juanchi el pastelero", 100, 200));
+            mediumDao.crear(new Medium("Juanchi el pastelero", 100, 200, bernal));
 
             List<Medium> lista = mediumDao.recuperarTodos();
 
@@ -163,8 +172,8 @@ public class HibernateMediumDAOTest {
 
         this.executeBlockInPersistentContext(() -> {
 
-            Medium mediumM1 = new Medium("Juancho", 100, 30);
-            Medium mediumM2 = new Medium("Alfonso", 200, 10);
+            Medium mediumM1 = new Medium("Juancho", 100, 30, bernal);
+            Medium mediumM2 = new Medium("Alfonso", 200, 10, bernal);
             mediumDao.crear(mediumM1);
             mediumDao.crear(mediumM2);
 
@@ -179,8 +188,8 @@ public class HibernateMediumDAOTest {
 
         this.executeBlockInPersistentContext(() -> {
 
-            Medium mediumM1 = new Medium("Juancho", 100, 30);
-            Medium mediumM2 = new Medium("Alfonso", 200, 10);
+            Medium mediumM1 = new Medium("Juancho", 100, 30, bernal);
+            Medium mediumM2 = new Medium("Alfonso", 200, 10, bernal);
             mediumDao.crear(mediumM1);
             mediumDao.crear(mediumM2);
 
@@ -205,6 +214,7 @@ public class HibernateMediumDAOTest {
     void tearDown() {
         executeBlockInPersistentContext(() -> {
             mediumDao.eliminarTodos();
+            ubicacionDao.eliminarTodos();
         });
     }
 

@@ -5,6 +5,8 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoException;
+import ar.edu.unq.epersgeist.modelo.exceptions.IdEspirituInvalidoException;
+import ar.edu.unq.epersgeist.modelo.exceptions.IdMediumInvalidoException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
@@ -26,12 +28,16 @@ public class EspirituServiceImpl implements EspirituService {
     @Override
     public Espiritu crear(Espiritu espiritu) {
         return
-                HibernateTransactionRunner.runTrx(() -> espirituDao.crear(espiritu));
+                HibernateTransactionRunner.runTrx(() -> espirituDao.guardar(espiritu));
     }
 
     @Override
     public Espiritu recuperar(Long espirituId) {
         return HibernateTransactionRunner.runTrx(() -> {
+            if (espirituId == null) {
+                throw new IdEspirituInvalidoException();
+            }
+
             Espiritu espiritu = espirituDao.recuperar(espirituId);
 
             if (espiritu == null) {
@@ -67,21 +73,24 @@ public class EspirituServiceImpl implements EspirituService {
     @Override
     public Medium conectar(Long espirituId, Long mediumId) {
         return HibernateTransactionRunner.runTrx(() -> {
+            if (espirituId == null) {
+                throw new IdEspirituInvalidoException();
+            }
+            if (mediumId == null) {
+                throw new IdMediumInvalidoException();
+            }
+
             Espiritu espirituAConectar = espirituDao.recuperar(espirituId);
             Medium mediumAConectar = mediumDao.recuperar(mediumId);
+
             if (espirituAConectar == null) {
                 throw new ErrorAlConectarEspirituConMedium("El espiritu no existe en la bbdd");
             }
             if (mediumAConectar == null) {
                 throw new ErrorAlConectarEspirituConMedium("El medium no existe en la bbdd");
             }
-            if (!espirituAConectar.getLibre()) {
-                throw new ErrorAlConectarEspirituConMedium("El espiritu no se encuentra libre");
-            }
-            if (!espirituAConectar.estaUbicadoEnElMismoLugarQue(mediumAConectar)) {
-                throw new ErrorAlConectarEspirituConMedium("El espiritu se encuentra en una ubicacion diferente al medium");
-            }
 
+            //las validaciones sobre si está libre y en la misma ubicación se dan en el method del modelo.
             espirituAConectar.aumentarConexionYConectar(mediumAConectar);
 
             mediumDao.actualizar(mediumAConectar);

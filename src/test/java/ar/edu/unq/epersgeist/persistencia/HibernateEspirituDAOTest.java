@@ -2,9 +2,12 @@ package ar.edu.unq.epersgeist.persistencia;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarEspirituException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,10 +20,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class HibernateEspirituDAOTest {
     private EspirituDAO espirituDao = new HibernateEspirituDAO();
     private Espiritu espirituM;
+    private Ubicacion bernal;
+    private UbicacionDAO ubicacionDao = new HibernateUbicacionDAO();
 
     @BeforeEach
     public void setUp() {
-        espirituM = new Espiritu("das");
+        this.executeBlockInPersistentContext(() -> {
+            bernal = ubicacionDao.guardar(new Ubicacion("Bernal"));
+        });
+        espirituM = new Angelical("das", bernal);
     }
 
     @Test
@@ -86,7 +94,7 @@ public class HibernateEspirituDAOTest {
     public void recuperarTodosDevuelveUnEspiritu() {
 
         this.executeBlockInPersistentContext(() -> {
-            espirituDao.crear(new Espiritu("Matias"));
+            espirituDao.crear(new Angelical("Matias", bernal));
 
             List<Espiritu> lista = espirituDao.recuperarTodos();
 
@@ -98,8 +106,8 @@ public class HibernateEspirituDAOTest {
     public void recuperarTodosDevuelveVariosElementos() {
 
         this.executeBlockInPersistentContext(() -> {
-            espirituDao.crear(new Espiritu("Matias"));
-            espirituDao.crear(new Espiritu("Juan"));
+            espirituDao.crear(new Angelical("Matias", bernal));
+            espirituDao.crear(new Angelical("Juanchi el Pastelero", bernal));
 
             List<Espiritu> lista = espirituDao.recuperarTodos();
 
@@ -111,9 +119,9 @@ public class HibernateEspirituDAOTest {
     public void recuperarTodosDevuelveListaOrdenadaPorNombre() {
 
         this.executeBlockInPersistentContext(() -> {
-            espirituDao.crear(new Espiritu("Matias"));
-            espirituDao.crear(new Espiritu("Juanchi el Pastelero"));
-            espirituDao.crear(new Espiritu("Alberto"));
+            espirituDao.crear(new Angelical("Matias", bernal));
+            espirituDao.crear(new Angelical("Juanchi el Pastelero", bernal));
+            espirituDao.crear(new Angelical("Alberto", bernal));
 
             List<Espiritu> lista = espirituDao.recuperarTodos();
 
@@ -127,7 +135,7 @@ public class HibernateEspirituDAOTest {
     public void seActualizaUnEspirituExistente() {
 
         this.executeBlockInPersistentContext(() -> {
-            Espiritu creado = espirituDao.crear(new Espiritu("Matias"));
+            Espiritu creado = espirituDao.crear(new Angelical("Matias", bernal));
             assertNotNull(creado.getId());
 
             creado.setNombre("NombreActualizado");
@@ -144,7 +152,7 @@ public class HibernateEspirituDAOTest {
     public void fallaAlActualizarUnEspirituInexistente() {
 
         Long idInexistente = 999L;
-        Espiritu inexistente = new Angelical("NoExisto");
+        Espiritu inexistente = new Angelical("NoExisto", bernal);
 
         inexistente.setId(idInexistente);
         ErrorAlActualizarEspirituException exception =
@@ -159,7 +167,7 @@ public class HibernateEspirituDAOTest {
     @Test
     public void fallaAlActualizarUnEspirituSinId() {
 
-        Espiritu espirituNoPersistido = new Angelical("NoEstoyPersistido");
+        Espiritu espirituNoPersistido = new Angelical("NoEstoyPersistido", bernal);
 
         ErrorAlActualizarEspirituException exception =
                 assertThrows(ErrorAlActualizarEspirituException.class, () -> {
@@ -183,6 +191,7 @@ public class HibernateEspirituDAOTest {
     void tearDown() {
         executeBlockInPersistentContext(() -> {
             espirituDao.eliminarTodos();
+            ubicacionDao.eliminarTodos();
         });
     }
 }

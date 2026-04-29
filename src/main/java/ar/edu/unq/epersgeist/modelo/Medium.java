@@ -37,16 +37,18 @@ public class Medium implements Serializable {
     @ManyToOne
     private Ubicacion ubicacion;
 
-    public Medium(@NonNull String nombre, @NonNull Integer manaMax, @NonNull Integer mana) {
+    public Medium(@NonNull String nombre, @NonNull Integer manaMax, @NonNull Integer mana, Ubicacion ubicacion) {
         this.espiritus = new ArrayList<Espiritu>();
         this.nombre = nombre;
         this.manaMax = manaMax;
         this.mana = mana;
+        this.ubicacion = ubicacion;
+        this.ubicacion.agregarMedium(this);
     }
 
     public void agregarEspiritu(Espiritu espiritu) {
         espiritus.add(espiritu);
-        espiritu.setMediumCon(this);
+        espiritu.vincular(this);
     }
 
     public void descansar() {
@@ -87,14 +89,14 @@ public class Medium implements Serializable {
             return espiritu; //si no hay suificiente maná, no se hace nada
         }
 
-        if (espiritu.getMediumCon() != null) { //si el Espiritu NO está libre
+        if (!espiritu.estaLibre()) { //El Espiritu dado debe estar libre
             throw new ErrorDeInvocacionDeEspirituException();
         }
 
         this.mana = Math.max(minimoMana, this.cantidadAlInvocar(manaRequeridoInvocacion));
 
-        espiritu.setUbicacion(this.ubicacion);
-        this.ubicacion.agregarEspiritu(espiritu);
+        //se desliga de su vieja ubicación y se relaciona con la nueva
+        espiritu.moverseA(this.ubicacion);
 
         return espiritu;
     }

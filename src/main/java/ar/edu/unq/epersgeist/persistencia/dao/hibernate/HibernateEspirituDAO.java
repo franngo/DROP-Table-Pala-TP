@@ -3,10 +3,7 @@ package ar.edu.unq.epersgeist.persistencia.dao.hibernate;
 import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlActualizarEspirituException;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorCantidadPorPaginaInvalidaExcepcion;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDireccionNulaException;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorNumeroPaginaInvalidoExcepcion;
+import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateSessionContext;
 import org.hibernate.Session;
@@ -21,6 +18,14 @@ public class HibernateEspirituDAO extends HibernateDAO<Espiritu> implements Espi
 
     @Override
     public Espiritu guardar(Espiritu espiritu) {
+        if (espiritu == null) {
+            throw new ErrorAlCrearEspirituException("espíritu nulo.");
+        }
+
+        if (espiritu.getId() != null) {
+            throw new ErrorAlCrearEspirituException("ya tiene un id asignado.");
+        }
+
         return super.crear(espiritu);
     }
 

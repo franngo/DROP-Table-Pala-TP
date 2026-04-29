@@ -27,6 +27,10 @@ public class UbicacionServiceImpl implements UbicacionService {
                 throw new UbicacionInvalidaException();
             }
 
+            if (ubicacion.getId() != null) {
+                throw new UbicacionNoPuedeTenerIdAlCrear();
+            }
+
             String nombre = ubicacion.getNombre();
 
             if (nombre == null || nombre.isBlank()) {
@@ -36,8 +40,8 @@ public class UbicacionServiceImpl implements UbicacionService {
             String trimmed = nombre.trim();
             ubicacion.setNombre(trimmed);
 
-            if (this.ubicacionDAO.recuperarPorNombre(trimmed) != null) {
-                throw new UbicacionYaExisteException(trimmed);
+            if (ubicacionDAO.recuperarPorNombre(trimmed) != null) {
+                throw new UbicacionYaExisteConEseNombreException(trimmed);
             }
 
             return this.ubicacionDAO.guardar(ubicacion);
@@ -46,13 +50,19 @@ public class UbicacionServiceImpl implements UbicacionService {
     }
 
     @Override
-    public Ubicacion recuperar(Long id) {
+    public Ubicacion recuperar(Long idUbicacion) {
         return HibernateTransactionRunner.runTrx(() -> {
-            if (id == null) {
+            if (idUbicacion == null) {
                 throw new IdUbicacionInvalidoException();
             }
 
-            return this.ubicacionDAO.recuperar(id);
+            Ubicacion ubicacionRecuperada = this.ubicacionDAO.recuperar(idUbicacion);
+
+            if (ubicacionRecuperada == null) {
+                throw new ErrorDeUbicacionNoEncontradaException(idUbicacion);
+            }
+
+            return ubicacionRecuperada;
         });
     }
 
@@ -87,17 +97,15 @@ public class UbicacionServiceImpl implements UbicacionService {
     @Override
     public void actualizar(Ubicacion ubicacionMod) {
         HibernateTransactionRunner.runTrx(() -> {
-            if (ubicacionMod == null || ubicacionMod.getId() == null) {
+            if (ubicacionMod == null) {
+                throw new ErrorAlActualizarUbicacionException("No se puede actualizar una ubicación nula.");
+            }
+
+            if (ubicacionMod.getId() == null) {
                 throw new ErrorAlActualizarUbicacionException("No se puede actualizar una ubicacion que no tiene id.");
             }
 
             Ubicacion existente = ubicacionDAO.recuperar(ubicacionMod.getId());
-
-            if (existente == null) {
-                throw new ErrorAlActualizarUbicacionException(
-                        "No existe en la BD la ubicacion con id: " + ubicacionMod.getId()
-                );
-            }
 
             this.ubicacionDAO.actualizar(ubicacionMod);
 
