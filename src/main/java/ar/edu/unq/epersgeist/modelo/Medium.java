@@ -96,7 +96,7 @@ public class Medium implements Serializable {
         this.mana = Math.max(minimoMana, this.cantidadAlInvocar(manaRequeridoInvocacion));
 
         //se desliga de su vieja ubicación y se relaciona con la nueva
-        espiritu.MoverseA(this.ubicacion);
+        espiritu.moverseA(this.ubicacion);
 
         return espiritu;
     }

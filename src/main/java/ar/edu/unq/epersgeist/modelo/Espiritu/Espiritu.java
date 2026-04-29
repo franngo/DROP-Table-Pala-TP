@@ -100,7 +100,7 @@ public abstract class Espiritu implements Serializable {
         this.mediumCon = medium;
     }
 
-    public void MoverseA(Ubicacion ubiNueva) {
+    public void moverseA(Ubicacion ubiNueva) {
         this.ubicacion.salirDeUbicacion(this);
         ubiNueva.agregarEspiritu(this);
     }
