@@ -89,12 +89,7 @@ public class EspirituServiceImpl implements EspirituService {
             if (mediumAConectar == null) {
                 throw new ErrorAlConectarEspirituConMedium("El medium no existe en la bbdd");
             }
-//            if (!espirituAConectar.estaLibre()) {
-//                throw new ErrorAlConectarEspirituConMedium("El espiritu no se encuentra libre");
-//            }
-//            if (!espirituAConectar.estaUbicadoEnElMismoLugarQue(mediumAConectar)) {
-//                throw new ErrorAlConectarEspirituConMedium("El espiritu se encuentra en una ubicacion diferente al medium");
-//            }
+
             //las validaciones sobre si está libre y en la misma ubicación se dan en el method del modelo.
             espirituAConectar.aumentarConexionYConectar(mediumAConectar);
 
