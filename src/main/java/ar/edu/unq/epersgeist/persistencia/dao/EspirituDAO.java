@@ -15,6 +15,7 @@ public interface EspirituDAO extends JpaRepository<Espiritu, Long> {
     @Query("SELECT e FROM Demonio e ORDER BY e.nivelDeConexion DESC")
     List<Espiritu> espiritusDemoniacos();
 
+    
     @Query("SELECT e FROM Demonio e")
     Page<Espiritu> espiritusDemoniacos(Pageable pageable);
 
