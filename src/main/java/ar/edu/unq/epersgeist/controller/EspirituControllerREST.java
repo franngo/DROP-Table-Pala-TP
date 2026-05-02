@@ -13,6 +13,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/espiritus")
 @AllArgsConstructor
@@ -49,6 +51,17 @@ public class EspirituControllerREST {
         return MapperEspiritu.toDetalle(espiritu);
 
     }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK) //TODO correjir codigo
+    public List<EspirituResponseDTO> obtenerTodosLosItems() {
+        List<Espiritu> todosE = espirituService.recuperarTodos();
+        return todosE.stream().map(MapperEspiritu::toDetalle).toList();
+    }
+
+    @PutMapping("/{id}")
+    public void
+
 }
 
 
