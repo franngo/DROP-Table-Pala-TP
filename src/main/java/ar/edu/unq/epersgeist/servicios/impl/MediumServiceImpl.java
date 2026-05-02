@@ -2,143 +2,125 @@ package ar.edu.unq.epersgeist.servicios.impl;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoException;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeMediumNoEncontradoException;
-import ar.edu.unq.epersgeist.modelo.exceptions.ExorcismoPropioNoPermitidoException;
-import ar.edu.unq.epersgeist.modelo.exceptions.IdMediumInvalidoException;
+import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.servicios.MediumService;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateSessionContext;
 import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
+import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
-
+@Service
+@Transactional
 public class MediumServiceImpl implements MediumService {
     private MediumDAO mediumDao;
     private EspirituDAO espirituDao; //se requiere para usar en el invocar()
 
-    public MediumServiceImpl(MediumDAO mediumDao, EspirituDAO espirituDao) {
-        this.mediumDao = mediumDao;
-        this.espirituDao = espirituDao;
-    }
+//    public MediumServiceImpl(MediumDAO mediumDao, EspirituDAO espirituDao) {
+//        this.mediumDao = mediumDao;
+//        this.espirituDao = espirituDao;
+//    }
 
     @Override
     public Medium crear(Medium medium) {
-        return HibernateTransactionRunner.runTrx(() -> this.mediumDao.crear(medium));
+        if (medium == null) {
+            throw new ErrorAlCrearMediumException("medium nulo.");
+        }
+
+        if (medium.getId() != null) {
+            throw new ErrorAlCrearMediumException("ya tiene un id asignado.");
+        }
+
+        return this.mediumDao.save(medium);
     }
 
     @Override
     public Medium recuperar(Long idMedium) {
-        return HibernateTransactionRunner.runTrx(() -> {
-            if (idMedium == null) {
-                throw new IdMediumInvalidoException();
-            }
+        if (idMedium == null) {
+            throw new IdMediumInvalidoException();
+        }
 
-            Medium mediumRecuperado = mediumDao.recuperar(idMedium);
-
-            if (mediumRecuperado == null) {
-                throw new ErrorDeMediumNoEncontradoException(idMedium);
-            }
-
-            return mediumRecuperado;
-        });
+        return mediumDao.findById(idMedium).orElseThrow(() -> new ErrorDeMediumNoEncontradoException(idMedium));
     }
 
     @Override
     public void actualizar(Medium medium) {
-        HibernateTransactionRunner.runTrx(() -> {
-            this.mediumDao.actualizar(medium);
-            return null;
-        });
+        if (medium.getId() == null) {
+            throw new ErrorAlActualizarMediumException("No se puede actualizar un medium que no tiene id.");
+        }
+
+        //lo intento recuperar solo para saber si está o no en la DB y si debo tirar el error
+        Long idMedium = medium.getId();
+        mediumDao.findById(idMedium).orElseThrow(() -> new ErrorAlActualizarMediumException("No existe en la BD el medium con id: " + idMedium));
+
+        this.mediumDao.save(medium);
     }
 
     @Override
     public void eliminar(Long idMedium) {
-        HibernateTransactionRunner.runTrx(() -> {
-            mediumDao.eliminar(idMedium);
-            return null;
-        });
+        mediumDao.deleteById(idMedium);
     }
 
     @Override
     public List<Medium> recuperarTodos() {
-        return HibernateTransactionRunner.runTrx(() ->
-                mediumDao.recuperarTodos());
+        return mediumDao.findAll();
     }
 
     @Override
-    public void descansar(Long id) {
-        HibernateTransactionRunner.runTrx(() -> {
-            Medium m = mediumDao.recuperar(id);
-
-            if (m == null) {
-                throw new ErrorDeMediumNoEncontradoException(id);
-            }
-
-            m.descansar();
-            return null;
-        });
+    public void descansar(Long idMedium) {
+        Medium m = this.recuperar(idMedium);
+        m.descansar();
     }
 
 
     @Override
     public Espiritu invocar(Long mediumId, Long espirituId) {
-        return HibernateTransactionRunner.runTrx(() -> {
-            Medium m = mediumDao.recuperar(mediumId);
-            Espiritu e = espirituDao.recuperar(espirituId);
+        Medium m = this.recuperar(mediumId);
 
-            if (m == null) {
-                throw new ErrorDeMediumNoEncontradoException(mediumId);
-            }
-            if (e == null) {
-                throw new ErrorDeEspirituNoEncontradoException(espirituId);
-            }
+        if (espirituId == null) {
+            throw new IdEspirituInvalidoException();
+        }
 
-            return m.invocar(e);
-        });
+        //remplazar por esto después cuando ya tenga el Dao de Espiritu versión Repository
+        //Espiritu e = espirituDao.findById(espirituId).orElseThrow(() -> new ErrorDeEspirituNoEncontradoException(espirituId));
+
+        Espiritu e = espirituDao.recuperar(espirituId);
+
+        if (e == null) {
+            throw new ErrorDeEspirituNoEncontradoException(espirituId);
+        }
+
+        return m.invocar(e);
     }
-
 
     @Override
     public void exorcizar(Long idMediumExorcista, Long idMediumAExorcizar) throws ExorcismoPropioNoPermitidoException {
-        if (idMediumExorcista == idMediumAExorcizar) {
+        if (idMediumExorcista.equals(idMediumAExorcizar)) {
             throw new ExorcismoPropioNoPermitidoException("Un medium no puede exorcizarse a si mismo");
         }
-        HibernateTransactionRunner.runTrx(() -> {
-            Medium mediumAtacante = mediumDao.recuperar(idMediumExorcista);
-            Medium mediumAExorcizar = mediumDao.recuperar(idMediumAExorcizar);
-            // aplico logica de modelo
-            mediumAtacante.exorcizar(mediumAExorcizar);
-            // persisto los cambios (opcional, ya que el session.flush() del final de la transacción ya se encarga de persistir los cambios de estado)
-            // mediumDao.actualizar(mediumAtacante);
-            // mediumDao.actualizar(mediumAExorcizar);
 
-            return null;
+        Medium mediumAtacante = this.recuperar(idMediumExorcista);
+        Medium mediumAExorcizar = this.recuperar(idMediumAExorcizar);
 
-        });
-
+        mediumAtacante.exorcizar(mediumAExorcizar);
     }
 
 
     @Override
     public List<Espiritu> espiritus(Long mediumId) {
-        return HibernateTransactionRunner.runTrx(() -> {
-            Medium recuperado = this.recuperar(mediumId);
-            return new ArrayList<Espiritu>(recuperado.getEspiritus());
-        });
+        Medium recuperado = this.recuperar(mediumId);
+        return new ArrayList<Espiritu>(recuperado.getEspiritus());
     }
 
 
     @Override
     public void eliminarTodos() {
-        HibernateTransactionRunner.runTrx(() -> {
-
-            mediumDao.eliminarTodos();
-            return null;
-        });
+        mediumDao.deleteAll();
     }
 
 

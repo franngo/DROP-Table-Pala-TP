@@ -3,10 +3,7 @@ package ar.edu.unq.epersgeist.servicios.impl;
 import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoException;
-import ar.edu.unq.epersgeist.modelo.exceptions.IdEspirituInvalidoException;
-import ar.edu.unq.epersgeist.modelo.exceptions.IdMediumInvalidoException;
+import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
@@ -81,19 +78,18 @@ public class EspirituServiceImpl implements EspirituService {
             }
 
             Espiritu espirituAConectar = espirituDao.recuperar(espirituId);
-            Medium mediumAConectar = mediumDao.recuperar(mediumId);
 
             if (espirituAConectar == null) {
                 throw new ErrorAlConectarEspirituConMedium("El espiritu no existe en la bbdd");
             }
-            if (mediumAConectar == null) {
-                throw new ErrorAlConectarEspirituConMedium("El medium no existe en la bbdd");
-            }
+
+            //rama de migración de mediumDao: tuve que actualizar acá de recuperar a findById porque mediumDao ya no tiene recuperar
+            Medium mediumAConectar = mediumDao.findById(mediumId).orElseThrow(() -> new ErrorAlConectarEspirituConMedium("El medium no existe en la bbdd"));
 
             //las validaciones sobre si está libre y en la misma ubicación se dan en el method del modelo.
             espirituAConectar.aumentarConexionYConectar(mediumAConectar);
 
-            mediumDao.actualizar(mediumAConectar);
+            mediumDao.save(mediumAConectar);
 
             return mediumAConectar;
         });
