@@ -10,7 +10,6 @@ import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.modelo.random.Estrategia.EstrategiaRangoEspecifico;
 import ar.edu.unq.epersgeist.modelo.random.RandomDefensa;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
-import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
 import ar.edu.unq.epersgeist.servicios.impl.MediumServiceImpl;
@@ -18,18 +17,24 @@ import ar.edu.unq.epersgeist.servicios.impl.UbicacionServiceImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class HibernateMediumServiceTest {
+@SpringBootTest
+public class MediumServiceTest {
 
-    private final HibernateMediumDAO mediumDao = new HibernateMediumDAO();
-    private final HibernateEspirituDAO espirituDao = new HibernateEspirituDAO();
-    private final EspirituService espirituService = new EspirituServiceImpl(espirituDao, mediumDao);
-    private final MediumService serviceMedium = new MediumServiceImpl(mediumDao, espirituDao);
-    UbicacionService ubicacionService = new UbicacionServiceImpl(new HibernateUbicacionDAO());
+    @Autowired
+    private EspirituService espirituService;
+
+    @Autowired
+    private MediumService serviceMedium;
+
+    @Autowired
+    private UbicacionService ubicacionService;
+
     private Ubicacion berazategui;
-
     private Espiritu espirituM;
     private Espiritu espirituM2;
     private Medium epifanioM;
@@ -264,7 +269,7 @@ public class HibernateMediumServiceTest {
 
         assertEquals(0, bernalM.getEspiritus().size());
         assertEquals(50, mediumPrueba.getMana());
-     
+
 
         Espiritu espirituP = espirituService.crear(espirituM);
 

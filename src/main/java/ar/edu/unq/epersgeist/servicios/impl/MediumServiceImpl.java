@@ -18,13 +18,13 @@ import java.util.NoSuchElementException;
 @Service
 @Transactional
 public class MediumServiceImpl implements MediumService {
-    private MediumDAO mediumDao;
-    private EspirituDAO espirituDao; //se requiere para usar en el invocar()
+    private final MediumDAO mediumDao;
+    private final EspirituDAO espirituDao; //se requiere para usar en el invocar()
 
-//    public MediumServiceImpl(MediumDAO mediumDao, EspirituDAO espirituDao) {
-//        this.mediumDao = mediumDao;
-//        this.espirituDao = espirituDao;
-//    }
+    public MediumServiceImpl(MediumDAO mediumDao, EspirituDAO espirituDao) {
+        this.mediumDao = mediumDao;
+        this.espirituDao = espirituDao;
+    }
 
     @Override
     public Medium crear(Medium medium) {
@@ -87,7 +87,7 @@ public class MediumServiceImpl implements MediumService {
         }
 
         //remplazar por esto después cuando ya tenga el Dao de Espiritu versión Repository
-        //Espiritu e = espirituDao.findById(espirituId).orElseThrow(() -> new ErrorDeEspirituNoEncontradoException(espirituId));
+//        Espiritu e = espirituDao.findById(espirituId).orElseThrow(() -> new ErrorDeEspirituNoEncontradoException(espirituId));
 
         Espiritu e = espirituDao.recuperar(espirituId);
 
