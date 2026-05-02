@@ -20,15 +20,15 @@ public class MapperEspiritu {
         return new Angelical(dto.nombre(), ubicacion);
     }
 
-    public static EspirituResponseDTO toDetalle(Espiritu espirituP) {
-        return new EspirituResponseDTO(
-                espirituP.getId(),
-                espirituP.getNombre(),
-                MapperMedium.toDetalle(espirituP.getMediumCon()),
-                MapperUbicacion.toDetalle(espirituP.getUbicacion()),
-                espirituP.getNivelDeConexion()
-        );
-    }
+//    public static EspirituResponseDTO toDetalle(Espiritu espirituP) {
+//        return new EspirituResponseDTO(
+//                espirituP.getId(),
+//                espirituP.getNombre(),
+//                MapperMedium.toDetalle(espirituP.getMediumCon()),
+//                MapperUbicacion.toDetalle(espirituP.getUbicacion()),
+//                espirituP.getNivelDeConexion()
+//        );
+//    }
 
     public static void actualizarDemonio(Demonio demonio, DemonioUpdateDTO dto) {
         demonio.setNombre(dto.nombre());

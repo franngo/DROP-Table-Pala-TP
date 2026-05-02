@@ -30,42 +30,42 @@ public class EspirituControllerREST {
     private final EspirituService espirituService;
     private final UbicacionService ubicacionService;
 
-    @PostMapping("/demonio")
-    @ResponseStatus(HttpStatus.CREATED)
-    public EspirituResponseDTO crearDemonio(@Valid @RequestBody DemonioCreateDTO dto) {
-        Ubicacion ubicacion = ubicacionService.recuperar(dto.ubicacionId());
-
-
-        Espiritu espirituM = MapperEspiritu.crearDemonio(dto, ubicacion);
-        Espiritu espirituP = espirituService.crear(espirituM);
-        return MapperEspiritu.toDetalle(espirituP);
-    }
-
-    @PostMapping("/angel")
-    @ResponseStatus(HttpStatus.CREATED)
-    public EspirituResponseDTO crearAngel(@Valid @RequestBody AngelicalCreateDTO dto) {
-        Ubicacion ubicacion = ubicacionService.recuperar(dto.ubicacionId());
-
-
-        Espiritu espirituM = MapperEspiritu.crearAngelical(dto, ubicacion);
-        Espiritu espirituP = espirituService.crear(espirituM);
-        return MapperEspiritu.toDetalle(espirituP);
-    }
-
-    @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public EspirituResponseDTO obtener(@PathVariable Long id) {
-        Espiritu espiritu = espirituService.recuperar(id);
-        return MapperEspiritu.toDetalle(espiritu);
-
-    }
-
-    @GetMapping
-    @ResponseStatus(HttpStatus.OK) //TODO correjir codigo
-    public List<EspirituResponseDTO> obtenerTodosLosItems() {
-        List<Espiritu> todosE = espirituService.recuperarTodos();
-        return todosE.stream().map(MapperEspiritu::toDetalle).toList();
-    }
+//    @PostMapping("/demonio")
+//    @ResponseStatus(HttpStatus.CREATED)
+//    public EspirituResponseDTO crearDemonio(@Valid @RequestBody DemonioCreateDTO dto) {
+//        Ubicacion ubicacion = ubicacionService.recuperar(dto.ubicacionId());
+//
+//
+////        Espiritu espirituM = MapperEspiritu.crearDemonio(dto, ubicacion);
+////        Espiritu espirituP = espirituService.crear(espirituM);
+////        return MapperEspiritu.toDetalle(espirituP);
+//    }
+//
+//    @PostMapping("/angel")
+//    @ResponseStatus(HttpStatus.CREATED)
+//    public EspirituResponseDTO crearAngel(@Valid @RequestBody AngelicalCreateDTO dto) {
+//        Ubicacion ubicacion = ubicacionService.recuperar(dto.ubicacionId());
+//
+//
+//        Espiritu espirituM = MapperEspiritu.crearAngelical(dto, ubicacion);
+//        Espiritu espirituP = espirituService.crear(espirituM);
+//        return MapperEspiritu.toDetalle(espirituP);
+//    }
+//
+//    @GetMapping("/{id}")
+//    @ResponseStatus(HttpStatus.OK)
+//    public EspirituResponseDTO obtener(@PathVariable Long id) {
+//        Espiritu espiritu = espirituService.recuperar(id);
+//        return MapperEspiritu.toDetalle(espiritu);
+//
+//    }
+//
+//    @GetMapping
+//    @ResponseStatus(HttpStatus.OK) //TODO correjir codigo
+//    public List<EspirituResponseDTO> obtenerTodosLosItems() {
+//        List<Espiritu> todosE = espirituService.recuperarTodos();
+//        return todosE.stream().map(MapperEspiritu::toDetalle).toList();
+//    }
 
     @PutMapping("/demonio/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT) // 204
@@ -98,13 +98,13 @@ public class EspirituControllerREST {
         espirituService.eliminar(id);
     }
 
-    //CASOS DE USO
-    @GetMapping("/demoniacos")
-    @ResponseStatus(HttpStatus.OK)
-    List<EspirituResponseDTO> espiritusDemoniacos() {
-        List<Demonio> todosE = espirituService.espiritusDemoniacos();
-        return todosE.stream().map(MapperEspiritu::toDetalle).toList();
-    }
+//    //CASOS DE USO
+//    @GetMapping("/demoniacos")
+//    @ResponseStatus(HttpStatus.OK)
+//    List<EspirituResponseDTO> espiritusDemoniacos() {
+//        List<Demonio> todosE = espirituService.espiritusDemoniacos();
+//        return todosE.stream().map(MapperEspiritu::toDetalle).toList();
+//    }
 
     @PostMapping("/{espirituId}/conectar/{mediumId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -114,18 +114,18 @@ public class EspirituControllerREST {
         espirituService.conectar(espirituId, mediumId);
     }
 
-    @GetMapping("/espiritus/demoniacos")
-    @ResponseStatus(HttpStatus.OK)
-    public PaginacionEspirituResponseDTO espiritusDemoniacos(
-            @RequestParam Direccion direccion,
-            @RequestParam int pagina,
-            @RequestParam int cantidadPorPagina
-    ) {
-        Page<Demonio> paginada = espirituService.espiritusDemoniacos(direccion, pagina, cantidadPorPagina);
-        return PageMapper.toEspirituPage(paginada,
-                MapperEspiritu::toDetalle,
-                direccion);
-    }
+//    @GetMapping("/espiritus/demoniacos")
+//    @ResponseStatus(HttpStatus.OK)
+//    public PaginacionEspirituResponseDTO espiritusDemoniacos(
+//            @RequestParam Direccion direccion,
+//            @RequestParam int pagina,
+//            @RequestParam int cantidadPorPagina
+//    ) {
+//        Page<Demonio> paginada = espirituService.espiritusDemoniacos(direccion, pagina, cantidadPorPagina);
+//        return PageMapper.toEspirituPage(paginada,
+//                MapperEspiritu::toDetalle,
+//                direccion);
+//    }
 
 }
 
