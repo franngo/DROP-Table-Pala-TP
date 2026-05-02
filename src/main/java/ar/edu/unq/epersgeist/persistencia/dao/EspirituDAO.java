@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.persistencia.dao;
 
+import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,11 +14,11 @@ import java.util.List;
 public interface EspirituDAO extends JpaRepository<Espiritu, Long> {
 
     @Query("SELECT e FROM Demonio e ORDER BY e.nivelDeConexion DESC")
-    List<Espiritu> espiritusDemoniacos();
+    List<Demonio> espiritusDemoniacos();
 
-    
+
     @Query("SELECT e FROM Demonio e")
-    Page<Espiritu> espiritusDemoniacos(Pageable pageable);
+    Page<Demonio> espiritusDemoniacos(Pageable pageable);
 
 
 }

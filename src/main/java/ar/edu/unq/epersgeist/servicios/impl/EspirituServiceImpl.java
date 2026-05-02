@@ -1,6 +1,7 @@
 package ar.edu.unq.epersgeist.servicios.impl;
 
 import ar.edu.unq.epersgeist.modelo.Direccion;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
@@ -80,14 +81,14 @@ public class EspirituServiceImpl implements EspirituService {
     }
 
     @Override
-    public List<Espiritu> espiritusDemoniacos() {
+    public List<Demonio> espiritusDemoniacos() {
 
         return espirituDao.espiritusDemoniacos();
     }
 
     //versión que implementa la paginación
     @Override
-    public List<Espiritu> espiritusDemoniacos(Direccion direccion, int pag, int cantPorPag) {
+    public List<Demonio> espiritusDemoniacos(Direccion direccion, int pag, int cantPorPag) {
         if (direccion == null) {
             throw new ErrorDireccionNulaException();
         }
