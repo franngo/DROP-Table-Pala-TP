@@ -1,7 +1,9 @@
 package ar.edu.unq.epersgeist.controller.mappers;
 
 import ar.edu.unq.epersgeist.controller.dto.espiritus.request.AngelicalCreateDTO;
+import ar.edu.unq.epersgeist.controller.dto.espiritus.request.AngelicalUpdateDTO;
 import ar.edu.unq.epersgeist.controller.dto.espiritus.request.DemonioCreateDTO;
+import ar.edu.unq.epersgeist.controller.dto.espiritus.request.DemonioUpdateDTO;
 import ar.edu.unq.epersgeist.controller.dto.espiritus.response.EspirituResponseDTO;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
@@ -27,4 +29,15 @@ public class MapperEspiritu {
                 espirituP.getNivelDeConexion()
         );
     }
+
+    public static void actualizarDemonio(Demonio demonio, DemonioUpdateDTO dto) {
+        demonio.setNombre(dto.nombre());
+        demonio.setNivelDeConexion(dto.nivelConexion());
+    }
+
+    public static void actualizarAngelical(Angelical angel, AngelicalUpdateDTO dto) {
+        angel.setNombre(dto.nombre());
+        angel.setNivelDeConexion(dto.nivelConexion());
+    }
+
 }
