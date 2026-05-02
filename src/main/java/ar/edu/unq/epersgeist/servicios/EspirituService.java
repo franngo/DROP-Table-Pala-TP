@@ -1,8 +1,10 @@
 package ar.edu.unq.epersgeist.servicios;
 
 import ar.edu.unq.epersgeist.modelo.Direccion;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -19,9 +21,9 @@ public interface EspirituService {
 
     Medium conectar(Long espirituId, Long mediumId);
 
-    List<Espiritu> espiritusDemoniacos();
+    List<Demonio> espiritusDemoniacos();
 
     void eliminarTodos();
 
-    List<Espiritu> espiritusDemoniacos(Direccion direccion, int pag, int cantPorPag);
+    Page<Demonio> espiritusDemoniacos(Direccion direccion, int pag, int cantPorPag);
 }

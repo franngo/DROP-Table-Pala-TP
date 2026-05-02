@@ -1,20 +1,24 @@
 package ar.edu.unq.epersgeist.persistencia.dao;
 
-import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface EspirituDAO {
-    Espiritu guardar(Espiritu espiritu);
+@Repository
+public interface EspirituDAO extends JpaRepository<Espiritu, Long> {
 
-    Espiritu crear(Espiritu espiritu);
-    Espiritu recuperar(Long idDelEspiritu);
-    void actualizar(Espiritu espiritu);
-    void eliminar(Long idDelEspiritu);
-    List<Espiritu> recuperarTodos();
-    void eliminarTodos();
-    List<Espiritu> espiritusDemoniacos();
-    List<Espiritu> espiritusDemoniacos(Direccion direccion, int pag, int cantPorPag);
+    @Query("SELECT e FROM Demonio e ORDER BY e.nivelDeConexion DESC")
+    List<Demonio> espiritusDemoniacos();
+
+
+    @Query("SELECT e FROM Demonio e")
+    Page<Demonio> espiritusDemoniacos(Pageable pageable);
+
+
 }

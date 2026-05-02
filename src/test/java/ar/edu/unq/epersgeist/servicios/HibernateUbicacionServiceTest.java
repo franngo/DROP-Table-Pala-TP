@@ -1,10 +1,12 @@
 package ar.edu.unq.epersgeist.servicios;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
-import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.*;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.ErrorDeUbicacionNoEncontradaException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteConEseNombreException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,8 +28,21 @@ public class HibernateUbicacionServiceTest {
 
     private final Ubicacion templo = new Ubicacion(NOMBRE_TEMPLO);
     private final Ubicacion cripta = new Ubicacion(NOMBRE_CRIPTA);
+    Ubicacion berazategui = new Ubicacion("Berazategui");
 
     private final Long ubicacionIdInexistente = 999L;
+    private final Espiritu guerrero = new Angelical("Espíritu de la Luz", berazategui);
+    private final Espiritu mago = new Angelical("Espíritu de la Oscuridad", berazategui);
+
+    private final Medium epifanio = new Medium("epifanio", 150, 50, berazategui);
+    private final Medium ubeda = new Medium("ubeda", 100, 20, berazategui);
+
+
+    @BeforeEach
+    void setUp() {
+
+
+    }
 
     // ============================== CREAR ==============================
 
@@ -137,6 +152,7 @@ public class HibernateUbicacionServiceTest {
         assertThrows(
                 UbicacionNoEncontradaException.class,
                 () -> ubicacionService.actualizar(templo)
+
         );
     }
 
@@ -295,6 +311,8 @@ public class HibernateUbicacionServiceTest {
 
     @AfterEach
     void tearDown() {
+        espirituService.eliminarTodos();
+        mediumService.eliminarTodos();
         ubicacionService.eliminarTodos();
     }
 }

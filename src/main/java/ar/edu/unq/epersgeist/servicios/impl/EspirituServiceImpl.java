@@ -1,124 +1,124 @@
 package ar.edu.unq.epersgeist.servicios.impl;
 
 import ar.edu.unq.epersgeist.modelo.Direccion;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoException;
-import ar.edu.unq.epersgeist.modelo.exceptions.IdEspirituInvalidoException;
-import ar.edu.unq.epersgeist.modelo.exceptions.IdMediumInvalidoException;
+import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
-import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
+@Service
+@Transactional
+@AllArgsConstructor
 public class EspirituServiceImpl implements EspirituService {
     private EspirituDAO espirituDao;
 
     private MediumDAO mediumDao;
 
-    public EspirituServiceImpl(EspirituDAO espirituDao, MediumDAO mediumDao) {
-
-        this.espirituDao = espirituDao;
-        this.mediumDao = mediumDao;
-    }
-
     @Override
     public Espiritu crear(Espiritu espiritu) {
-        return
-                HibernateTransactionRunner.runTrx(() -> espirituDao.guardar(espiritu));
+        return espirituDao.save(espiritu);
     }
 
     @Override
     public Espiritu recuperar(Long espirituId) {
-        return HibernateTransactionRunner.runTrx(() -> {
-            if (espirituId == null) {
-                throw new IdEspirituInvalidoException();
-            }
 
-            Espiritu espiritu = espirituDao.recuperar(espirituId);
-
-            if (espiritu == null) {
-                throw new ErrorDeEspirituNoEncontradoException(espirituId);
-            }
-
-            return espiritu;
-        });
+        return espirituDao.findById(espirituId).orElseThrow(
+                () -> new ErrorDeEspirituNoEncontradoException(espirituId)
+        );
     }
 
     @Override
     public void actualizar(Espiritu espiritu) {
-        HibernateTransactionRunner.runTrx(() -> {
-            espirituDao.actualizar(espiritu);
-            return null;
-        });
+
+        espirituDao.save(espiritu);
+
     }
 
     @Override
     public void eliminar(Long espirituId) {
-        HibernateTransactionRunner.runTrx(() -> {
-            espirituDao.eliminar(espirituId);
-            return null;
-        });
+
+        espirituDao.deleteById(espirituId);
+
     }
 
     @Override
     public List<Espiritu> recuperarTodos() {
-        return HibernateTransactionRunner.runTrx(() ->
-                espirituDao.recuperarTodos());
+
+        return espirituDao.findAll();
     }
 
     @Override
     public Medium conectar(Long espirituId, Long mediumId) {
-        return HibernateTransactionRunner.runTrx(() -> {
-            if (espirituId == null) {
-                throw new IdEspirituInvalidoException();
-            }
-            if (mediumId == null) {
-                throw new IdMediumInvalidoException();
-            }
+        Optional<Espiritu> espirituAConectar = espirituDao.findById(espirituId);
 
-            Espiritu espirituAConectar = espirituDao.recuperar(espirituId);
-            Medium mediumAConectar = mediumDao.recuperar(mediumId);
+        Optional<Medium> mediumAConectar = mediumDao.findById(mediumId);
 
-            if (espirituAConectar == null) {
-                throw new ErrorAlConectarEspirituConMedium("El espiritu no existe en la bbdd");
-            }
-            if (mediumAConectar == null) {
-                throw new ErrorAlConectarEspirituConMedium("El medium no existe en la bbdd");
-            }
+        if (espirituAConectar.isEmpty()) {
+            throw new ErrorAlConectarEspirituConMedium("El espiritu no existe en la bbdd");
+        }
+        if (mediumAConectar.isEmpty()) {
+            throw new ErrorAlConectarEspirituConMedium("El medium no existe en la bbdd");
+        }
+        Espiritu espirituEncontrado = espirituAConectar.get();
+        Medium mediumEncontrado = mediumAConectar.get();
+        //las validaciones sobre si está libre y en la misma ubicación se dan en el method del modelo.
+        espirituEncontrado.aumentarConexionYConectar(mediumEncontrado);
 
-            //las validaciones sobre si está libre y en la misma ubicación se dan en el method del modelo.
-            espirituAConectar.aumentarConexionYConectar(mediumAConectar);
+        return mediumDao.save(mediumEncontrado);
 
-            mediumDao.actualizar(mediumAConectar);
 
-            return mediumAConectar;
-        });
     }
 
     @Override
-    public List<Espiritu> espiritusDemoniacos() {
-        return HibernateTransactionRunner.runTrx(() ->
-                espirituDao.espiritusDemoniacos());
+    public List<Demonio> espiritusDemoniacos() {
+
+        return espirituDao.espiritusDemoniacos();
     }
 
     //versión que implementa la paginación
     @Override
-    public List<Espiritu> espiritusDemoniacos(Direccion direccion, int pag, int cantPorPag) {
-        return HibernateTransactionRunner.runTrx(() ->
-                espirituDao.espiritusDemoniacos(direccion, pag, cantPorPag));
+    public Page<Demonio> espiritusDemoniacos(Direccion direccion, int pag, int cantPorPag) {
+        if (direccion == null) {
+            throw new ErrorDireccionNulaException();
+        }
+
+        if (pag <= 0) {
+            throw new ErrorNumeroPaginaInvalidoExcepcion();
+        }
+
+        if (cantPorPag <= 0) {
+            throw new ErrorCantidadPorPaginaInvalidaExcepcion();
+        }
+
+        Sort sort = (direccion == Direccion.DESCENDENTE)
+                ? Sort.by("nivelDeConexion").descending()
+                : Sort.by("nivelDeConexion").ascending();
+
+        Pageable pageable = PageRequest.of(pag - 1, cantPorPag, sort);
+
+        return espirituDao.espiritusDemoniacos(pageable);
+
     }
 
     @Override
 
     public void eliminarTodos() {
-        HibernateTransactionRunner.runTrx(() -> {
-            espirituDao.eliminarTodos();
-            return null;
-        });
+
+        espirituDao.deleteAll();
+
     }
 
 }
