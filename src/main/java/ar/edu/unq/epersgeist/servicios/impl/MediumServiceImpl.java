@@ -86,10 +86,8 @@ public class MediumServiceImpl implements MediumService {
             throw new IdEspirituInvalidoException();
         }
 
-        //remplazar por esto después cuando ya tenga el Dao de Espiritu versión Repository
-//        Espiritu e = espirituDao.findById(espirituId).orElseThrow(() -> new ErrorDeEspirituNoEncontradoException(espirituId));
 
-        Espiritu e = espirituDao.recuperar(espirituId);
+        Espiritu e = espirituDao.findById(espirituId).orElseThrow(() -> new ErrorDeEspirituNoEncontradoException(espirituId));
 
         if (e == null) {
             throw new ErrorDeEspirituNoEncontradoException(espirituId);

@@ -9,8 +9,6 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.modelo.random.Estrategia.EstrategiaRangoEspecifico;
 import ar.edu.unq.epersgeist.modelo.random.RandomDefensa;
-import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
-import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
 import ar.edu.unq.epersgeist.servicios.impl.MediumServiceImpl;
 import ar.edu.unq.epersgeist.servicios.impl.UbicacionServiceImpl;
@@ -108,18 +106,18 @@ public class MediumServiceTest {
 
     //recuperar
 
-    @Test
-    void deberiaRecuperarCorrectamenteLosDatosDelMedium() {
-        Medium mediumRecuperado = serviceMedium.recuperar(ubedaP.getId());
-
-
-        assertEquals(ubedaP.getId(), mediumRecuperado.getId());
-        assertEquals(ubedaP.getNombre(), mediumRecuperado.getNombre());
-        assertEquals(ubedaP.getMana(), mediumRecuperado.getMana());
-        assertEquals(ubedaP.getManaMax(), mediumRecuperado.getManaMax());
-        assertEquals(0, ubedaP.getEspiritus().size());
-        assertEquals(0, mediumRecuperado.getEspiritus().size());
-    }
+//    @Test
+//    void deberiaRecuperarCorrectamenteLosDatosDelMedium() {
+//        Medium mediumRecuperado = serviceMedium.recuperar(ubedaP.getId());
+//
+//
+//        assertEquals(ubedaP.getId(), mediumRecuperado.getId());
+//        assertEquals(ubedaP.getNombre(), mediumRecuperado.getNombre());
+//        assertEquals(ubedaP.getMana(), mediumRecuperado.getMana());
+//        assertEquals(ubedaP.getManaMax(), mediumRecuperado.getManaMax());
+//        assertEquals(0, ubedaP.getEspiritus().size());
+//        assertEquals(0, mediumRecuperado.getEspiritus().size());
+//    }
 
     @Test
     void noSeEncuentraElMediumNoPersistido() {

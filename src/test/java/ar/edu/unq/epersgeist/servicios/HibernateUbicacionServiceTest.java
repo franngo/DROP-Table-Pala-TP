@@ -22,6 +22,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class HibernateUbicacionServiceTest {
     @Autowired
     private UbicacionService ubicacionService;
+    @Autowired
+    private EspirituService espirituService;
+    @Autowired
+    private MediumService mediumService;
 
     private final String NOMBRE_TEMPLO = "Templo del Alba Eterna";
     private final String NOMBRE_CRIPTA = "Cripta de los Susurros";
