@@ -7,34 +7,35 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
-import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
-import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
-import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
-import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateEspirituDAO;
-import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateMediumDAO;
-import ar.edu.unq.epersgeist.persistencia.dao.hibernate.HibernateUbicacionDAO;
-import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
-import ar.edu.unq.epersgeist.servicios.impl.MediumServiceImpl;
-import ar.edu.unq.epersgeist.servicios.impl.UbicacionServiceImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class HibernateEspirituServiceTest {
-    private final EspirituDAO espirituDao = new HibernateEspirituDAO();
+@SpringBootTest
+public class EspirituServiceTest {
+    // private final EspirituDAO espirituDao = new HibernateEspirituDAO();
 
-    private final MediumDAO mediumDao = new HibernateMediumDAO();
-    private final UbicacionDAO ubicacionDao = new HibernateUbicacionDAO();
-    private final EspirituService serviceEspiritu = new EspirituServiceImpl(espirituDao, mediumDao);
-    private final MediumService mediumService = new MediumServiceImpl(mediumDao, espirituDao);
-    private final UbicacionService ubicacionService = new UbicacionServiceImpl(ubicacionDao);
+    //private final MediumDAO mediumDao = new HibernateMediumDAO();
+    //private final UbicacionDAO ubicacionDao = new HibernateUbicacionDAO();
+    //private final EspirituService serviceEspiritu = new EspirituServiceImpl(espirituDao, mediumDao);
+    //private final MediumService mediumService = new MediumServiceImpl(mediumDao, espirituDao);
+    //private final UbicacionService ubicacionService = new UbicacionServiceImpl(ubicacionDao);
     private Espiritu matias;
     private Ubicacion berazategui;
+    
+    @Autowired
+    private final EspirituService serviceEspiritu;
+    @Autowired
+    private final MediumService mediumService;
+    @Autowired
+    private final UbicacionService ubicacionService;
 
     @BeforeEach
     public void setUp() {
