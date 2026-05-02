@@ -1,6 +1,6 @@
-package ar.edu.unq.epersgeist.controller.dto.espiritus;
+package ar.edu.unq.epersgeist.controller.dtos.espiritus;
 
-import ar.edu.unq.epersgeist.controller.dto.espiritus.response.EspirituResponseDTO;
+import ar.edu.unq.epersgeist.controller.dtos.espiritus.response.EspirituResponseDTO;
 import ar.edu.unq.epersgeist.modelo.Direccion;
 
 import java.util.List;

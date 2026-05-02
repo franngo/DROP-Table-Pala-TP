@@ -1,4 +1,4 @@
-package ar.edu.unq.epersgeist.controller.dto.espiritus.response;
+package ar.edu.unq.epersgeist.controller.dtos.espiritus.response;
 
 public record EspirituResponseDTO(
         Long id,

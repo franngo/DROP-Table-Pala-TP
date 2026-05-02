@@ -1,6 +1,6 @@
 package ar.edu.unq.epersgeist.controller.mappers;
 
-import ar.edu.unq.epersgeist.controller.dto.espiritus.PaginacionEspirituResponseDTO;
+import ar.edu.unq.epersgeist.controller.dtos.espiritus.PaginacionEspirituResponseDTO;
 import ar.edu.unq.epersgeist.modelo.Direccion;
 import org.springframework.data.domain.Page;
 

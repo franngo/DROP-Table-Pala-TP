@@ -1,11 +1,11 @@
 package ar.edu.unq.epersgeist.controller;
 
-import ar.edu.unq.epersgeist.controller.dto.espiritus.PaginacionEspirituResponseDTO;
-import ar.edu.unq.epersgeist.controller.dto.espiritus.request.AngelicalCreateDTO;
-import ar.edu.unq.epersgeist.controller.dto.espiritus.request.AngelicalUpdateDTO;
-import ar.edu.unq.epersgeist.controller.dto.espiritus.request.DemonioCreateDTO;
-import ar.edu.unq.epersgeist.controller.dto.espiritus.request.DemonioUpdateDTO;
-import ar.edu.unq.epersgeist.controller.dto.espiritus.response.EspirituResponseDTO;
+import ar.edu.unq.epersgeist.controller.dtos.espiritus.PaginacionEspirituResponseDTO;
+import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.AngelicalCreateDTO;
+import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.AngelicalUpdateDTO;
+import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.DemonioCreateDTO;
+import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.DemonioUpdateDTO;
+import ar.edu.unq.epersgeist.controller.dtos.espiritus.response.EspirituResponseDTO;
 import ar.edu.unq.epersgeist.controller.mappers.MapperEspiritu;
 import ar.edu.unq.epersgeist.controller.mappers.PageMapper;
 import ar.edu.unq.epersgeist.modelo.Direccion;

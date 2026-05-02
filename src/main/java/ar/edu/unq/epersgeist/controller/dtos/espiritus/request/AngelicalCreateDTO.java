@@ -1,4 +1,4 @@
-package ar.edu.unq.epersgeist.controller.dto.espiritus.request;
+package ar.edu.unq.epersgeist.controller.dtos.espiritus.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
