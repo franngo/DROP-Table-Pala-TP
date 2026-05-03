@@ -5,7 +5,9 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
-import ar.edu.unq.epersgeist.modelo.exceptions.*;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlCrearEspirituException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +31,7 @@ public class EspirituServiceTest {
 
     @Autowired
     private MediumService mediumService;
-   @Autowired
+    @Autowired
     private UbicacionService ubicacionService;
 
     @BeforeEach
@@ -47,13 +49,13 @@ public class EspirituServiceTest {
         assertNotNull(espirituP.getId());
     }
 
-//    @Test
-//    void fallaAlCrearEspirituNulo() {
-//        Espiritu espiritu = null;
-//        assertThrows(ErrorAlCrearEspirituException.class, () -> {
-//            Espiritu espirituP = serviceEspiritu.crear(espiritu);
-//        });
-//    }
+    @Test
+    void fallaAlCrearEspirituNulo() {
+        Espiritu espiritu = null;
+        assertThrows(ErrorAlCrearEspirituException.class, () -> {
+            Espiritu espirituP = serviceEspiritu.crear(espiritu);
+        });
+    }
 //
 //    @Test
 //    void noSeCreaUnEspirituPorqueYaTieneIdAsignado() {
