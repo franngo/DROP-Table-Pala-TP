@@ -34,7 +34,6 @@ public class EspirituServiceImpl implements EspirituService {
         this.validarEspiritu(espiritu);
         return espirituDao.save(espiritu);
 
-
     }
 
     private void validarEspiritu(Espiritu espiritu) {
