@@ -1,17 +1,22 @@
 package ar.edu.unq.epersgeist.servicios;
 
+import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
-import ar.edu.unq.epersgeist.modelo.exceptions.*;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlCrearEspirituException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoException;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -29,7 +34,7 @@ public class EspirituServiceTest {
 
     @Autowired
     private MediumService mediumService;
-   @Autowired
+    @Autowired
     private UbicacionService ubicacionService;
 
     @BeforeEach
@@ -47,22 +52,22 @@ public class EspirituServiceTest {
         assertNotNull(espirituP.getId());
     }
 
-//    @Test
-//    void fallaAlCrearEspirituNulo() {
-//        Espiritu espiritu = null;
-//        assertThrows(ErrorAlCrearEspirituException.class, () -> {
-//            Espiritu espirituP = serviceEspiritu.crear(espiritu);
-//        });
-//    }
-//
-//    @Test
-//    void noSeCreaUnEspirituPorqueYaTieneIdAsignado() {
-//        matias.setId(1L);
-//
-//        assertThrows(ErrorAlCrearEspirituException.class, () -> {
-//            serviceEspiritu.crear(matias);
-//        });
-//    }
+    @Test
+    void fallaAlCrearEspirituNulo() {
+        Espiritu espiritu = null;
+        assertThrows(ErrorAlCrearEspirituException.class, () -> {
+            Espiritu espirituP = serviceEspiritu.crear(espiritu);
+        });
+    }
+
+    @Test
+    void noSeCreaUnEspirituPorqueYaTieneIdAsignado() {
+        matias.setId(1L);
+
+        assertThrows(ErrorAlCrearEspirituException.class, () -> {
+            serviceEspiritu.crear(matias);
+        });
+    }
 
     //recuperar
 
@@ -77,13 +82,6 @@ public class EspirituServiceTest {
         assertEquals(matias.getNivelDeConexion(), espirituRecuperado.getNivelDeConexion());
     }
 
-//    @Test
-//    void debeLanzarExcepcionSiElIdEsNull() {
-//        assertThrows(
-//                IdEspirituInvalidoException.class,
-//                () -> serviceEspiritu.recuperar(null)
-//        );
-//    }
 
     @Test
     void noSeEncuentraElEspirituNoPersistido() {
@@ -115,14 +113,6 @@ public class EspirituServiceTest {
         assertEquals(99, actualizado.getNivelDeConexion());
     }
 
-//    @Test
-//    void noDeberiaActualizarConIdNulo() {
-//
-//        assertThrows(ErrorAlActualizarEspirituException.class, () -> {
-//            serviceEspiritu.actualizar(matias);
-//        });
-//
-//    }
 
     //eliminar
 
@@ -230,51 +220,55 @@ public class EspirituServiceTest {
 
     //espiritusDemoniacos (con paginación)
 
-//    @Test
-//    void losDemoniosSeDevuelvenOrdenadosPorNivelDeConexionDeFormaAscendenteYPaginados() {
-//        Espiritu charizard = new Demonio("Charizard", berazategui);
-//        charizard.setNivelDeConexion(95);
-//        serviceEspiritu.crear(charizard);
-//
-//        Espiritu bulbasaur = new Demonio("bulbasaur", berazategui);
-//        bulbasaur.setNivelDeConexion(90);
-//        serviceEspiritu.crear(bulbasaur);
-//
-//        Espiritu pikachu = new Demonio("pikachu", berazategui);
-//        pikachu.setNivelDeConexion(80);
-//        serviceEspiritu.crear(pikachu);
-//
-//        Espiritu ghastly = new Demonio("ghastly", berazategui);
-//        ghastly.setNivelDeConexion(65);
-//        serviceEspiritu.crear(ghastly);
-//
-//        Espiritu pichu = new Demonio("pichu", berazategui);
-//        pichu.setNivelDeConexion(55);
-//        serviceEspiritu.crear(pichu);
-//
-//        Espiritu raichu = new Demonio("raichu", berazategui);
-//        raichu.setNivelDeConexion(45);
-//        serviceEspiritu.crear(raichu);
-//
-//        Espiritu magikarp = new Demonio("magikarp", berazategui);
-//        magikarp.setNivelDeConexion(5);
-//        serviceEspiritu.crear(magikarp);
-//
-//
-//        Page<Demonio> daemons = serviceEspiritu.espiritusDemoniacos(Direccion.ASCENDENTE, 1, 3);
-//
-//        assertEquals(3, daemons.size());
-//        assertEquals(daemons.get(0).getId(), magikarp.getId());
-//        assertEquals(daemons.get(1).getId(), raichu.getId());
-//        assertEquals(daemons.get(2).getId(), pichu.getId());
-//
-//        Page<Demonio> daemons2 = serviceEspiritu.espiritusDemoniacos(Direccion.ASCENDENTE, 2, 3);
-//
-//        assertEquals(3, daemons.size());
-//        assertEquals(daemons2.get(0).getId(), ghastly.getId());
-//        assertEquals(daemons2.get(1).getId(), pikachu.getId());
-//        assertEquals(daemons2.get(2).getId(), bulbasaur.getId());
-//    }
+    @Test
+    void losDemoniosSeDevuelvenOrdenadosPorNivelDeConexionDeFormaAscendenteYPaginados() {
+        Espiritu charizard = new Demonio("Charizard", berazategui);
+        charizard.setNivelDeConexion(95);
+        serviceEspiritu.crear(charizard);
+
+        Espiritu bulbasaur = new Demonio("bulbasaur", berazategui);
+        bulbasaur.setNivelDeConexion(90);
+        serviceEspiritu.crear(bulbasaur);
+
+        Espiritu pikachu = new Demonio("pikachu", berazategui);
+        pikachu.setNivelDeConexion(80);
+        serviceEspiritu.crear(pikachu);
+
+        Espiritu ghastly = new Demonio("ghastly", berazategui);
+        ghastly.setNivelDeConexion(65);
+        serviceEspiritu.crear(ghastly);
+
+        Espiritu pichu = new Demonio("pichu", berazategui);
+        pichu.setNivelDeConexion(55);
+        serviceEspiritu.crear(pichu);
+
+        Espiritu raichu = new Demonio("raichu", berazategui);
+        raichu.setNivelDeConexion(45);
+        serviceEspiritu.crear(raichu);
+
+        Espiritu magikarp = new Demonio("magikarp", berazategui);
+        magikarp.setNivelDeConexion(5);
+        serviceEspiritu.crear(magikarp);
+
+
+        Page<Demonio> daemons = serviceEspiritu.espiritusDemoniacos(Direccion.ASCENDENTE, 1, 3);
+        List<Demonio> demoniosList = daemons.getContent();
+        assertEquals(3, demoniosList.size());
+        assertEquals(demoniosList.get(0).getId(), magikarp.getId());
+        assertEquals(demoniosList.get(1).getId(), raichu.getId());
+        assertEquals(demoniosList.get(2).getId(), pichu.getId());
+
+        Page<Demonio> daemons2 = serviceEspiritu.espiritusDemoniacos(Direccion.ASCENDENTE, 2, 3);
+        List<Demonio> demoniosList2 = daemons2.getContent();
+        assertEquals(3, demoniosList2.size());
+
+        assertEquals(demoniosList2.get(0).getId(), ghastly.getId());
+
+
+        assertEquals(demoniosList2.get(0).getId(), ghastly.getId());
+        assertEquals(demoniosList2.get(1).getId(), pikachu.getId());
+        assertEquals(demoniosList2.get(2).getId(), bulbasaur.getId());
+    }
 
     //recuperarTodos
 
@@ -293,24 +287,6 @@ public class EspirituServiceTest {
 
     //conectar
 
-//    @Test
-//    void noDeberiaConectarUnEspirituNuloConUnMedium() {
-//        Medium medium = new Medium("Juan", 120, 10, berazategui);
-//        Medium mediumP = mediumService.crear(medium);
-//
-//        assertThrows(IdEspirituInvalidoException.class, () -> {
-//            serviceEspiritu.conectar(null, mediumP.getId());
-//        });
-//    }
-//
-//    @Test
-//    void noDeberiaConectarUnEspirituConUnMediumNulo() {
-//        Espiritu espiritu = serviceEspiritu.crear(matias);
-//
-//        assertThrows(IdMediumInvalidoException.class, () -> {
-//            serviceEspiritu.conectar(espiritu.getId(), null);
-//        });
-//    }
 
     @Test
     void noDeberiaConectarUnEspirituInexistenteConUnMedium() {
@@ -407,50 +383,47 @@ public class EspirituServiceTest {
         });
     }
 
-//    @Test
-//    public void seConectaUnEspirituConUnMedium() {
-//        Ubicacion bernalM = new Ubicacion("Bernal");
-//        Ubicacion bernalP = ubicacionService.crear(bernalM);
-//        matias.setUbicacion(bernalP);
-//        Espiritu espirituP = serviceEspiritu.crear(matias);
-//        Medium mediumM = new Medium("Juan", 120, 10, berazategui);
-//
-//        assertEquals(0, espirituP.getNivelDeConexion());
-//        mediumM.setUbicacion(bernalP);
-//        Medium mediumP = mediumService.crear(mediumM);
-//        Medium medium2 = serviceEspiritu.conectar(espirituP.getId(), mediumM.getId());
-//
-//        assertFalse(medium2.getEspiritus().isEmpty());
-//
-//        Espiritu espirituActualizado = serviceEspiritu.recuperar(espirituP.getId());
-//
-//        assertEquals(2.0, espirituActualizado.getNivelDeConexion());
-//    }
-//
-//    @Test
-//    void deberiaAsociarElEspirituAlMedium() {
-//        Espiritu nuevoEspiritu = new Angelical("Matias", berazategui);
-//        Espiritu nuevoEspirituP = serviceEspiritu.crear(nuevoEspiritu);
-//
-//        Medium mediumJuan = new Medium("Juan", 120, 10, berazategui);
-//        Ubicacion ubicacion = new Ubicacion("Tailandia");
-//        Ubicacion ubicacionP = ubicacionService.crear(ubicacion);
-//
-//        ubicacion.agregarMedium(mediumJuan);
-//        ubicacion.agregarEspiritu(nuevoEspirituP);
-//
-//        Medium mediumJuanP = mediumService.crear(mediumJuan);
-//        ubicacionService.actualizar(ubicacionP);
-//
-//        Medium mediumConectado = serviceEspiritu.conectar(nuevoEspirituP.getId(), mediumJuanP.getId());
-//
-//        Medium mediumJuanActualizadoP = mediumService.recuperar(mediumJuanP.getId());
-//        assertEquals(1, mediumJuanActualizadoP.getEspiritus().size());
-//        assertTrue(
-//                mediumConectado.getEspiritus().stream()
-//                        .allMatch(e -> e.getId().equals(nuevoEspirituP.getId()))
-//        );
-//    }
+    @Transactional
+    @Test
+    public void seConectaUnEspirituConUnMedium() {
+        Ubicacion bernalM = new Ubicacion("Bernal");
+        Ubicacion bernalP = ubicacionService.crear(bernalM);
+        Espiritu juanM = new Angelical("Juan", bernalP);
+        Espiritu espirituP = serviceEspiritu.crear(juanM);
+        Medium mediumM = new Medium("Juan", 120, 10, berazategui);
+
+        assertEquals(0, espirituP.getNivelDeConexion());
+        mediumM.setUbicacion(bernalP);
+        Medium mediumP = mediumService.crear(mediumM);
+        Medium medium2 = serviceEspiritu.conectar(espirituP.getId(), mediumM.getId());
+
+        assertFalse(medium2.getEspiritus().isEmpty());
+
+        Espiritu espirituActualizado = serviceEspiritu.recuperar(espirituP.getId());
+
+        assertEquals(2.0, espirituActualizado.getNivelDeConexion());
+    }
+
+    @Transactional
+    @Test
+    void deberiaAsociarElEspirituAlMedium() {
+        Espiritu nuevoEspiritu = new Angelical("Matias", berazategui);
+        Espiritu nuevoEspirituP = serviceEspiritu.crear(nuevoEspiritu);
+
+        Medium mediumJuan = new Medium("Juan", 120, 10, berazategui);
+
+        Medium mediumJuanP = mediumService.crear(mediumJuan);
+        ubicacionService.actualizar(berazategui); // antes ubicacionP
+
+        Medium mediumConectado = serviceEspiritu.conectar(nuevoEspirituP.getId(), mediumJuanP.getId());
+
+        Medium mediumJuanActualizadoP = mediumService.recuperar(mediumJuanP.getId());
+        assertEquals(1, mediumJuanActualizadoP.getEspiritus().size());
+        assertTrue(
+                mediumConectado.getEspiritus().stream()
+                        .allMatch(e -> e.getId().equals(nuevoEspirituP.getId()))
+        );
+    }
 
     @Test
     void deberiaPersistirElNivelDeConexionLuegoDeConectar() {
@@ -474,49 +447,48 @@ public class EspirituServiceTest {
         assertEquals(mediumP.cantidadDeFortalecimientoDeConexion(), recuperado.getNivelDeConexion());
     }
 
-//    @Test
-//    void deberiaPermitirConectarVariosEspiritusAlMismoMedium() {
-//        Ubicacion ubicacion = new Ubicacion("Tailandia");
-//        Ubicacion ubiPersistida = ubicacionService.crear(ubicacion);
-//        Medium medium = new Medium("Juan", 120, 10, berazategui);
-//        Espiritu pepe = new Angelical("Pepe", berazategui);
-//        Espiritu raul = new Angelical("Raul", berazategui);
-//        ubicacion.agregarEspiritu(pepe);
-//        ubicacion.agregarEspiritu(raul);
-//        ubicacion.agregarMedium(medium);
-//
-//        Espiritu espiritu1 = serviceEspiritu.crear(pepe);
-//        Espiritu espiritu2 = serviceEspiritu.crear(raul);
-//
-//        Medium mediumP = mediumService.crear(medium);
-//        ubicacionService.actualizar(ubiPersistida);
-//        serviceEspiritu.conectar(espiritu1.getId(), mediumP.getId());
-//        serviceEspiritu.conectar(espiritu2.getId(), mediumP.getId());
-//
-//        // Medium mediumActualizado = serviceEspiritu.conectar(espiritu2.getId(), mediumP.getId());
-//        Medium mediumActualizado = mediumService.recuperar(mediumP.getId());
-//        assertEquals(2, mediumActualizado.getEspiritus().size());
-//    }
-//
-//
-//    @Test
-//    void deberiaMantenerLosDatosOriginalesDelEspirituLuegoDeConectar() {
-//        Medium medium = new Medium("Juan", 120, 10, berazategui);
-//        mediumService.crear(medium);
-//        serviceEspiritu.crear(matias);
-//        // agregamos la ubicacion de los actores
-//        Ubicacion ubicacion = new Ubicacion("Tailandia");
-//        ubicacion.agregarEspiritu(matias);
-//        ubicacion.agregarMedium(medium);
-//        ubicacionService.crear(ubicacion);
-//
-//        String nombreOriginal = matias.getNombre();
-//
-//        serviceEspiritu.conectar(matias.getId(), medium.getId());
-//        Espiritu recuperado = serviceEspiritu.recuperar(matias.getId());
-//
-//        assertEquals(nombreOriginal, recuperado.getNombre());
-//    }
+    @Transactional
+    @Test
+    void deberiaPermitirConectarVariosEspiritusAlMismoMedium() {
+        Ubicacion ubicacion = new Ubicacion("Tailandia");
+        Ubicacion ubiPersistida = ubicacionService.crear(ubicacion);
+        Medium medium = new Medium("Juan", 120, 10, berazategui);
+        Espiritu pepe = new Angelical("Pepe", berazategui);
+        Espiritu raul = new Angelical("Raul", berazategui);
+        ubicacion.agregarEspiritu(pepe);
+        ubicacion.agregarEspiritu(raul);
+        ubicacion.agregarMedium(medium);
+
+        Espiritu espiritu1 = serviceEspiritu.crear(pepe);
+        Espiritu espiritu2 = serviceEspiritu.crear(raul);
+
+        Medium mediumP = mediumService.crear(medium);
+        ubicacionService.actualizar(ubiPersistida);
+        serviceEspiritu.conectar(espiritu1.getId(), mediumP.getId());
+        serviceEspiritu.conectar(espiritu2.getId(), mediumP.getId());
+
+        Medium mediumActualizado = mediumService.recuperar(mediumP.getId());
+        assertEquals(2, mediumActualizado.getEspiritus().size());
+    }
+
+
+    @Test
+    void deberiaMantenerLosDatosOriginalesDelEspirituLuegoDeConectar() {
+        Medium medium = new Medium("Juan", 120, 10, berazategui);
+        mediumService.crear(medium);
+        serviceEspiritu.crear(matias);
+
+
+        String nombreOriginal = matias.getNombre();
+
+        serviceEspiritu.conectar(matias.getId(), medium.getId());
+        Espiritu recuperado = serviceEspiritu.recuperar(matias.getId());
+
+        assertEquals(nombreOriginal, recuperado.getNombre());
+        assertEquals(matias.getId(), recuperado.getId());
+       
+
+    }
 
     @AfterEach
     void tearDown() {

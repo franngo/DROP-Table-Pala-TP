@@ -10,6 +10,7 @@ import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @Transactional
 @AllArgsConstructor
@@ -29,8 +31,21 @@ public class EspirituServiceImpl implements EspirituService {
 
     @Override
     public Espiritu crear(Espiritu espiritu) {
+        this.validarEspiritu(espiritu);
         return espirituDao.save(espiritu);
+
+
     }
+
+    private void validarEspiritu(Espiritu espiritu) {
+        if (espiritu == null) {
+            throw new ErrorAlCrearEspirituException("No se puede crear el espiritu");
+        }
+        if (espiritu.getId() != null) {
+            throw new ErrorAlCrearEspirituException("No se puede crear espiritu con id existente");
+        }
+    }
+
 
     @Override
     public Espiritu recuperar(Long espirituId) {

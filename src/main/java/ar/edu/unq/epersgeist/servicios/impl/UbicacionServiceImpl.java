@@ -3,14 +3,15 @@ package ar.edu.unq.epersgeist.servicios.impl;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.*;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.ErrorDeUbicacionNoEncontradaException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteConEseNombreException;
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -39,7 +40,7 @@ public class UbicacionServiceImpl implements UbicacionService {
         return ubicacionDAO
                 .findById(idUbicacion)
                 .orElseThrow(() -> new ErrorDeUbicacionNoEncontradaException(idUbicacion)
-        );
+                );
     }
 
     @Override
@@ -76,6 +77,12 @@ public class UbicacionServiceImpl implements UbicacionService {
 
     @Override
     public List<Espiritu> espiritusEn(Long ubicacionId) {
+
+        // 2. validar existencia
+        if (!ubicacionDAO.existsById(ubicacionId)) {
+            throw new UbicacionNoEncontradaException(ubicacionId);
+        }
+
         return ubicacionDAO.espiritusEn(ubicacionId);
     }
 
