@@ -29,7 +29,12 @@ public class EspirituServiceImpl implements EspirituService {
 
     @Override
     public Espiritu crear(Espiritu espiritu) {
+        if (espiritu == null) {
+            throw new ErrorAlCrearEspirituException("No se puede crear el espiritu");
+        }
         return espirituDao.save(espiritu);
+
+
     }
 
     @Override
