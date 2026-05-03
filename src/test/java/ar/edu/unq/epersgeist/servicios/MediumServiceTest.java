@@ -9,9 +9,7 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.modelo.random.Estrategia.EstrategiaRangoEspecifico;
 import ar.edu.unq.epersgeist.modelo.random.RandomDefensa;
-import ar.edu.unq.epersgeist.servicios.impl.EspirituServiceImpl;
-import ar.edu.unq.epersgeist.servicios.impl.MediumServiceImpl;
-import ar.edu.unq.epersgeist.servicios.impl.UbicacionServiceImpl;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -105,19 +103,19 @@ public class MediumServiceTest {
     }
 
     //recuperar
+    @Transactional
+    @Test
+    void deberiaRecuperarCorrectamenteLosDatosDelMedium() {
+        Medium mediumRecuperado = serviceMedium.recuperar(ubedaP.getId());
 
-//    @Test
-//    void deberiaRecuperarCorrectamenteLosDatosDelMedium() {
-//        Medium mediumRecuperado = serviceMedium.recuperar(ubedaP.getId());
-//
-//
-//        assertEquals(ubedaP.getId(), mediumRecuperado.getId());
-//        assertEquals(ubedaP.getNombre(), mediumRecuperado.getNombre());
-//        assertEquals(ubedaP.getMana(), mediumRecuperado.getMana());
-//        assertEquals(ubedaP.getManaMax(), mediumRecuperado.getManaMax());
-//        assertEquals(0, ubedaP.getEspiritus().size());
-//        assertEquals(0, mediumRecuperado.getEspiritus().size());
-//    }
+
+        assertEquals(ubedaP.getId(), mediumRecuperado.getId());
+        assertEquals(ubedaP.getNombre(), mediumRecuperado.getNombre());
+        assertEquals(ubedaP.getMana(), mediumRecuperado.getMana());
+        assertEquals(ubedaP.getManaMax(), mediumRecuperado.getManaMax());
+        assertEquals(0, ubedaP.getEspiritus().size());
+        assertEquals(0, mediumRecuperado.getEspiritus().size());
+    }
 
     @Test
     void noSeEncuentraElMediumNoPersistido() {
