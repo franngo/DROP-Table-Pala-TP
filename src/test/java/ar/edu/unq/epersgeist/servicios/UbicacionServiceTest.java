@@ -1,7 +1,6 @@
 package ar.edu.unq.epersgeist.servicios;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
-import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
@@ -245,10 +244,8 @@ public class UbicacionServiceTest {
     @Test
     void debeObtenerMediumsSinEspiritus() {
         ubicacionService.crear(cripta);
-        ubicacionService.crear(templo);
+        // ubicacionService.crear(templo);
 
-        Espiritu frieren = new Angelical("Frieren", templo);
-        Espiritu qual = new Demonio("Qual", cripta);
 
         mediumService.crear(epifanio);
         mediumService.crear(ubeda);
@@ -267,23 +264,35 @@ public class UbicacionServiceTest {
     @Transactional
     @Test
     void deberiaObtener1MediumSinEspiritus() {
-        Ubicacion ubicacion = ubicacionService.crear(cripta);
-        espirituService.crear(guerrero);
+
+        ubicacionService.crear(cripta);
+
         mediumService.crear(epifanio);
         mediumService.crear(ubeda);
 
-        ubicacion.agregarMedium(epifanio);
-        ubicacion.agregarMedium(ubeda);
-        epifanio.agregarEspiritu(guerrero);
-        mediumService.actualizar(epifanio);
-        ubicacionService.actualizar(ubicacion);
+        // Ubicarlos en la cripta
+        cripta.agregarMedium(epifanio);
+        cripta.agregarMedium(ubeda);
+        ubicacionService.actualizar(cripta);
 
+        // Crear espíritu en la cripta
+        Espiritu chiquiTapa = new Angelical("Chiqui", cripta);
+        espirituService.crear(chiquiTapa);
 
-        List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(ubicacion.getId());
+        // Conectar el espíritu a epifanio
+        espirituService.conectar(chiquiTapa.getId(), epifanio.getId());
 
+        // Ejecutar
+        List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(cripta.getId());
+
+        // Verificar
         assertEquals(1, resultado.size());
-        assertTrue(resultado.stream().noneMatch(u -> Objects.equals(u.getId(), epifanio.getId())));
-        assertTrue(resultado.stream().anyMatch(u -> Objects.equals(u.getId(), ubeda.getId())));
+
+        assertTrue(resultado.stream()
+                .noneMatch(m -> Objects.equals(m.getId(), epifanio.getId())));
+
+        assertTrue(resultado.stream()
+                .anyMatch(m -> Objects.equals(m.getId(), ubeda.getId())));
     }
 
 
