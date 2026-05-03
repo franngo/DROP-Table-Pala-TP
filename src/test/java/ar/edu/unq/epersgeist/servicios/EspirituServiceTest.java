@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.servicios;
 
+import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -56,15 +58,15 @@ public class EspirituServiceTest {
             Espiritu espirituP = serviceEspiritu.crear(espiritu);
         });
     }
-//
-//    @Test
-//    void noSeCreaUnEspirituPorqueYaTieneIdAsignado() {
-//        matias.setId(1L);
-//
-//        assertThrows(ErrorAlCrearEspirituException.class, () -> {
-//            serviceEspiritu.crear(matias);
-//        });
-//    }
+
+    @Test
+    void noSeCreaUnEspirituPorqueYaTieneIdAsignado() {
+        matias.setId(1L);
+
+        assertThrows(ErrorAlCrearEspirituException.class, () -> {
+            serviceEspiritu.crear(matias);
+        });
+    }
 
     //recuperar
 
@@ -79,13 +81,6 @@ public class EspirituServiceTest {
         assertEquals(matias.getNivelDeConexion(), espirituRecuperado.getNivelDeConexion());
     }
 
-//    @Test
-//    void debeLanzarExcepcionSiElIdEsNull() {
-//        assertThrows(
-//                IdEspirituInvalidoException.class,
-//                () -> serviceEspiritu.recuperar(null)
-//        );
-//    }
 
     @Test
     void noSeEncuentraElEspirituNoPersistido() {
@@ -117,14 +112,6 @@ public class EspirituServiceTest {
         assertEquals(99, actualizado.getNivelDeConexion());
     }
 
-//    @Test
-//    void noDeberiaActualizarConIdNulo() {
-//
-//        assertThrows(ErrorAlActualizarEspirituException.class, () -> {
-//            serviceEspiritu.actualizar(matias);
-//        });
-//
-//    }
 
     //eliminar
 
@@ -232,51 +219,55 @@ public class EspirituServiceTest {
 
     //espiritusDemoniacos (con paginación)
 
-//    @Test
-//    void losDemoniosSeDevuelvenOrdenadosPorNivelDeConexionDeFormaAscendenteYPaginados() {
-//        Espiritu charizard = new Demonio("Charizard", berazategui);
-//        charizard.setNivelDeConexion(95);
-//        serviceEspiritu.crear(charizard);
-//
-//        Espiritu bulbasaur = new Demonio("bulbasaur", berazategui);
-//        bulbasaur.setNivelDeConexion(90);
-//        serviceEspiritu.crear(bulbasaur);
-//
-//        Espiritu pikachu = new Demonio("pikachu", berazategui);
-//        pikachu.setNivelDeConexion(80);
-//        serviceEspiritu.crear(pikachu);
-//
-//        Espiritu ghastly = new Demonio("ghastly", berazategui);
-//        ghastly.setNivelDeConexion(65);
-//        serviceEspiritu.crear(ghastly);
-//
-//        Espiritu pichu = new Demonio("pichu", berazategui);
-//        pichu.setNivelDeConexion(55);
-//        serviceEspiritu.crear(pichu);
-//
-//        Espiritu raichu = new Demonio("raichu", berazategui);
-//        raichu.setNivelDeConexion(45);
-//        serviceEspiritu.crear(raichu);
-//
-//        Espiritu magikarp = new Demonio("magikarp", berazategui);
-//        magikarp.setNivelDeConexion(5);
-//        serviceEspiritu.crear(magikarp);
-//
-//
-//        Page<Demonio> daemons = serviceEspiritu.espiritusDemoniacos(Direccion.ASCENDENTE, 1, 3);
-//
-//        assertEquals(3, daemons.size());
-//        assertEquals(daemons.get(0).getId(), magikarp.getId());
-//        assertEquals(daemons.get(1).getId(), raichu.getId());
-//        assertEquals(daemons.get(2).getId(), pichu.getId());
-//
-//        Page<Demonio> daemons2 = serviceEspiritu.espiritusDemoniacos(Direccion.ASCENDENTE, 2, 3);
-//
-//        assertEquals(3, daemons.size());
-//        assertEquals(daemons2.get(0).getId(), ghastly.getId());
-//        assertEquals(daemons2.get(1).getId(), pikachu.getId());
-//        assertEquals(daemons2.get(2).getId(), bulbasaur.getId());
-//    }
+    @Test
+    void losDemoniosSeDevuelvenOrdenadosPorNivelDeConexionDeFormaAscendenteYPaginados() {
+        Espiritu charizard = new Demonio("Charizard", berazategui);
+        charizard.setNivelDeConexion(95);
+        serviceEspiritu.crear(charizard);
+
+        Espiritu bulbasaur = new Demonio("bulbasaur", berazategui);
+        bulbasaur.setNivelDeConexion(90);
+        serviceEspiritu.crear(bulbasaur);
+
+        Espiritu pikachu = new Demonio("pikachu", berazategui);
+        pikachu.setNivelDeConexion(80);
+        serviceEspiritu.crear(pikachu);
+
+        Espiritu ghastly = new Demonio("ghastly", berazategui);
+        ghastly.setNivelDeConexion(65);
+        serviceEspiritu.crear(ghastly);
+
+        Espiritu pichu = new Demonio("pichu", berazategui);
+        pichu.setNivelDeConexion(55);
+        serviceEspiritu.crear(pichu);
+
+        Espiritu raichu = new Demonio("raichu", berazategui);
+        raichu.setNivelDeConexion(45);
+        serviceEspiritu.crear(raichu);
+
+        Espiritu magikarp = new Demonio("magikarp", berazategui);
+        magikarp.setNivelDeConexion(5);
+        serviceEspiritu.crear(magikarp);
+
+
+        Page<Demonio> daemons = serviceEspiritu.espiritusDemoniacos(Direccion.ASCENDENTE, 1, 3);
+        List<Demonio> demoniosList = daemons.getContent();
+        assertEquals(3, demoniosList.size());
+        assertEquals(demoniosList.get(0).getId(), magikarp.getId());
+        assertEquals(demoniosList.get(1).getId(), raichu.getId());
+        assertEquals(demoniosList.get(2).getId(), pichu.getId());
+
+        Page<Demonio> daemons2 = serviceEspiritu.espiritusDemoniacos(Direccion.ASCENDENTE, 2, 3);
+        List<Demonio> demoniosList2 = daemons2.getContent();
+        assertEquals(3, demoniosList2.size());
+
+        assertEquals(demoniosList2.get(0).getId(), ghastly.getId());
+
+
+        assertEquals(demoniosList2.get(0).getId(), ghastly.getId());
+        assertEquals(demoniosList2.get(1).getId(), pikachu.getId());
+        assertEquals(demoniosList2.get(2).getId(), bulbasaur.getId());
+    }
 
     //recuperarTodos
 
