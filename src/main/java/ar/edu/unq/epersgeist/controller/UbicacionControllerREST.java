@@ -71,4 +71,26 @@ public class UbicacionControllerREST {
     }
 
     // --------------------------------------------------------------------------------
+
+//    @GetMapping("/{id}/espiritus")
+//    @ResponseStatus(HttpStatus.OK)
+//    public List<EspirituResponseDTO> obtenerEspiritus(@PathVariable Long id) {
+//        return ubicacionService.espiritusEn(id)
+//                .stream()
+//                .map(MapperEspiritu::toDetalle)
+//                .toList();
+//    }
+
+    // --------------------------------------------------------------------------------
+
+//    @GetMapping("/{id}/mediums/sin-espiritus")
+//    @ResponseStatus(HttpStatus.OK)
+//    public List<MediumResponseDTO> obtenerMediumsSinEspiritus(@PathVariable Long id) {
+//        return ubicacionService.mediumsSinEspiritusEn(id)
+//                .stream()
+//                .map(MapperMedium::toDTO)
+//                .toList();
+//    }
+
+    // --------------------------------------------------------------------------------
 }
