@@ -1,9 +1,11 @@
 package ar.edu.unq.epersgeist.controller;
 
+import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionCreateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionResponseDTO;
 import ar.edu.unq.epersgeist.controller.mappers.MapperUbicacion;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -27,11 +29,23 @@ public class UbicacionControllerREST {
                 .toList();
     }
 
+    // --------------------------------------------------------------------------------
+
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UbicacionResponseDTO obtenerPorId(@PathVariable Long id) {
         Ubicacion ubicacion = ubicacionService.recuperar(id);
         return MapperUbicacion.toDTO(ubicacion);
+    }
+
+    // --------------------------------------------------------------------------------
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public UbicacionResponseDTO crear(@Valid @RequestBody UbicacionCreateDTO dto) {
+        Ubicacion ubicacion = new Ubicacion(dto.nombre());
+        Ubicacion ubicacionCreada = ubicacionService.crear(ubicacion);
+        return MapperUbicacion.toDTO(ubicacionCreada);
     }
 
     // --------------------------------------------------------------------------------
