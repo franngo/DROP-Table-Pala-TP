@@ -14,6 +14,7 @@ public record MediumCreateDTO(
         //@Max(value = manaMax, message = "El mana no puede ser mayor que el manaMax")
         int mana,
         @NotNull(message = "El id de la ubicación del medium es obligatorio")
+        //duda: ¿No sería mejor pasarle un UbicacionDTO? De modo que podríamos pasarle una Ubicacion aún no persistida
         Long ubicacionId
 ) {
 }
