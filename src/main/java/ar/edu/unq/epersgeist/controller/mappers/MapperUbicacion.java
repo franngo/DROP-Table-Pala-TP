@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.controller.mappers;
 
+import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionUpdateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionResponseDTO;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 
@@ -9,5 +10,9 @@ public class MapperUbicacion {
                 ubicacion.getId(),
                 ubicacion.getNombre()
         );
+    }
+
+    public static void actualizar(Ubicacion ubicacion, UbicacionUpdateDTO dto) {
+        ubicacion.setNombre(dto.nombre());
     }
 }
