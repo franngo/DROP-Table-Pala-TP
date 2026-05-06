@@ -83,12 +83,7 @@ public class MediumServiceImpl implements MediumService {
             throw new IdEspirituInvalidoException();
         }
 
-
         Espiritu e = espirituDao.findById(espirituId).orElseThrow(() -> new ErrorDeEspirituNoEncontradoException(espirituId));
-
-        if (e == null) {
-            throw new ErrorDeEspirituNoEncontradoException(espirituId);
-        }
 
         return m.invocar(e);
     }
