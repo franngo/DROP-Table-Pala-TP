@@ -1,6 +1,7 @@
 package ar.edu.unq.epersgeist.controller;
 
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionCreateDTO;
+import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionUpdateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionResponseDTO;
 import ar.edu.unq.epersgeist.controller.mappers.MapperUbicacion;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
@@ -46,6 +47,19 @@ public class UbicacionControllerREST {
         Ubicacion ubicacion = new Ubicacion(dto.nombre());
         Ubicacion ubicacionCreada = ubicacionService.crear(ubicacion);
         return MapperUbicacion.toDTO(ubicacionCreada);
+    }
+
+    // --------------------------------------------------------------------------------
+
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void actualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody UbicacionUpdateDTO dto
+    ) {
+        Ubicacion ubicacionRecuperada = ubicacionService.recuperar(id);
+        MapperUbicacion.actualizar(ubicacionRecuperada, dto);
+        ubicacionService.actualizar(ubicacionRecuperada);
     }
 
     // --------------------------------------------------------------------------------
