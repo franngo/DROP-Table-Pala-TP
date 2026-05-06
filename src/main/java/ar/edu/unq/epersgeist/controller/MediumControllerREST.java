@@ -5,7 +5,9 @@ import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.MediumUpdateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.espiritus.response.MediumResponseDTO;
 import ar.edu.unq.epersgeist.controller.mappers.MapperMedium;
 import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.servicios.MediumService;
+import ar.edu.unq.epersgeist.servicios.UbicacionService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class MediumControllerREST {
     private final MediumService mediumService;
+    private final UbicacionService ubicacionService;
 
     @GetMapping
     public List<MediumResponseDTO> obtenerTodosLosMediums() {
@@ -34,8 +37,11 @@ public class MediumControllerREST {
     }
 
     @PostMapping
-    public void crearMedium(@Valid @RequestBody MediumCreateDTO dtoRequest) {
-        Medium m = mediumService.crear(MapperMedium.toModeloCrear(dtoRequest));
+    public MediumResponseDTO crearMedium(@Valid @RequestBody MediumCreateDTO dtoRequest) {
+        Long idU = dtoRequest.ubicacionId();
+        Ubicacion u = ubicacionService.recuperar(idU);
+
+        Medium m = mediumService.crear(MapperMedium.toModeloCrear(dtoRequest, u));
         return MapperMedium.toDetalle(m);
     }
 
@@ -45,7 +51,7 @@ public class MediumControllerREST {
 
         MapperMedium.actualizar(m, dtoRequest);
 
-        //mediumService.actualizar(m);
+        mediumService.actualizar(m);
     }
 
     @DeleteMapping("{id}")
