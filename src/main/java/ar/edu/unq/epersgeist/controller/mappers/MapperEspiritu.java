@@ -9,7 +9,7 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion;
 public class MapperEspiritu {
 
 
-    public static Espiritu crearEspiritu(EspirituCreateDTO dto, Ubicacion ubicacion) {
+    public static Espiritu toModelo(EspirituCreateDTO dto, Ubicacion ubicacion) {
         return dto.tipoEspiritu().crear(dto.nombre(), ubicacion);
     }
 

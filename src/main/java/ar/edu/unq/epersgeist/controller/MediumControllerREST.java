@@ -16,7 +16,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/mediums")
@@ -27,9 +26,8 @@ public class MediumControllerREST {
 
     @GetMapping
     public List<MediumResponseDTO> obtenerTodosLosMediums() {
-        return mediumService.recuperarTodos().stream().
-                map((m) -> MapperMedium.toDetalle(m)).
-                collect(Collectors.toList());
+        return mediumService.recuperarTodos().stream()
+                .map(MapperMedium::toDTO).toList();
     }
 
     @GetMapping("/{id}")
