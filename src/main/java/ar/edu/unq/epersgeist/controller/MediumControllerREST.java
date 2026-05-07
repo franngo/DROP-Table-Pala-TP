@@ -2,8 +2,11 @@ package ar.edu.unq.epersgeist.controller;
 
 import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.MediumCreateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.MediumUpdateDTO;
+import ar.edu.unq.epersgeist.controller.dtos.espiritus.response.EspirituResponseDTO;
 import ar.edu.unq.epersgeist.controller.dtos.espiritus.response.MediumResponseDTO;
+import ar.edu.unq.epersgeist.controller.mappers.MapperEspiritu;
 import ar.edu.unq.epersgeist.controller.mappers.MapperMedium;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.servicios.MediumService;
@@ -54,9 +57,39 @@ public class MediumControllerREST {
         mediumService.actualizar(m);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public void deleteMedium(@PathVariable Long id) {
         mediumService.eliminar(id);
     }
+
+    @PutMapping("/{id}/descansar")
+    public void descansar(@PathVariable Long id) {
+        mediumService.descansar(id);
+    }
+
+//    @PutMapping("/{idM}/invocar/espiritus/{idE}")
+//    public EspirituResponseDTO invocar(@PathVariable Long idM, @PathVariable Long idE) {
+//        Espiritu e = mediumService.invocar(idM, idE);
+//        return MapperEspiritu.toDetalle(e);
+//    }
+
+    @PutMapping("/{idM1}/exorcizar/mediums/{idM2}")
+    public void exorcizar(@PathVariable Long idM1, @PathVariable Long idM2) {
+        mediumService.exorcizar(idM1, idM2);
+    }
+
+    //acá necesitaría un method de MapperEspiritu que me devuelva un EspirituDTO
+//    @GetMapping("/{id}/espiritus")
+//    public List<EspirituDTO> espiritus(@PathVariable Long id) {
+//        List<Espiritu> espiritus = mediumService.espiritus(id);
+//        return espiritus.stream().
+//                map((e) -> MapperEspiritu.toResumido(e)).
+//                collect(Collectors.toList());
+//    }
+
+//    @PutMapping("/{idM}/mover/ubicaciones/{idU}")
+//    public void mover(@PathVariable Long idM, @PathVariable Long idU) {
+//
+//    }
 
 }
