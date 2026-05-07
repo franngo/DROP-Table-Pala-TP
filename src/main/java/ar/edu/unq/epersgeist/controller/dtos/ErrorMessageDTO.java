@@ -1,7 +1,6 @@
 package ar.edu.unq.epersgeist.controller.dtos;
 
-public record FieldErrorResponseDTO(
-        String field,
+public record ErrorMessageDTO(
         String message
 ) {
 }

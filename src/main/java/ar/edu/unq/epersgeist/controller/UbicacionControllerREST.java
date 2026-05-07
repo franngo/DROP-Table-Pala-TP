@@ -44,7 +44,7 @@ public class UbicacionControllerREST {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UbicacionResponseDTO crear(@Valid @RequestBody UbicacionCreateDTO dto) {
-        Ubicacion ubicacion = new Ubicacion(dto.nombre());
+        Ubicacion ubicacion = MapperUbicacion.toModelo(dto);
         Ubicacion ubicacionCreada = ubicacionService.crear(ubicacion);
         return MapperUbicacion.toDTO(ubicacionCreada);
     }
