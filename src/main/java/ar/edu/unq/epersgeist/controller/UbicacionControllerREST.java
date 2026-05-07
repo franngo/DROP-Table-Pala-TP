@@ -1,8 +1,12 @@
 package ar.edu.unq.epersgeist.controller;
 
+import ar.edu.unq.epersgeist.controller.dtos.espiritus.response.EspirituResponseDTO;
+import ar.edu.unq.epersgeist.controller.dtos.mediums.response.MediumResponseDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionCreateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionUpdateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionResponseDTO;
+import ar.edu.unq.epersgeist.controller.mappers.MapperEspiritu;
+import ar.edu.unq.epersgeist.controller.mappers.MapperMedium;
 import ar.edu.unq.epersgeist.controller.mappers.MapperUbicacion;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
@@ -72,25 +76,25 @@ public class UbicacionControllerREST {
 
     // --------------------------------------------------------------------------------
 
-//    @GetMapping("/{id}/espiritus")
-//    @ResponseStatus(HttpStatus.OK)
-//    public List<EspirituResponseDTO> obtenerEspiritus(@PathVariable Long id) {
-//        return ubicacionService.espiritusEn(id)
-//                .stream()
-//                .map(MapperEspiritu::toDetalle)
-//                .toList();
-//    }
+    @GetMapping("/{id}/espiritus")
+    @ResponseStatus(HttpStatus.OK)
+    public List<EspirituResponseDTO> obtenerEspiritus(@PathVariable Long id) {
+        return ubicacionService.espiritusEn(id)
+                .stream()
+                .map(MapperEspiritu::toDTO)
+                .toList();
+    }
 
     // --------------------------------------------------------------------------------
 
-//    @GetMapping("/{id}/mediums/sin-espiritus")
-//    @ResponseStatus(HttpStatus.OK)
-//    public List<MediumResponseDTO> obtenerMediumsSinEspiritus(@PathVariable Long id) {
-//        return ubicacionService.mediumsSinEspiritusEn(id)
-//                .stream()
-//                .map(MapperMedium::toDTO)
-//                .toList();
-//    }
+    @GetMapping("/{id}/mediums/sin-espiritus")
+    @ResponseStatus(HttpStatus.OK)
+    public List<MediumResponseDTO> obtenerMediumsSinEspiritus(@PathVariable Long id) {
+        return ubicacionService.mediumsSinEspiritusEn(id)
+                .stream()
+                .map(MapperMedium::toDTO)
+                .toList();
+    }
 
     // --------------------------------------------------------------------------------
 }

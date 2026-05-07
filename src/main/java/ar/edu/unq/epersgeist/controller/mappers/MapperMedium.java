@@ -7,18 +7,17 @@ import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 
 public class MapperMedium {
-    public static MediumResponseDTO toDetalle(Medium m) {
+    public static MediumResponseDTO toDTO(Medium m) {
         return new MediumResponseDTO(
                 m.getId(),
                 m.getNombre(),
                 m.getManaMax(),
                 m.getMana()
-                //UbicacionDTO
-                //List<EspirituDTO>
+
         );
     }
 
-    public static Medium toModeloCrear(MediumCreateDTO dtoM, Ubicacion u) {
+    public static Medium toModelo(MediumCreateDTO dtoM, Ubicacion u) {
         return new Medium(
                 dtoM.nombre(),
                 dtoM.manaMax(),
@@ -27,9 +26,12 @@ public class MapperMedium {
         );
     }
 
+
     public static void actualizar(Medium m, MediumUpdateDTO dtoU) {
         m.setNombre(dtoU.nombre());
         m.setManaMax(dtoU.manaMax());
         m.setMana(dtoU.mana());
     }
 }
+
+

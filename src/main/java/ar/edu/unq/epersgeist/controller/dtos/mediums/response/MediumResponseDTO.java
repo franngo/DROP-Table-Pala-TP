@@ -5,7 +5,6 @@ public record MediumResponseDTO(
         String nombre,
         int manaMax,
         int mana
-        //UbicacionDTO dtoU
-        //List<EspirituDTO> dtosE
+
 ) {
 }
