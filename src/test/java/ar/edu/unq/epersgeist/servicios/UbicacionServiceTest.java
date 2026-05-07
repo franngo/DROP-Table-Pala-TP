@@ -4,9 +4,8 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.ErrorDeUbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteConEseNombreException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,27 +20,22 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class UbicacionServiceTest {
+    private final String NOMBRE_TEMPLO = "Templo del Alba Eterna";
+    private final String NOMBRE_CRIPTA = "Cripta de los Susurros";
+    private final Ubicacion templo = new Ubicacion(NOMBRE_TEMPLO);
+    private final Ubicacion cripta = new Ubicacion(NOMBRE_CRIPTA);
+    private final Long ubicacionIdInexistente = 999L;
+    Ubicacion berazategui = new Ubicacion("Berazategui");
+    private final Espiritu guerrero = new Angelical("Espíritu de la Luz", berazategui);
+    private final Espiritu mago = new Angelical("Espíritu de la Oscuridad", berazategui);
+    private final Medium epifanio = new Medium("epifanio", 150, 50, berazategui);
+    private final Medium ubeda = new Medium("ubeda", 100, 20, berazategui);
     @Autowired
     private UbicacionService ubicacionService;
     @Autowired
     private EspirituService espirituService;
     @Autowired
     private MediumService mediumService;
-
-    private final String NOMBRE_TEMPLO = "Templo del Alba Eterna";
-    private final String NOMBRE_CRIPTA = "Cripta de los Susurros";
-
-    private final Ubicacion templo = new Ubicacion(NOMBRE_TEMPLO);
-    private final Ubicacion cripta = new Ubicacion(NOMBRE_CRIPTA);
-    Ubicacion berazategui = new Ubicacion("Berazategui");
-
-    private final Long ubicacionIdInexistente = 999L;
-    private final Espiritu guerrero = new Angelical("Espíritu de la Luz", berazategui);
-    private final Espiritu mago = new Angelical("Espíritu de la Oscuridad", berazategui);
-
-    private final Medium epifanio = new Medium("epifanio", 150, 50, berazategui);
-    private final Medium ubeda = new Medium("ubeda", 100, 20, berazategui);
-
 
     @BeforeEach
     void setUp() {
@@ -76,7 +70,7 @@ public class UbicacionServiceTest {
         ubicacionService.crear(templo);
 
         assertThrows(
-                UbicacionYaExisteConEseNombreException.class,
+                UbicacionYaExisteException.class,
                 () -> ubicacionService.crear(templo)
         );
     }
@@ -96,7 +90,7 @@ public class UbicacionServiceTest {
     @Test
     void noDebeRecuperarUbicacionConIdInexistente() {
         assertThrows(
-                ErrorDeUbicacionNoEncontradaException.class,
+                UbicacionNoEncontradaException.class,
                 () -> ubicacionService.recuperar(ubicacionIdInexistente)
         );
     }
@@ -160,7 +154,7 @@ public class UbicacionServiceTest {
 
         );
     }
-
+    
     // ============================== ELIMINAR ==============================
 
     @Test
@@ -171,7 +165,7 @@ public class UbicacionServiceTest {
         ubicacionService.eliminar(ubicacionId);
 
         assertThrows(
-                ErrorDeUbicacionNoEncontradaException.class,
+                UbicacionNoEncontradaException.class,
                 () -> ubicacionService.recuperar(ubicacionId)
         );
     }
@@ -181,7 +175,7 @@ public class UbicacionServiceTest {
         ubicacionService.eliminar(ubicacionIdInexistente);
 
         assertThrows(
-                ErrorDeUbicacionNoEncontradaException.class,
+                UbicacionNoEncontradaException.class,
                 () -> ubicacionService.recuperar(ubicacionIdInexistente)
         );
     }
@@ -206,6 +200,7 @@ public class UbicacionServiceTest {
     }
 
     // ============================== ESPIRITUS EN ==============================
+
     @Transactional
     @Test
     void debeRecuperarEspiritusEnUbicacion() {
@@ -236,7 +231,6 @@ public class UbicacionServiceTest {
 
         );
     }
-
 
     // ============================== MEDIUMS SIN ESPIRITUS EN ==============================
     @Transactional

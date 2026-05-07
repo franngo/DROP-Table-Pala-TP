@@ -3,9 +3,8 @@ package ar.edu.unq.epersgeist.servicios.impl;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.ErrorDeUbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteConEseNombreException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
 import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
 import jakarta.transaction.Transactional;
@@ -24,10 +23,8 @@ public class UbicacionServiceImpl implements UbicacionService {
 
     @Override
     public Ubicacion crear(Ubicacion ubicacion) {
-        String nombre = ubicacion.getNombre();
-
-        if (ubicacionDAO.existsByName(nombre)) {
-            throw new UbicacionYaExisteConEseNombreException(nombre);
+        if (ubicacionDAO.existsByName(ubicacion.getNombre())) {
+            throw new UbicacionYaExisteException(ubicacion.getNombre());
         }
 
         return ubicacionDAO.save(ubicacion);
@@ -39,8 +36,7 @@ public class UbicacionServiceImpl implements UbicacionService {
     public Ubicacion recuperar(Long idUbicacion) {
         return ubicacionDAO
                 .findById(idUbicacion)
-                .orElseThrow(() -> new ErrorDeUbicacionNoEncontradaException(idUbicacion)
-                );
+                .orElseThrow(() -> new UbicacionNoEncontradaException(idUbicacion));
     }
 
     @Override
@@ -77,8 +73,6 @@ public class UbicacionServiceImpl implements UbicacionService {
 
     @Override
     public List<Espiritu> espiritusEn(Long ubicacionId) {
-
-        // 2. validar existencia
         if (!ubicacionDAO.existsById(ubicacionId)) {
             throw new UbicacionNoEncontradaException(ubicacionId);
         }
@@ -86,8 +80,16 @@ public class UbicacionServiceImpl implements UbicacionService {
         return ubicacionDAO.espiritusEn(ubicacionId);
     }
 
+    // --------------------------------------------------------------------------------
+
     @Override
     public List<Medium> mediumsSinEspiritusEn(Long ubicacionId) {
+        if (!ubicacionDAO.existsById(ubicacionId)) {
+            throw new UbicacionNoEncontradaException(ubicacionId);
+        }
+
         return ubicacionDAO.mediumsSinEspiritusEn(ubicacionId);
     }
+
+    // --------------------------------------------------------------------------------
 }
