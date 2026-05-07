@@ -1,12 +1,9 @@
 package ar.edu.unq.epersgeist.controller;
 
-import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.MediumCreateDTO;
-import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.MediumUpdateDTO;
-import ar.edu.unq.epersgeist.controller.dtos.espiritus.response.EspirituResponseDTO;
-import ar.edu.unq.epersgeist.controller.dtos.espiritus.response.MediumResponseDTO;
-import ar.edu.unq.epersgeist.controller.mappers.MapperEspiritu;
+import ar.edu.unq.epersgeist.controller.dtos.mediums.request.MediumCreateDTO;
+import ar.edu.unq.epersgeist.controller.dtos.mediums.request.MediumUpdateDTO;
+import ar.edu.unq.epersgeist.controller.dtos.mediums.response.MediumResponseDTO;
 import ar.edu.unq.epersgeist.controller.mappers.MapperMedium;
-import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.servicios.MediumService;
@@ -16,7 +13,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController

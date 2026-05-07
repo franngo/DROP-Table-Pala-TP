@@ -1,27 +1,14 @@
 package ar.edu.unq.epersgeist.controller;
 
-import ar.edu.unq.epersgeist.controller.dtos.espiritus.PaginacionEspirituResponseDTO;
-import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.AngelicalCreateDTO;
-import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.AngelicalUpdateDTO;
-import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.DemonioCreateDTO;
-import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.DemonioUpdateDTO;
-import ar.edu.unq.epersgeist.controller.dtos.espiritus.response.EspirituResponseDTO;
+import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.EspirituUpdateDTO;
 import ar.edu.unq.epersgeist.controller.mappers.MapperEspiritu;
-import ar.edu.unq.epersgeist.controller.mappers.PageMapper;
-import ar.edu.unq.epersgeist.modelo.Direccion;
-import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
-import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/espiritus")
@@ -36,9 +23,10 @@ public class EspirituControllerREST {
 //        Ubicacion ubicacion = ubicacionService.recuperar(dto.ubicacionId());
 //
 //
-////        Espiritu espirituM = MapperEspiritu.crearDemonio(dto, ubicacion);
-////        Espiritu espirituP = espirituService.crear(espirituM);
-////        return MapperEspiritu.toDetalle(espirituP);
+
+    /// /        Espiritu espirituM = MapperEspiritu.crearDemonio(dto, ubicacion);
+    /// /        Espiritu espirituP = espirituService.crear(espirituM);
+    /// /        return MapperEspiritu.toDetalle(espirituP);
 //    }
 //
 //    @PostMapping("/angel")
@@ -66,31 +54,19 @@ public class EspirituControllerREST {
 //        List<Espiritu> todosE = espirituService.recuperarTodos();
 //        return todosE.stream().map(MapperEspiritu::toDetalle).toList();
 //    }
-
-    @PutMapping("/demonio/{id}")
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT) // 204
-    public void actualizarDemonio(@Valid @RequestBody DemonioUpdateDTO dto, @PathVariable Long id) {
+    public void actualizarDemonio(@Valid @RequestBody EspirituUpdateDTO dto, @PathVariable Long id) {
 
         Espiritu espirituP = espirituService.recuperar(id);
 
-        MapperEspiritu.actualizarDemonio((Demonio) espirituP, dto);
+        MapperEspiritu.actualizarEspiritu(espirituP, dto);
 
         espirituService.actualizar(espirituP);
 
 
     }
 
-    @PutMapping("/angelical/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT) // 204
-    public void actualizarAngelical(@Valid @RequestBody AngelicalUpdateDTO dto, @PathVariable Long id) {
-
-        Espiritu espirituP = espirituService.recuperar(id);
-
-        MapperEspiritu.actualizarAngelical((Angelical) espirituP, dto);
-
-        espirituService.actualizar(espirituP);
-
-    }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT) // 204

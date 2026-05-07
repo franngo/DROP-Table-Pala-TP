@@ -1,8 +1,8 @@
 package ar.edu.unq.epersgeist.controller.mappers;
 
-import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.MediumCreateDTO;
-import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.MediumUpdateDTO;
-import ar.edu.unq.epersgeist.controller.dtos.espiritus.response.MediumResponseDTO;
+import ar.edu.unq.epersgeist.controller.dtos.mediums.request.MediumCreateDTO;
+import ar.edu.unq.epersgeist.controller.dtos.mediums.request.MediumUpdateDTO;
+import ar.edu.unq.epersgeist.controller.dtos.mediums.response.MediumResponseDTO;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion;
 

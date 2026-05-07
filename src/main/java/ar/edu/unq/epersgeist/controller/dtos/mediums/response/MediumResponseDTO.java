@@ -1,4 +1,4 @@
-package ar.edu.unq.epersgeist.controller.dtos.espiritus.response;
+package ar.edu.unq.epersgeist.controller.dtos.mediums.response;
 
 public record MediumResponseDTO(
         Long id,
