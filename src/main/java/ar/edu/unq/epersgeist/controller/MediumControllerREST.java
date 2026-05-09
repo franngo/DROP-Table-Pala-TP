@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/mediums")
@@ -75,19 +76,12 @@ public class MediumControllerREST {
         mediumService.exorcizar(idM1, idM2);
     }
 
-    //acá necesitaría un method de MapperEspiritu que me devuelva un EspirituDTO
     @GetMapping("/{id}/espiritus")
-//    public List<EspirituResponseDTO> espiritus(@PathVariable Long id) {
-//        List<Espiritu> espiritus = mediumService.espiritus(id);
-//        return espiritus.stream().
-//                map((e) -> MapperEspiritu.toResumido(e)).
-//                collect(Collectors.toList());
-//    }
-
     public List<EspirituResponseDTO> espiritus(@PathVariable Long id) {
         List<Espiritu> espiritus = mediumService.espiritus(id);
         return espiritus.stream().
-                map(MapperEspiritu::toDTO).toList();
+                map((e) -> MapperEspiritu.toDTO(e)).
+                collect(Collectors.toList());
     }
 
 //    @PutMapping("/{idM}/mover/ubicaciones/{idU}")

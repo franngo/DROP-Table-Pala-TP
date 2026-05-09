@@ -12,8 +12,8 @@ public class MapperMedium {
                 m.getId(),
                 m.getNombre(),
                 m.getManaMax(),
-                m.getMana()
-
+                m.getMana(),
+                MapperUbicacion.toDTO(m.getUbicacion())
         );
     }
 
