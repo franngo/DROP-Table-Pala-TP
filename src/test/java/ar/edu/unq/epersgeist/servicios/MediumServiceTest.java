@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -31,8 +33,11 @@ public class MediumServiceTest {
     private UbicacionService ubicacionService;
 
     private Ubicacion berazategui;
+    private Ubicacion bernal;
+
     private Espiritu espirituM;
     private Espiritu espirituM2;
+
     private Medium epifanioM;
     private Medium ubedaM;
     private Medium epifanioP;
@@ -40,39 +45,32 @@ public class MediumServiceTest {
 
     Espiritu rikaM;
     Espiritu jaegerM;
-
     Espiritu rikaP;
     Espiritu jaegerP;
-    Ubicacion bernal;
+    @Autowired
+    private MediumService mediumService;
+
 
     @BeforeEach
     public void setUp() {
         berazategui = ubicacionService.crear(new Ubicacion("Berazategui"));
         bernal = ubicacionService.crear(new Ubicacion("Bernal"));
+
         espirituM = new Angelical("Charizard", berazategui);
         espirituM2 = new Angelical("Bulbasor", berazategui);
-
-        epifanioM = new Medium("Epifanio el poderoso", 150, 50, berazategui);
-        epifanioM.setUbicacion(bernal);
-
-        ubedaM = new Medium("Ubeda el dt", 100, 20, berazategui);
-        ubedaM.setUbicacion(bernal);
+        epifanioM = new Medium("Epifanio el poderoso", 150, 50, bernal);
+        ubedaM = new Medium("Ubeda el dt", 100, 20, bernal);
 
         epifanioP = serviceMedium.crear(epifanioM);
-
         ubedaP = serviceMedium.crear(ubedaM);
 
-        rikaM = new Angelical("Rika", berazategui);
+        rikaM = new Angelical("Rika", bernal);
         rikaM.setNivelDeConexion(60);
-        rikaM.setUbicacion(bernal);
         rikaP = espirituService.crear(rikaM);
 
-        jaegerM = new Demonio("Jaeger", berazategui);
+        jaegerM = new Demonio("Jaeger", bernal);
         jaegerM.setNivelDeConexion(50);
-        jaegerM.setUbicacion(bernal);
         jaegerP = espirituService.crear(jaegerM);
-
-
     }
 
     //crear
@@ -337,6 +335,25 @@ public class MediumServiceTest {
         Espiritu omnimanDerrotado = espirituService.recuperar(omnimanP.getId());
 
         assertEquals(65.0, omnimanDerrotado.getNivelDeConexion());
+    }
+
+    //espiritus
+
+    @Transactional
+    @Test
+    public void espiritus() {
+        assertEquals(0, mediumService.espiritus(ubedaP.getId()).size());
+
+        //ubedaP ya está en la misma ubicación que rikaP y jaegerP
+        espirituService.conectar(jaegerP.getId(), ubedaP.getId());
+        espirituService.conectar(rikaP.getId(), ubedaP.getId());
+
+        List<Espiritu> es = mediumService.espiritus(ubedaP.getId());
+
+        assertEquals(2, es.size());
+
+        assertTrue(es.stream().anyMatch((e) -> e.getId().equals(rikaP.getId())));
+        assertTrue(es.stream().anyMatch((e) -> e.getId().equals(jaegerP.getId())));
     }
 
     @AfterEach
