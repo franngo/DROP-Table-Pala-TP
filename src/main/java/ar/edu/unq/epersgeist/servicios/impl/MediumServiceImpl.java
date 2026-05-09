@@ -104,7 +104,7 @@ public class MediumServiceImpl implements MediumService {
     @Override
     public List<Espiritu> espiritus(Long mediumId) {
         Medium recuperado = this.recuperar(mediumId);
-        return new ArrayList<Espiritu>(recuperado.getEspiritus());
+        return recuperado.getEspiritus();
     }
 
 
