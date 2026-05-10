@@ -96,7 +96,8 @@ public class Medium implements Serializable {
         this.mana = Math.max(minimoMana, this.cantidadAlInvocar(manaRequeridoInvocacion));
 
         //se desliga de su vieja ubicación y se relaciona con la nueva
-        espiritu.moverseA(this.ubicacion);
+        // TODO ver si esto tiene sentido??
+        espiritu.actualizarUbicacion(this.ubicacion);
 
         return espiritu;
     }
@@ -148,29 +149,20 @@ public class Medium implements Serializable {
 
     public void mover(Ubicacion ubicacionAMover) {
         // si la ubicacion a mover en la misma no deberia pasar nada
-        if (!(ubicacionAMover == this.ubicacion)) {
-            //Nos salimos de la ubicacion actual
-            this.salirDeUbicacionActual();
 
+        //Nos salimos de la ubicacion actual
 
-            // nos movemos a la nueva
-            ubicacionAMover.agregarMedium(this);
-            //la ubicacion del medium ya es la actual
-            this.espiritus.forEach(espiritu -> {
-                espiritu.moverseA(ubicacionAMover);
-            });
+        this.ubicacion.removerMedium(this);
 
-        }
+        ubicacionAMover.agregarMedium(this);
 
-
-    }
-
-    private void salirDeUbicacionActual() {
-        //Se sale el medium
-        this.ubicacion.mediumSeVa(this);
-        // se salen los espiritus
+        // ahora tocan los espiritus
         this.espiritus.forEach(espiritu -> {
-            this.ubicacion.salirDeUbicacion(espiritu);
+            espiritu.actualizarUbicacion(ubicacionAMover);
+
         });
+
     }
+
+
 }

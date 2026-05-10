@@ -322,7 +322,7 @@ public class MediumTest {
         //comprobamos conexion del demonio
         assertEquals(60, jaeger.getNivelDeConexion());
 
-        // mediumM.mover(santuario);
+        mediumM.mover(santuario);
         // el demonio pierde 10 unidades
         assertEquals(50, jaeger.getNivelDeConexion());
     }
@@ -335,7 +335,7 @@ public class MediumTest {
         //comprobamos conexion del angel
         assertEquals(40, rika.getNivelDeConexion());
 
-        // mediumM.mover(santuario);
+        mediumM.mover(santuario);
         // el angel no se ve afectado
         assertEquals(40, jaeger.getNivelDeConexion());
     }
@@ -362,7 +362,7 @@ public class MediumTest {
         //comprobamos conexion del angel
         assertEquals(40, rika.getNivelDeConexion());
 
-        // mediumM.mover(cementerio);
+        mediumM.mover(cementerio);
         // el angel se ve afectado
         assertEquals(35, jaeger.getNivelDeConexion());
     }

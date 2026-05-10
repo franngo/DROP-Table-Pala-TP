@@ -76,6 +76,9 @@ public abstract class Espiritu implements Serializable {
         this.nivelDeConexion = Math.min(Espiritu.limiteConexion, this.cantidadNuevaConexion(cantidad));
     }
 
+    public void afectarConexion(double cantidad) {
+        this.nivelDeConexion = Math.max(0, this.getNivelDeConexion() - cantidad);
+    }
 
     private double cantidadNuevaConexion(double cantidad) {
         return this.getNivelDeConexion() + cantidad;
@@ -101,11 +104,18 @@ public abstract class Espiritu implements Serializable {
     }
 
 
-    public void moverseA(Ubicacion ubiNueva) {
-        this.ubicacion.salirDeUbicacion(this);
-        // ubiNueva.agregarEspiritu(this);
-        // TODO REVISAR
-        ubiNueva.afectarEspiritu(this);
+//    public void moverseA(Ubicacion ubiNueva) {
+//        this.ubicacion.salirDeUbicacion(this);
+//        ubiNueva.agregarEspiritu(this);
+//        // TODO REVISAR
+//        //ubiNueva.afectarEspiritu(this);
+//    }
+
+
+    public void actualizarUbicacion(Ubicacion ubicacionAMover) {
+        this.ubicacion.removerEspiritu(this);
+        ubicacionAMover.agregarEspiritu(this);
+        
     }
 
 
