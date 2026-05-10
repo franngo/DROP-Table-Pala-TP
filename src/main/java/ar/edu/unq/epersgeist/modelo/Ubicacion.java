@@ -36,7 +36,8 @@ public class Ubicacion {
     public void agregarEspiritu(Espiritu espiritu) {
         if (!espiritus.contains(espiritu)) {
             this.espiritus.add(espiritu);
-            espiritu.setUbicacion(this);
+
+            espiritu.moverseA(this);
         }
     }
 
@@ -54,5 +55,16 @@ public class Ubicacion {
 
     public void salirDeUbicacion(Espiritu espiritu) {
         this.espiritus.remove(espiritu);
+    }
+
+    //CODIGO AGREGADO PARA MOVER:
+    // TODO testear
+    public void mediumSeVa(Medium espiritu) {
+        this.mediums.remove(espiritu);
+    }
+
+    // TODO esto debe implementar la ubicacion para afectar segun sea Santuario o Cementerio
+    public void afectarEspiritu(Espiritu espiritu) {
+
     }
 }

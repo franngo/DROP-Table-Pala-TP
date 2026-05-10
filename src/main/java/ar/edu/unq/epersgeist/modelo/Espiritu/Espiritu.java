@@ -50,7 +50,7 @@ public abstract class Espiritu implements Serializable {
     }
 
     private void validarUbicacionNoNula(Ubicacion ubicacion) {
-        if(ubicacion==null) {
+        if (ubicacion == null) {
             throw new UbicacionInvalidaException();
         }
     }
@@ -100,9 +100,14 @@ public abstract class Espiritu implements Serializable {
         this.mediumCon = medium;
     }
 
+
     public void moverseA(Ubicacion ubiNueva) {
         this.ubicacion.salirDeUbicacion(this);
-        ubiNueva.agregarEspiritu(this);
+        // ubiNueva.agregarEspiritu(this);
+        // TODO REVISAR
+        ubiNueva.afectarEspiritu(this);
     }
+
+
 }
 

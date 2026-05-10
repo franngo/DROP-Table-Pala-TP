@@ -281,12 +281,12 @@ public class MediumTest {
         assertEquals(bernal, rika.getUbicacion());
         assertEquals(bernal, jaeger.getUbicacion());
 
-        //  mediumM.mover(santuario);
+        mediumM.mover(santuario);
 
-        //todos se movieron a la misma ubicacion
-        //  assertEquals(santuario, mediumM.getUbicacion());
-        // assertEquals(santuario, rika.getUbicacion());
-        //assertEquals(santuario, jaeger.getUbicacion());
+        // todos se movieron al santuario
+        assertEquals(santuario, mediumM.getUbicacion());
+        assertEquals(santuario, rika.getUbicacion());
+        assertEquals(santuario, jaeger.getUbicacion());
 
     }
 
@@ -304,7 +304,7 @@ public class MediumTest {
         assertEquals(bernal, rika.getUbicacion());
         assertEquals(bernal, jaeger.getUbicacion());
 
-        //  mediumM.mover(ubicacionAMover);
+        mediumM.mover(bernal);
 
         //todos se siguen en la misma ubicacion
         assertEquals(bernal, mediumM.getUbicacion());
@@ -379,6 +379,31 @@ public class MediumTest {
         //se desvincularo rika de mediumM
         assertFalse(mediumM.getEspiritus().contains(rika));
         assertTrue(rika.estaLibre());
+
+    }
+
+    // Consistencia en ubicaciones
+    @Test
+    void laUbicacionAmoverQuedaConsistente() {
+        rika.aumentarConexionYConectar(mediumM);
+
+        mediumM.mover(cementerio);
+
+        //se movieron de bernal
+        assertTrue(cementerio.getEspiritus().contains(rika));
+        assertTrue(cementerio.getMediums().contains(mediumM));
+
+    }
+
+    @Test
+    void laUbicacionAnteriorQuedaConsistente() {
+        rika.aumentarConexionYConectar(mediumM);
+
+        mediumM.mover(cementerio);
+
+        //se movieron de bernal, ya no deberian estar ahi
+        assertFalse(bernal.getEspiritus().contains(rika));
+        assertFalse(bernal.getMediums().contains(mediumM));
 
     }
 

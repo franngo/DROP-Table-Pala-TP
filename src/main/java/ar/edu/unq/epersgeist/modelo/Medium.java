@@ -146,4 +146,31 @@ public class Medium implements Serializable {
     }
 
 
+    public void mover(Ubicacion ubicacionAMover) {
+        // si la ubicacion a mover en la misma no deberia pasar nada
+        if (!(ubicacionAMover == this.ubicacion)) {
+            //Nos salimos de la ubicacion actual
+            this.salirDeUbicacionActual();
+
+
+            // nos movemos a la nueva
+            ubicacionAMover.agregarMedium(this);
+            //la ubicacion del medium ya es la actual
+            this.espiritus.forEach(espiritu -> {
+                espiritu.moverseA(ubicacionAMover);
+            });
+
+        }
+
+
+    }
+
+    private void salirDeUbicacionActual() {
+        //Se sale el medium
+        this.ubicacion.mediumSeVa(this);
+        // se salen los espiritus
+        this.espiritus.forEach(espiritu -> {
+            this.ubicacion.salirDeUbicacion(espiritu);
+        });
+    }
 }
