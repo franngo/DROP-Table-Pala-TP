@@ -147,20 +147,10 @@ public class Medium implements Serializable {
     }
 
 
-    public void mover(Ubicacion ubicacionAMover) {
-        // si la ubicacion a mover en la misma no deberia pasar nada
-
-        //Nos salimos de la ubicacion actual
+    public void moverA(Ubicacion nuevaUbicacion) {
 
         this.ubicacion.removerMedium(this);
-
-        ubicacionAMover.agregarMedium(this);
-
-        // ahora tocan los espiritus
-        this.espiritus.forEach(espiritu -> {
-            espiritu.actualizarUbicacion(ubicacionAMover);
-
-        });
+        nuevaUbicacion.agregarMedium(this);
 
     }
 

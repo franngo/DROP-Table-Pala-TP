@@ -104,18 +104,10 @@ public abstract class Espiritu implements Serializable {
     }
 
 
-//    public void moverseA(Ubicacion ubiNueva) {
-//        this.ubicacion.salirDeUbicacion(this);
-//        ubiNueva.agregarEspiritu(this);
-//        // TODO REVISAR
-//        //ubiNueva.afectarEspiritu(this);
-//    }
-
-
-    public void actualizarUbicacion(Ubicacion ubicacionAMover) {
+    public void moverA(Ubicacion nuevaUbicacion) {
         this.ubicacion.removerEspiritu(this);
-        ubicacionAMover.agregarEspiritu(this);
-        
+        nuevaUbicacion.agregarEspiritu(this);
+
     }
 
 

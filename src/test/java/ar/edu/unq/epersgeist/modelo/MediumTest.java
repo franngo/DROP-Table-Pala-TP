@@ -281,7 +281,7 @@ public class MediumTest {
         assertEquals(bernal, rika.getUbicacion());
         assertEquals(bernal, jaeger.getUbicacion());
 
-        mediumM.mover(santuario);
+        mediumM.moverA(santuario);
 
         // todos se movieron al santuario
         assertEquals(santuario, mediumM.getUbicacion());
@@ -304,7 +304,7 @@ public class MediumTest {
         assertEquals(bernal, rika.getUbicacion());
         assertEquals(bernal, jaeger.getUbicacion());
 
-        mediumM.mover(bernal);
+        mediumM.moverA(bernal);
 
         //todos se siguen en la misma ubicacion
         assertEquals(bernal, mediumM.getUbicacion());
@@ -322,7 +322,7 @@ public class MediumTest {
         //comprobamos conexion del demonio
         assertEquals(60, jaeger.getNivelDeConexion());
 
-        mediumM.mover(santuario);
+        mediumM.moverA(santuario);
         // el demonio pierde 10 unidades
         assertEquals(50, jaeger.getNivelDeConexion());
     }
@@ -335,7 +335,7 @@ public class MediumTest {
         //comprobamos conexion del angel
         assertEquals(40, rika.getNivelDeConexion());
 
-        mediumM.mover(santuario);
+        mediumM.moverA(santuario);
         // el angel no se ve afectado
         assertEquals(40, jaeger.getNivelDeConexion());
     }
@@ -362,7 +362,7 @@ public class MediumTest {
         //comprobamos conexion del angel
         assertEquals(40, rika.getNivelDeConexion());
 
-        mediumM.mover(cementerio);
+        mediumM.moverA(cementerio);
         // el angel se ve afectado
         assertEquals(35, jaeger.getNivelDeConexion());
     }
@@ -374,7 +374,7 @@ public class MediumTest {
         rika.setNivelDeConexion(1); // seteamos para que se pierda la conexion
         assertEquals(1, rika.getNivelDeConexion());
 
-        mediumM.mover(cementerio);
+        mediumM.moverA(cementerio);
 
         //se desvincularo rika de mediumM
         assertFalse(mediumM.getEspiritus().contains(rika));
@@ -387,7 +387,7 @@ public class MediumTest {
     void laUbicacionAmoverQuedaConsistente() {
         rika.aumentarConexionYConectar(mediumM);
 
-        mediumM.mover(cementerio);
+        mediumM.moverA(cementerio);
 
         //se movieron de bernal
         assertTrue(cementerio.getEspiritus().contains(rika));
@@ -399,7 +399,7 @@ public class MediumTest {
     void laUbicacionAnteriorQuedaConsistente() {
         rika.aumentarConexionYConectar(mediumM);
 
-        mediumM.mover(cementerio);
+        mediumM.moverA(cementerio);
 
         //se movieron de bernal, ya no deberian estar ahi
         assertFalse(bernal.getEspiritus().contains(rika));
