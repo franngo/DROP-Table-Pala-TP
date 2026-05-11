@@ -43,8 +43,7 @@ public abstract class Espiritu implements Serializable {
         this.nivelDeConexion = 0;
         this.nombre = nombre;
         this.ubicacion = ubicacion;
-        // this.ubicacion.agregarEspiritu(this);
-
+        
     }
 
     private void validarUbicacionNoNula(Ubicacion ubicacion) {
@@ -106,7 +105,7 @@ public abstract class Espiritu implements Serializable {
         this.ubicacion = ubiNueva;
         this.cambiosConexion(ubicacion);
     }
-    
+
     public boolean sinConexion() {
         return this.getNivelDeConexion() == 0;
     }
