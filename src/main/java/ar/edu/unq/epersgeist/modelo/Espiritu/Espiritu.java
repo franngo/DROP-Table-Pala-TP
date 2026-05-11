@@ -43,12 +43,12 @@ public abstract class Espiritu implements Serializable {
         this.nivelDeConexion = 0;
         this.nombre = nombre;
         this.ubicacion = ubicacion;
-        this.ubicacion.agregarEspiritu(this);
+        // this.ubicacion.agregarEspiritu(this);
 
     }
 
     private void validarUbicacionNoNula(Ubicacion ubicacion) {
-        if(ubicacion==null) {
+        if (ubicacion == null) {
             throw new UbicacionInvalidaException();
         }
     }
@@ -102,15 +102,28 @@ public abstract class Espiritu implements Serializable {
     }
 
     public void moverseA(Ubicacion ubiNueva) {
+
         this.ubicacion = ubiNueva;
-    }
-
-    public void aplicarEfectoDeCementerio() {
-    }
-
-    public void aplicarEfectoDeSantuario() {
+        this.actualizarEstado(this.ubicacion);
 
     }
+
+    public void actualizarEstado(Ubicacion ubicacion) {
+        this.cambiosConexion(ubicacion);
+        this.comprobarVinculo();
+    }
+
+    private void comprobarVinculo() {
+        if (sinConexion()) {
+            this.mediumCon.desvincularseDe(this);
+        }
+    }
+
+    private boolean sinConexion() {
+        return this.getNivelDeConexion() == 0;
+    }
+
+    public abstract void cambiosConexion(Ubicacion ubicacion);
 
 
 }

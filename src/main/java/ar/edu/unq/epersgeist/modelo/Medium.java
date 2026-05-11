@@ -145,8 +145,8 @@ public class Medium implements Serializable {
 
     public void moverA(Ubicacion nuevaUbicacion) {
 
-        this.ubicacion.removerMedium(this);
-        nuevaUbicacion.agregarMedium(this);
+        this.ubicacion = nuevaUbicacion;
+        this.espiritus.forEach(e -> e.moverseA(nuevaUbicacion));
 
     }
 
