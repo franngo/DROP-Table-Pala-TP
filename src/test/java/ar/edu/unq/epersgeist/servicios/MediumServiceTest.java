@@ -376,9 +376,24 @@ public class MediumServiceTest {
         });
     }
 
+    @Transactional
     @Test
-    losEspiritusDelMediumSeVenAfectados() {
+    void losEspiritusDelMediumSeMueven() {
+        Espiritu juanchi =
+                espirituService.crear(new Demonio("Juanchi", bernal));
+        Espiritu ramon = espirituService.crear(new Demonio("Ramon", bernal));
+        serviceMedium.invocar(ubedaP.getId(), juanchi.getId());
+        serviceMedium.invocar(ubedaP.getId(), ramon.getId());
 
+        mediumService.actualizar(ubedaP);
+        mediumService.mover(ubedaP.getId(), berazategui.getId());
+
+        Medium mediumRecuperado = mediumService.recuperar(ubedaP.getId());
+
+        assertEquals(berazategui.getId(), mediumRecuperado.getUbicacion().getId());
+        for (Espiritu e : mediumRecuperado.getEspiritus()) {
+            assertEquals(berazategui.getId(), e.getUbicacion().getId());
+        }
 
     }
 
