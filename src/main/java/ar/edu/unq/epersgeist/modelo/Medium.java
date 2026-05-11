@@ -91,8 +91,7 @@ public class Medium implements Serializable {
 
         this.mana = Math.max(minimoMana, this.cantidadAlInvocar(manaRequeridoInvocacion));
 
-        //se desliga de su vieja ubicación y se relaciona con la nueva
-        // TODO ver si esto tiene sentido??
+
         espiritu.moverseA(this.ubicacion);
 
         return espiritu;
@@ -146,7 +145,21 @@ public class Medium implements Serializable {
     public void moverA(Ubicacion nuevaUbicacion) {
 
         this.ubicacion = nuevaUbicacion;
-        this.espiritus.forEach(e -> e.moverseA(nuevaUbicacion));
+        // this.espiritus.forEach(e -> e.moverseA(nuevaUbicacion));
+
+        for (Espiritu e : espiritus) {
+            e.moverseA(nuevaUbicacion); // solo setea la ubicacion y afecta la conexion
+
+
+        }
+        for (Espiritu e : espiritus) {
+            if (e.sinConexion()) {
+                e.desvincularse();
+            } // solo setea la ubicacion y afecta la conexion
+
+
+        }
+
 
     }
 

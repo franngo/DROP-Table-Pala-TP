@@ -18,10 +18,6 @@ public class Cementerio extends Ubicacion {
         super(nombre, energia);
     }
 
-//    @Override
-//    public void aplicarEfectoMovimiento(Espiritu espiritu) {
-//        espiritu.aplicarEfectoDeCementerio();
-//    }
 
     @Override
     public double dañoAEspiritu() {

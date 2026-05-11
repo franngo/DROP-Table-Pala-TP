@@ -19,10 +19,6 @@ public class Santuario extends Ubicacion {
         super(nombre, energia);
     }
 
-//    @Override
-//    public void aplicarEfectoMovimiento(Espiritu espiritu) {
-//        espiritu.aplicarEfectoDeSantuario();
-//    }
 
     @Override
     public double dañoAEspiritu() {
