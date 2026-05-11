@@ -99,5 +99,12 @@ public abstract class Espiritu implements Serializable {
     public void moverseA(Ubicacion ubiNueva) {
         this.ubicacion = ubiNueva;
     }
+
+    public void aplicarEfectoDeCementerio() {
+    }
+
+    public void aplicarEfectoDeSantuario() {
+
+    }
 }
 

@@ -17,12 +17,12 @@ import java.util.List;
 @NoArgsConstructor
 
 @Entity
-//@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-//@DiscriminatorColumn(name = "tipo_ubicacion")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "tipo_ubicacion")
 
 // --------------------------------------------------------------------------------
 
-public class Ubicacion {
+public abstract class Ubicacion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -84,7 +84,7 @@ public class Ubicacion {
 
     // --------------------------------------------------------------------------------
 
-    // public abstract void aplicarEfectoMovimiento(Espiritu espiritu);
+    public abstract void aplicarEfectoMovimiento(Espiritu espiritu);
 
     // --------------------------------------------------------------------------------
 }
