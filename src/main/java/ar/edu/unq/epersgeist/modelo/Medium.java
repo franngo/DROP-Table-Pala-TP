@@ -97,7 +97,7 @@ public class Medium implements Serializable {
 
         //se desliga de su vieja ubicación y se relaciona con la nueva
         // TODO ver si esto tiene sentido??
-        espiritu.actualizarUbicacion(this.ubicacion);
+        espiritu.moverA(this.ubicacion);
 
         return espiritu;
     }
