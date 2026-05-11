@@ -11,11 +11,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class UbicacionTest {
+    private static final Integer ENERGIA = 100;
     private Ubicacion ubicacion;
 
     @BeforeEach
     void setUp() {
-        this.ubicacion = new Santuario("Santuario de la Luz");
+        this.ubicacion = new Santuario("Santuario de la Luz", ENERGIA);
     }
 
     @Test

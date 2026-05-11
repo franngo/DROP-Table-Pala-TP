@@ -14,8 +14,8 @@ public class MapperUbicacion {
 
     public static Ubicacion toModelo(UbicacionCreateDTO dto) {
         return switch (dto.tipo().toUpperCase()) {
-            case "CEMENTERIO" -> new Cementerio(dto.nombre());
-            case "SANTUARIO" -> new Santuario(dto.nombre());
+            case "CEMENTERIO" -> new Cementerio(dto.nombre(), dto.energia());
+            case "SANTUARIO" -> new Santuario(dto.nombre(), dto.energia());
             default -> throw new IllegalArgumentException("Tipo de ubicación inválido");
         };
     }

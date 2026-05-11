@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 
 public class Santuario extends Ubicacion {
 
-    public Santuario(String nombre) {
-        super(nombre);
+    public Santuario(String nombre, Integer energia) {
+        super(nombre, energia);
     }
 
     @Override

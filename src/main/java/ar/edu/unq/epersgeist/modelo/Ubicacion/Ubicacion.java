@@ -3,6 +3,8 @@ package ar.edu.unq.epersgeist.modelo.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,6 +32,11 @@ public abstract class Ubicacion {
     @Column(unique = true, nullable = false)
     private String nombre;
 
+    @Min(0)
+    @Max(100)
+    @Column(nullable = false)
+    private Integer energia;
+
     @OneToMany(mappedBy = "ubicacion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Espiritu> espiritus = new ArrayList<>();
 
@@ -38,8 +45,9 @@ public abstract class Ubicacion {
 
     // --------------------------------------------------------------------------------
 
-    public Ubicacion(String nombre) {
+    public Ubicacion(String nombre, Integer energia) {
         this.nombre = nombre;
+        this.energia = energia;
     }
 
     // --------------------------------------------------------------------------------

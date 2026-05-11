@@ -12,13 +12,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class EspirituTest {
 
+    private static final Integer ENERGIA = 100;
     Espiritu espirituM;
     Medium medium;
     Ubicacion ubicacion;
 
     @BeforeEach
     void setUp() {
-        ubicacion = new Santuario("Berazategui");
+        ubicacion = new Santuario("Berazategui", ENERGIA);
         espirituM = new Angelical("Matias", ubicacion);
         medium = new Medium("Juan", 100, 10, ubicacion);
     }
@@ -107,7 +108,7 @@ public class EspirituTest {
 
     @Test
     void conectarUnEspirituEnDiferenteUbicacionAlMediumFalla() {
-        Ubicacion otraUbicacion = new Santuario("Quilmes");
+        Ubicacion otraUbicacion = new Santuario("Quilmes", ENERGIA);
         Medium otroMedium = new Medium("Juan2", 100, 50, otraUbicacion);
 
         // Intento conectar al angel con otroMedium, sin estar estos en la misma Ubicacion, y fallo

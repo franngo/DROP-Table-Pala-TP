@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class MediumServiceTest {
+    private static final Integer ENERGIA = 100;
 
     Espiritu rikaM;
     Espiritu jaegerM;
@@ -48,8 +49,8 @@ public class MediumServiceTest {
 
     @BeforeEach
     public void setUp() {
-        berazategui = ubicacionService.crear(new Santuario("Berazategui"));
-        bernal = ubicacionService.crear(new Santuario("Bernal"));
+        berazategui = ubicacionService.crear(new Santuario("Berazategui", ENERGIA));
+        bernal = ubicacionService.crear(new Santuario("Bernal", ENERGIA));
 
         espirituM = new Angelical("Charizard", berazategui);
         espirituM2 = new Angelical("Bulbasor", berazategui);
@@ -251,7 +252,7 @@ public class MediumServiceTest {
 
         Medium mediumPrueba = new Medium("MediumTest", 100, 50, berazategui);
         Medium mediumP = serviceMedium.crear(mediumPrueba);
-        Ubicacion bernalM = new Santuario("Quilmes");
+        Ubicacion bernalM = new Santuario("Quilmes", ENERGIA);
         Ubicacion bernalP = ubicacionService.crear(bernalM);
         bernalM.agregarMedium(mediumPrueba);
         ubicacionService.actualizar(bernalM);
@@ -295,7 +296,7 @@ public class MediumServiceTest {
     @Test
     void exorcismoNoExitosoDeberiaAfectarElAngelDelMedium() throws ExorcismoPropioNoPermitidoException {
         // Por una cuestion de comodidad voy a crear el contexto con nuevas variables
-        Ubicacion quilmes = ubicacionService.crear(new Santuario("Quilmes"));
+        Ubicacion quilmes = ubicacionService.crear(new Santuario("Quilmes", ENERGIA));
 
 
         Medium matiasM = new Medium("Matias", 150, 50, berazategui);

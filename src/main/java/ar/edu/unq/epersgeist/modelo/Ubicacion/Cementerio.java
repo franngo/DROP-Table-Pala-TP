@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 // --------------------------------------------------------------------------------
 
 public class Cementerio extends Ubicacion {
-    public Cementerio(String nombre) {
-        super(nombre);
+    public Cementerio(String nombre, Integer energia) {
+        super(nombre, energia);
     }
 
     @Override

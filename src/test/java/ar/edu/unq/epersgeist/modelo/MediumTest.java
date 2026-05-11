@@ -16,7 +16,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MediumTest {
-    Ubicacion bernal = new Santuario("Bernal");
+    private static final Integer ENERGIA = 100;
+
+    Ubicacion bernal = new Santuario("Bernal", ENERGIA);
     Medium mediumM;
     Medium mediumM2;
     Espiritu espirituM;
@@ -119,7 +121,7 @@ public class MediumTest {
 
     @Test
     public void invocarCasoExitoso() {
-        Ubicacion ubicacion = new Santuario("Quilmes");
+        Ubicacion ubicacion = new Santuario("Quilmes", ENERGIA);
         mediumM.setUbicacion(ubicacion);
 
         assertEquals(50, mediumM.getMana());
@@ -135,7 +137,7 @@ public class MediumTest {
 
     @Test
     public void invocarCasoManaInsuficiente() {
-        Ubicacion ubicacion = new Santuario("Quilmes");
+        Ubicacion ubicacion = new Santuario("Quilmes", ENERGIA);
         mediumM.setUbicacion(ubicacion);
 
         mediumM.setMana(5); //mana insuficiente para invocar()
@@ -151,7 +153,7 @@ public class MediumTest {
 
     @Test
     public void invocarCasoFallido() {
-        Ubicacion ubicacion = new Santuario("Quilmes");
+        Ubicacion ubicacion = new Santuario("Quilmes", ENERGIA);
         mediumM.setUbicacion(ubicacion);
 
         espirituM.setMediumCon(mediumM2); //espirituM pasa a NO estar libre, por lo que no puede ser invocado
