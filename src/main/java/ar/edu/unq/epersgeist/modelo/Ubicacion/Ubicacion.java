@@ -87,11 +87,7 @@ public class Ubicacion {
     // public abstract void aplicarEfectoMovimiento(Espiritu espiritu);
 
     // --------------------------------------------------------------------------------
-
-    public boolean tieneElMismoNombreQue(Ubicacion ubicacion) {
-        return getNombre().equals(ubicacion.getNombre());
-    }
-
+    
     public void salirDeUbicacion(Espiritu espiritu) {
         espiritus.remove(espiritu);
     }

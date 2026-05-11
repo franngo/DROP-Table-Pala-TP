@@ -89,7 +89,7 @@ public abstract class Espiritu implements Serializable {
 
 
     public boolean estaUbicadoEnElMismoLugarQue(Medium mediumAConectar) {
-        return this.getUbicacion().tieneElMismoNombreQue(mediumAConectar.getUbicacion());
+        return this.getUbicacion().equals(mediumAConectar.getUbicacion());
     }
 
     public void vincular(Medium medium) {
