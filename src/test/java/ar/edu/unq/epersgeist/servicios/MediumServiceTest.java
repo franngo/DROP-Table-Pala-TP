@@ -5,7 +5,7 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
-import ar.edu.unq.epersgeist.modelo.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.modelo.random.Estrategia.EstrategiaRangoEspecifico;
 import ar.edu.unq.epersgeist.modelo.random.RandomDefensa;
@@ -23,30 +23,24 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 public class MediumServiceTest {
 
-    @Autowired
-    private EspirituService espirituService;
-
-    @Autowired
-    private MediumService serviceMedium;
-
-    @Autowired
-    private UbicacionService ubicacionService;
-
-    private Ubicacion berazategui;
-    private Ubicacion bernal;
-
-    private Espiritu espirituM;
-    private Espiritu espirituM2;
-
-    private Medium epifanioM;
-    private Medium ubedaM;
-    private Medium epifanioP;
-    private Medium ubedaP;
-
     Espiritu rikaM;
     Espiritu jaegerM;
     Espiritu rikaP;
     Espiritu jaegerP;
+    @Autowired
+    private EspirituService espirituService;
+    @Autowired
+    private MediumService serviceMedium;
+    @Autowired
+    private UbicacionService ubicacionService;
+    private Ubicacion berazategui;
+    private Ubicacion bernal;
+    private Espiritu espirituM;
+    private Espiritu espirituM2;
+    private Medium epifanioM;
+    private Medium ubedaM;
+    private Medium epifanioP;
+    private Medium ubedaP;
     @Autowired
     private MediumService mediumService;
 

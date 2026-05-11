@@ -1,6 +1,7 @@
-package ar.edu.unq.epersgeist.modelo;
+package ar.edu.unq.epersgeist.modelo.Ubicacion;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.Medium;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

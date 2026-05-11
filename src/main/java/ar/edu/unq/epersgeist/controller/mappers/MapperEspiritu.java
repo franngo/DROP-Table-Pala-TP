@@ -4,7 +4,7 @@ import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.EspirituCreateDTO
 import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.EspirituUpdateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.espiritus.response.EspirituResponseDTO;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 
 public class MapperEspiritu {
 
