@@ -41,7 +41,7 @@ public abstract class Espiritu implements Serializable {
         this.nivelDeConexion = 0;
         this.nombre = nombre;
         this.ubicacion = ubicacion;
-        this.ubicacion.agregarEspiritu(this);
+        // this.ubicacion.agregarEspiritu(this);
 
     }
 

@@ -329,7 +329,7 @@ public class EspirituServiceTest {
 
         Medium juan = new Medium("Juan", 120, 20, berazategui);
 
-        bernalP.agregarMedium(juan);
+        //bernalP.agregarMedium(juan);
         Medium juanP = mediumService.crear(juan);
 
         Espiritu espiritu = serviceEspiritu.crear(matias);
@@ -342,7 +342,7 @@ public class EspirituServiceTest {
         Ubicacion EzpeletaP = ubicacionService.crear(EzpeletaM);
 
         Medium lolo = new Medium("Lolo", 120, 20, berazategui);
-        EzpeletaP.agregarMedium(lolo);
+        //EzpeletaP.agregarMedium(lolo);
         Medium loloP = mediumService.crear(lolo);
 
 
@@ -359,7 +359,7 @@ public class EspirituServiceTest {
 
         Medium juan = new Medium("Juan", 120, 20, berazategui);
 
-        bernalP.agregarMedium(juan);
+        //bernalP.agregarMedium(juan);
         Medium juanP = mediumService.crear(juan);
 
         Espiritu espiritu = serviceEspiritu.crear(matias);
@@ -369,7 +369,7 @@ public class EspirituServiceTest {
         assertEquals(espiritu2.getUbicacion().getId(), juanP.getUbicacion().getId());
 
         Medium lolo = new Medium("Lolo", 120, 20, berazategui);
-        bernalP.agregarMedium(lolo);
+        //bernalP.agregarMedium(lolo);
         Medium loloP = mediumService.crear(lolo);
 
 
@@ -377,7 +377,7 @@ public class EspirituServiceTest {
         serviceEspiritu.conectar(espiritu2.getId(), loloP.getId());
 
         Medium pipo = new Medium("Pipo", 120, 20, berazategui);
-        bernalP.agregarMedium(pipo);
+        //bernalP.agregarMedium(pipo);
         Medium pipoP = mediumService.crear(pipo);
 
         assertThrows(ErrorAlConectarEspirituConMedium.class, () -> {
@@ -435,8 +435,8 @@ public class EspirituServiceTest {
         Espiritu nuevoEspiritu = new Angelical("Juan", berazategui);
 
 
-        ubicacion.agregarMedium(medium);
-        ubicacion.agregarEspiritu(nuevoEspiritu);
+        //ubicacion.agregarMedium(medium);
+        //ubicacion.agregarEspiritu(nuevoEspiritu);
         Medium mediumP = mediumService.crear(medium);
         Espiritu espirituP = serviceEspiritu.crear(nuevoEspiritu);
         ubicacionService.actualizar(ubicacionP);
@@ -457,9 +457,9 @@ public class EspirituServiceTest {
         Medium medium = new Medium("Juan", 120, 10, berazategui);
         Espiritu pepe = new Angelical("Pepe", berazategui);
         Espiritu raul = new Angelical("Raul", berazategui);
-        ubicacion.agregarEspiritu(pepe);
-        ubicacion.agregarEspiritu(raul);
-        ubicacion.agregarMedium(medium);
+//        ubicacion.agregarEspiritu(pepe);
+//        ubicacion.agregarEspiritu(raul);
+//        ubicacion.agregarMedium(medium);
 
         Espiritu espiritu1 = serviceEspiritu.crear(pepe);
         Espiritu espiritu2 = serviceEspiritu.crear(raul);

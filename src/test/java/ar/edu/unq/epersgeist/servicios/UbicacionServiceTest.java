@@ -216,8 +216,8 @@ public class UbicacionServiceTest {
         espirituService.crear(mago);
 
         // Asignar espíritus a la ubicación
-        ubicacionCreada.agregarEspiritu(guerrero);
-        ubicacionCreada.agregarEspiritu(mago);
+//        ubicacionCreada.agregarEspiritu(guerrero);
+//        ubicacionCreada.agregarEspiritu(mago);
 
         // Actualizar la ubicación para guardar los cambios
         ubicacionService.actualizar(ubicacionCreada);
@@ -249,8 +249,8 @@ public class UbicacionServiceTest {
         mediumService.crear(epifanio);
         mediumService.crear(ubeda);
 
-        cripta.agregarMedium(epifanio);
-        cripta.agregarMedium(ubeda);
+//        cripta.agregarMedium(epifanio);
+//        cripta.agregarMedium(ubeda);
         ubicacionService.actualizar(cripta);
 
         List<Medium> resultado = ubicacionService.mediumsSinEspiritusEn(cripta.getId());
@@ -270,8 +270,8 @@ public class UbicacionServiceTest {
         mediumService.crear(ubeda);
 
         // Ubicarlos en la cripta
-        cripta.agregarMedium(epifanio);
-        cripta.agregarMedium(ubeda);
+//        cripta.agregarMedium(epifanio);
+//        cripta.agregarMedium(ubeda);
         ubicacionService.actualizar(cripta);
 
         // Crear espíritu en la cripta
