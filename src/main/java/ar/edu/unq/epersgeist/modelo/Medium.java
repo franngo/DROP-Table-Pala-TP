@@ -45,7 +45,6 @@ public class Medium implements Serializable {
         this.manaMax = manaMax;
         this.mana = mana;
         this.ubicacion = ubicacion;
-        this.ubicacion.agregarMedium(this);
     }
 
     public void agregarEspiritu(Espiritu espiritu) {
