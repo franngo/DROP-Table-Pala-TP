@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Transactional
@@ -122,13 +123,18 @@ public class MediumServiceImpl implements MediumService {
                 .orElseThrow(() ->
                         new ErrorDeMediumNoEncontradoException(mediumId)
                 );
+        Long ubiActual = mediumAMover.getUbicacion().getId();
+        if (!quiereMoverseALaMisma(ubiActual, ubicacionId)) {
+            mediumAMover.moverA(ubicacionAMover);
+        }
 
-        mediumAMover.moverA(ubicacionAMover);
         mediumDao.save(mediumAMover);
-
 
     }
 
+    private boolean quiereMoverseALaMisma(Long idUbicacionActual, Long idUbicacionAMover) {
+        return Objects.equals(idUbicacionActual, idUbicacionAMover);
+    }
 
     @Override
     public void eliminarTodos() {

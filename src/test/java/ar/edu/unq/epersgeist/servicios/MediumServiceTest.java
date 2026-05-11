@@ -365,6 +365,17 @@ public class MediumServiceTest {
     }
 
     @Test
+    void siSeQuiereMoverALaMismaUbicacionQuedaEnLaMisma() {
+        Ubicacion ubiActual = ubedaP.getUbicacion();
+        serviceMedium.mover(ubedaP.getId(), ubiActual.getId());
+
+        Medium ubedaAct = serviceMedium.recuperar(ubedaP.getId());
+
+        assertEquals(ubiActual.getId(), ubedaAct.getUbicacion().getId());
+
+    }
+
+    @Test
     void elMediumNoPuedeMoverseAUnaUbicacionInexistente() {
         Ubicacion ubi = new Cementerio("Cementerio", 100);
         ubi.setId(10000l);
@@ -373,6 +384,7 @@ public class MediumServiceTest {
             serviceMedium.mover(ubedaP.getId(), ubi.getId());
         });
     }
+
 
     @Transactional
     @Test
@@ -388,6 +400,24 @@ public class MediumServiceTest {
 
         for (Espiritu e : mediumRecuperado.getEspiritus()) {
             assertEquals(berazategui.getId(), e.getUbicacion().getId());
+        }
+
+    }
+
+    @Transactional
+    @Test
+    void losEspiritusNoCambianDeUbicacionSielMediumSeMuevenALaMisma() {
+        //se conecta Ubeda con 2 espiritus
+        espirituService.conectar(jaegerP.getId(), ubedaP.getId());
+        espirituService.conectar(rikaP.getId(), ubedaP.getId());
+
+        Long ubiActual = ubedaP.getUbicacion().getId();
+        serviceMedium.mover(ubedaP.getId(), ubiActual);
+
+        Medium mediumRecuperado = serviceMedium.recuperar(ubedaP.getId());
+
+        for (Espiritu e : mediumRecuperado.getEspiritus()) {
+            assertEquals(ubiActual, e.getUbicacion().getId());
         }
 
     }
