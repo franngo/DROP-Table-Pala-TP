@@ -5,9 +5,11 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.random.Estrategia.EstrategiaRangoEspecifico;
 import ar.edu.unq.epersgeist.modelo.random.RandomDefensa;
 import jakarta.transaction.Transactional;
@@ -350,6 +352,34 @@ public class MediumServiceTest {
 
         assertTrue(es.stream().anyMatch((e) -> e.getId().equals(rikaP.getId())));
         assertTrue(es.stream().anyMatch((e) -> e.getId().equals(jaegerP.getId())));
+    }
+
+    // MOVER
+    @Test
+    void elMediumSeMueveAUnaUbicacionExitosamente() {
+        //ubedaP.moverA(bernal);
+        serviceMedium.mover(ubedaP.getId(), bernal.getId());
+
+        Medium ubedaAct = serviceMedium.recuperar(ubedaP.getId());
+
+        assertEquals(bernal.getId(), ubedaAct.getUbicacion().getId());
+
+    }
+
+    @Test
+    void elMediumNoPuedeMoverseAUnaUbicacionInexistente() {
+        Ubicacion ubi = new Cementerio("Cementerio", 100);
+        ubi.setId(10000l);
+        assertThrows(UbicacionNoEncontradaException.class, () -> {
+
+            serviceMedium.mover(ubedaP.getId(), ubi.getId());
+        });
+    }
+
+    @Test
+    losEspiritusDelMediumSeVenAfectados() {
+
+
     }
 
     @AfterEach

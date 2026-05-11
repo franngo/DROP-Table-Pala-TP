@@ -2,9 +2,12 @@ package ar.edu.unq.epersgeist.servicios.impl;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
+import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
 import ar.edu.unq.epersgeist.servicios.MediumService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -16,10 +19,12 @@ import java.util.List;
 public class MediumServiceImpl implements MediumService {
     private final MediumDAO mediumDao;
     private final EspirituDAO espirituDao; //se requiere para usar en el invocar()
+    private final UbicacionDAO ubicacionDAO;
 
-    public MediumServiceImpl(MediumDAO mediumDao, EspirituDAO espirituDao) {
+    public MediumServiceImpl(MediumDAO mediumDao, EspirituDAO espirituDao, UbicacionDAO ubicacionDAO) {
         this.mediumDao = mediumDao;
         this.espirituDao = espirituDao;
+        this.ubicacionDAO = ubicacionDAO;
     }
 
     @Override
@@ -108,6 +113,18 @@ public class MediumServiceImpl implements MediumService {
 
     @Override
     public void mover(Long mediumId, Long ubicacionId) {
+        Ubicacion ubicacionAMover = ubicacionDAO.findById(ubicacionId)
+                .orElseThrow(() ->
+                        new UbicacionNoEncontradaException(ubicacionId)
+                );
+
+        Medium mediumAMover = mediumDao.findById(mediumId)
+                .orElseThrow(() ->
+                        new ErrorDeMediumNoEncontradoException(mediumId)
+                );
+
+        mediumAMover.moverA(ubicacionAMover);
+        mediumDao.save(mediumAMover);
 
 
     }

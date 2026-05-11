@@ -26,4 +26,6 @@ public interface EspirituService {
     void eliminarTodos();
 
     Page<Demonio> espiritusDemoniacos(Direccion direccion, int pag, int cantPorPag);
+
+
 }
