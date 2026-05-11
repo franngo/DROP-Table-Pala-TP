@@ -97,8 +97,7 @@ public abstract class Espiritu implements Serializable {
     }
 
     public void moverseA(Ubicacion ubiNueva) {
-        this.ubicacion.salirDeUbicacion(this);
-        ubiNueva.agregarEspiritu(this);
+        this.ubicacion = ubiNueva;
     }
 }
 

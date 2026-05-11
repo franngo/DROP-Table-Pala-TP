@@ -87,8 +87,4 @@ public class Ubicacion {
     // public abstract void aplicarEfectoMovimiento(Espiritu espiritu);
 
     // --------------------------------------------------------------------------------
-    
-    public void salirDeUbicacion(Espiritu espiritu) {
-        espiritus.remove(espiritu);
-    }
 }
