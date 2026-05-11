@@ -53,17 +53,16 @@ public abstract class Ubicacion {
     // --------------------------------------------------------------------------------
 
     public void agregarEspiritu(Espiritu espiritu) {
-        if (!espiritus.contains(espiritu)) {
+        if (!contieneEspiritu(espiritu)) {
             espiritus.add(espiritu);
             espiritu.setUbicacion(this);
         }
     }
 
     public void removerEspiritu(Espiritu espiritu) {
-        if (espiritus.contains(espiritu)) {
-            espiritus.remove(espiritu);
-            espiritu.setUbicacion(null);
-        }
+
+        espiritus.remove(espiritu);
+
     }
 
     public boolean contieneEspiritu(Espiritu espiritu) {
@@ -73,17 +72,17 @@ public abstract class Ubicacion {
     // --------------------------------------------------------------------------------
 
     public void agregarMedium(Medium medium) {
-        if (!mediums.contains(medium)) {
+        if (!contieneMedium(medium)) {
             mediums.add(medium);
             medium.setUbicacion(this);
         }
     }
 
     public void removerMedium(Medium medium) {
-        if (mediums.contains(medium)) {
-            mediums.remove(medium);
-            medium.setUbicacion(null);
-        }
+
+        mediums.remove(medium);
+        //medium.setUbicacion(null);
+
     }
 
     public boolean contieneMedium(Medium medium) {
@@ -92,7 +91,10 @@ public abstract class Ubicacion {
 
     // --------------------------------------------------------------------------------
 
-    public abstract void aplicarEfectoMovimiento(Espiritu espiritu);
+    // public abstract void aplicarEfectoMovimiento(Espiritu espiritu);
+
+    public abstract double dañoAEspiritu();
+
 
     // --------------------------------------------------------------------------------
 }

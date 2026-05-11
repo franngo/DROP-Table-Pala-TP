@@ -9,7 +9,6 @@ import ar.edu.unq.epersgeist.servicios.MediumService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -105,6 +104,12 @@ public class MediumServiceImpl implements MediumService {
     public List<Espiritu> espiritus(Long mediumId) {
         Medium recuperado = this.recuperar(mediumId);
         return recuperado.getEspiritus();
+    }
+
+    @Override
+    public void mover(Long mediumId, Long ubicacionId) {
+
+
     }
 
 

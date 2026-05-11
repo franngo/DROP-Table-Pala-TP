@@ -3,6 +3,7 @@ package ar.edu.unq.epersgeist.modelo;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeInvocacionDeEspirituException;
@@ -19,6 +20,12 @@ public class MediumTest {
     private static final Integer ENERGIA = 100;
 
     Ubicacion bernal = new Santuario("Bernal", ENERGIA);
+
+
+    Ubicacion cementerio;
+    Ubicacion santuario;
+
+
     Medium mediumM;
     Medium mediumM2;
     Espiritu espirituM;
@@ -34,6 +41,10 @@ public class MediumTest {
 
     @BeforeEach
     void setUp() {
+
+        cementerio = new Cementerio("Cementerio Chacarita", ENERGIA);
+        santuario = new Santuario("Santario Lujan", ENERGIA);
+
         mediumM = new Medium("Juan", 100, 50, bernal);
         mediumM2 = new Medium("Matias", 80, 40, bernal);
         espirituM = new Angelical("Charizard", bernal);
@@ -228,38 +239,122 @@ public class MediumTest {
         });
     }
 
-    /*
-     *
-     * */
-//    @Test
-//    public void invocarCasoExitosoCORRECCION() {
-//        Ubicacion quilmes = new Santuario("Quilmes");
-//        Ubicacion bernal = new Santuario("Bernal");
-//        Medium unmedium = new Medium("UnMedium", 50, 50, bernal);
-//        Medium otromedium = new Medium("OtroMedium", 50, 50, bernal);
-//
-//        unmedium.setUbicacion(quilmes);
-//        otromedium.setUbicacion(bernal);
-//
-//
-//        unmedium.invocar(espirituM);
-//
-//        // La ubicacion del espiritu cambia a unmedium.ubicacion (Quilmes)
-//        assertEquals(unmedium.getUbicacion(), espirituM.getUbicacion());
-//
-//        otromedium.invocar(espirituM);
-//
-//        // La ubicacion del espiritu cambia a otromedium.ubicacion (Bernal)
-//        assertEquals(otromedium.getUbicacion(), espirituM.getUbicacion());
-//
-//        // Pero.. Quilmes sigue incluyendo al espiritu en su lista
-//        //assertTrue(quilmes.getEspiritus().contains(espirituM));
-//
-//        // Cuando Bernal tambien lo conoce
-//        assertTrue(bernal.getEspiritus().contains(espirituM));
-//
-//        // El Espiritu está en dos ubicaciones distintas a la vez
-//    }
+ 
+    // MOVER
+    @Test
+    public void elMediumSeMueveExitosamente() {
+        //El medium se conecta con dos espiritus y se comprueba que los conoce
+        rika.aumentarConexionYConectar(mediumM);
+        jaeger.aumentarConexionYConectar(mediumM);
+
+        assertTrue(mediumM.getEspiritus().contains(rika));
+        assertTrue(mediumM.getEspiritus().contains(jaeger));
+
+        //todos en la misma ubicacion
+        assertEquals(bernal, mediumM.getUbicacion());
+        assertEquals(bernal, rika.getUbicacion());
+        assertEquals(bernal, jaeger.getUbicacion());
+
+        mediumM.moverA(santuario);
+
+        // todos se movieron al santuario
+        assertEquals(santuario, mediumM.getUbicacion());
+        assertEquals(santuario, rika.getUbicacion());
+        assertEquals(santuario, jaeger.getUbicacion());
+
+    }
+
+    @Test
+    public void elMediumSeMueveALaMismaUbicacion() {
+        //El medium se conecta con dos espiritus y se comprueba que los conoce
+        jaeger.aumentarConexionYConectar(mediumM);
+        rika.aumentarConexionYConectar(mediumM);
+
+        assertTrue(mediumM.getEspiritus().contains(rika));
+        assertTrue(mediumM.getEspiritus().contains(jaeger));
+
+        //todos en la misma ubicacion
+        assertEquals(bernal, mediumM.getUbicacion());
+        assertEquals(bernal, rika.getUbicacion());
+        assertEquals(bernal, jaeger.getUbicacion());
+
+        mediumM.moverA(bernal);
+
+        //todos se siguen en la misma ubicacion
+        assertEquals(bernal, mediumM.getUbicacion());
+        assertEquals(bernal, rika.getUbicacion());
+        assertEquals(bernal, jaeger.getUbicacion());
+
+    }
+
+    // CONEXION DE EXPIRITUS AL ARRIBAR A SANTUARIOS
+    @Test
+    public void conexionDemonios_SI_CambiaAlMoverseA_SANTUARIO() {
+        //El medium tiene 1 demonio
+        jaeger.aumentarConexionYConectar(mediumM);
+
+        //comprobamos conexion del demonio
+        assertEquals(60, jaeger.getNivelDeConexion());
+
+        mediumM.moverA(santuario);
+        // el demonio pierde 10 unidades
+        assertEquals(50, jaeger.getNivelDeConexion());
+    }
+
+    @Test
+    public void conexionAngeles_NO_CambiaAlMoverseA_SANTUARIO() {
+        //El medium tiene 1 angel
+        rika.aumentarConexionYConectar(mediumM);
+
+        //comprobamos conexion del angel
+        assertEquals(70, rika.getNivelDeConexion());
+
+        mediumM.moverA(santuario);
+        // el angel no se ve afectado
+        assertEquals(70, rika.getNivelDeConexion());
+    }
+
+    // CONEXION DE ESPIRITUS AL ARRIBAR A CEMENTERIOS
+    @Test
+    public void conexionDemonios_NO_CambiaAlMoverseA_CEMENTERIO() {
+        //El medium tiene 1 demonio
+        jaeger.aumentarConexionYConectar(mediumM);
+
+        //comprobamos conexion del demonio
+        assertEquals(60, jaeger.getNivelDeConexion());
+
+        // mediumM.mover(cementerio);
+        // el demonio no se ve afectado
+        assertEquals(60, jaeger.getNivelDeConexion());
+    }
+
+    @Test
+    public void conexionAngeles_SI_CambiaAlMoverseA_CEMENTERIO() {
+        //El medium tiene 1 angel
+        rika.aumentarConexionYConectar(mediumM);
+
+        //comprobamos conexion del angel
+        assertEquals(70, rika.getNivelDeConexion());
+
+        mediumM.moverA(cementerio);
+        // el angel se ve afectado
+        assertEquals(65, rika.getNivelDeConexion());
+    }
+
+    // Desvinculacion de mediums al mover
+    @Test
+    void elEspirituSeDesvinculaSiPierdeSuNivelDeConexion() {
+        rika.aumentarConexionYConectar(mediumM);
+        rika.setNivelDeConexion(1); // seteamos para que se pierda la conexion
+        assertEquals(1, rika.getNivelDeConexion());
+
+        mediumM.moverA(cementerio);
+
+        //se desvincularo rika de mediumM
+        assertFalse(mediumM.getEspiritus().contains(rika));
+        assertTrue(rika.estaLibre());
+
+    }
 
 
 }

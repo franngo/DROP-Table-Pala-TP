@@ -23,7 +23,7 @@ import java.io.Serializable;
 
 public abstract class Espiritu implements Serializable {
 
-    public static final int limiteConexion = 100;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -35,13 +35,15 @@ public abstract class Espiritu implements Serializable {
     @ManyToOne
     private Ubicacion ubicacion;
 
+    public static final int limiteConexion = 100;
+
     public Espiritu(@NonNull String nombre, Ubicacion ubicacion) {
         this.validarUbicacionNoNula(ubicacion);
 
         this.nivelDeConexion = 0;
         this.nombre = nombre;
         this.ubicacion = ubicacion;
-        this.ubicacion.agregarEspiritu(this);
+        // this.ubicacion.agregarEspiritu(this);
 
     }
 
@@ -72,6 +74,9 @@ public abstract class Espiritu implements Serializable {
         this.nivelDeConexion = Math.min(Espiritu.limiteConexion, this.cantidadNuevaConexion(cantidad));
     }
 
+    public void afectarConexion(double cantidad) {
+        this.nivelDeConexion = Math.max(0, this.getNivelDeConexion() - cantidad);
+    }
 
     private double cantidadNuevaConexion(double cantidad) {
         return this.getNivelDeConexion() + cantidad;
@@ -97,14 +102,17 @@ public abstract class Espiritu implements Serializable {
     }
 
     public void moverseA(Ubicacion ubiNueva) {
+
         this.ubicacion = ubiNueva;
+        this.cambiosConexion(ubicacion);
+    }
+    
+    public boolean sinConexion() {
+        return this.getNivelDeConexion() == 0;
     }
 
-    public void aplicarEfectoDeCementerio() {
-    }
+    public abstract void cambiosConexion(Ubicacion ubicacion);
 
-    public void aplicarEfectoDeSantuario() {
 
-    }
 }
 

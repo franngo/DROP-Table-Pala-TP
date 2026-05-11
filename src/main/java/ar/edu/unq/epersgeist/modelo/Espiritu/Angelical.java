@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.modelo.Espiritu;
 
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -30,4 +31,13 @@ public class Angelical extends Espiritu implements Combatiente {
         // le baja el nivel de conexion segun el calculo en el ataque y la deja en un valor o en 0
         this.setNivelDeConexion(Math.max(0, this.getNivelDeConexion() - 5));
     }
+
+    @Override
+    public void cambiosConexion(Ubicacion ubicacion) {
+        if (ubicacion instanceof Cementerio) {
+            this.afectarConexion(ubicacion.dañoAEspiritu());
+        }
+    }
+
+
 }

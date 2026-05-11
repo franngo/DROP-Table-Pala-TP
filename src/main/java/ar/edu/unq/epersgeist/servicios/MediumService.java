@@ -29,5 +29,7 @@ public interface MediumService {
 
     List<Espiritu> espiritus(Long mediumId);
 
+    void mover(Long mediumId, Long ubicacionId);
+
 
 }

@@ -38,6 +38,7 @@ public class Medium implements Serializable {
     private List<Espiritu> espiritus;
     @ManyToOne
     private Ubicacion ubicacion;
+
     public Medium(@NonNull String nombre, @NonNull Integer manaMax, @NonNull Integer mana, Ubicacion ubicacion) {
         this.espiritus = new ArrayList<Espiritu>();
         this.nombre = nombre;
@@ -90,7 +91,7 @@ public class Medium implements Serializable {
 
         this.mana = Math.max(minimoMana, this.cantidadAlInvocar(manaRequeridoInvocacion));
 
-        //se desliga de su vieja ubicación y se relaciona con la nueva
+
         espiritu.moverseA(this.ubicacion);
 
         return espiritu;
@@ -141,4 +142,19 @@ public class Medium implements Serializable {
     }
 
 
+    public void moverA(Ubicacion nuevaUbicacion) {
+
+        this.ubicacion = nuevaUbicacion;
+
+        this.espiritus.forEach(e -> {
+            e.moverseA(this.ubicacion);
+        });
+        // se desvinculan de ser necesarios los espiritus sin conexion para no eliminarlos
+        // de la lista de arriba mientras los itero
+        for (Espiritu e : new ArrayList<>(espiritus)) {
+            if (e.sinConexion()) {
+                e.desvincularse();
+            }
+        }
+    }
 }
