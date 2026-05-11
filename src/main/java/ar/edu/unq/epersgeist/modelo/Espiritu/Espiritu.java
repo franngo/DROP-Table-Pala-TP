@@ -24,6 +24,7 @@ import java.io.Serializable;
 public abstract class Espiritu implements Serializable {
 
 
+    public static final int limiteConexion = 100;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -35,15 +36,13 @@ public abstract class Espiritu implements Serializable {
     @ManyToOne
     private Ubicacion ubicacion;
 
-    public static final int limiteConexion = 100;
-
     public Espiritu(@NonNull String nombre, Ubicacion ubicacion) {
         this.validarUbicacionNoNula(ubicacion);
 
         this.nivelDeConexion = 0;
         this.nombre = nombre;
         this.ubicacion = ubicacion;
-        
+
     }
 
     private void validarUbicacionNoNula(Ubicacion ubicacion) {
@@ -113,5 +112,9 @@ public abstract class Espiritu implements Serializable {
     public abstract void cambiosConexion(Ubicacion ubicacion);
 
 
-}
+    public void aplicarEfectoDeCementerio() {
+    }
 
+    public void aplicarEfectoDeSantuario() {
+    }
+}
