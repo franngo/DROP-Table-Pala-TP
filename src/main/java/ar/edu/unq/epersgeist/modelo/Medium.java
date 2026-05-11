@@ -38,6 +38,7 @@ public class Medium implements Serializable {
     private List<Espiritu> espiritus;
     @ManyToOne
     private Ubicacion ubicacion;
+
     public Medium(@NonNull String nombre, @NonNull Integer manaMax, @NonNull Integer mana, Ubicacion ubicacion) {
         this.espiritus = new ArrayList<Espiritu>();
         this.nombre = nombre;
@@ -92,7 +93,7 @@ public class Medium implements Serializable {
 
         //se desliga de su vieja ubicación y se relaciona con la nueva
         // TODO ver si esto tiene sentido??
-        espiritu.moverA(this.ubicacion);
+        espiritu.moverseA(this.ubicacion);
 
         return espiritu;
     }

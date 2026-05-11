@@ -3,6 +3,7 @@ package ar.edu.unq.epersgeist.modelo;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeInvocacionDeEspirituException;
@@ -40,9 +41,9 @@ public class MediumTest {
 
     @BeforeEach
     void setUp() {
-        bernal = new Ubicacion("Bernal");
-        cementerio = new Cementerio("Cementerio Chacarita");
-        santuario = new Santuario("Santario Lujan");
+
+        cementerio = new Cementerio("Cementerio Chacarita", ENERGIA);
+        santuario = new Santuario("Santario Lujan", ENERGIA);
 
         mediumM = new Medium("Juan", 100, 50, bernal);
         mediumM2 = new Medium("Matias", 80, 40, bernal);
