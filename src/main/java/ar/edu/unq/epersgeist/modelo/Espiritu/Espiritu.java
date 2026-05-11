@@ -104,22 +104,9 @@ public abstract class Espiritu implements Serializable {
     public void moverseA(Ubicacion ubiNueva) {
 
         this.ubicacion = ubiNueva;
-        //this.actualizarEstado(this.ubicacion);
         this.cambiosConexion(ubicacion);
-
     }
-
-//    public void actualizarEstado(Ubicacion ubicacion) {
-//        this.cambiosConexion(ubicacion);
-//       // this.comprobarVinculo();
-//    }
-
-//    private void comprobarVinculo() {
-//        if (sinConexion()) {
-//            this.desvincularse();
-//        }
-//    }
-
+    
     public boolean sinConexion() {
         return this.getNivelDeConexion() == 0;
     }

@@ -145,23 +145,16 @@ public class Medium implements Serializable {
     public void moverA(Ubicacion nuevaUbicacion) {
 
         this.ubicacion = nuevaUbicacion;
-        // this.espiritus.forEach(e -> e.moverseA(nuevaUbicacion));
 
-        for (Espiritu e : espiritus) {
-            e.moverseA(nuevaUbicacion); // solo setea la ubicacion y afecta la conexion
-
-
-        }
-        for (Espiritu e : espiritus) {
+        this.espiritus.forEach(e -> {
+            e.moverseA(this.ubicacion);
+        });
+        // se desvinculan de ser necesarios los espiritus sin conexion para no eliminarlos
+        // de la lista de arriba mientras los itero
+        for (Espiritu e : new ArrayList<>(espiritus)) {
             if (e.sinConexion()) {
                 e.desvincularse();
-            } // solo setea la ubicacion y afecta la conexion
-
-
+            }
         }
-
-
     }
-
-
 }
