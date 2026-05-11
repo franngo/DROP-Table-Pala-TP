@@ -35,7 +35,7 @@ public class Angelical extends Espiritu implements Combatiente {
     @Override
     public void cambiosConexion(Ubicacion ubicacion) {
         if (ubicacion instanceof Cementerio) {
-            this.afectarConexion(ubicacion.dañoAEspiritu());
+            // this.afectarConexion(ubicacion.dañoAEspiritu());
         }
     }
 

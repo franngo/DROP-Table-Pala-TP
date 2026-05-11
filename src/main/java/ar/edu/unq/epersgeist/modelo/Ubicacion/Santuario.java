@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.modelo.Ubicacion;
 
+import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.NoArgsConstructor;
@@ -19,9 +20,8 @@ public class Santuario extends Ubicacion {
         super(nombre, energia);
     }
 
-
     @Override
-    public double dañoAEspiritu() {
-        return 10;
+    public void aplicarEfectoMovimiento(Espiritu espiritu) {
+        espiritu.aplicarEfectoDeSantuario();
     }
 }

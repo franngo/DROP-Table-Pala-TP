@@ -9,7 +9,11 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 
 public class MapperUbicacion {
     public static UbicacionResponseDTO toDTO(Ubicacion ubicacion) {
-        return new UbicacionResponseDTO(ubicacion.getId(), ubicacion.getNombre());
+        return new UbicacionResponseDTO(
+                ubicacion.getId(),
+                ubicacion.getNombre(),
+                ubicacion.getEnergia()
+        );
     }
 
     public static Ubicacion toModelo(UbicacionCreateDTO dto) {
@@ -22,5 +26,6 @@ public class MapperUbicacion {
 
     public static void actualizar(Ubicacion ubicacion, UbicacionUpdateDTO dto) {
         ubicacion.setNombre(dto.nombre());
+        ubicacion.setEnergia(dto.energia());
     }
 }
