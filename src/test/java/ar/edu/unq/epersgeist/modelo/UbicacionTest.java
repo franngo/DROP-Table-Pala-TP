@@ -2,6 +2,8 @@ package ar.edu.unq.epersgeist.modelo;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,11 +11,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class UbicacionTest {
+    private static final Integer ENERGIA = 100;
     private Ubicacion ubicacion;
 
     @BeforeEach
     void setUp() {
-        this.ubicacion = new Ubicacion("Santuario de la Luz");
+        this.ubicacion = new Santuario("Santuario de la Luz", ENERGIA);
     }
 
     @Test

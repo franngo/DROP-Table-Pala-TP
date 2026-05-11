@@ -1,7 +1,7 @@
 package ar.edu.unq.epersgeist.modelo.Espiritu;
 
 import ar.edu.unq.epersgeist.modelo.Medium;
-import ar.edu.unq.epersgeist.modelo.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionInvalidaException;
 import jakarta.persistence.*;
@@ -23,21 +23,17 @@ import java.io.Serializable;
 
 public abstract class Espiritu implements Serializable {
 
+    public static final int limiteConexion = 100;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
     private double nivelDeConexion;
     private String nombre;
-
-
     @ManyToOne
     @JoinColumn(name = "mediumCon_id")
     private Medium mediumCon;
     @ManyToOne
     private Ubicacion ubicacion;
-
-    public static final int limiteConexion = 100;
 
     public Espiritu(@NonNull String nombre, Ubicacion ubicacion) {
         this.validarUbicacionNoNula(ubicacion);
@@ -50,7 +46,7 @@ public abstract class Espiritu implements Serializable {
     }
 
     private void validarUbicacionNoNula(Ubicacion ubicacion) {
-        if(ubicacion==null) {
+        if (ubicacion == null) {
             throw new UbicacionInvalidaException();
         }
     }
@@ -93,7 +89,7 @@ public abstract class Espiritu implements Serializable {
 
 
     public boolean estaUbicadoEnElMismoLugarQue(Medium mediumAConectar) {
-        return this.getUbicacion().tieneElMismoNombreQue(mediumAConectar.getUbicacion());
+        return this.getUbicacion().equals(mediumAConectar.getUbicacion());
     }
 
     public void vincular(Medium medium) {
@@ -101,8 +97,14 @@ public abstract class Espiritu implements Serializable {
     }
 
     public void moverseA(Ubicacion ubiNueva) {
-        this.ubicacion.salirDeUbicacion(this);
-        ubiNueva.agregarEspiritu(this);
+        this.ubicacion = ubiNueva;
+    }
+
+    public void aplicarEfectoDeCementerio() {
+    }
+
+    public void aplicarEfectoDeSantuario() {
+
     }
 }
 

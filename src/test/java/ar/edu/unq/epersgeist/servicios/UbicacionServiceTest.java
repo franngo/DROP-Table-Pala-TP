@@ -3,12 +3,14 @@ package ar.edu.unq.epersgeist.servicios;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
-import ar.edu.unq.epersgeist.modelo.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,12 +22,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class UbicacionServiceTest {
+    private static final Integer ENERGIA = 100;
+
+
     private final String NOMBRE_TEMPLO = "Templo del Alba Eterna";
     private final String NOMBRE_CRIPTA = "Cripta de los Susurros";
-    private final Ubicacion templo = new Ubicacion(NOMBRE_TEMPLO);
-    private final Ubicacion cripta = new Ubicacion(NOMBRE_CRIPTA);
+    private final Ubicacion templo = new Santuario(NOMBRE_TEMPLO, ENERGIA);
+    private final Ubicacion cripta = new Santuario(NOMBRE_CRIPTA, ENERGIA);
     private final Long ubicacionIdInexistente = 999L;
-    Ubicacion berazategui = new Ubicacion("Berazategui");
+    Ubicacion berazategui = new Santuario("Berazategui", ENERGIA);
     private final Espiritu guerrero = new Angelical("Espíritu de la Luz", berazategui);
     private final Espiritu mago = new Angelical("Espíritu de la Oscuridad", berazategui);
     private final Medium epifanio = new Medium("epifanio", 150, 50, berazategui);
@@ -122,7 +127,7 @@ public class UbicacionServiceTest {
     void debeActualizarUbicacion() {
         Ubicacion ubicacionCreada = ubicacionService.crear(templo);
 
-        Ubicacion ubicacionModificada = new Ubicacion(NOMBRE_CRIPTA);
+        Ubicacion ubicacionModificada = new Santuario(NOMBRE_CRIPTA, ENERGIA);
         ubicacionModificada.setId(ubicacionCreada.getId());
 
         ubicacionService.actualizar(ubicacionModificada);
@@ -138,7 +143,7 @@ public class UbicacionServiceTest {
         ubicacionService.crear(templo);
 
         // No se asigna el ID a la ubicación modificada, lo que simula un intento de actualización con ID null
-        Ubicacion ubicacionModificada = new Ubicacion(NOMBRE_CRIPTA);
+        Ubicacion ubicacionModificada = new Santuario(NOMBRE_CRIPTA, ENERGIA);
 
         assertThrows(
                 UbicacionNoEncontradaException.class,
@@ -154,7 +159,7 @@ public class UbicacionServiceTest {
 
         );
     }
-    
+
     // ============================== ELIMINAR ==============================
 
     @Test
@@ -289,7 +294,6 @@ public class UbicacionServiceTest {
                 .anyMatch(m -> Objects.equals(m.getId(), ubeda.getId())));
     }
 
-
     @Test
     void deberiaRetornarListaVaciaSiNoHayMediumsSinEspiritus() {
         Ubicacion ubicacion = ubicacionService.crear(templo);
@@ -307,5 +311,10 @@ public class UbicacionServiceTest {
         espirituService.eliminarTodos();
         mediumService.eliminarTodos();
         ubicacionService.eliminarTodos();
+    }
+
+    @Nested
+    class PruebasUbicacionService {
+        // VER DESPUES
     }
 }

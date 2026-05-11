@@ -5,7 +5,8 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
-import ar.edu.unq.epersgeist.modelo.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlCrearEspirituException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoException;
@@ -24,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class EspirituServiceTest {
+    private static final Integer ENERGIA = 100;
 
     private Espiritu matias;
     private Ubicacion berazategui;
@@ -39,7 +41,7 @@ public class EspirituServiceTest {
 
     @BeforeEach
     public void setUp() {
-        berazategui = ubicacionService.crear(new Ubicacion("Berazategui"));
+        berazategui = ubicacionService.crear(new Santuario("Berazategui", ENERGIA));
         matias = new Angelical("Matias", berazategui);
     }
 
@@ -322,7 +324,7 @@ public class EspirituServiceTest {
 
     @Test
     void noDeberiaConectarUnEspirituQueEstaEnDiferenteUbicacion() {
-        Ubicacion bernalM = new Ubicacion("Bernal");
+        Ubicacion bernalM = new Santuario("Bernal", ENERGIA);
         Ubicacion bernalP = ubicacionService.crear(bernalM);
 
         Medium juan = new Medium("Juan", 120, 20, berazategui);
@@ -336,7 +338,7 @@ public class EspirituServiceTest {
         //ahora espiritu2 está en una Ubicacion
         assertEquals(espiritu2.getUbicacion().getId(), juanP.getUbicacion().getId());
 
-        Ubicacion EzpeletaM = new Ubicacion("Ezpeleta");
+        Ubicacion EzpeletaM = new Santuario("Ezpeleta", ENERGIA);
         Ubicacion EzpeletaP = ubicacionService.crear(EzpeletaM);
 
         Medium lolo = new Medium("Lolo", 120, 20, berazategui);
@@ -352,7 +354,7 @@ public class EspirituServiceTest {
 
     @Test
     void noDeberiaConectarUnEspirituQueNoEstaLibre() {
-        Ubicacion bernalM = new Ubicacion("Bernal");
+        Ubicacion bernalM = new Santuario("Bernal", ENERGIA);
         Ubicacion bernalP = ubicacionService.crear(bernalM);
 
         Medium juan = new Medium("Juan", 120, 20, berazategui);
@@ -386,7 +388,7 @@ public class EspirituServiceTest {
     @Transactional
     @Test
     public void seConectaUnEspirituConUnMedium() {
-        Ubicacion bernalM = new Ubicacion("Bernal");
+        Ubicacion bernalM = new Santuario("Bernal", ENERGIA);
         Ubicacion bernalP = ubicacionService.crear(bernalM);
         Espiritu juanM = new Angelical("Juan", bernalP);
         Espiritu espirituP = serviceEspiritu.crear(juanM);
@@ -427,7 +429,7 @@ public class EspirituServiceTest {
 
     @Test
     void deberiaPersistirElNivelDeConexionLuegoDeConectar() {
-        Ubicacion ubicacion = new Ubicacion("Tailandia");
+        Ubicacion ubicacion = new Santuario("Tailandia", ENERGIA);
         Ubicacion ubicacionP = ubicacionService.crear(ubicacion);
         Medium medium = new Medium("Juan", 120, 25, berazategui);
         Espiritu nuevoEspiritu = new Angelical("Juan", berazategui);
@@ -450,7 +452,7 @@ public class EspirituServiceTest {
     @Transactional
     @Test
     void deberiaPermitirConectarVariosEspiritusAlMismoMedium() {
-        Ubicacion ubicacion = new Ubicacion("Tailandia");
+        Ubicacion ubicacion = new Santuario("Tailandia", ENERGIA);
         Ubicacion ubiPersistida = ubicacionService.crear(ubicacion);
         Medium medium = new Medium("Juan", 120, 10, berazategui);
         Espiritu pepe = new Angelical("Pepe", berazategui);
@@ -486,7 +488,7 @@ public class EspirituServiceTest {
 
         assertEquals(nombreOriginal, recuperado.getNombre());
         assertEquals(matias.getId(), recuperado.getId());
-       
+
 
     }
 

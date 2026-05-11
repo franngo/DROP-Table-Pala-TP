@@ -3,7 +3,7 @@ package ar.edu.unq.epersgeist.controller.dtos.espiritus.request;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 
 public enum TipoEspiritu {
 

@@ -8,7 +8,7 @@ import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionRespo
 import ar.edu.unq.epersgeist.controller.mappers.MapperEspiritu;
 import ar.edu.unq.epersgeist.controller.mappers.MapperMedium;
 import ar.edu.unq.epersgeist.controller.mappers.MapperUbicacion;
-import ar.edu.unq.epersgeist.modelo.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
