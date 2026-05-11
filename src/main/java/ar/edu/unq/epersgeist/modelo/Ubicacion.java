@@ -37,7 +37,6 @@ public class Ubicacion {
         if (!espiritus.contains(espiritu)) {
             this.espiritus.add(espiritu);
             espiritu.setUbicacion(this);
-        
         }
     }
 
@@ -53,13 +52,7 @@ public class Ubicacion {
         }
     }
 
-    public void removerEspiritu(Espiritu espiritu) {
-
+    public void salirDeUbicacion(Espiritu espiritu) {
         this.espiritus.remove(espiritu);
     }
-
-    public void removerMedium(Medium medium) {
-        this.mediums.remove(medium);
-    }
-
 }

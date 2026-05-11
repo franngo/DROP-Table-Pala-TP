@@ -2,6 +2,8 @@ package ar.edu.unq.epersgeist.modelo;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,13 +12,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class EspirituTest {
 
+    private static final Integer ENERGIA = 100;
     Espiritu espirituM;
     Medium medium;
     Ubicacion ubicacion;
 
     @BeforeEach
     void setUp() {
-        ubicacion = new Ubicacion("Berazategui");
+        ubicacion = new Santuario("Berazategui", ENERGIA);
         espirituM = new Angelical("Matias", ubicacion);
         medium = new Medium("Juan", 100, 10, ubicacion);
     }
@@ -105,7 +108,7 @@ public class EspirituTest {
 
     @Test
     void conectarUnEspirituEnDiferenteUbicacionAlMediumFalla() {
-        Ubicacion otraUbicacion = new Ubicacion("Quilmes");
+        Ubicacion otraUbicacion = new Santuario("Quilmes", ENERGIA);
         Medium otroMedium = new Medium("Juan2", 100, 50, otraUbicacion);
 
         // Intento conectar al angel con otroMedium, sin estar estos en la misma Ubicacion, y fallo

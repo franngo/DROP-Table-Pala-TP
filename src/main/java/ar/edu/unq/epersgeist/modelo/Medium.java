@@ -4,8 +4,8 @@ import ar.edu.unq.epersgeist.modelo.Batalla.Batalla;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeInvocacionDeEspirituException;
-
 import ar.edu.unq.epersgeist.modelo.exceptions.ExorcistaSinAngelesException;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -23,20 +23,21 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 public class Medium implements Serializable {
+    public static final int minimoMana = 0;
+    public static final int manaRequeridoInvocacion = 10;
+    public static final int manaDescansoMedium = 15;
+    public static final int manaDescansoEspiritus = 5;
+    public static final double porcentajeAFortalecer = 0.20;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
     private String nombre;
     private Integer manaMax;
     private Integer mana;
-
     @OneToMany(mappedBy = "mediumCon", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Espiritu> espiritus;
-
     @ManyToOne
     private Ubicacion ubicacion;
-
     public Medium(@NonNull String nombre, @NonNull Integer manaMax, @NonNull Integer mana, Ubicacion ubicacion) {
         this.espiritus = new ArrayList<Espiritu>();
         this.nombre = nombre;
@@ -55,12 +56,6 @@ public class Medium implements Serializable {
         this.recuperarMana(Medium.manaDescansoMedium);
         this.espiritusRecuperanMana(Medium.manaDescansoEspiritus);
     }
-
-    public static final int minimoMana = 0;
-    public static final int manaRequeridoInvocacion = 10;
-    public static final int manaDescansoMedium = 15;
-    public static final int manaDescansoEspiritus = 5;
-    public static final double porcentajeAFortalecer = 0.20;
 
     private void recuperarMana(int cantidad) {
         this.mana = Math.min(this.manaMax, this.cantidadAlDescansar(cantidad));

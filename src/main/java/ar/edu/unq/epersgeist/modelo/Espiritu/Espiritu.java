@@ -1,7 +1,7 @@
 package ar.edu.unq.epersgeist.modelo.Espiritu;
 
 import ar.edu.unq.epersgeist.modelo.Medium;
-import ar.edu.unq.epersgeist.modelo.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionInvalidaException;
 import jakarta.persistence.*;
@@ -23,14 +23,12 @@ import java.io.Serializable;
 
 public abstract class Espiritu implements Serializable {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
     private double nivelDeConexion;
     private String nombre;
-
-
     @ManyToOne
     @JoinColumn(name = "mediumCon_id")
     private Medium mediumCon;
@@ -50,7 +48,7 @@ public abstract class Espiritu implements Serializable {
     }
 
     private void validarUbicacionNoNula(Ubicacion ubicacion) {
-        if (ubicacion == null) {
+        if(ubicacion==null) {
             throw new UbicacionInvalidaException();
         }
     }
@@ -96,17 +94,21 @@ public abstract class Espiritu implements Serializable {
 
 
     public boolean estaUbicadoEnElMismoLugarQue(Medium mediumAConectar) {
-        return this.getUbicacion().tieneElMismoNombreQue(mediumAConectar.getUbicacion());
+        return this.getUbicacion().equals(mediumAConectar.getUbicacion());
     }
 
     public void vincular(Medium medium) {
         this.mediumCon = medium;
     }
 
+    public void moverseA(Ubicacion ubiNueva) {
+        this.ubicacion = ubiNueva;
+    }
 
-    public void moverA(Ubicacion nuevaUbicacion) {
-        this.ubicacion.removerEspiritu(this);
-        nuevaUbicacion.agregarEspiritu(this);
+    public void aplicarEfectoDeCementerio() {
+    }
+
+    public void aplicarEfectoDeSantuario() {
 
     }
 

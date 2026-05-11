@@ -1,9 +1,8 @@
 package ar.edu.unq.epersgeist.modelo.Espiritu;
 
-import ar.edu.unq.epersgeist.modelo.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
