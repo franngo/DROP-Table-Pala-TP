@@ -1,16 +1,12 @@
 package ar.edu.unq.epersgeist.modelo.Ubicacion;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.Medium;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 // --------------------------------------------------------------------------------
 
@@ -37,12 +33,6 @@ public abstract class Ubicacion {
     @Column(nullable = false)
     private Integer energia;
 
-    @OneToMany(mappedBy = "ubicacion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Espiritu> espiritus = new ArrayList<>();
-
-    @OneToMany(mappedBy = "ubicacion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Medium> mediums = new ArrayList<>();
-
     // --------------------------------------------------------------------------------
 
     public Ubicacion(String nombre, Integer energia) {
@@ -52,49 +42,7 @@ public abstract class Ubicacion {
 
     // --------------------------------------------------------------------------------
 
-    public void agregarEspiritu(Espiritu espiritu) {
-        if (!contieneEspiritu(espiritu)) {
-            espiritus.add(espiritu);
-            espiritu.setUbicacion(this);
-        }
-    }
-
-    public void removerEspiritu(Espiritu espiritu) {
-
-        espiritus.remove(espiritu);
-
-    }
-
-    public boolean contieneEspiritu(Espiritu espiritu) {
-        return espiritus.contains(espiritu);
-    }
-
-    // --------------------------------------------------------------------------------
-
-    public void agregarMedium(Medium medium) {
-        if (!contieneMedium(medium)) {
-            mediums.add(medium);
-            medium.setUbicacion(this);
-        }
-    }
-
-    public void removerMedium(Medium medium) {
-
-        mediums.remove(medium);
-        //medium.setUbicacion(null);
-
-    }
-
-    public boolean contieneMedium(Medium medium) {
-        return mediums.contains(medium);
-    }
-
-    // --------------------------------------------------------------------------------
-
-    // public abstract void aplicarEfectoMovimiento(Espiritu espiritu);
-
-    public abstract double dañoAEspiritu();
-
+    public abstract void aplicarEfectoMovimiento(Espiritu espiritu);
 
     // --------------------------------------------------------------------------------
 }

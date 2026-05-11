@@ -13,12 +13,19 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+// --------------------------------------------------------------------------------
+
 @Service
 @Transactional
 @AllArgsConstructor
+
+// --------------------------------------------------------------------------------
+
 public class UbicacionServiceImpl implements UbicacionService {
     private final UbicacionDAO ubicacionDAO;
 
+    // --------------------------------------------------------------------------------
+    // CREAR
     // --------------------------------------------------------------------------------
 
     @Override
@@ -31,12 +38,14 @@ public class UbicacionServiceImpl implements UbicacionService {
     }
 
     // --------------------------------------------------------------------------------
+    // RECUPERAR
+    // --------------------------------------------------------------------------------
 
     @Override
-    public Ubicacion recuperar(Long idUbicacion) {
+    public Ubicacion recuperar(Long ubicacionId) {
         return ubicacionDAO
-                .findById(idUbicacion)
-                .orElseThrow(() -> new UbicacionNoEncontradaException(idUbicacion));
+                .findById(ubicacionId)
+                .orElseThrow(() -> new UbicacionNoEncontradaException(ubicacionId));
     }
 
     @Override
@@ -44,6 +53,8 @@ public class UbicacionServiceImpl implements UbicacionService {
         return ubicacionDAO.findAll();
     }
 
+    // --------------------------------------------------------------------------------
+    // ACTUALIZAR
     // --------------------------------------------------------------------------------
 
     @Override
@@ -58,6 +69,8 @@ public class UbicacionServiceImpl implements UbicacionService {
     }
 
     // --------------------------------------------------------------------------------
+    // ELIMINAR
+    // --------------------------------------------------------------------------------
 
     @Override
     public void eliminar(Long id) {
@@ -70,24 +83,16 @@ public class UbicacionServiceImpl implements UbicacionService {
     }
 
     // --------------------------------------------------------------------------------
-
-    @Override
-    public List<Espiritu> espiritusEn(Long ubicacionId) {
-        if (!ubicacionDAO.existsById(ubicacionId)) {
-            throw new UbicacionNoEncontradaException(ubicacionId);
-        }
-
-        return ubicacionDAO.espiritusEn(ubicacionId);
-    }
-
+    // CONSULTAS DE RELACIONES
     // --------------------------------------------------------------------------------
 
     @Override
-    public List<Medium> mediumsSinEspiritusEn(Long ubicacionId) {
-        if (!ubicacionDAO.existsById(ubicacionId)) {
-            throw new UbicacionNoEncontradaException(ubicacionId);
-        }
+    public List<Espiritu> espiritusEn(Long ubicacionId) {
+        return ubicacionDAO.espiritusEn(ubicacionId);
+    }
 
+    @Override
+    public List<Medium> mediumsSinEspiritusEn(Long ubicacionId) {
         return ubicacionDAO.mediumsSinEspiritusEn(ubicacionId);
     }
 
