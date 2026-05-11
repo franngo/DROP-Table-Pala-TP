@@ -45,8 +45,6 @@ public class MediumServiceTest {
     private Medium ubedaM;
     private Medium epifanioP;
     private Medium ubedaP;
-    @Autowired
-    private MediumService mediumService;
 
 
     @BeforeEach
@@ -340,13 +338,13 @@ public class MediumServiceTest {
     @Transactional
     @Test
     public void espiritus() {
-        assertEquals(0, mediumService.espiritus(ubedaP.getId()).size());
+        assertEquals(0, serviceMedium.espiritus(ubedaP.getId()).size());
 
         //ubedaP ya está en la misma ubicación que rikaP y jaegerP
         espirituService.conectar(jaegerP.getId(), ubedaP.getId());
         espirituService.conectar(rikaP.getId(), ubedaP.getId());
 
-        List<Espiritu> es = mediumService.espiritus(ubedaP.getId());
+        List<Espiritu> es = serviceMedium.espiritus(ubedaP.getId());
 
         assertEquals(2, es.size());
 
@@ -378,19 +376,16 @@ public class MediumServiceTest {
 
     @Transactional
     @Test
-    void losEspiritusDelMediumSeMueven() {
-        Espiritu juanchi =
-                espirituService.crear(new Demonio("Juanchi", bernal));
-        Espiritu ramon = espirituService.crear(new Demonio("Ramon", bernal));
-        serviceMedium.invocar(ubedaP.getId(), juanchi.getId());
-        serviceMedium.invocar(ubedaP.getId(), ramon.getId());
+    void losEspiritusDelMediumSeMuevenConEl() {
+        //se conecta Ubeda con 2 espiritus
+        espirituService.conectar(jaegerP.getId(), ubedaP.getId());
+        espirituService.conectar(rikaP.getId(), ubedaP.getId());
 
-        mediumService.actualizar(ubedaP);
-        mediumService.mover(ubedaP.getId(), berazategui.getId());
 
-        Medium mediumRecuperado = mediumService.recuperar(ubedaP.getId());
+        serviceMedium.mover(ubedaP.getId(), berazategui.getId());
 
-        assertEquals(berazategui.getId(), mediumRecuperado.getUbicacion().getId());
+        Medium mediumRecuperado = serviceMedium.recuperar(ubedaP.getId());
+
         for (Espiritu e : mediumRecuperado.getEspiritus()) {
             assertEquals(berazategui.getId(), e.getUbicacion().getId());
         }
