@@ -115,6 +115,7 @@ public class UbicacionTest {
     // EFECTO DE MOVIMIENTO
     // --------------------------------------------------------------------------------
 
+
     @Nested
     class EfectoDeMovimiento {
         @Test

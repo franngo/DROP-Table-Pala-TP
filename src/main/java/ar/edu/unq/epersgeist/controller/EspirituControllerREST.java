@@ -1,15 +1,19 @@
 package ar.edu.unq.epersgeist.controller;
 
+import ar.edu.unq.epersgeist.controller.dtos.espiritus.PaginacionEspirituResponseDTO;
 import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.EspirituCreateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.EspirituUpdateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.espiritus.response.EspirituResponseDTO;
 import ar.edu.unq.epersgeist.controller.mappers.MapperEspiritu;
+import ar.edu.unq.epersgeist.controller.mappers.PageMapper;
+import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -77,18 +81,18 @@ public class EspirituControllerREST {
         espirituService.conectar(espirituId, mediumId);
     }
 
-//    @GetMapping("/espiritus/demoniacos")
-//    @ResponseStatus(HttpStatus.OK)
-//    public PaginacionEspirituResponseDTO espiritusDemoniacos(
-//            @RequestParam Direccion direccion,
-//            @RequestParam int pagina,
-//            @RequestParam int cantidadPorPagina
-//    ) {
-//        Page<Demonio> paginada = espirituService.espiritusDemoniacos(direccion, pagina, cantidadPorPagina);
-//        return PageMapper.toEspirituPage(paginada,
-//                MapperEspiritu::toDetalle,
-//                direccion);
-//    }
+    @GetMapping("/espiritus/demoniacos")
+    @ResponseStatus(HttpStatus.OK)
+    public PaginacionEspirituResponseDTO espiritusDemoniacos(
+            @RequestParam Direccion direccion,
+            @RequestParam int pagina,
+            @RequestParam int cantidadPorPagina
+    ) {
+        Page<Espiritu> paginada = espirituService.espiritusDemoniacos(direccion, pagina, cantidadPorPagina);
+        return PageMapper.toEspirituPage(paginada,
+                MapperEspiritu::toDTO,
+                direccion);
+    }
 
 }
 

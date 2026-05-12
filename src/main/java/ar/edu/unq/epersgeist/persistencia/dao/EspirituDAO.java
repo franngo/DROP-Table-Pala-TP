@@ -18,7 +18,7 @@ public interface EspirituDAO extends JpaRepository<Espiritu, Long> {
 
 
     @Query("SELECT e FROM Demonio e")
-    Page<Demonio> espiritusDemoniacos(Pageable pageable);
+    Page<Espiritu> espiritusDemoniacos(Pageable pageable);
 
 
 }

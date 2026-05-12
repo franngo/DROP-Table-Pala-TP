@@ -1,6 +1,5 @@
 package ar.edu.unq.epersgeist.modelo.Ubicacion;
 
-import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -39,10 +38,8 @@ public abstract class Ubicacion {
         this.nombre = nombre;
         this.energia = energia;
     }
+    
+    public abstract double dañoAEspiritu();
 
-    // --------------------------------------------------------------------------------
 
-    public abstract void aplicarEfectoMovimiento(Espiritu espiritu);
-
-    // --------------------------------------------------------------------------------
 }

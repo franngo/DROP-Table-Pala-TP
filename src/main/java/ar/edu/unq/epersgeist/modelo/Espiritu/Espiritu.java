@@ -112,9 +112,4 @@ public abstract class Espiritu implements Serializable {
     public abstract void cambiosConexion(Ubicacion ubicacion);
 
 
-    public void aplicarEfectoDeCementerio() {
-    }
-
-    public void aplicarEfectoDeSantuario() {
-    }
 }

@@ -323,7 +323,7 @@ public class MediumTest {
         //comprobamos conexion del demonio
         assertEquals(60, jaeger.getNivelDeConexion());
 
-        // mediumM.mover(cementerio);
+         mediumM.moverA(cementerio);
         // el demonio no se ve afectado
         assertEquals(60, jaeger.getNivelDeConexion());
     }

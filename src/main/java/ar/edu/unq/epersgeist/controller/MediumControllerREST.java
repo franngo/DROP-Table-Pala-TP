@@ -13,6 +13,7 @@ import ar.edu.unq.epersgeist.servicios.MediumService;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -80,13 +81,14 @@ public class MediumControllerREST {
     public List<EspirituResponseDTO> espiritus(@PathVariable Long id) {
         List<Espiritu> espiritus = mediumService.espiritus(id);
         return espiritus.stream().
-                map((e) -> MapperEspiritu.toDTO(e)).
+                map(MapperEspiritu::toDTO).
                 collect(Collectors.toList());
     }
 
-//    @PutMapping("/{idM}/mover/ubicaciones/{idU}")
-//    public void mover(@PathVariable Long idM, @PathVariable Long idU) {
-//
-//    }
+    @PutMapping("/{idM}/mover/{idU}")
+    @ResponseStatus(HttpStatus.OK)
+    public void mover(@PathVariable Long idM, @PathVariable Long idU) {
+        mediumService.mover(idM, idU);
+    }
 
 }

@@ -104,7 +104,7 @@ public class EspirituServiceImpl implements EspirituService {
 
     //versión que implementa la paginación
     @Override
-    public Page<Demonio> espiritusDemoniacos(Direccion direccion, int pag, int cantPorPag) {
+    public Page<Espiritu> espiritusDemoniacos(Direccion direccion, int pag, int cantPorPag) {
         if (direccion == null) {
             throw new ErrorDireccionNulaException();
         }
@@ -127,7 +127,7 @@ public class EspirituServiceImpl implements EspirituService {
 
     }
 
-   
+
     @Override
 
     public void eliminarTodos() {
