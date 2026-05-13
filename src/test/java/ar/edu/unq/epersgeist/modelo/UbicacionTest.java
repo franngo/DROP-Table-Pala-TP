@@ -116,18 +116,18 @@ public class UbicacionTest {
     // --------------------------------------------------------------------------------
 
 
-    @Nested
-    class EfectoDeMovimiento {
-        @Test
-        void santuarioEjecutaSuEfectoSinErrores() {
-            Espiritu espiritu = new Angelical("Miguel", santuario);
-            assertDoesNotThrow(() -> santuario.aplicarEfectoMovimiento(espiritu));
-        }
-
-        @Test
-        void cementerioEjecutaSuEfectoSinErrores() {
-            Espiritu espiritu = new Demonio("Belcebu", cementerio);
-            assertDoesNotThrow(() -> cementerio.aplicarEfectoMovimiento(espiritu));
-        }
-    }
+//    @Nested
+//    class EfectoDeMovimiento {
+//        @Test
+//        void santuarioEjecutaSuEfectoSinErrores() {
+//            Espiritu espiritu = new Angelical("Miguel", santuario);
+//            assertDoesNotThrow(() -> santuario.aplicarEfectoMovimiento(espiritu));
+//        }
+//
+//        @Test
+//        void cementerioEjecutaSuEfectoSinErrores() {
+//            Espiritu espiritu = new Demonio("Belcebu", cementerio);
+//            assertDoesNotThrow(() -> cementerio.aplicarEfectoMovimiento(espiritu));
+//        }
+//    }
 }

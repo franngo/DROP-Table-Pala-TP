@@ -39,5 +39,8 @@ public class Angelical extends Espiritu implements Combatiente {
         }
     }
 
+    public int porcentajeDescansarEn(Ubicacion ubicacion) {
+        return ubicacion.porcentajeDescansarAngelical();
+    }
 
 }

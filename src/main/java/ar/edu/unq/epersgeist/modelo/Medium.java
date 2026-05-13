@@ -25,9 +25,9 @@ import java.util.List;
 public class Medium implements Serializable {
     public static final int minimoMana = 0;
     public static final int manaRequeridoInvocacion = 10;
-    public static final int manaDescansoMedium = 15;
-    public static final int manaDescansoEspiritus = 5;
-    public static final double porcentajeAFortalecer = 0.20;
+    //public static final int manaDescansoMedium = 15;
+    //public static final int manaDescansoEspiritus = 5;
+    public static final double porcentajeAFortalecer = 0.20; //para calcular el 20% del maná del medium, que es lo que recupera un espiritu al conectar
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -53,21 +53,22 @@ public class Medium implements Serializable {
     }
 
     public void descansar() {
-        this.recuperarMana(Medium.manaDescansoMedium);
-        this.espiritusRecuperanMana(Medium.manaDescansoEspiritus);
+        this.recuperarMana();
+        this.espiritusRecuperanMana();
     }
 
-    private void recuperarMana(int cantidad) {
-        this.mana = Math.min(this.manaMax, this.cantidadAlDescansar(cantidad));
+    private void recuperarMana() {
+        this.mana = Math.min(this.manaMax, this.cantidadAlDescansar());
     }
 
-    private int cantidadAlDescansar(int cantidad) {
-        return this.mana + cantidad;
+    private int cantidadAlDescansar() {
+        int recarga = this.ubicacion.porcentajeDescansarMedium() * this.mana / 100;
+        return this.mana + recarga;
     }
 
-    private void espiritusRecuperanMana(int cantidad) {
+    private void espiritusRecuperanMana() {
         for (Espiritu espiritu : espiritus) {
-            espiritu.fortalecerConexion(cantidad);
+            espiritu.fortalecerConexionDescansandoEn(this.ubicacion);
         }
     }
 
