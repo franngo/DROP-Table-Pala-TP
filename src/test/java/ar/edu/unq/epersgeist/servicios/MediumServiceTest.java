@@ -255,26 +255,19 @@ public class MediumServiceTest {
 
     @Test
     public void invocarCasoExitoso() {
+        //ubedaP es un Medium en bernal, que es un Santuario. Tiene 20 de mana
+        assertEquals(20, ubedaP.getMana());
 
-        Medium mediumPrueba = new Medium("MediumTest", 100, 50, berazategui);
-        Medium mediumP = serviceMedium.crear(mediumPrueba);
-        Ubicacion bernalM = new Santuario("Quilmes", ENERGIA);
-        Ubicacion bernalP = ubicacionService.crear(bernalM);
-//        bernalM.agregarMedium(mediumPrueba);
-        ubicacionService.actualizar(bernalM);
-
-//        assertEquals(0, bernalM.getEspiritus().size());
-        assertEquals(50, mediumPrueba.getMana());
-
-
+        //espirituM es un Angelical que está en berazategui
         Espiritu espirituP = espirituService.crear(espirituM);
 
-        serviceMedium.invocar(mediumP.getId(), espirituP.getId());
+        //al ser un Angelical libre, espirituP puede ser invocado por ubedaP, quien cuenta con suficiente mana para hacerlo
+        serviceMedium.invocar(ubedaP.getId(), espirituP.getId());
 
-        Medium mediumActualiado = serviceMedium.recuperar(mediumPrueba.getId());
-        Espiritu espirituActualizado = espirituService.recuperar(espirituM.getId());
+        Medium mediumActualiado = serviceMedium.recuperar(ubedaP.getId());
+        Espiritu espirituActualizado = espirituService.recuperar(espirituP.getId());
 
-        assertEquals(40, mediumActualiado.getMana());
+        assertEquals(10, mediumActualiado.getMana());
         assertEquals(mediumActualiado.getUbicacion().getNombre(), espirituActualizado.getUbicacion().getNombre());
     }
 

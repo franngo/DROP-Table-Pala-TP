@@ -172,19 +172,31 @@ public class MediumTest {
     }
 
     @Test
-    public void invocarCasoExitoso() {
-        Ubicacion ubicacion = new Santuario("Quilmes", ENERGIA);
-        mediumM.setUbicacion(ubicacion);
+    public void invocarCasoExitosoAngelicalYSantuario() {
+        mediumM.moverA(santuario);
 
         assertEquals(50, mediumM.getMana());
 
+        //mediumM tiene suficiente maná (50) y rika está libre. Además, rika es un Angelical (puede ser invocado en santuario)
 
-        //mediumM tiene suficiente maná (50) y espirituM está libre
-
-        mediumM.invocar(espirituM);
+        mediumM.invocar(rika);
 
         assertEquals(40, mediumM.getMana());
-        assertEquals(mediumM.getUbicacion(), espirituM.getUbicacion());
+        assertEquals(mediumM.getUbicacion(), rika.getUbicacion());
+    }
+
+    @Test
+    public void invocarCasoExitosoDemonioYCementerio() {
+        mediumM.moverA(cementerio);
+
+        assertEquals(50, mediumM.getMana());
+
+        //mediumM tiene suficiente maná (50) y jaeger está libre. Además, jaeger es un Demonio (puede ser invocado en cementerio)
+
+        mediumM.invocar(jaeger);
+
+        assertEquals(40, mediumM.getMana());
+        assertEquals(mediumM.getUbicacion(), jaeger.getUbicacion());
     }
 
     @Test
@@ -204,13 +216,39 @@ public class MediumTest {
     }
 
     @Test
-    public void invocarCasoFallido() {
+    public void invocarCasoFallidoPorNoLibre() {
         Ubicacion ubicacion = new Santuario("Quilmes", ENERGIA);
         mediumM.setUbicacion(ubicacion);
 
         espirituM.setMediumCon(mediumM2); //espirituM pasa a NO estar libre, por lo que no puede ser invocado
 
         assertThrows(ErrorDeInvocacionDeEspirituException.class, () -> mediumM.invocar(espirituM));
+    }
+
+    @Test
+    public void invocarCasoFallidoPorDemonioYSantuario() {
+        mediumM.moverA(santuario);
+
+        assertEquals(50, mediumM.getMana());
+
+        //mediumM tiene suficiente maná (50) y jaeger está libre. Sin embargo, jaeger es un Demonio (NO puede ser invocado en santuario)
+
+        ErrorDeInvocacionDeEspirituException excepcion = assertThrows(ErrorDeInvocacionDeEspirituException.class, () ->
+                mediumM.invocar(jaeger) );
+        assertEquals("Un espíritu del tipo dado no se puede invocar en la ubicación actual ni ninguna otra de su mismo tipo", excepcion.getMessage());
+    }
+
+    @Test
+    public void invocarCasoFallidoPorAngelicalYSementerio() {
+        mediumM.moverA(cementerio);
+
+        assertEquals(50, mediumM.getMana());
+
+        //mediumM tiene suficiente maná (50) y rika está libre. Sin embargo, rika es un Angelical (NO puede ser invocado en cementerio)
+
+        ErrorDeInvocacionDeEspirituException excepcion = assertThrows(ErrorDeInvocacionDeEspirituException.class, () ->
+                mediumM.invocar(rika) );
+        assertEquals("Un espíritu del tipo dado no se puede invocar en la ubicación actual ni ninguna otra de su mismo tipo", excepcion.getMessage());
     }
 
     //Test de exorcismo
