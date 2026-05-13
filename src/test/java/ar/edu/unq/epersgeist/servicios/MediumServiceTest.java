@@ -213,28 +213,34 @@ public class MediumServiceTest {
     }
 
     //descansar
-
+    @Transactional
     @Test
     public void descansarCasoExitoso() {
 
-        Medium mediumPrueba = new Medium("MediumTest", 100, 50, berazategui);
-        assertEquals(50, mediumPrueba.getMana());
-        assertEquals(0, espirituM.getNivelDeConexion());
-        assertEquals(0, espirituM2.getNivelDeConexion());
+        Medium mediumPrueba = new Medium("MediumTest", 200, 50, bernal);
+        rikaP.setNivelDeConexion(0);
+        assertEquals(0, rikaP.getNivelDeConexion()); //Angelical
+        jaegerP.setNivelDeConexion(0);
+        assertEquals(0, jaegerP.getNivelDeConexion()); //Demonio
 
-        espirituM.aumentarConexionYConectar(mediumPrueba);
-        espirituM2.aumentarConexionYConectar(mediumPrueba);
+        //están todos en bernal, que es un Santuario
+        rikaP.aumentarConexionYConectar(mediumPrueba);
+        jaegerP.aumentarConexionYConectar(mediumPrueba);
+
+        assertEquals(10, rikaP.getNivelDeConexion());
+        assertEquals(10, jaegerP.getNivelDeConexion());
+
         Medium mediumPruebaP = serviceMedium.crear(mediumPrueba);
 
         serviceMedium.descansar(mediumPruebaP.getId());
 
-        Medium m = serviceMedium.recuperar(mediumPruebaP.getId());
-        Espiritu e1 = espirituService.recuperar(espirituM.getId());
-        Espiritu e2 = espirituService.recuperar(espirituM2.getId());
+        Medium med = serviceMedium.recuperar(mediumPruebaP.getId());
+        Espiritu rik = espirituService.recuperar(rikaP.getId());
+        Espiritu jag = espirituService.recuperar(jaegerP.getId());
 
-        assertEquals(65, m.getMana());
-        assertEquals(15, e1.getNivelDeConexion());
-        assertEquals(15, e2.getNivelDeConexion());
+        assertEquals(125, med.getMana());
+        assertEquals(20, rik.getNivelDeConexion());
+        assertEquals(10, jag.getNivelDeConexion());
     }
 
 

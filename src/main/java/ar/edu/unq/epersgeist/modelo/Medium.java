@@ -68,9 +68,7 @@ public class Medium implements Serializable {
 
     private void espiritusRecuperanMana() {
         for (Espiritu espiritu : espiritus) {
-            int recarga = espiritu.porcentajeDescansarEn(this.ubicacion) * this.mana / 100;
-
-            espiritu.fortalecerConexion(recarga);
+            espiritu.fortalecerConexionDescansandoEn(this.ubicacion);
         }
     }
 

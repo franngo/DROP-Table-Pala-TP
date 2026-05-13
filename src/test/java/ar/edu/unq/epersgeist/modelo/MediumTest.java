@@ -95,39 +95,80 @@ public class MediumTest {
     }
 
     @Test
-    public void descansar() {
-        assertEquals(50, mediumM.getMana());
-        assertEquals(0, espirituM.getNivelDeConexion());
-        assertEquals(0, espirituM2.getNivelDeConexion());
+    public void descansarEnSantuario() {
+        mediumM.setManaMax(200);
+        rika.setNivelDeConexion(0); //Angelical
+        jaeger.setNivelDeConexion(0); //Demonio
 
-        mediumM.agregarEspiritu(espirituM);
-        mediumM.agregarEspiritu(espirituM2);
+        assertEquals(50, mediumM.getMana());
+        assertEquals(0, rika.getNivelDeConexion());
+        assertEquals(0, jaeger.getNivelDeConexion());
+
+        //todos en bernal, que es un Santuario
+        rika.aumentarConexionYConectar(mediumM);
+        jaeger.aumentarConexionYConectar(mediumM);
+
+        assertEquals(50, mediumM.getMana());
+        assertEquals(10, rika.getNivelDeConexion());
+        assertEquals(10, jaeger.getNivelDeConexion());
 
         mediumM.descansar();
 
-        assertEquals(65, mediumM.getMana());
-        assertEquals(5, espirituM.getNivelDeConexion());
-        assertEquals(5, espirituM2.getNivelDeConexion());
+        assertEquals(125, mediumM.getMana()); //aumenta en un 150% su maná
+        assertEquals(20, rika.getNivelDeConexion()); //aumenta en un 100% su nivel de conexión
+        assertEquals(10, jaeger.getNivelDeConexion()); //aumenta en un 0% su nivel de conexión
+    }
+
+    @Test
+    public void descansarEnCementerio() {
+        Medium mediumCem = new Medium("Matias", 100, 50, cementerio);
+        Espiritu gabriel = new Angelical("Gabriel", cementerio);
+        Espiritu belcebu = new Demonio("Belcebú", cementerio);
+
+        assertEquals(50, mediumCem.getMana());
+        assertEquals(0, gabriel.getNivelDeConexion());
+        assertEquals(0, belcebu.getNivelDeConexion());
+
+        //todos en cementerio, que es un Cementerio
+        gabriel.aumentarConexionYConectar(mediumCem);
+        belcebu.aumentarConexionYConectar(mediumCem);
+
+        assertEquals(50, mediumCem.getMana());
+        assertEquals(10, gabriel.getNivelDeConexion());
+        assertEquals(10, belcebu.getNivelDeConexion());
+
+        mediumCem.descansar();
+
+        assertEquals(75, mediumCem.getMana()); //aumenta en un 50% su maná
+        assertEquals(10, gabriel.getNivelDeConexion()); //aumenta en un 0% su nivel de conexión
+        assertEquals(20, belcebu.getNivelDeConexion()); //aumenta en un 100% su nivel de conexión
     }
 
     @Test
     public void noSeExcedenLimitesEnDescansar() {
+        //mediumM tiene 100 de manaMax
+        rika.setNivelDeConexion(0); //Angelical
+        jaeger.setNivelDeConexion(0); //Demonio
+
         assertEquals(50, mediumM.getMana());
-        assertEquals(0, espirituM.getNivelDeConexion());
-        assertEquals(0, espirituM2.getNivelDeConexion());
+        assertEquals(0, rika.getNivelDeConexion());
+        assertEquals(0, jaeger.getNivelDeConexion());
 
-        mediumM.agregarEspiritu(espirituM);
-        mediumM.agregarEspiritu(espirituM2);
+        //todos en bernal, que es un Santuario
+        rika.aumentarConexionYConectar(mediumM);
+        jaeger.aumentarConexionYConectar(mediumM);
 
-        mediumM.setMana(89); //tiene un manaMax de 100
-        espirituM.setNivelDeConexion(94); //el límite del nivelDeConexion es de 100
-        espirituM2.setNivelDeConexion(97); //el límite del nivelDeConexion es de 100
+        assertEquals(50, mediumM.getMana());
+        assertEquals(10, rika.getNivelDeConexion());
+        assertEquals(10, jaeger.getNivelDeConexion());
+
+        rika.setNivelDeConexion(94); //el límite del nivelDeConexion de todos los Espiritus es de 100
 
         mediumM.descansar();
 
-        assertEquals(100, mediumM.getMana());
-        assertEquals(99, espirituM.getNivelDeConexion());
-        assertEquals(100, espirituM2.getNivelDeConexion());
+        assertEquals(100, mediumM.getMana()); //aumenta en un 150% su maná, pero queda en 100 debido al manaMax
+        assertEquals(100, rika.getNivelDeConexion()); //aumenta en un 100% su nivel de conexión, pero queda en 100 debido al límite
+        assertEquals(10, jaeger.getNivelDeConexion()); //aumenta en un 0% su nivel de conexión
     }
 
     @Test

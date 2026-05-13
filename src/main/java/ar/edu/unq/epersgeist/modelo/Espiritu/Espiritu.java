@@ -113,4 +113,9 @@ public abstract class Espiritu implements Serializable {
 
     public abstract int porcentajeDescansarEn(Ubicacion ubicacion);
 
+    public void fortalecerConexionDescansandoEn(Ubicacion ubicacion) {
+        int recarga = this.porcentajeDescansarEn(this.ubicacion) * (int) this.nivelDeConexion / 100;
+        this.fortalecerConexion(recarga);
+    }
+
 }
