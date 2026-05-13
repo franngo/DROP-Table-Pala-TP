@@ -43,4 +43,9 @@ public class Angelical extends Espiritu implements Combatiente {
         return ubicacion.porcentajeDescansarAngelical();
     }
 
+    @Override
+    public boolean puedeInvocarseEn(Ubicacion ubicacion) {
+        return ubicacion.puedeInvocarseUnAngelical();
+    }
+
 }

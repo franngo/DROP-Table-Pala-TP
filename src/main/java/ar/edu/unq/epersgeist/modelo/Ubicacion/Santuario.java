@@ -39,4 +39,14 @@ public class Santuario extends Ubicacion {
         return 0;
     }
 
+    @Override
+    public boolean puedeInvocarseUnAngelical() {
+        return true;
+    }
+
+    @Override
+    public boolean puedeInvocarseUnDemonio() {
+        return false;
+    }
+
 }

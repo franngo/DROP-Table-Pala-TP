@@ -48,4 +48,9 @@ public class Demonio extends Espiritu implements Combatiente {
         return ubicacion.porcentajeDescansarDemonio();
     }
 
+    @Override
+    public boolean puedeInvocarseEn(Ubicacion ubicacion) {
+        return ubicacion.puedeInvocarseUnDemonio();
+    }
+
 }

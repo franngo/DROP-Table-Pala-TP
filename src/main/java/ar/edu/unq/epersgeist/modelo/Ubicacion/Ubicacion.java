@@ -47,4 +47,8 @@ public abstract class Ubicacion {
 
     public abstract int porcentajeDescansarDemonio();
 
+    public abstract boolean puedeInvocarseUnAngelical();
+
+    public abstract boolean puedeInvocarseUnDemonio();
+
 }

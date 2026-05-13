@@ -86,7 +86,11 @@ public class Medium implements Serializable {
         }
 
         if (!espiritu.estaLibre()) { //El Espiritu dado debe estar libre
-            throw new ErrorDeInvocacionDeEspirituException();
+            throw new ErrorDeInvocacionDeEspirituException("El espiritu dado no está libre, por lo que no puede ser invocado por el medium dado.");
+        }
+
+        if(!espiritu.puedeInvocarseEn(this.ubicacion)) {
+            throw new ErrorDeInvocacionDeEspirituException("Un espíritu del tipo dado no se puede invocar en la ubicación actual ni ninguna otra de su mismo tipo");
         }
 
         this.mana = Math.max(minimoMana, this.cantidadAlInvocar(manaRequeridoInvocacion));
