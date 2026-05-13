@@ -118,4 +118,6 @@ public abstract class Espiritu implements Serializable {
         this.fortalecerConexion(recarga);
     }
 
+    public abstract boolean puedeInvocarseEn(Ubicacion ubicacion);
+
 }

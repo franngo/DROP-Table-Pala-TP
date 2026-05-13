@@ -39,4 +39,14 @@ public class Cementerio extends Ubicacion {
         return 100;
     }
 
+    @Override
+    public boolean puedeInvocarseUnAngelical() {
+        return false;
+    }
+
+    @Override
+    public boolean puedeInvocarseUnDemonio() {
+        return true;
+    }
+
 }
