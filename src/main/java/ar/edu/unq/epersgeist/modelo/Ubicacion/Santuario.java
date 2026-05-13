@@ -19,9 +19,24 @@ public class Santuario extends Ubicacion {
         super(nombre, energia);
     }
 
-
     @Override
     public double dañoAEspiritu() {
         return 10;
     }
+
+    @Override
+    public int porcentajeDescansarMedium() {
+        return 150;
+    }
+
+    @Override
+    public int porcentajeDescansarAngelical() {
+        return 100;
+    }
+
+    @Override
+    public int porcentajeDescansarDemonio() {
+        return 0;
+    }
+
 }

@@ -111,5 +111,6 @@ public abstract class Espiritu implements Serializable {
 
     public abstract void cambiosConexion(Ubicacion ubicacion);
 
+    public abstract int porcentajeDescansarEn(Ubicacion ubicacion);
 
 }

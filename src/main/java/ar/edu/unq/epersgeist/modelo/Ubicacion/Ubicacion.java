@@ -41,5 +41,10 @@ public abstract class Ubicacion {
     
     public abstract double dañoAEspiritu();
 
+    public abstract int porcentajeDescansarMedium();
+
+    public abstract int porcentajeDescansarAngelical();
+
+    public abstract int porcentajeDescansarDemonio();
 
 }
