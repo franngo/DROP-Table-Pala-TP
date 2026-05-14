@@ -21,12 +21,7 @@ public class GlobalExceptionHandler {
     // --------------------------------------------------------------------------------
 
     @ExceptionHandler({
-            MethodArgumentNotValidException.class,
-            ErrorAlCrearEspirituException.class,
-            ErrorDireccionNulaException.class,
-            ErrorNumeroPaginaInvalidoExcepcion.class,
-            ErrorCantidadPorPaginaInvalidaExcepcion.class,
-            UbicacionInvalidaException.class
+            MethodArgumentNotValidException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponseDTO badRequestHandler(MethodArgumentNotValidException e) {
@@ -39,7 +34,23 @@ public class GlobalExceptionHandler {
                 .toList();
 
 
-        return new ErrorResponseDTO(400, "VALIDACION_ERROR", errors);
+        return new ErrorResponseDTO(400, "ARGUMENTO_INVÁLIDO", errors);
+    }
+
+    @ExceptionHandler({
+            ErrorAlCrearEspirituException.class,
+            ErrorDireccionNulaException.class,
+            ErrorNumeroPaginaInvalidoExcepcion.class,
+            ErrorCantidadPorPaginaInvalidaExcepcion.class,
+            UbicacionInvalidaException.class
+    })
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponseDTO badRequestHandler(EpergeistException e) {
+        return new ErrorResponseDTO(
+                400,
+                "ARGUMENTO_INVÁLIDO",
+                List.of(new ErrorMessageDTO(e.getMessage()))
+        );
     }
 
     // --------------------------------------------------------------------------------
@@ -77,7 +88,7 @@ public class GlobalExceptionHandler {
     public ErrorResponseDTO conflictHandler(EpergeistException e) {
         return new ErrorResponseDTO(
                 409,
-                "RECURSO_DUPLICADO",
+                "CONFLICTO_CON_ESTADO_ACTUAL",
                 List.of(new ErrorMessageDTO(e.getMessage()))
         );
     }
