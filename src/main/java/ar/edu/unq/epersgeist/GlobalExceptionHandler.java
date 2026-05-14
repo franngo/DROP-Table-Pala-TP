@@ -22,11 +22,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             MethodArgumentNotValidException.class,
-            ErrorAlCrearEspirituException.class,
-            ErrorDireccionNulaException.class,
-            ErrorNumeroPaginaInvalidoExcepcion.class,
-            ErrorCantidadPorPaginaInvalidaExcepcion.class,
-            UbicacionInvalidaException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponseDTO badRequestHandler(MethodArgumentNotValidException e) {
@@ -39,7 +34,27 @@ public class GlobalExceptionHandler {
                 .toList();
 
 
-        return new ErrorResponseDTO(400, "VALIDACION_ERROR", errors);
+        return new ErrorResponseDTO(400, "ARGUMENTO_INVÁLIDO", errors);
+    }
+
+    @ExceptionHandler({
+            UbicacionInvalidaException.class,
+            ErrorAlActualizarMediumException.class,
+            ErrorAlCrearEspirituException.class,
+            ErrorAlCrearMediumException.class,
+            ErrorCantidadPorPaginaInvalidaExcepcion.class,
+            ErrorNumeroPaginaInvalidoExcepcion.class,
+            ErrorDireccionNulaException.class,
+            IdEspirituInvalidoException.class,
+            IdMediumInvalidoException.class,
+    })
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponseDTO badRequestHandler(EpergeistException e) {
+        return new ErrorResponseDTO(
+                400,
+                "ARGUMENTO_INVÁLIDO",
+                List.of(new ErrorMessageDTO(e.getMessage()))
+        );
     }
 
     // --------------------------------------------------------------------------------
@@ -48,10 +63,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             UbicacionNoEncontradaException.class,
-            ErrorAlActualizarMediumException.class,
-            NoExisteSantuarioCorruptoException.class,
             ErrorDeEspirituNoEncontradoException.class,
-            ErrorAlConectarEspirituConMedium.class
+            ErrorDeMediumNoEncontradoException.class,
+            NoExisteSantuarioCorruptoException.class,
     })
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponseDTO notFoundHandler(EpergeistException e) {
@@ -68,16 +82,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             UbicacionYaExisteException.class,
+            ErrorAlConectarEspirituConMedium.class,
             ErrorDeInvocacionDeEspirituException.class,
             ErrorDeMediumExorcizandoAOtroEnDistintaUbicacion.class,
-            ErrorAlConectarEspirituConMedium.class,
-
+            ExorcismoPropioNoPermitidoException.class,
+            ExorcistaSinAngelesException.class,
     })
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponseDTO conflictHandler(EpergeistException e) {
         return new ErrorResponseDTO(
                 409,
-                "RECURSO_DUPLICADO",
+                "CONFLICTO_CON_ESTADO_ACTUAL",
                 List.of(new ErrorMessageDTO(e.getMessage()))
         );
     }
