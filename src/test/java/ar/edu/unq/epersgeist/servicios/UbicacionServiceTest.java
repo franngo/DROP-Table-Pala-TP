@@ -332,13 +332,13 @@ public class UbicacionServiceTest {
             espirituService.conectar(espiritu.getId(), mediumConEspiritus.getId());
         }
 
+
         @AfterEach
         void tearDown() {
             espirituService.eliminarTodos();
             mediumService.eliminarTodos();
             ubicacionService.eliminarTodos();
         }
-
         // --------------------------------------------------------------------------------
 
         @Test
@@ -357,6 +357,7 @@ public class UbicacionServiceTest {
 
             assertTrue(mediums.isEmpty());
         }
+
 
         @Test
         void devuelveListaVaciaSiLaUbicacionNoExiste() {

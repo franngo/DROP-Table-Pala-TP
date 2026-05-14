@@ -24,4 +24,6 @@ public interface UbicacionService {
     List<Espiritu> espiritusEn(Long id);
 
     List<Medium> mediumsSinEspiritusEn(Long ubicacionId);
+
+
 }
