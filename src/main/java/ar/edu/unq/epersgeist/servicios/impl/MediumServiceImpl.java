@@ -102,6 +102,11 @@ public class MediumServiceImpl implements MediumService {
         Medium mediumAtacante = this.recuperar(idMediumExorcista);
         Medium mediumAExorcizar = this.recuperar(idMediumAExorcizar);
 
+        //en el service porque involucra ids, que es lo que usamos para comparar objetos por igualdad. Los recuperar anteriores nos aseguran los ids
+        if(!mediumAtacante.getUbicacion().getId().equals(mediumAExorcizar.getUbicacion().getId())) {
+            throw new ErrorDeMediumExorcizandoAOtroEnDistintaUbicacion(mediumAtacante.getId(), mediumAExorcizar.getId());
+        }
+
         mediumAtacante.exorcizar(mediumAExorcizar);
     }
 
