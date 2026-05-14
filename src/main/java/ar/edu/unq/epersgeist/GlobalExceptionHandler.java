@@ -3,6 +3,7 @@ package ar.edu.unq.epersgeist;
 import ar.edu.unq.epersgeist.controller.dtos.ErrorMessageDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ErrorResponseDTO;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionInvalidaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             MethodArgumentNotValidException.class,
-            ErrorAlCrearMediumException.class,
+            ErrorAlCrearEspirituException.class,
+            ErrorDireccionNulaException.class,
+            ErrorNumeroPaginaInvalidoExcepcion.class,
+            ErrorCantidadPorPaginaInvalidaExcepcion.class,
+            UbicacionInvalidaException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponseDTO badRequestHandler(MethodArgumentNotValidException e) {
@@ -44,6 +49,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             UbicacionNoEncontradaException.class,
             ErrorAlActualizarMediumException.class,
+            NoExisteSantuarioCorruptoException.class,
+            ErrorDeEspirituNoEncontradoException.class,
+            ErrorAlConectarEspirituConMedium.class
     })
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponseDTO notFoundHandler(EpergeistException e) {
@@ -62,6 +70,8 @@ public class GlobalExceptionHandler {
             UbicacionYaExisteException.class,
             ErrorDeInvocacionDeEspirituException.class,
             ErrorDeMediumExorcizandoAOtroEnDistintaUbicacion.class,
+            ErrorAlConectarEspirituConMedium.class,
+
     })
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponseDTO conflictHandler(EpergeistException e) {
