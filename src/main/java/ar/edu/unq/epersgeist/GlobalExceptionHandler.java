@@ -68,7 +68,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             UbicacionYaExisteException.class,
             ErrorAlConectarEspirituConMedium.class,
-            ErrorAlConectarEspirituConMedium.class
+
     })
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponseDTO conflictHandler(EpergeistException e) {
