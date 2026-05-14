@@ -62,7 +62,7 @@ public class EspirituTest {
     @Test
     public void laConexionDelEspirituNoSobrepasaLos100Niveles() {
 
-        medium = new Medium("Juan", 100, 100000, ubicacion);
+        medium = new Medium("Juan", 100000, 100000, ubicacion);
         espirituM.aumentarConexionYConectar(medium);
 
         assertEquals(100, espirituM.getNivelDeConexion());

@@ -39,7 +39,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             UbicacionInvalidaException.class,
-            ErrorAlActualizarMediumException.class,
             ErrorAlCrearEspirituException.class,
             ErrorAlCrearMediumException.class,
             ErrorCantidadPorPaginaInvalidaExcepcion.class,
@@ -47,6 +46,7 @@ public class GlobalExceptionHandler {
             ErrorDireccionNulaException.class,
             IdEspirituInvalidoException.class,
             IdMediumInvalidoException.class,
+            ErrorManaMayorQueManaMaxAlCrearMedium.class,
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponseDTO badRequestHandler(EpergeistException e) {
@@ -63,6 +63,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             UbicacionNoEncontradaException.class,
+            ErrorAlActualizarMediumException.class,
             ErrorDeEspirituNoEncontradoException.class,
             ErrorDeMediumNoEncontradoException.class,
             NoExisteSantuarioCorruptoException.class,

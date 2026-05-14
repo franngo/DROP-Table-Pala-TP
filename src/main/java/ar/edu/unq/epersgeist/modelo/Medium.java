@@ -6,6 +6,7 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeInvocacionDeEspirituException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorManaMayorQueManaMaxAlCrearMedium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ExorcistaSinAngelesException;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -40,11 +41,19 @@ public class Medium implements Serializable {
     private Ubicacion ubicacion;
 
     public Medium(@NonNull String nombre, @NonNull Integer manaMax, @NonNull Integer mana, Ubicacion ubicacion) {
+        this.validarManaMenorQueManaMax(mana, manaMax);
+
         this.espiritus = new ArrayList<Espiritu>();
         this.nombre = nombre;
         this.manaMax = manaMax;
         this.mana = mana;
         this.ubicacion = ubicacion;
+    }
+
+    public void validarManaMenorQueManaMax(Integer mana, Integer manaMax) {
+        if (mana > manaMax) {
+            throw new ErrorManaMayorQueManaMaxAlCrearMedium();
+        }
     }
 
     public void agregarEspiritu(Espiritu espiritu) {
