@@ -21,4 +21,11 @@ public interface EspirituDAO extends JpaRepository<Espiritu, Long> {
     Page<Espiritu> espiritusDemoniacos(Pageable pageable);
 
 
+    @Query("""
+                SELECT COUNT(e)
+                FROM Demonio e
+                WHERE e.ubicacion.id = :santuarioId
+                AND e.mediumCon IS NULL
+            """)
+    Long demoniosLibres(Long santuarioId);
 }
