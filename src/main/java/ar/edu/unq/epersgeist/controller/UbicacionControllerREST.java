@@ -74,7 +74,7 @@ public class UbicacionControllerREST {
     // --------------------------------------------------------------------------------
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.NO_CONTENT) // 204
     public void eliminar(@PathVariable Long id) {
         ubicacionService.eliminar(id);
     }

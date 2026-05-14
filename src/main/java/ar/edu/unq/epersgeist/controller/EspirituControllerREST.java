@@ -46,7 +46,7 @@ public class EspirituControllerREST {
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK) //TODO correjir codigo
+    @ResponseStatus(HttpStatus.OK)
     public List<EspirituResponseDTO> obtenerTodosLosEspiritus() {
         List<Espiritu> todosE = espirituService.recuperarTodos();
         return todosE.stream().map(MapperEspiritu::toDTO).toList();

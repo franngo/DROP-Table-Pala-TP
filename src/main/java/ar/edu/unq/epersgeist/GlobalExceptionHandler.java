@@ -48,6 +48,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             UbicacionNoEncontradaException.class,
+            ErrorAlActualizarMediumException.class,
             NoExisteSantuarioCorruptoException.class,
             ErrorDeEspirituNoEncontradoException.class,
             ErrorAlConectarEspirituConMedium.class
@@ -67,6 +68,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             UbicacionYaExisteException.class,
+            ErrorDeInvocacionDeEspirituException.class,
+            ErrorDeMediumExorcizandoAOtroEnDistintaUbicacion.class,
             ErrorAlConectarEspirituConMedium.class,
 
     })
