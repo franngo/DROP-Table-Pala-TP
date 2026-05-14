@@ -87,9 +87,7 @@ public abstract class Espiritu implements Serializable {
         this.mediumCon = null;
     }
 
-
     public abstract void recibirAtaqueDe(Espiritu angel);
-
 
     public boolean estaUbicadoEnElMismoLugarQue(Medium mediumAConectar) {
         return this.getUbicacion().equals(mediumAConectar.getUbicacion());
@@ -101,8 +99,8 @@ public abstract class Espiritu implements Serializable {
 
     public void moverseA(Ubicacion ubiNueva) {
 
-        this.ubicacion = ubiNueva;
-        this.cambiosConexion(ubicacion);
+        this.setUbicacion(ubiNueva);
+        this.cambiosConexion(getUbicacion());
     }
 
     public boolean sinConexion() {
