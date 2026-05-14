@@ -293,28 +293,23 @@ public class MediumServiceTest {
     //exorcizar
 
     @Test
-    void exorcismoNoExitosoDeberiaAfectarElAngelDelMedium() throws ExorcismoPropioNoPermitidoException {
+    void exorcismoNoExitosoDeberiaAfectarElAngelDelMedium() {
         // Por una cuestion de comodidad voy a crear el contexto con nuevas variables
         Ubicacion quilmes = ubicacionService.crear(new Santuario("Quilmes", ENERGIA));
 
+        Medium matiasM = new Medium("Matias", 150, 50, quilmes);
 
-        Medium matiasM = new Medium("Matias", 150, 50, berazategui);
-        matiasM.setUbicacion(quilmes);
-
-        Medium francoM = new Medium("Franco", 100, 20, berazategui);
-        francoM.setUbicacion(quilmes);
+        Medium francoM = new Medium("Franco", 100, 20, quilmes);
 
         Medium matiasP = serviceMedium.crear(matiasM);
         Medium francoP = serviceMedium.crear(francoM);
 
-        Espiritu omnimanM = new Angelical("Omniman", berazategui);
+        Espiritu omnimanM = new Angelical("Omniman", quilmes);
         omnimanM.setNivelDeConexion(60);
-        omnimanM.setUbicacion(quilmes);
         Espiritu omnimanP = espirituService.crear(omnimanM);
 
-        Espiritu markM = new Demonio("Mark", berazategui);
+        Espiritu markM = new Demonio("Mark", quilmes);
         markM.setNivelDeConexion(50);
-        markM.setUbicacion(quilmes);
         Espiritu markP = espirituService.crear(markM);
         // el demonio siempre gana
         RandomDefensa.setEstrategiaNumero(new EstrategiaRangoEspecifico(99, 99));
@@ -330,6 +325,34 @@ public class MediumServiceTest {
         Espiritu omnimanDerrotado = espirituService.recuperar(omnimanP.getId());
 
         assertEquals(65.0, omnimanDerrotado.getNivelDeConexion());
+    }
+
+    @Test
+    void unMediumNoSePuedeExorcizarASiMismo() {
+        // Por una cuestion de comodidad voy a crear el contexto con nuevas variables
+        Ubicacion quilmes = ubicacionService.crear(new Santuario("Quilmes", ENERGIA));
+
+        Medium matiasM = new Medium("Matias", 150, 50, quilmes);
+
+        Medium matiasP = serviceMedium.crear(matiasM);
+
+        assertThrows(ExorcismoPropioNoPermitidoException.class, () -> serviceMedium.exorcizar(matiasP.getId(), matiasP.getId()) );
+    }
+
+    @Test
+    void unMediumNoPuedeExorcizarAOtroEnUbicacionDiferente() {
+        // Por una cuestion de comodidad voy a crear el contexto con nuevas variables
+        Ubicacion quilmes = ubicacionService.crear(new Santuario("Quilmes", ENERGIA));
+        Ubicacion wilde = ubicacionService.crear(new Santuario("Wilde", ENERGIA));
+
+        Medium matiasM = new Medium("Matias", 150, 50, quilmes);
+
+        Medium francoM = new Medium("Franco", 100, 20, wilde);
+
+        Medium matiasP = serviceMedium.crear(matiasM);
+        Medium francoP = serviceMedium.crear(francoM);
+
+        assertThrows(ErrorDeMediumExorcizandoAOtroEnDistintaUbicacion.class, () -> serviceMedium.exorcizar(matiasP.getId(), francoP.getId()) );
     }
 
     //espiritus

@@ -107,19 +107,16 @@ public class Medium implements Serializable {
     }
 
     public void exorcizar(Medium mediumAExorcizar) throws ExorcistaSinAngelesException {
-        this.validarExorcismo(mediumAExorcizar);
+        this.validarExorcismo();
 
         Batalla batalla = new Batalla(this, mediumAExorcizar);
         batalla.iniciarBatalla();
 
     }
 
-    private void validarExorcismo(Medium mediumAExorcizar) throws ExorcistaSinAngelesException {
+    private void validarExorcismo() throws ExorcistaSinAngelesException {
         if (!this.tengoAlgunEspirituAngel()) {
             throw new ExorcistaSinAngelesException("El medium no cuenta con espiritus angeles");
-        }
-        if(!this.ubicacion.getId().equals(mediumAExorcizar.getUbicacion().getId())) {
-            throw new ErrorDeMediumExorcizandoAOtroEnDistintaUbicacion(this.id, mediumAExorcizar.getId());
         }
     }
 
