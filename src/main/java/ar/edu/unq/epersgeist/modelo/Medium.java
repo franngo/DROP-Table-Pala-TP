@@ -6,6 +6,7 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeInvocacionDeEspirituException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeMediumExorcizandoAOtroEnDistintaUbicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ExorcistaSinAngelesException;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -106,16 +107,19 @@ public class Medium implements Serializable {
     }
 
     public void exorcizar(Medium mediumAExorcizar) throws ExorcistaSinAngelesException {
-        this.validarExorcismo();
+        this.validarExorcismo(mediumAExorcizar);
 
         Batalla batalla = new Batalla(this, mediumAExorcizar);
         batalla.iniciarBatalla();
 
     }
 
-    private void validarExorcismo() throws ExorcistaSinAngelesException {
+    private void validarExorcismo(Medium mediumAExorcizar) throws ExorcistaSinAngelesException {
         if (!this.tengoAlgunEspirituAngel()) {
             throw new ExorcistaSinAngelesException("El medium no cuenta con espiritus angeles");
+        }
+        if(!this.ubicacion.getId().equals(mediumAExorcizar.getUbicacion().getId())) {
+            throw new ErrorDeMediumExorcizandoAOtroEnDistintaUbicacion(this.id, mediumAExorcizar.getId());
         }
     }
 
