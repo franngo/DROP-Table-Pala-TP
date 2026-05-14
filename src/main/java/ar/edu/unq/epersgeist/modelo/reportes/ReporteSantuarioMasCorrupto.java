@@ -15,6 +15,4 @@ public class ReporteSantuarioMasCorrupto {
         this.cantidadTotalDemonios = demonios;
         this.demoniosLibres = libres;
     }
-
-
 }
