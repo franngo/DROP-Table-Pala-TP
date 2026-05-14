@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
     // --------------------------------------------------------------------------------
 
     @ExceptionHandler({
-            MethodArgumentNotValidException.class
+            MethodArgumentNotValidException.class,
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponseDTO badRequestHandler(MethodArgumentNotValidException e) {
@@ -38,11 +38,15 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({
+            UbicacionInvalidaException.class,
+            ErrorAlActualizarMediumException.class,
             ErrorAlCrearEspirituException.class,
-            ErrorDireccionNulaException.class,
-            ErrorNumeroPaginaInvalidoExcepcion.class,
+            ErrorAlCrearMediumException.class,
             ErrorCantidadPorPaginaInvalidaExcepcion.class,
-            UbicacionInvalidaException.class
+            ErrorNumeroPaginaInvalidoExcepcion.class,
+            ErrorDireccionNulaException.class,
+            IdEspirituInvalidoException.class,
+            IdMediumInvalidoException.class,
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponseDTO badRequestHandler(EpergeistException e) {
@@ -59,10 +63,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             UbicacionNoEncontradaException.class,
-            ErrorAlActualizarMediumException.class,
-            NoExisteSantuarioCorruptoException.class,
             ErrorDeEspirituNoEncontradoException.class,
-            ErrorAlConectarEspirituConMedium.class
+            ErrorDeMediumNoEncontradoException.class,
+            NoExisteSantuarioCorruptoException.class,
     })
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponseDTO notFoundHandler(EpergeistException e) {
@@ -79,10 +82,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             UbicacionYaExisteException.class,
+            ErrorAlConectarEspirituConMedium.class,
             ErrorDeInvocacionDeEspirituException.class,
             ErrorDeMediumExorcizandoAOtroEnDistintaUbicacion.class,
-            ErrorAlConectarEspirituConMedium.class,
-
+            ExorcismoPropioNoPermitidoException.class,
+            ExorcistaSinAngelesException.class,
     })
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponseDTO conflictHandler(EpergeistException e) {
