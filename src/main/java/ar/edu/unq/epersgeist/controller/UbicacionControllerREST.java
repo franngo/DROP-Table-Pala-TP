@@ -2,13 +2,17 @@ package ar.edu.unq.epersgeist.controller;
 
 import ar.edu.unq.epersgeist.controller.dtos.espiritus.response.EspirituResponseDTO;
 import ar.edu.unq.epersgeist.controller.dtos.mediums.response.MediumResponseDTO;
+import ar.edu.unq.epersgeist.controller.dtos.reportes.responses.ReporteSantuarioMasCorruptoResponseDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionCreateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionUpdateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionResponseDTO;
+import ar.edu.unq.epersgeist.controller.mappers.EstadisticaMapper;
 import ar.edu.unq.epersgeist.controller.mappers.MapperEspiritu;
 import ar.edu.unq.epersgeist.controller.mappers.MapperMedium;
 import ar.edu.unq.epersgeist.controller.mappers.MapperUbicacion;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.reportes.ReporteSantuarioMasCorrupto;
+import ar.edu.unq.epersgeist.servicios.EstadisticaService;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -22,6 +26,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UbicacionControllerREST {
     private final UbicacionService ubicacionService;
+    private final EstadisticaService estadisticaService;
 
     // --------------------------------------------------------------------------------
 
@@ -97,4 +102,13 @@ public class UbicacionControllerREST {
     }
 
     // --------------------------------------------------------------------------------
+
+    @GetMapping("/santuario-corrupto")
+    @ResponseStatus(HttpStatus.OK)
+    public ReporteSantuarioMasCorruptoResponseDTO santuarioMasCorrupto() {
+
+        ReporteSantuarioMasCorrupto reporte = estadisticaService.santuarioCorrupto();
+
+        return EstadisticaMapper.toDTO(reporte);
+    }
 }
