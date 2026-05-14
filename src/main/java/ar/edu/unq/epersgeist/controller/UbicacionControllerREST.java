@@ -2,7 +2,7 @@ package ar.edu.unq.epersgeist.controller;
 
 import ar.edu.unq.epersgeist.controller.dtos.espiritus.response.EspirituResponseDTO;
 import ar.edu.unq.epersgeist.controller.dtos.mediums.response.MediumResponseDTO;
-import ar.edu.unq.epersgeist.controller.dtos.reportes.responses.ReporteSantuarioMasCorruptoDTO;
+import ar.edu.unq.epersgeist.controller.dtos.reportes.responses.ReporteSantuarioMasCorruptoResponseDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionCreateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionUpdateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionResponseDTO;
@@ -105,7 +105,7 @@ public class UbicacionControllerREST {
 
     @GetMapping("/santuario-corrupto")
     @ResponseStatus(HttpStatus.OK)
-    public ReporteSantuarioMasCorruptoDTO santuarioMasCorrupto() {
+    public ReporteSantuarioMasCorruptoResponseDTO santuarioMasCorrupto() {
 
         ReporteSantuarioMasCorrupto reporte =
                 estadisticaService.santuarioCorrupto();

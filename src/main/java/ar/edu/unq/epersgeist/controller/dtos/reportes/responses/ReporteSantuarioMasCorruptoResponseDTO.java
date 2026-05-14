@@ -1,6 +1,6 @@
 package ar.edu.unq.epersgeist.controller.dtos.reportes.responses;
 
-public record ReporteSantuarioMasCorruptoDTO(
+public record ReporteSantuarioMasCorruptoResponseDTO(
         String nombreSantuario,
         String nombreMedium,
         Long cantidadTotalDemonios,
