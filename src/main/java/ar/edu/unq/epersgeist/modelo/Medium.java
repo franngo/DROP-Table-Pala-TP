@@ -6,7 +6,6 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeInvocacionDeEspirituException;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeMediumExorcizandoAOtroEnDistintaUbicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ExorcistaSinAngelesException;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -90,7 +89,7 @@ public class Medium implements Serializable {
             throw new ErrorDeInvocacionDeEspirituException("El espiritu dado no está libre, por lo que no puede ser invocado por el medium dado.");
         }
 
-        if(!espiritu.puedeInvocarseEn(this.ubicacion)) {
+        if (!espiritu.puedeInvocarseEn(this.ubicacion)) {
             throw new ErrorDeInvocacionDeEspirituException("Un espíritu del tipo dado no se puede invocar en la ubicación actual ni ninguna otra de su mismo tipo");
         }
 
@@ -149,17 +148,20 @@ public class Medium implements Serializable {
 
     public void moverA(Ubicacion nuevaUbicacion) {
 
-        this.ubicacion = nuevaUbicacion;
+        this.setUbicacion(nuevaUbicacion);
+        this.moverEspiritusA(getUbicacion());
+    }
 
+    public void moverEspiritusA(Ubicacion nuevaUbicacion) {
+
+        List<Espiritu> aDesvincular = new ArrayList<>();
         this.espiritus.forEach(e -> {
-            e.moverseA(this.ubicacion);
-        });
-        // se desvinculan de ser necesarios los espiritus sin conexion para no eliminarlos
-        // de la lista de arriba mientras los itero
-        for (Espiritu e : new ArrayList<>(espiritus)) {
+            e.moverseA(nuevaUbicacion);
+
             if (e.sinConexion()) {
-                e.desvincularse();
+                aDesvincular.add(e);
             }
-        }
+        });
+        aDesvincular.forEach(Espiritu::desvincularse);
     }
 }

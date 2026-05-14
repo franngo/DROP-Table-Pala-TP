@@ -39,7 +39,7 @@ public abstract class Ubicacion {
         this.energia = energia;
     }
     
-    public abstract double dañoAEspiritu();
+    //public abstract double dañoAEspiritu();
 
     public abstract int porcentajeDescansarMedium();
 
