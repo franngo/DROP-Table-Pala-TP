@@ -177,7 +177,7 @@ public class MediumServiceTest {
         ErrorAlActualizarMediumException exception =
                 assertThrows(ErrorAlActualizarMediumException.class, () -> {
 
-                    serviceMedium.actualizar(new Medium("Julian", 12, 22, berazategui));
+                    serviceMedium.actualizar(new Medium("Julian", 22, 22, berazategui));
 
                 });
 
@@ -189,8 +189,8 @@ public class MediumServiceTest {
     void noDeberiaActualizarConIdQueNoSeEncuentraEnBD() {
         ErrorAlActualizarMediumException exception =
                 assertThrows(ErrorAlActualizarMediumException.class, () -> {
-                    Medium romanM = new Medium("a", 1, 2, berazategui);
-                    romanM.setId(132L); //no hay nada en la DB con id 1, porque arranca vacía
+                    Medium romanM = new Medium("a", 2, 2, berazategui);
+                    romanM.setId(132L); //no hay nada en la DB con ese id, porque arranca vacía
                     serviceMedium.actualizar(romanM);
 
                 });
