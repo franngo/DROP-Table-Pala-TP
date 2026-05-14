@@ -107,8 +107,7 @@ public class UbicacionControllerREST {
     @ResponseStatus(HttpStatus.OK)
     public ReporteSantuarioMasCorruptoResponseDTO santuarioMasCorrupto() {
 
-        ReporteSantuarioMasCorrupto reporte =
-                estadisticaService.santuarioCorrupto();
+        ReporteSantuarioMasCorrupto reporte = estadisticaService.santuarioCorrupto();
 
         return EstadisticaMapper.toDTO(reporte);
     }
