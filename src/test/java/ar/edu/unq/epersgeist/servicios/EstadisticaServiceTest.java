@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -111,11 +112,8 @@ public class EstadisticaServiceTest {
             ReporteSantuarioMasCorrupto reporte =
                     estadisticaService.santuarioCorrupto();
 
-            assertTrue(
-                    reporte.getNombreMedium().equals("Valentin")
-                            ||
-                            reporte.getNombreMedium().equals("Pedro")
-            );
+            assertThat(reporte.getNombreMedium()).isIn("Valentin", "Pedro");
+
         }
 
         @Transactional
@@ -147,18 +145,14 @@ public class EstadisticaServiceTest {
         void empateEntreSantuariosDevuelveCualquiera() {
             //llegan 3 demonios mas a berazategui y ahora podria darme cualquier
             // santuario el reporte
-            Espiritu benja = espirituService.crear(new Demonio("benja", berazategui));
-            Espiritu fidel = espirituService.crear(new Demonio("fidel", berazategui));
-            Espiritu raul = espirituService.crear(new Demonio("raul", berazategui));
+            espirituService.crear(new Demonio("benja", berazategui));
+            espirituService.crear(new Demonio("fidel", berazategui));
+            espirituService.crear(new Demonio("raul", berazategui));
 
             ReporteSantuarioMasCorrupto reporte =
                     estadisticaService.santuarioCorrupto();
+            assertThat(reporte.getNombreSantuario()).isIn("Varela", "Berazategui");
 
-            assertTrue(
-                    reporte.getNombreSantuario().equals("Varela")
-                            ||
-                            reporte.getNombreSantuario().equals("Berazategui")
-            );
         }
 
 
@@ -192,11 +186,7 @@ public class EstadisticaServiceTest {
         }
 
     }
-
-
-//
-
-
+    
     @AfterEach
     void tearDown() {
         espirituService.eliminarTodos();

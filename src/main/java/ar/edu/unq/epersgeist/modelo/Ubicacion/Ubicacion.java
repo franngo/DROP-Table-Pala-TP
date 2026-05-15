@@ -38,8 +38,6 @@ public abstract class Ubicacion {
         this.nombre = nombre;
         this.energia = energia;
     }
-    
-    //public abstract double dañoAEspiritu();
 
     public abstract int porcentajeDescansarMedium();
 

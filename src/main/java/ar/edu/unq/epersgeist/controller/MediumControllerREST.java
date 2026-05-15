@@ -36,28 +36,28 @@ public class MediumControllerREST {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public MediumResponseDTO obtenerMediumPorId(@PathVariable Long id) {
-        Medium m = mediumService.recuperar(id);
-        return MapperMedium.toDTO(m);
+        Medium medium = mediumService.recuperar(id);
+        return MapperMedium.toDTO(medium);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public MediumResponseDTO crearMedium(@Valid @RequestBody MediumCreateDTO dtoRequest) {
-        Long idU = dtoRequest.ubicacionId();
-        Ubicacion u = ubicacionService.recuperar(idU);
+        Long idUbicacion = dtoRequest.ubicacionId();
+        Ubicacion ubicacion = ubicacionService.recuperar(idUbicacion);
 
-        Medium m = mediumService.crear(MapperMedium.toModelo(dtoRequest, u));
-        return MapperMedium.toDTO(m);
+        Medium medium = mediumService.crear(MapperMedium.toModelo(dtoRequest, ubicacion));
+        return MapperMedium.toDTO(medium);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void actualizarMedium(@PathVariable Long id, @Valid @RequestBody MediumUpdateDTO dtoRequest) {
-        Medium m = mediumService.recuperar(id);
+        Medium medium = mediumService.recuperar(id);
 
-        MapperMedium.actualizar(m, dtoRequest);
+        MapperMedium.actualizar(medium, dtoRequest);
 
-        mediumService.actualizar(m);
+        mediumService.actualizar(medium);
     }
 
     @DeleteMapping("/{id}")
@@ -75,8 +75,8 @@ public class MediumControllerREST {
     @PutMapping("/{idM}/invocar/espiritus/{idE}")
     @ResponseStatus(HttpStatus.OK)
     public EspirituResponseDTO invocar(@PathVariable Long idM, @PathVariable Long idE) {
-        Espiritu e = mediumService.invocar(idM, idE);
-        return MapperEspiritu.toDTO(e);
+        Espiritu espiritu = mediumService.invocar(idM, idE);
+        return MapperEspiritu.toDTO(espiritu);
     }
 
     @PutMapping("/{idM1}/exorcizar/mediums/{idM2}")

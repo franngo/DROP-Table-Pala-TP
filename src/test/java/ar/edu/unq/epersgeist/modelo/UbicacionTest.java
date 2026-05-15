@@ -1,9 +1,5 @@
 package ar.edu.unq.epersgeist.modelo;
 
-import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
-import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
-import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import jakarta.validation.ConstraintViolation;
@@ -38,8 +34,6 @@ public class UbicacionTest {
     // --------------------------------------------------------------------------------
 
     private Ubicacion santuario;
-    private Ubicacion cementerio;
-
     private Validator validator;
 
     // --------------------------------------------------------------------------------
@@ -49,7 +43,6 @@ public class UbicacionTest {
     @BeforeEach
     void setUp() {
         santuario = new Santuario(NOMBRE_SANTUARIO, ENERGIA_VALIDA);
-        cementerio = new Cementerio(NOMBRE_CEMENTERIO, ENERGIA_VALIDA);
 
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
@@ -111,23 +104,4 @@ public class UbicacionTest {
         }
     }
 
-    // --------------------------------------------------------------------------------
-    // EFECTO DE MOVIMIENTO
-    // --------------------------------------------------------------------------------
-
-
-//    @Nested
-//    class EfectoDeMovimiento {
-//        @Test
-//        void santuarioEjecutaSuEfectoSinErrores() {
-//            Espiritu espiritu = new Angelical("Miguel", santuario);
-//            assertDoesNotThrow(() -> santuario.aplicarEfectoMovimiento(espiritu));
-//        }
-//
-//        @Test
-//        void cementerioEjecutaSuEfectoSinErrores() {
-//            Espiritu espiritu = new Demonio("Belcebu", cementerio);
-//            assertDoesNotThrow(() -> cementerio.aplicarEfectoMovimiento(espiritu));
-//        }
-//    }
 }

@@ -58,6 +58,7 @@ public class UbicacionControllerREST {
         return MapperUbicacion.toDTO(ubicacionCreada);
     }
 
+
     // --------------------------------------------------------------------------------
 
     @PutMapping("/{id}")
