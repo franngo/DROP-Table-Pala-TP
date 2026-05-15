@@ -43,9 +43,6 @@ public class MediumServiceImpl implements MediumService {
 
     @Override
     public Medium recuperar(Long idMedium) {
-        if (idMedium == null) {
-            throw new IdMediumInvalidoException();
-        }
 
         return mediumDao.findById(idMedium).orElseThrow(() -> new ErrorDeMediumNoEncontradoException(idMedium));
     }
@@ -84,10 +81,6 @@ public class MediumServiceImpl implements MediumService {
     public Espiritu invocar(Long mediumId, Long espirituId) {
         Medium m = this.recuperar(mediumId);
 
-        if (espirituId == null) {
-            throw new IdEspirituInvalidoException();
-        }
-
         Espiritu e = espirituDao.findById(espirituId).orElseThrow(() -> new ErrorDeEspirituNoEncontradoException(espirituId));
 
         return m.invocar(e);
@@ -103,7 +96,8 @@ public class MediumServiceImpl implements MediumService {
         Medium mediumAExorcizar = this.recuperar(idMediumAExorcizar);
 
         //en el service porque involucra ids, que es lo que usamos para comparar objetos por igualdad. Los recuperar anteriores nos aseguran los ids
-        if(!mediumAtacante.getUbicacion().getId().equals(mediumAExorcizar.getUbicacion().getId())) {
+
+        if (!mediumAtacante.getUbicacion().getId().equals(mediumAExorcizar.getUbicacion().getId())) {
             throw new ErrorDeMediumExorcizandoAOtroEnDistintaUbicacion(mediumAtacante.getId(), mediumAExorcizar.getId());
         }
 

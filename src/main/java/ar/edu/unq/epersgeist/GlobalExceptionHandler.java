@@ -22,6 +22,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             MethodArgumentNotValidException.class,
+            IllegalArgumentException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponseDTO badRequestHandler(MethodArgumentNotValidException e) {
@@ -44,8 +45,6 @@ public class GlobalExceptionHandler {
             ErrorCantidadPorPaginaInvalidaExcepcion.class,
             ErrorNumeroPaginaInvalidoExcepcion.class,
             ErrorDireccionNulaException.class,
-            IdEspirituInvalidoException.class,
-            IdMediumInvalidoException.class,
             ErrorManaMayorQueManaMaxAlCrearMedium.class,
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)

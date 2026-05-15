@@ -26,8 +26,6 @@ import java.util.List;
 public class Medium implements Serializable {
     public static final int minimoMana = 0;
     public static final int manaRequeridoInvocacion = 10;
-    //public static final int manaDescansoMedium = 15;
-    //public static final int manaDescansoEspiritus = 5;
     public static final double porcentajeAFortalecer = 0.20; //para calcular el 20% del maná del medium, que es lo que recupera un espiritu al conectar
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -43,7 +41,7 @@ public class Medium implements Serializable {
     public Medium(@NonNull String nombre, @NonNull Integer manaMax, @NonNull Integer mana, Ubicacion ubicacion) {
         this.validarManaMenorQueManaMax(mana, manaMax);
 
-        this.espiritus = new ArrayList<Espiritu>();
+        this.espiritus = new ArrayList<>();
         this.nombre = nombre;
         this.manaMax = manaMax;
         this.mana = mana;

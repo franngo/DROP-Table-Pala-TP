@@ -40,7 +40,7 @@ public class Demonio extends Espiritu implements Combatiente {
     @Override
     public void cambiosConexion(Ubicacion ubicacion) {
         if (ubicacion instanceof Santuario) {
-            this.afectarConexion(Santuario.DAÑO_A_ESPIRITU);
+            this.afectarConexion(Santuario.DANIO_A_ESPIRITU);
         }
     }
 

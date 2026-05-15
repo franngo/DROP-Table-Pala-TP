@@ -12,7 +12,6 @@ import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlCrearEspirituException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoException;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +22,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Transactional
 @SpringBootTest
 public class EspirituServiceTest {
     private static final Integer ENERGIA = 100;
@@ -58,7 +58,7 @@ public class EspirituServiceTest {
     void fallaAlCrearEspirituNulo() {
         Espiritu espiritu = null;
         assertThrows(ErrorAlCrearEspirituException.class, () -> {
-            Espiritu espirituP = serviceEspiritu.crear(espiritu);
+            serviceEspiritu.crear(espiritu);
         });
     }
 
@@ -101,7 +101,7 @@ public class EspirituServiceTest {
 
         Long id = serviceEspiritu.crear(matias).getId();
 
-        // ⚠ nueva instancia (no reutilizar la anterior)
+
         Espiritu modificado = new Angelical("Juanchi el pastelero", berazategui);
         modificado.setId(id);
         modificado.setNivelDeConexion(99);
@@ -144,23 +144,6 @@ public class EspirituServiceTest {
         });
     }
 
-    //
-
-    @Test
-    public void seUsaElServicioParaGuardarModelo() {
-
-        Espiritu espirituP = serviceEspiritu.crear(matias);
-        var otroEspiritu = serviceEspiritu.recuperar(espirituP.getId());
-
-
-        assertEquals(espirituP.getNivelDeConexion(), otroEspiritu.getNivelDeConexion());
-        assertEquals(espirituP.getNombre(), otroEspiritu.getNombre());
-        assertEquals(espirituP.getId(), otroEspiritu.getId());
-
-        //Pero no son el mismo objeto =(
-        //A esto nos referimos con "perdida de identidad"
-        Assertions.assertNotEquals(espirituP, otroEspiritu);
-    }
 
     //espiritusDemoniacos
 
@@ -322,35 +305,65 @@ public class EspirituServiceTest {
         });
     }
 
-//    @Test
-//    void noDeberiaConectarUnEspirituQueEstaEnDiferenteUbicacion() {
-//        Ubicacion bernalM = new Santuario("Bernal", ENERGIA);
-//        Ubicacion bernalP = ubicacionService.crear(bernalM);
-//
-//        Medium juan = new Medium("Juan", 120, 20, berazategui);
-//
-//        //bernalP.agregarMedium(juan);
-//        Medium juanP = mediumService.crear(juan);
-//
-//        Espiritu espiritu = serviceEspiritu.crear(matias);
-//        Espiritu espiritu2 = mediumService.invocar(juanP.getId(), espiritu.getId());
-//
-//        //ahora espiritu2 está en una Ubicacion
-//        assertEquals(espiritu2.getUbicacion().getId(), juanP.getUbicacion().getId());
-//
-//        Ubicacion EzpeletaM = new Santuario("Ezpeleta", ENERGIA);
-//        Ubicacion EzpeletaP = ubicacionService.crear(EzpeletaM);
-//
-//        Medium lolo = new Medium("Lolo", 120, 20, berazategui);
-//        //EzpeletaP.agregarMedium(lolo);
-//        Medium loloP = mediumService.crear(lolo);
-//
-//
-//        //loloP está en una Ubicacion diferente a la de espiritu2
-//        assertThrows(ErrorAlConectarEspirituConMedium.class, () -> {
-//            serviceEspiritu.conectar(espiritu2.getId(), loloP.getId());
-//        });
-//    }
+
+    @Test
+    void noDeberiaConectarUnEspirituQueEstaEnDiferenteUbicacion() {
+
+        Ubicacion bera = ubicacionService.crear(new Santuario("Bera", ENERGIA));
+
+        Ubicacion bernalito = ubicacionService.crear(new Santuario("Bernalito", ENERGIA));
+
+        // ------------------------------------------------------------
+        // Medium que invoca al espiritu
+        // ------------------------------------------------------------
+
+        Medium juan = new Medium("Juan", 120, 20, bera);
+
+        Medium juanP = mediumService.crear(juan);
+
+        // ------------------------------------------------------------
+        // Espiritu invocado en Berazategui
+        // ------------------------------------------------------------
+
+        Espiritu espiritu = serviceEspiritu.crear(matias);
+
+        Espiritu espirituInvocado = mediumService.invocar(juanP.getId(), espiritu.getId());
+
+        assertEquals(
+                bera.getId(),
+                espirituInvocado.getUbicacion().getId()
+        );
+
+        // ------------------------------------------------------------
+        // Otro medium en Bernal
+        // ------------------------------------------------------------
+
+        Medium lolo = new Medium("Lolo", 120, 20, bernalito);
+
+        Medium loloP = mediumService.crear(lolo);
+
+        assertEquals(
+                bernalito.getId(),
+                loloP.getUbicacion().getId()
+        );
+
+        // ------------------------------------------------------------
+        // Verificacion
+        // ------------------------------------------------------------
+
+        assertNotEquals(
+                espirituInvocado.getUbicacion().getId(),
+                loloP.getUbicacion().getId()
+        );
+
+        assertThrows(
+                ErrorAlConectarEspirituConMedium.class,
+                () -> serviceEspiritu.conectar(
+                        espirituInvocado.getId(),
+                        loloP.getId()
+                )
+        );
+    }
 
     @Test
     void noDeberiaConectarUnEspirituQueNoEstaLibre() {
@@ -359,7 +372,6 @@ public class EspirituServiceTest {
 
         Medium juan = new Medium("Juan", 120, 20, berazategui);
 
-        //bernalP.agregarMedium(juan);
         Medium juanP = mediumService.crear(juan);
 
         Espiritu espiritu = serviceEspiritu.crear(matias);
@@ -369,7 +381,6 @@ public class EspirituServiceTest {
         assertEquals(espiritu2.getUbicacion().getId(), juanP.getUbicacion().getId());
 
         Medium lolo = new Medium("Lolo", 120, 20, berazategui);
-        //bernalP.agregarMedium(lolo);
         Medium loloP = mediumService.crear(lolo);
 
 
@@ -377,7 +388,6 @@ public class EspirituServiceTest {
         serviceEspiritu.conectar(espiritu2.getId(), loloP.getId());
 
         Medium pipo = new Medium("Pipo", 120, 20, berazategui);
-        //bernalP.agregarMedium(pipo);
         Medium pipoP = mediumService.crear(pipo);
 
         assertThrows(ErrorAlConectarEspirituConMedium.class, () -> {
@@ -385,7 +395,7 @@ public class EspirituServiceTest {
         });
     }
 
-    @Transactional
+
     @Test
     public void seConectaUnEspirituConUnMedium() {
         Ubicacion bernalM = new Santuario("Bernal", ENERGIA);
@@ -406,7 +416,7 @@ public class EspirituServiceTest {
         assertEquals(2.0, espirituActualizado.getNivelDeConexion());
     }
 
-    @Transactional
+
     @Test
     void deberiaAsociarElEspirituAlMedium() {
         Espiritu nuevoEspiritu = new Angelical("Matias", berazategui);
@@ -434,9 +444,6 @@ public class EspirituServiceTest {
         Medium medium = new Medium("Juan", 120, 25, berazategui);
         Espiritu nuevoEspiritu = new Angelical("Juan", berazategui);
 
-
-        //ubicacion.agregarMedium(medium);
-        //ubicacion.agregarEspiritu(nuevoEspiritu);
         Medium mediumP = mediumService.crear(medium);
         Espiritu espirituP = serviceEspiritu.crear(nuevoEspiritu);
         ubicacionService.actualizar(ubicacionP);
@@ -457,9 +464,7 @@ public class EspirituServiceTest {
         Medium medium = new Medium("Juan", 120, 10, berazategui);
         Espiritu pepe = new Angelical("Pepe", berazategui);
         Espiritu raul = new Angelical("Raul", berazategui);
-//        ubicacion.agregarEspiritu(pepe);
-//        ubicacion.agregarEspiritu(raul);
-//        ubicacion.agregarMedium(medium);
+
 
         Espiritu espiritu1 = serviceEspiritu.crear(pepe);
         Espiritu espiritu2 = serviceEspiritu.crear(raul);

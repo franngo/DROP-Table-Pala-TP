@@ -119,13 +119,6 @@ public class MediumServiceTest {
         });
     }
 
-    @Test
-    void debeLanzarExcepcionSiElIdEsNull() {
-        assertThrows(
-                IdMediumInvalidoException.class,
-                () -> serviceMedium.recuperar(null)
-        );
-    }
 
     //actualizar
 
@@ -336,7 +329,7 @@ public class MediumServiceTest {
 
         Medium matiasP = serviceMedium.crear(matiasM);
 
-        assertThrows(ExorcismoPropioNoPermitidoException.class, () -> serviceMedium.exorcizar(matiasP.getId(), matiasP.getId()) );
+        assertThrows(ExorcismoPropioNoPermitidoException.class, () -> serviceMedium.exorcizar(matiasP.getId(), matiasP.getId()));
     }
 
     @Test
@@ -352,7 +345,7 @@ public class MediumServiceTest {
         Medium matiasP = serviceMedium.crear(matiasM);
         Medium francoP = serviceMedium.crear(francoM);
 
-        assertThrows(ErrorDeMediumExorcizandoAOtroEnDistintaUbicacion.class, () -> serviceMedium.exorcizar(matiasP.getId(), francoP.getId()) );
+        assertThrows(ErrorDeMediumExorcizandoAOtroEnDistintaUbicacion.class, () -> serviceMedium.exorcizar(matiasP.getId(), francoP.getId()));
     }
 
     //espiritus

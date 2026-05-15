@@ -19,7 +19,7 @@ public class Cementerio extends Ubicacion {
         super(nombre, energia);
     }
 
-    public static final double DAÑO_A_ESPIRITU = 5;
+    public static final double DANIO_A_ESPIRITU = 5;
 
     @Override
     public int porcentajeDescansarMedium() {

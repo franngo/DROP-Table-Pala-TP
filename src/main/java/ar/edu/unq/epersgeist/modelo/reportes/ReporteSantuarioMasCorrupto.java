@@ -4,10 +4,10 @@ import lombok.Getter;
 
 @Getter
 public class ReporteSantuarioMasCorrupto {
-    String nombreSantuario;
-    String nombreMedium;
-    Long cantidadTotalDemonios;
-    Long demoniosLibres;
+    private String nombreSantuario;
+    private String nombreMedium;
+    private Long cantidadTotalDemonios;
+    private Long demoniosLibres;
 
     public ReporteSantuarioMasCorrupto(String nombreSantuario, String nombreMedium, Long demonios, Long libres) {
         this.nombreSantuario = nombreSantuario;
