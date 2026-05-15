@@ -7,6 +7,7 @@ import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionInvalidaExcept
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -16,16 +17,17 @@ import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
     // --------------------------------------------------------------------------------
     // 400 - BAD_REQUEST
     // --------------------------------------------------------------------------------
 
-    @ExceptionHandler({
-            MethodArgumentNotValidException.class,
-            IllegalArgumentException.class
-    })
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponseDTO badRequestHandler(MethodArgumentNotValidException e) {
+    public ErrorResponseDTO validationHandler(
+            MethodArgumentNotValidException e
+    ) {
+
         var errors = e.getBindingResult()
                 .getFieldErrors()
                 .stream()
@@ -34,8 +36,43 @@ public class GlobalExceptionHandler {
                 ))
                 .toList();
 
+        return new ErrorResponseDTO(
+                400,
+                "ARGUMENTO_INVÁLIDO",
+                errors
+        );
+    }
 
-        return new ErrorResponseDTO(400, "ARGUMENTO_INVÁLIDO", errors);
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponseDTO jsonInvalidoHandler(
+            HttpMessageNotReadableException e
+    ) {
+
+        return new ErrorResponseDTO(
+                400,
+                "ARGUMENTO_INVÁLIDO",
+                List.of(
+                        new ErrorMessageDTO(
+                                "El body enviado contiene valores inválidos"
+                        )
+                )
+        );
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponseDTO illegalArgumentHandler(
+            IllegalArgumentException e
+    ) {
+
+        return new ErrorResponseDTO(
+                400,
+                "ARGUMENTO_INVÁLIDO",
+                List.of(
+                        new ErrorMessageDTO(e.getMessage())
+                )
+        );
     }
 
     @ExceptionHandler({
@@ -46,13 +83,20 @@ public class GlobalExceptionHandler {
             ErrorNumeroPaginaInvalidoExcepcion.class,
             ErrorDireccionNulaException.class,
             ErrorManaMayorQueManaMaxAlCrearMedium.class,
+            CampoInvalidoTipoEspirituException.class,
+            CampoTipoUbicacionInvalido.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponseDTO badRequestHandler(EpergeistException e) {
+    public ErrorResponseDTO badRequestHandler(
+            EpergeistException e
+    ) {
+
         return new ErrorResponseDTO(
                 400,
                 "ARGUMENTO_INVÁLIDO",
-                List.of(new ErrorMessageDTO(e.getMessage()))
+                List.of(
+                        new ErrorMessageDTO(e.getMessage())
+                )
         );
     }
 
@@ -68,11 +112,16 @@ public class GlobalExceptionHandler {
             NoExisteSantuarioCorruptoException.class,
     })
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponseDTO notFoundHandler(EpergeistException e) {
+    public ErrorResponseDTO notFoundHandler(
+            EpergeistException e
+    ) {
+
         return new ErrorResponseDTO(
                 404,
                 "RECURSO_NO_ENCONTRADO",
-                List.of(new ErrorMessageDTO(e.getMessage()))
+                List.of(
+                        new ErrorMessageDTO(e.getMessage())
+                )
         );
     }
 
@@ -89,11 +138,16 @@ public class GlobalExceptionHandler {
             ExorcistaSinAngelesException.class,
     })
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponseDTO conflictHandler(EpergeistException e) {
+    public ErrorResponseDTO conflictHandler(
+            EpergeistException e
+    ) {
+
         return new ErrorResponseDTO(
                 409,
                 "CONFLICTO_CON_ESTADO_ACTUAL",
-                List.of(new ErrorMessageDTO(e.getMessage()))
+                List.of(
+                        new ErrorMessageDTO(e.getMessage())
+                )
         );
     }
 

@@ -4,6 +4,7 @@ import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionCreate
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionUpdateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionResponseDTO;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.exceptions.CampoTipoUbicacionInvalido;
 
 import static ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.TipoUbicacion.CEMENTERIO;
 import static ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.TipoUbicacion.SANTUARIO;
@@ -21,7 +22,7 @@ public class MapperUbicacion {
         return switch (dto.tipoUbicacion()) {
             case CEMENTERIO -> CEMENTERIO.crear(dto.nombre(), dto.energia());
             case SANTUARIO -> SANTUARIO.crear(dto.nombre(), dto.energia());
-            default -> throw new IllegalArgumentException("Tipo de ubicación inválido");
+            default -> throw new CampoTipoUbicacionInvalido("Tipo de ubicación inválido");
         };
     }
 
