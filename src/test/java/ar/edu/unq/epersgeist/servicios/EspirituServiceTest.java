@@ -305,34 +305,64 @@ public class EspirituServiceTest {
         });
     }
 
+
     @Test
     void noDeberiaConectarUnEspirituQueEstaEnDiferenteUbicacion() {
-        Ubicacion bernalM = new Santuario("Bernal", ENERGIA);
 
-        Medium juan = new Medium("Juan", 120, 20, berazategui);
+        Ubicacion bera = ubicacionService.crear(new Santuario("Bera", ENERGIA));
 
-        bernalP.agregarMedium(juan);
-        Ubicacion bernalP = ubicacionService.crear(bernalM);
+        Ubicacion bernalito = ubicacionService.crear(new Santuario("Bernalito", ENERGIA));
+
+        // ------------------------------------------------------------
+        // Medium que invoca al espiritu
+        // ------------------------------------------------------------
+
+        Medium juan = new Medium("Juan", 120, 20, bera);
+
         Medium juanP = mediumService.crear(juan);
 
+        // ------------------------------------------------------------
+        // Espiritu invocado en Berazategui
+        // ------------------------------------------------------------
+
         Espiritu espiritu = serviceEspiritu.crear(matias);
-        Espiritu espiritu2 = mediumService.invocar(juanP.getId(), espiritu.getId());
 
-        //ahora espiritu2 está en una Ubicacion
-        assertEquals(espiritu2.getUbicacion().getId(), juanP.getUbicacion().getId());
+        Espiritu espirituInvocado = mediumService.invocar(juanP.getId(), espiritu.getId());
 
-        Ubicacion EzpeletaM = new Santuario("Ezpeleta", ENERGIA);
-        Ubicacion EzpeletaP = ubicacionService.crear(EzpeletaM);
+        assertEquals(
+                bera.getId(),
+                espirituInvocado.getUbicacion().getId()
+        );
 
-        Medium lolo = new Medium("Lolo", 120, 20, berazategui);
-        //EzpeletaP.agregarMedium(lolo);
+        // ------------------------------------------------------------
+        // Otro medium en Bernal
+        // ------------------------------------------------------------
+
+        Medium lolo = new Medium("Lolo", 120, 20, bernalito);
+
         Medium loloP = mediumService.crear(lolo);
 
+        assertEquals(
+                bernalito.getId(),
+                loloP.getUbicacion().getId()
+        );
 
-        //loloP está en una Ubicacion diferente a la de espiritu2
-        assertThrows(ErrorAlConectarEspirituConMedium.class, () -> {
-            serviceEspiritu.conectar(espiritu2.getId(), loloP.getId());
-        });
+        // ------------------------------------------------------------
+        // Verificacion
+        // ------------------------------------------------------------
+
+        assertNotEquals(
+                espirituInvocado.getUbicacion().getId(),
+                loloP.getUbicacion().getId()
+        );
+
+        assertThrows(
+                ErrorAlConectarEspirituConMedium.class,
+                () -> serviceEspiritu.conectar(
+                        espirituInvocado.getId(),
+                        loloP.getId()
+                )
+        );
     }
 
     @Test
@@ -342,7 +372,6 @@ public class EspirituServiceTest {
 
         Medium juan = new Medium("Juan", 120, 20, berazategui);
 
-        //bernalP.agregarMedium(juan);
         Medium juanP = mediumService.crear(juan);
 
         Espiritu espiritu = serviceEspiritu.crear(matias);
@@ -352,7 +381,6 @@ public class EspirituServiceTest {
         assertEquals(espiritu2.getUbicacion().getId(), juanP.getUbicacion().getId());
 
         Medium lolo = new Medium("Lolo", 120, 20, berazategui);
-        //bernalP.agregarMedium(lolo);
         Medium loloP = mediumService.crear(lolo);
 
 
@@ -360,7 +388,6 @@ public class EspirituServiceTest {
         serviceEspiritu.conectar(espiritu2.getId(), loloP.getId());
 
         Medium pipo = new Medium("Pipo", 120, 20, berazategui);
-        //bernalP.agregarMedium(pipo);
         Medium pipoP = mediumService.crear(pipo);
 
         assertThrows(ErrorAlConectarEspirituConMedium.class, () -> {
