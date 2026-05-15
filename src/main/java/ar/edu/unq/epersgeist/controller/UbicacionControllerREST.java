@@ -57,8 +57,7 @@ public class UbicacionControllerREST {
         Ubicacion ubicacionCreada = ubicacionService.crear(ubicacion);
         return MapperUbicacion.toDTO(ubicacionCreada);
     }
-
-
+    
     // --------------------------------------------------------------------------------
 
     @PutMapping("/{id}")
