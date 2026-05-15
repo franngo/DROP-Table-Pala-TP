@@ -7,7 +7,7 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 
 public enum TipoEspiritu {
 
-    ANGEL {
+    ANGELICAL {
         @Override
         public Espiritu crear(String nombre,
                               Ubicacion ubicacion) {

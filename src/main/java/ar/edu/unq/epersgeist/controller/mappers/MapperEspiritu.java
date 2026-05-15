@@ -5,12 +5,21 @@ import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.EspirituUpdateDTO
 import ar.edu.unq.epersgeist.controller.dtos.espiritus.response.EspirituResponseDTO;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.exceptions.CampoInvalidoTipoEspirituException;
+
+import static ar.edu.unq.epersgeist.controller.dtos.espiritus.request.TipoEspiritu.ANGELICAL;
+import static ar.edu.unq.epersgeist.controller.dtos.espiritus.request.TipoEspiritu.DEMONIO;
 
 public class MapperEspiritu {
 
 
     public static Espiritu toModelo(EspirituCreateDTO dto, Ubicacion ubicacion) {
-        return dto.tipoEspiritu().crear(dto.nombre(), ubicacion);
+
+        return switch (dto.tipoEspiritu()) {
+            case DEMONIO -> DEMONIO.crear(dto.nombre(), ubicacion);
+            case ANGELICAL -> ANGELICAL.crear(dto.nombre(), ubicacion);
+            default -> throw new CampoInvalidoTipoEspirituException("Tipo de Espiritu inválido");
+        };
     }
 
 
