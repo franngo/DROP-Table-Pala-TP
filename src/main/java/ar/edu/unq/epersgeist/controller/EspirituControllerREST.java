@@ -81,12 +81,12 @@ public class EspirituControllerREST {
         espirituService.conectar(espirituId, mediumId);
     }
 
-    @GetMapping("/espiritus/demoniacos")
+    @GetMapping("/demoniacos")
     @ResponseStatus(HttpStatus.OK)
     public PaginacionEspirituResponseDTO espiritusDemoniacos(
-            @RequestParam Direccion direccion,
-            @RequestParam int pagina,
-            @RequestParam int cantidadPorPagina
+            @RequestParam(defaultValue = "DESCENDENTE") Direccion direccion,
+            @RequestParam(defaultValue = "1") int pagina,
+            @RequestParam(defaultValue = "3") int cantidadPorPagina
     ) {
         Page<Espiritu> paginada = espirituService.espiritusDemoniacos(direccion, pagina, cantidadPorPagina);
         return PageMapper.toEspirituPage(paginada,
