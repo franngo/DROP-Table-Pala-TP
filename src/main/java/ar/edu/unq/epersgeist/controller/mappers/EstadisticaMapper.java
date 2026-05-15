@@ -6,7 +6,6 @@ import ar.edu.unq.epersgeist.modelo.reportes.ReporteSantuarioMasCorrupto;
 public class EstadisticaMapper {
     public static ReporteSantuarioMasCorruptoResponseDTO toDTO(ReporteSantuarioMasCorrupto reporte) {
 
-
         return new ReporteSantuarioMasCorruptoResponseDTO(
                 reporte.getNombreSantuario(),
                 reporte.getNombreMedium(),
