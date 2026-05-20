@@ -1,4 +1,4 @@
-package ar.edu.unq.epersgeist.persistencia.dao;
+package ar.edu.unq.epersgeist.persistencia.sql;
 
 import ar.edu.unq.epersgeist.modelo.Medium;
 import org.springframework.data.domain.Pageable;
