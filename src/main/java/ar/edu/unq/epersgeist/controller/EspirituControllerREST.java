@@ -18,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 @RestController
 @RequestMapping("/espiritus")
 @AllArgsConstructor
@@ -26,7 +25,7 @@ public class EspirituControllerREST {
     private final EspirituService espirituService;
     private final UbicacionService ubicacionService;
 
-    @PostMapping("/crear")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public EspirituResponseDTO crearEspiritu(@Valid @RequestBody EspirituCreateDTO dto) {
         Ubicacion ubicacion = ubicacionService.recuperar(dto.ubicacionId());
@@ -42,7 +41,6 @@ public class EspirituControllerREST {
     public EspirituResponseDTO obtener(@PathVariable Long id) {
         Espiritu espiritu = espirituService.recuperar(id);
         return MapperEspiritu.toDTO(espiritu);
-
     }
 
     @GetMapping
