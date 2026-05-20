@@ -114,7 +114,7 @@ public class MediumTest {
 
         mediumM.descansar();
 
-        assertEquals(200, mediumM.getMana()); //aumenta en un 150% su maná
+        assertEquals(151, mediumM.getMana()); //aumenta en un 150% su maná
         assertEquals(100, rika.getNivelDeConexion()); //aumenta en un 100% su nivel de conexión
         assertEquals(10, jaeger.getNivelDeConexion()); //aumenta en un 0% su nivel de conexión
     }

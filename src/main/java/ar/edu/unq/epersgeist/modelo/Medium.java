@@ -69,7 +69,7 @@ public class Medium implements Serializable {
     }
 
     private int cantidadAlDescansar() {
-        int recarga = this.ubicacion.porcentajeDescansarMedium() + this.ubicacion.porcentajeDescansarMedium() / 100;
+        int recarga = (int)(this.ubicacion.getEnergia() + this.ubicacion.porcentajeDescansarMedium() / 100);
         return this.mana + recarga;
     }
 
