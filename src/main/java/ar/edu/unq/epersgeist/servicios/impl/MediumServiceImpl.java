@@ -50,7 +50,7 @@ public class MediumServiceImpl implements MediumService {
     @Override
     public void actualizar(Medium medium) {
         if (medium.getId() == null) {
-            throw new ErrorAlActualizarMediumException("No se puede actualizar un medium que no tiene id.");
+            throw new ErrorAlActualizarMediumSinIdException("No se puede actualizar un medium que no tiene id.");
         }
 
         //lo intento recuperar solo para saber si está o no en la DB y si debo tirar el error
@@ -108,7 +108,9 @@ public class MediumServiceImpl implements MediumService {
     @Override
     public List<Espiritu> espiritus(Long mediumId) {
         Medium recuperado = this.recuperar(mediumId);
-        return recuperado.getEspiritus();
+        List<Espiritu> espiritus = recuperado.getEspiritus();
+        espiritus.size();
+        return espiritus;
     }
 
     @Override
@@ -125,10 +127,8 @@ public class MediumServiceImpl implements MediumService {
         Long ubiActual = mediumAMover.getUbicacion().getId();
         if (!quiereMoverseALaMisma(ubiActual, ubicacionId)) {
             mediumAMover.moverA(ubicacionAMover);
+            mediumDao.save(mediumAMover);
         }
-
-        mediumDao.save(mediumAMover);
-
     }
 
     private boolean quiereMoverseALaMisma(Long idUbicacionActual, Long idUbicacionAMover) {

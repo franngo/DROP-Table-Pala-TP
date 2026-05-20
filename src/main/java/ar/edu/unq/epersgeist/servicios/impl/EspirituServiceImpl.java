@@ -56,9 +56,14 @@ public class EspirituServiceImpl implements EspirituService {
 
     @Override
     public void actualizar(Espiritu espiritu) {
+        if (espiritu.getId() == null) {
+            throw new ErrorAlActualizarEspirituSinIdException("No se puede actualizar un espiritu que no tiene id.");
+        }
 
-        espirituDao.save(espiritu);
+        Long espirituId = espiritu.getId();
+        espirituDao.findById(espirituId).orElseThrow(() -> new ErrorAlActualizarEspirituException("No existe en la BD el espiritu con id: " + espirituId));
 
+        this.espirituDao.save(espiritu);
     }
 
     @Override

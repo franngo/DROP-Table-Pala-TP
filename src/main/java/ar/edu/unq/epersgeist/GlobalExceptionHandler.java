@@ -78,7 +78,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             UbicacionInvalidaException.class,
             ErrorAlCrearEspirituException.class,
+            ErrorAlActualizarEspirituSinIdException.class,
             ErrorAlCrearMediumException.class,
+            ErrorAlActualizarMediumSinIdException.class,
             ErrorCantidadPorPaginaInvalidaExcepcion.class,
             ErrorNumeroPaginaInvalidoExcepcion.class,
             ErrorDireccionNulaException.class,
@@ -106,6 +108,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             UbicacionNoEncontradaException.class,
+            ErrorAlActualizarEspirituException.class,
             ErrorAlActualizarMediumException.class,
             ErrorDeEspirituNoEncontradoException.class,
             ErrorDeMediumNoEncontradoException.class,
