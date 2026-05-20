@@ -1,4 +1,4 @@
-package ar.edu.unq.epersgeist.persistencia.dao;
+package ar.edu.unq.epersgeist.persistencia.sql;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface UbicacionDAO extends JpaRepository<Ubicacion, Long> {
+public interface UbicacionDAOSQL extends JpaRepository<Ubicacion, Long> {
     @Query("SELECT COUNT(u) > 0 FROM Ubicacion u WHERE u.nombre = :nombre")
     boolean existsByName(String nombre);
 
