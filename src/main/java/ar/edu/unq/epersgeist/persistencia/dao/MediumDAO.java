@@ -19,7 +19,7 @@ public interface MediumDAO extends JpaRepository<Medium, Long> {
             WHERE TYPE(e) = Demonio
             AND e.ubicacion.id = :santuarioId
             GROUP BY m
-            ORDER BY COUNT(e) DESC
+            ORDER BY COUNT(e) DESC, m.id ASC
             """)
     List<Medium> mediumConMasDemonios(
             @Param("santuarioId") Long id,
