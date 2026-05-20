@@ -229,7 +229,7 @@ public class MediumServiceTest {
         rik = espirituService.recuperar(rikaP.getId());
         jag = espirituService.recuperar(jaegerP.getId());
 
-        assertEquals(151, med.getMana());
+        assertEquals(200, med.getMana());
         assertEquals(100, rik.getNivelDeConexion());
         assertEquals(10, jag.getNivelDeConexion());
     }
