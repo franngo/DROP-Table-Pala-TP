@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.modelo.Ubicacion;
 
+import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.TipoUbicacionResponse;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -48,5 +49,8 @@ public abstract class Ubicacion {
     public abstract boolean puedeInvocarseUnAngelical();
 
     public abstract boolean puedeInvocarseUnDemonio();
+
+    public abstract TipoUbicacionResponse getTipoUbicacion();
+
 
 }
