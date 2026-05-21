@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.modelo.Ubicacion;
 
+import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.TipoUbicacionResponse;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.NoArgsConstructor;
@@ -45,5 +46,11 @@ public class Santuario extends Ubicacion {
     public boolean puedeInvocarseUnDemonio() {
         return false;
     }
+
+    @Override
+    public TipoUbicacionResponse getTipoUbicacion() {
+        return TipoUbicacionResponse.SANTUARIO;
+    }
+
 
 }

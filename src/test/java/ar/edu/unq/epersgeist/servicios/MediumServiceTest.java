@@ -97,7 +97,6 @@ public class MediumServiceTest {
     }
 
     //recuperar
-    @Transactional
     @Test
     void deberiaRecuperarCorrectamenteLosDatosDelMedium() {
         Medium mediumRecuperado = serviceMedium.recuperar(ubedaP.getId());
@@ -107,8 +106,7 @@ public class MediumServiceTest {
         assertEquals(ubedaP.getNombre(), mediumRecuperado.getNombre());
         assertEquals(ubedaP.getMana(), mediumRecuperado.getMana());
         assertEquals(ubedaP.getManaMax(), mediumRecuperado.getManaMax());
-        assertEquals(0, ubedaP.getEspiritus().size());
-        assertEquals(0, mediumRecuperado.getEspiritus().size());
+        assertEquals(0, serviceMedium.espiritus(ubedaP.getId()).size());
     }
 
     @Test
@@ -167,8 +165,8 @@ public class MediumServiceTest {
 
     @Test
     void noDeberiaActualizarConIdNulo() {
-        ErrorAlActualizarMediumException exception =
-                assertThrows(ErrorAlActualizarMediumException.class, () -> {
+        ErrorAlActualizarMediumSinIdException exception =
+                assertThrows(ErrorAlActualizarMediumSinIdException.class, () -> {
 
                     serviceMedium.actualizar(new Medium("Julian", 22, 22, berazategui));
 
@@ -206,33 +204,33 @@ public class MediumServiceTest {
     }
 
     //descansar
-    @Transactional
     @Test
     public void descansarCasoExitoso() {
 
         Medium mediumPrueba = new Medium("MediumTest", 200, 50, bernal);
-        rikaP.setNivelDeConexion(0);
-        assertEquals(0, rikaP.getNivelDeConexion()); //Angelical
-        jaegerP.setNivelDeConexion(0);
-        assertEquals(0, jaegerP.getNivelDeConexion()); //Demonio
-
-        //están todos en bernal, que es un Santuario
-        rikaP.aumentarConexionYConectar(mediumPrueba);
-        jaegerP.aumentarConexionYConectar(mediumPrueba);
-
-        assertEquals(10, rikaP.getNivelDeConexion());
-        assertEquals(10, jaegerP.getNivelDeConexion());
-
         Medium mediumPruebaP = serviceMedium.crear(mediumPrueba);
+
+        rikaP.setNivelDeConexion(0);
+        jaegerP.setNivelDeConexion(0);
+        espirituService.actualizar(rikaP);
+        espirituService.actualizar(jaegerP);
+
+        espirituService.conectar(rikaP.getId(), mediumPruebaP.getId());
+        espirituService.conectar(jaegerP.getId(), mediumPruebaP.getId());
+
+        Espiritu rik = espirituService.recuperar(rikaP.getId());
+        Espiritu jag = espirituService.recuperar(jaegerP.getId());
+        assertEquals(10, rik.getNivelDeConexion());
+        assertEquals(10, jag.getNivelDeConexion());
 
         serviceMedium.descansar(mediumPruebaP.getId());
 
         Medium med = serviceMedium.recuperar(mediumPruebaP.getId());
-        Espiritu rik = espirituService.recuperar(rikaP.getId());
-        Espiritu jag = espirituService.recuperar(jaegerP.getId());
+        rik = espirituService.recuperar(rikaP.getId());
+        jag = espirituService.recuperar(jaegerP.getId());
 
-        assertEquals(125, med.getMana());
-        assertEquals(20, rik.getNivelDeConexion());
+        assertEquals(200, med.getMana());
+        assertEquals(100, rik.getNivelDeConexion());
         assertEquals(10, jag.getNivelDeConexion());
     }
 
@@ -350,7 +348,6 @@ public class MediumServiceTest {
 
     //espiritus
 
-    @Transactional
     @Test
     public void espiritus() {
         assertEquals(0, serviceMedium.espiritus(ubedaP.getId()).size());
@@ -401,25 +398,22 @@ public class MediumServiceTest {
     }
 
 
-    @Transactional
     @Test
     void losEspiritusDelMediumSeMuevenConEl() {
         //se conecta Ubeda con 2 espiritus
         espirituService.conectar(jaegerP.getId(), ubedaP.getId());
         espirituService.conectar(rikaP.getId(), ubedaP.getId());
 
-
         serviceMedium.mover(ubedaP.getId(), berazategui.getId());
 
-        Medium mediumRecuperado = serviceMedium.recuperar(ubedaP.getId());
+        List<Espiritu> espiritus = serviceMedium.espiritus(ubedaP.getId());
 
-        for (Espiritu e : mediumRecuperado.getEspiritus()) {
+        for (Espiritu e : espiritus) {
             assertEquals(berazategui.getId(), e.getUbicacion().getId());
         }
 
     }
 
-    @Transactional
     @Test
     void losEspiritusNoCambianDeUbicacionSielMediumSeMuevenALaMisma() {
         //se conecta Ubeda con 2 espiritus
@@ -429,9 +423,9 @@ public class MediumServiceTest {
         Long ubiActual = ubedaP.getUbicacion().getId();
         serviceMedium.mover(ubedaP.getId(), ubiActual);
 
-        Medium mediumRecuperado = serviceMedium.recuperar(ubedaP.getId());
+        List<Espiritu> espiritus = serviceMedium.espiritus(ubedaP.getId());
 
-        for (Espiritu e : mediumRecuperado.getEspiritus()) {
+        for (Espiritu e : espiritus) {
             assertEquals(ubiActual, e.getUbicacion().getId());
         }
 

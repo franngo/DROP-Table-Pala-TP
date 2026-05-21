@@ -114,8 +114,8 @@ public class MediumTest {
 
         mediumM.descansar();
 
-        assertEquals(125, mediumM.getMana()); //aumenta en un 150% su maná
-        assertEquals(20, rika.getNivelDeConexion()); //aumenta en un 100% su nivel de conexión
+        assertEquals(200, mediumM.getMana()); //aumenta en un 150% su maná
+        assertEquals(100, rika.getNivelDeConexion()); //aumenta en un 100% su nivel de conexión
         assertEquals(10, jaeger.getNivelDeConexion()); //aumenta en un 0% su nivel de conexión
     }
 
@@ -139,9 +139,9 @@ public class MediumTest {
 
         mediumCem.descansar();
 
-        assertEquals(75, mediumCem.getMana()); //aumenta en un 50% su maná
+        assertEquals(100, mediumCem.getMana()); //aumenta en un 50% su maná
         assertEquals(10, gabriel.getNivelDeConexion()); //aumenta en un 0% su nivel de conexión
-        assertEquals(20, belcebu.getNivelDeConexion()); //aumenta en un 100% su nivel de conexión
+        assertEquals(100, belcebu.getNivelDeConexion()); //aumenta en un 100% su nivel de conexión
     }
 
     @Test

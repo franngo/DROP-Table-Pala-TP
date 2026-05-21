@@ -102,7 +102,7 @@ public class EstadisticaServiceTest {
         }
 
         @Test
-        void empateEntreMediumsDevuelveCualquiera() {
+        void empateEntreMediumsDevuelveElQueTieneElIdMenor() {
 
 
             espirituService.conectar(nico.getId(), pancho.getId());
@@ -112,33 +112,26 @@ public class EstadisticaServiceTest {
             ReporteSantuarioMasCorrupto reporte =
                     estadisticaService.santuarioCorrupto();
 
-            assertThat(reporte.getNombreMedium()).isIn("Valentin", "Pedro");
+            assertEquals("Valentin", reporte.getNombreMedium());
 
         }
 
-        @Transactional
         @Test
         void reporteSinMediumNoRompe() {
 
             Espiritu juanchiAct = espirituService.recuperar(juanchi.getId());
             Espiritu yoelAct = espirituService.recuperar(yoel.getId());
 
-            juanchiAct.desvincularse();
-            yoelAct.desvincularse();
+            juanchiAct.setMediumCon(null);
+            yoelAct.setMediumCon(null);
             espirituService.actualizar(juanchiAct);
             espirituService.actualizar(yoelAct);
 
             ReporteSantuarioMasCorrupto reporte =
                     estadisticaService.santuarioCorrupto();
 
-            assertEquals(
-                    "Varela",
-                    reporte.getNombreSantuario()
-            );
-
-            assertNull(
-                    reporte.getNombreMedium()
-            );
+            assertEquals("Varela", reporte.getNombreSantuario());
+            assertNull(reporte.getNombreMedium());
         }
 
         @Test

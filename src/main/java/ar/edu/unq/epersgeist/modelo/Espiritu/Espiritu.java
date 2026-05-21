@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.modelo.Espiritu;
 
+import ar.edu.unq.epersgeist.modelo.Auditable;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
@@ -21,7 +22,7 @@ import java.io.Serializable;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "tipo_espiritu")
 
-public abstract class Espiritu implements Serializable {
+public abstract class Espiritu extends Auditable implements Serializable {
 
 
     public static final int limiteConexion = 100;
@@ -112,7 +113,7 @@ public abstract class Espiritu implements Serializable {
     public abstract int porcentajeDescansarEn(Ubicacion ubicacion);
 
     public void fortalecerConexionDescansandoEn(Ubicacion ubicacion) {
-        int recarga = this.porcentajeDescansarEn(this.ubicacion) * (int) this.nivelDeConexion / 100;
+        int recarga = (int)(ubicacion.getEnergia() * this.porcentajeDescansarEn(ubicacion) / 100.0);
         this.fortalecerConexion(recarga);
     }
 

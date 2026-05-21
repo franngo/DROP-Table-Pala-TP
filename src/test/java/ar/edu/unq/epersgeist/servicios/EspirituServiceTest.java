@@ -456,7 +456,6 @@ public class EspirituServiceTest {
         assertEquals(mediumP.cantidadDeFortalecimientoDeConexion(), recuperado.getNivelDeConexion());
     }
 
-    @Transactional
     @Test
     void deberiaPermitirConectarVariosEspiritusAlMismoMedium() {
         Ubicacion ubicacion = new Santuario("Tailandia", ENERGIA);

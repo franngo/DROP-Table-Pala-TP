@@ -7,6 +7,6 @@ public record MediumResponseDTO(
         String nombre,
         int manaMax,
         int mana,
-        UbicacionResponseDTO dtoU
+        UbicacionResponseDTO ubicacion
 ) {
 }

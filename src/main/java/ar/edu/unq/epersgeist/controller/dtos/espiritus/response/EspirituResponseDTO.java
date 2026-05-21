@@ -6,8 +6,8 @@ import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionRespo
 public record EspirituResponseDTO(
         Long id,
         String nombre,
-        MediumResponseDTO dtoM,
-        UbicacionResponseDTO dtoU,
+        MediumResponseDTO medium,
+        UbicacionResponseDTO ubicacion,
         double nivelConexion
 ) {
 }
