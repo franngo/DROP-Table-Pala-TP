@@ -23,7 +23,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Entity
-public class Medium implements Serializable {
+public class Medium extends Auditable implements Serializable {
     public static final int minimoMana = 0;
     public static final int manaRequeridoInvocacion = 10;
     public static final double porcentajeAFortalecer = 0.20; //para calcular el 20% del maná del medium, que es lo que recupera un espiritu al conectar

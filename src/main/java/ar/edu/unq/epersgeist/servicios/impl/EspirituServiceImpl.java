@@ -69,7 +69,9 @@ public class EspirituServiceImpl implements EspirituService {
     @Override
     public void eliminar(Long espirituId) {
 
-        espirituDao.deleteById(espirituId);
+        Espiritu espiritu = this.recuperar(espirituId);
+        espiritu.setDeletedAt(true);
+        espirituDao.save(espiritu);
 
     }
 

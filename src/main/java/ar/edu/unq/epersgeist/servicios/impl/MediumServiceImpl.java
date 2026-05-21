@@ -62,7 +62,9 @@ public class MediumServiceImpl implements MediumService {
 
     @Override
     public void eliminar(Long idMedium) {
-        mediumDao.deleteById(idMedium);
+        Medium medium = this.recuperar(idMedium);
+        medium.setDeletedAt(true);
+        mediumDao.save(medium);
     }
 
     @Override

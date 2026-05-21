@@ -1,6 +1,7 @@
 package ar.edu.unq.epersgeist.modelo.Ubicacion;
 
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.TipoUbicacionResponse;
+import ar.edu.unq.epersgeist.modelo.Auditable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -20,7 +21,7 @@ import lombok.Setter;
 
 // --------------------------------------------------------------------------------
 
-public abstract class Ubicacion {
+public abstract class Ubicacion extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
