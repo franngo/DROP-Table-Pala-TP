@@ -1,4 +1,4 @@
-package ar.edu.unq.epersgeist.persistencia.dao;
+package ar.edu.unq.epersgeist.persistencia.sql;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
@@ -13,11 +13,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+
 @Repository
-public interface UbicacionDAO extends JpaRepository<Ubicacion, Long> {
+public interface UbicacionDAOSQL extends JpaRepository<Ubicacion, Long> {
 
     @Query("SELECT u FROM Ubicacion u WHERE u.id = :id AND u.deletedAt = false")
-    Optional<Ubicacion> findById(@Param("id") Long id);
+    Optional<Ubicacion> findById(Long id);
 
     @Query("SELECT u FROM Ubicacion u WHERE u.deletedAt = false")
     List<Ubicacion> findAll();
@@ -26,10 +27,10 @@ public interface UbicacionDAO extends JpaRepository<Ubicacion, Long> {
     @Query("SELECT COUNT(u) > 0 FROM Ubicacion u WHERE u.nombre = :nombre AND u.deletedAt = false")
     boolean existsByName(String nombre);
 
-    @Query("SELECT e FROM Espiritu e WHERE e.ubicacion.id = :id AND e.deletedAt = false")
+    @Query("SELECT e FROM Espiritu e WHERE e.ubicacion.id = :id")
     List<Espiritu> espiritusEn(Long id);
 
-    @Query("SELECT m FROM Medium m WHERE m.ubicacion.id = :id AND m.espiritus IS EMPTY AND m.deletedAt = false")
+    @Query("SELECT m FROM Medium m WHERE m.ubicacion.id = :id AND m.espiritus IS EMPTY")
     List<Medium> mediumsSinEspiritusEn(Long id);
 
 

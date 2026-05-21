@@ -4,9 +4,9 @@ import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.exceptions.NoExisteSantuarioCorruptoException;
 import ar.edu.unq.epersgeist.modelo.reportes.ReporteSantuarioMasCorrupto;
-import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
-import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
-import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
+import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAO;
+import ar.edu.unq.epersgeist.persistencia.sql.MediumDAO;
+import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
 import ar.edu.unq.epersgeist.servicios.EstadisticaService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.PageRequest;
@@ -17,18 +17,18 @@ import org.springframework.stereotype.Service;
 public class EstadisticaServiceImpl implements EstadisticaService {
     private final MediumDAO mediumDao;
     private final EspirituDAO espirituDao; //se requiere para usar en el invocar()
-    private final UbicacionDAO ubicacionDAO;
+    private final UbicacionDAOSQL ubicacionDAOSQL;
 
-    public EstadisticaServiceImpl(MediumDAO mediumDao, EspirituDAO espirituDao, UbicacionDAO ubicacionDAO) {
+    public EstadisticaServiceImpl(MediumDAO mediumDao, EspirituDAO espirituDao, UbicacionDAOSQL ubicacionDAOSQL) {
         this.mediumDao = mediumDao;
         this.espirituDao = espirituDao;
-        this.ubicacionDAO = ubicacionDAO;
+        this.ubicacionDAOSQL = ubicacionDAOSQL;
     }
 
     public ReporteSantuarioMasCorrupto santuarioCorrupto() {
 
         Santuario santuario =
-                ubicacionDAO
+                ubicacionDAOSQL
                         .santuariosMasCorruptos(PageRequest.of(0, 1))
                         .stream()
                         .findFirst()
@@ -37,7 +37,7 @@ public class EstadisticaServiceImpl implements EstadisticaService {
                         );
 
         Long cantidadTotalDemonios =
-                ubicacionDAO.cantidadDemonios(santuario.getId());
+                ubicacionDAOSQL.cantidadDemonios(santuario.getId());
 
         Long cantLibres =
                 espirituDao.demoniosLibres(santuario.getId());

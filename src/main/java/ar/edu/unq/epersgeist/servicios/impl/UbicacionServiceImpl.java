@@ -5,7 +5,7 @@ import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
-import ar.edu.unq.epersgeist.persistencia.dao.UbicacionDAO;
+import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -22,7 +22,7 @@ import java.util.List;
 // --------------------------------------------------------------------------------
 
 public class UbicacionServiceImpl implements UbicacionService {
-    private final UbicacionDAO ubicacionDAO;
+    private final UbicacionDAOSQL ubicacionDAOSQL;
 
     // --------------------------------------------------------------------------------
     // CREAR
@@ -30,11 +30,11 @@ public class UbicacionServiceImpl implements UbicacionService {
 
     @Override
     public Ubicacion crear(Ubicacion ubicacion) {
-        if (ubicacionDAO.existsByName(ubicacion.getNombre())) {
+        if (ubicacionDAOSQL.existsByName(ubicacion.getNombre())) {
             throw new UbicacionYaExisteException(ubicacion.getNombre());
         }
 
-        return ubicacionDAO.save(ubicacion);
+        return ubicacionDAOSQL.save(ubicacion);
     }
 
     // --------------------------------------------------------------------------------
@@ -43,14 +43,14 @@ public class UbicacionServiceImpl implements UbicacionService {
 
     @Override
     public Ubicacion recuperar(Long ubicacionId) {
-        return ubicacionDAO
+        return ubicacionDAOSQL
                 .findById(ubicacionId)
                 .orElseThrow(() -> new UbicacionNoEncontradaException(ubicacionId));
     }
 
     @Override
     public List<Ubicacion> recuperarTodos() {
-        return ubicacionDAO.findAll();
+        return ubicacionDAOSQL.findAll();
     }
 
     // --------------------------------------------------------------------------------
@@ -61,11 +61,11 @@ public class UbicacionServiceImpl implements UbicacionService {
     public void actualizar(Ubicacion ubicacion) {
         Long id = ubicacion.getId();
 
-        if (id == null || !ubicacionDAO.existsById(id)) {
+        if (id == null || !ubicacionDAOSQL.existsById(id)) {
             throw new UbicacionNoEncontradaException(id);
         }
 
-        ubicacionDAO.save(ubicacion);
+        ubicacionDAOSQL.save(ubicacion);
     }
 
     // --------------------------------------------------------------------------------
@@ -74,15 +74,15 @@ public class UbicacionServiceImpl implements UbicacionService {
 
     @Override
     public void eliminar(Long id) {
-        ubicacionDAO.findById(id).ifPresent(ubicacion -> {
+        ubicacionDAOSQL.findById(id).ifPresent(ubicacion -> {
             ubicacion.setDeletedAt(true);
-            ubicacionDAO.save(ubicacion);
+            ubicacionDAOSQL.save(ubicacion);
         });
     }
 
     @Override
     public void eliminarTodos() {
-        ubicacionDAO.deleteAll();
+        ubicacionDAOSQL.deleteAll();
     }
 
     // --------------------------------------------------------------------------------
@@ -91,12 +91,12 @@ public class UbicacionServiceImpl implements UbicacionService {
 
     @Override
     public List<Espiritu> espiritusEn(Long ubicacionId) {
-        return ubicacionDAO.espiritusEn(ubicacionId);
+        return ubicacionDAOSQL.espiritusEn(ubicacionId);
     }
 
     @Override
     public List<Medium> mediumsSinEspiritusEn(Long ubicacionId) {
-        return ubicacionDAO.mediumsSinEspiritusEn(ubicacionId);
+        return ubicacionDAOSQL.mediumsSinEspiritusEn(ubicacionId);
     }
 
     // --------------------------------------------------------------------------------
