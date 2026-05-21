@@ -16,7 +16,7 @@ import java.util.Optional;
 public interface EspirituDAO extends JpaRepository<Espiritu, Long> {
 
     @Query("SELECT e FROM Espiritu e WHERE e.id = :id AND e.deletedAt = false")
-    Optional<Espiritu> findById(@Param("id") Long id);
+    Optional<Espiritu> findById(Long id);
 
     @Query("SELECT e FROM Espiritu e WHERE e.deletedAt = false")
     List<Espiritu> findAll();

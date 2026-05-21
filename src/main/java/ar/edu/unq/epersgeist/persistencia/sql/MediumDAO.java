@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface MediumDAO extends JpaRepository<Medium, Long> {
 
     @Query("SELECT m FROM Medium m WHERE m.id = :id AND m.deletedAt = false")
-    Optional<Medium> findById(@Param("id") Long id);
+    Optional<Medium> findById(Long id);
 
     @Query("SELECT m FROM Medium m WHERE m.deletedAt = false")
     List<Medium> findAll();
