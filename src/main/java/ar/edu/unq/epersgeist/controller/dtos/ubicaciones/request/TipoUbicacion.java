@@ -12,6 +12,8 @@ public enum TipoUbicacion {
 
             return new Cementerio(nombre, energia);
         }
+
+
     },
 
     SANTUARIO {
@@ -21,8 +23,11 @@ public enum TipoUbicacion {
 
             return new Santuario(nombre, energia);
         }
+
+
     };
 
     public abstract Ubicacion crear(String nombre,
                                     Integer energia);
+
 }

@@ -1,6 +1,7 @@
 package ar.edu.unq.epersgeist.persistencia.neo.entity;
 
-import org.springframework.data.neo4j.core.schema.GeneratedValue;
+import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.TipoUbicacion;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 
@@ -8,9 +9,15 @@ import org.springframework.data.neo4j.core.schema.Node;
 public class UbicacionNeo4j {
 
     @Id
-    @GeneratedValue
     private Long id;
 
     private String nombre;
 
+    private TipoUbicacion tipo;
+
+    public UbicacionNeo4j(Ubicacion ubicacion) {
+        this.id = ubicacion.getId();
+        this.nombre = ubicacion.getNombre();
+        this.tipo = ubicacion.getTipoUbicacion();
+    }
 }

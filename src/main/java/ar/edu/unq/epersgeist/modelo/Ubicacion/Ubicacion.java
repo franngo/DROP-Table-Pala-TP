@@ -1,6 +1,6 @@
 package ar.edu.unq.epersgeist.modelo.Ubicacion;
 
-import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.TipoUbicacionResponse;
+import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.TipoUbicacion;
 import ar.edu.unq.epersgeist.modelo.Auditable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
@@ -51,7 +51,7 @@ public abstract class Ubicacion extends Auditable {
 
     public abstract boolean puedeInvocarseUnDemonio();
 
-    public abstract TipoUbicacionResponse getTipoUbicacion();
+    public abstract TipoUbicacion getTipoUbicacion();
 
 
 }

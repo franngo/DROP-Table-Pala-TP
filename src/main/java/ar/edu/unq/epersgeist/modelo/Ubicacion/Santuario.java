@@ -1,6 +1,6 @@
 package ar.edu.unq.epersgeist.modelo.Ubicacion;
 
-import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.TipoUbicacionResponse;
+import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.TipoUbicacion;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.NoArgsConstructor;
@@ -48,8 +48,8 @@ public class Santuario extends Ubicacion {
     }
 
     @Override
-    public TipoUbicacionResponse getTipoUbicacion() {
-        return TipoUbicacionResponse.SANTUARIO;
+    public TipoUbicacion getTipoUbicacion() {
+        return TipoUbicacion.SANTUARIO;
     }
 
 
