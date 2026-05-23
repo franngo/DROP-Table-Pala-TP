@@ -5,6 +5,7 @@ import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
+import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
 import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.sql.MediumDAO;
 import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
@@ -21,11 +22,13 @@ public class MediumServiceImpl implements MediumService {
     private final MediumDAO mediumDao;
     private final EspirituDAO espirituDao; //se requiere para usar en el invocar()
     private final UbicacionDAOSQL ubicacionDAOSQL;
+    private final UbicacionDAONeo4j ubicacionDAONeo4j;
 
-    public MediumServiceImpl(MediumDAO mediumDao, EspirituDAO espirituDao, UbicacionDAOSQL ubicacionDAOSQL) {
+    public MediumServiceImpl(MediumDAO mediumDao, EspirituDAO espirituDao, UbicacionDAOSQL ubicacionDAOSQL, UbicacionDAONeo4j ubicacionDAONeo4j) {
         this.mediumDao = mediumDao;
         this.espirituDao = espirituDao;
         this.ubicacionDAOSQL = ubicacionDAOSQL;
+        this.ubicacionDAONeo4j = ubicacionDAONeo4j;
     }
 
     @Override
@@ -117,7 +120,7 @@ public class MediumServiceImpl implements MediumService {
 
     @Override
     public void mover(Long mediumId, Long ubicacionId) {
-        Ubicacion ubicacionAMover = ubicacionDAOSQL.findById(ubicacionId)
+        Ubicacion ubicacionAMover = ubicacionDAONeo4j.findById(ubicacionId)
                 .orElseThrow(() ->
                         new UbicacionNoEncontradaException(ubicacionId)
                 );
@@ -126,10 +129,19 @@ public class MediumServiceImpl implements MediumService {
                 .orElseThrow(() ->
                         new ErrorDeMediumNoEncontradoException(mediumId)
                 );
+        this.validacionUbicacion(mediumAMover.getUbicacion(),ubicacionAMover);
+        Long costo = ubicacionDAONeo4j.costoHacia(mediumAMover.getUbicacion().getId(),ubicacionAMover.getId());
+
         Long ubiActual = mediumAMover.getUbicacion().getId();
         if (!quiereMoverseALaMisma(ubiActual, ubicacionId)) {
             mediumAMover.moverA(ubicacionAMover);
             mediumDao.save(mediumAMover);
+        }
+    }
+
+    private void validacionUbicacion(Ubicacion ubicacion, Ubicacion ubicacionAMover) {
+        if (!ubicacionDAONeo4j.estanConectadas(ubicacion.getId(),ubicacionAMover.getId()){
+            throw new UbicaciónLejanaException("La ubicacion esta lejana");
         }
     }
 
