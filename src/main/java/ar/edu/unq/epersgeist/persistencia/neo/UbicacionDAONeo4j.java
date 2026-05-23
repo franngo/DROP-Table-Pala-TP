@@ -1,7 +1,10 @@
 package ar.edu.unq.epersgeist.persistencia.neo;
 
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.persistencia.neo.entity.UbicacionNeo4j;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
+import org.springframework.data.neo4j.repository.query.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long> {
 
@@ -14,4 +17,10 @@ public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long>
     //List<Ubicacion> caminoMasCorto(Long idOrigen, Long idDestino);
 
     // List<Ubicacion> caminoMasRentable(Long idOrigen, Long idDestino);
+
+    @Query("""
+        MATCH (u:Ubicacion {id: $id})
+        SET u.nombre = $nombre
+    """)
+    public void actualizar(@Param("id") Long id, @Param("string") String nombre);
 }

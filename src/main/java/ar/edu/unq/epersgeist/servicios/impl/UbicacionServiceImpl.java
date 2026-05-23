@@ -72,7 +72,7 @@ public class UbicacionServiceImpl implements UbicacionService {
 
         ubicacionDAOSQL.save(ubicacion);
 
-        //ubicacionDAONeo.actualizar(ubicacion); //necesito de op especial del dao de neo4j, porque lo tengo acá es un Ubicacion y no un UbicacionNeo4j!!
+        ubicacionDAONeo.actualizar(ubicacion.getId(), ubicacion.getNombre()); //necesito de op especial del dao de neo4j, porque lo tengo acá es un Ubicacion y no un UbicacionNeo4j!!
     }
 
     // --------------------------------------------------------------------------------
