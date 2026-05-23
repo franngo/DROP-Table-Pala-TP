@@ -2,10 +2,12 @@ package ar.edu.unq.epersgeist.persistencia.neo.entity;
 
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.TipoUbicacion;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
+import lombok.Getter;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 
 @Node
+@Getter
 public class UbicacionNeo4j {
 
     @Id
@@ -20,4 +22,6 @@ public class UbicacionNeo4j {
         this.nombre = ubicacion.getNombre();
         this.tipo = ubicacion.getTipoUbicacion();
     }
+
+
 }

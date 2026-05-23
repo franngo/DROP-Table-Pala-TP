@@ -19,5 +19,5 @@ public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long>
     @Query
     // recorro la cadena de relaciones entre primera y segunda y consigo el costo segun el enunciado
 
-    void costoHacia(Long idUbiActual, Long ubiAMover);
+    double costoHacia(Long idUbiActual, Long ubiAMover);
 }

@@ -6,6 +6,7 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
+import ar.edu.unq.epersgeist.persistencia.neo.entity.UbicacionNeo4j;
 import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.sql.MediumDAO;
 import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
@@ -120,26 +121,44 @@ public class MediumServiceImpl implements MediumService {
 
     @Override
     public void mover(Long mediumId, Long ubicacionId) {
-        Ubicacion ubicacionAMover = ubicacionDAONeo4j.findById(ubicacionId)
-                .orElseThrow(() ->
-                        new UbicacionNoEncontradaException(ubicacionId)
-                );
 
         Medium mediumAMover = mediumDao.findById(mediumId)
                 .orElseThrow(() ->
                         new ErrorDeMediumNoEncontradoException(mediumId)
                 );
-        this.validacionUbicacion(mediumAMover.getUbicacion(),ubicacionAMover);
-        Long costo = ubicacionDAONeo4j.costoHacia(mediumAMover.getUbicacion().getId(),ubicacionAMover.getId());
 
-        Long ubiActual = mediumAMover.getUbicacion().getId();
-        if (!quiereMoverseALaMisma(ubiActual, ubicacionId)) {
-            mediumAMover.moverA(ubicacionAMover);
+        // Ubicacion neo para calcular si se puede mover
+        UbicacionNeo4j ubicacionAMover = ubicacionDAONeo4j.findById(ubicacionId)
+                .orElseThrow(() ->
+                        new UbicacionNoEncontradaException(ubicacionId)
+                );
+
+        Long ubicacionMediumId = mediumAMover.getUbicacion().getId();
+        Long ubicacionAIrId = ubicacionAMover.getId();
+
+        if (!quiereMoverseALaMisma(ubicacionMediumId, ubicacionAIrId)) {
+
+        // valido si estan conectadas
+        this.validacionUbicacion(mediumAMover.getUbicacion(),ubicacionAMover);
+
+        // calculo el costo de moverse
+        double costo = ubicacionDAONeo4j.costoHacia(ubicacionMediumId,ubicacionAIrId);
+
+        // ubicacion confirmada
+        Ubicacion ubicacionConfirmada = ubicacionDAOSQL.findById(ubicacionId)
+                    .orElseThrow(() ->
+                            new UbicacionNoEncontradaException(ubicacionId));
+
+            // En caso de que el medium se quede sin maná luego de moverse,
+        // el mismo debe ser eliminado.
+
+            mediumAMover.moverA(ubicacionConfirmada);
+            this.actualizarEstadoMedium();
             mediumDao.save(mediumAMover);
         }
     }
 
-    private void validacionUbicacion(Ubicacion ubicacion, Ubicacion ubicacionAMover) {
+    private void validacionUbicacion(Ubicacion ubicacion, UbicacionNeo4j ubicacionAMover) {
         if (!ubicacionDAONeo4j.estanConectadas(ubicacion.getId(),ubicacionAMover.getId()){
             throw new UbicaciónLejanaException("La ubicacion esta lejana");
         }
