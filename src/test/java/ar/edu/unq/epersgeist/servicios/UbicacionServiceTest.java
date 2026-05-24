@@ -367,3 +367,56 @@ public class UbicacionServiceTest {
         }
     }
 }
+
+// --------------------------------------------------------------------------------
+// PRUEBAS NEO4J
+// --------------------------------------------------------------------------------
+
+@SpringBootTest
+class Neo4jTesting {
+    // --------------------------------------------------------------------------------
+    // CONSTANTES
+    // --------------------------------------------------------------------------------
+
+    private static final String NOMBRE_SANTUARIO = "Santuario de Lumen Silente";
+    private static final String NOMBRE_CEMENTERIO = "Cementerio de Nox Umbra";
+
+    private static final Integer ENERGIA_VALIDA = 50;
+    private static final Integer ENERGIA_MAXIMA = 100;
+
+    private static final Long ID_INEXISTENTE = 999_999_999L;
+
+    // --------------------------------------------------------------------------------
+    // DEPENDENCIAS
+    // --------------------------------------------------------------------------------
+
+    @Autowired
+    private UbicacionService ubicacionService;
+
+    // --------------------------------------------------------------------------------
+    // ATRIBUTOS
+    // --------------------------------------------------------------------------------
+
+    private Ubicacion santuario;
+    private Ubicacion cementerio;
+
+    // --------------------------------------------------------------------------------
+    // SETUP Y TEARDOWN
+    // --------------------------------------------------------------------------------
+
+    @BeforeEach
+    void setUp() {
+        santuario = new Santuario(NOMBRE_SANTUARIO, ENERGIA_VALIDA);
+        cementerio = new Cementerio(NOMBRE_CEMENTERIO, ENERGIA_VALIDA);
+    }
+
+    @AfterEach
+    void tearDown() {
+        //ubicacionService.eliminarTodos();
+    }
+
+    @Test
+    void sePuedeCrearUnaUbicacion() {
+        Ubicacion ubicacionCreada = ubicacionService.crear(cementerio);
+    }
+}

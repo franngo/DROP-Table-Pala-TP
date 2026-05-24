@@ -12,7 +12,12 @@ public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long>
 
     //void conectar(Long idOrigen, Long idDestino, Long costo);
 
-    //Boolean estanConectadas(Long idOrigen, Long idDestino);
+    //falta cambiar query
+    @Query("""
+        MATCH (u:Ubicacion {id: $id})
+        SET u.nombre = $nombre
+    """)
+    Boolean estanConectadas(Long idOrigen, Long idDestino);
 
     // List<Ubicacion> ubicacionesSobrecargadas(int umbralDeEnergia);
 
