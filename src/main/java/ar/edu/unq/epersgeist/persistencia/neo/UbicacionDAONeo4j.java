@@ -12,10 +12,10 @@ public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long>
 
     //void conectar(Long idOrigen, Long idDestino, Long costo);
 
-    //falta cambiar query
     @Query("""
-        MATCH (u:Ubicacion {id: $id})
-        SET u.nombre = $nombre
+        MATCH (u1:Ubicacion {id: $idOrigen}), (u2:Ubicacion {id: $idDestino})
+        MATCH p=(u1)-[:CONECTADO_CON]-(u2)
+        RETURN count(p) > 0
     """)
     Boolean estanConectadas(Long idOrigen, Long idDestino);
 
