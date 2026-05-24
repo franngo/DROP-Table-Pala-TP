@@ -369,7 +369,7 @@ public class UbicacionServiceTest {
 }
 
 // --------------------------------------------------------------------------------
-// PRUEBAS NEO4J
+// PRUEBAS NEO4J (Clase de testing fea con cosas hardcodeadas. Después hay que hacer el testing como corresponde)
 // --------------------------------------------------------------------------------
 
 @SpringBootTest
@@ -415,8 +415,10 @@ class Neo4jTesting {
         //ubicacionService.eliminarTodos();
     }
 
-    @Test
-    void sePuedeCrearUnaUbicacion() {
-        Ubicacion ubicacionCreada = ubicacionService.crear(cementerio);
-    }
+//    @Test
+//    void testFeoHardcodeado() {
+//        //Ubicacion ubicacionCreada = ubicacionService.crear(new Santuario("Villa España", ENERGIA_VALIDA));
+//
+//        assertTrue(ubicacionService.estanConectadas(2937L, 2938L));
+//    }
 }
