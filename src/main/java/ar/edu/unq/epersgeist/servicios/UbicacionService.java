@@ -25,5 +25,9 @@ public interface UbicacionService {
 
     List<Medium> mediumsSinEspiritusEn(Long ubicacionId);
 
+    // --------------------------------------------------------------------------------
+
+    Boolean estanConectadas(Long idOrigen, Long idDestino);
+
 
 }

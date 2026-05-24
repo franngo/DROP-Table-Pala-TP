@@ -109,4 +109,16 @@ public class UbicacionServiceImpl implements UbicacionService {
     }
 
     // --------------------------------------------------------------------------------
+    // CONSULTAS DE CONEXIONES ENTRE UBICACIONES
+    // --------------------------------------------------------------------------------
+
+    @Override
+    public Boolean estanConectadas(Long idOrigen, Long idDestino) {
+        this.recuperar(idOrigen);
+        this.recuperar(idDestino);
+        //recuperamos para pasar por la validación y tirar excepción si no están en la DB
+        return ubicacionDAONeo.estanConectadas(idOrigen, idDestino);
+    }
+
+    // --------------------------------------------------------------------------------
 }
