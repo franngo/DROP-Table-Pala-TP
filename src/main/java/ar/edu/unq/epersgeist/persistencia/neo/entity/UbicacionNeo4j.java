@@ -5,7 +5,7 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 
-@Node
+@Node(primaryLabel = "Ubicacion")
 public class UbicacionNeo4j {
 
     @Id

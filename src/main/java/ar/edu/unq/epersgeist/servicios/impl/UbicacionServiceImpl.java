@@ -5,6 +5,8 @@ import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
+import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
+import ar.edu.unq.epersgeist.persistencia.neo.entity.UbicacionNeo4j;
 import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
 import jakarta.transaction.Transactional;
@@ -23,6 +25,7 @@ import java.util.List;
 
 public class UbicacionServiceImpl implements UbicacionService {
     private final UbicacionDAOSQL ubicacionDAOSQL;
+    private final UbicacionDAONeo4j ubicacionDAONeo;
 
     // --------------------------------------------------------------------------------
     // CREAR
@@ -34,7 +37,9 @@ public class UbicacionServiceImpl implements UbicacionService {
             throw new UbicacionYaExisteException(ubicacion.getNombre());
         }
 
-        return ubicacionDAOSQL.save(ubicacion);
+        ubicacionDAOSQL.save(ubicacion); //se actualiza el estado de ubicacion con el id
+        ubicacionDAONeo.save(new UbicacionNeo4j(ubicacion)); //lo persisto en neo4j con dicho id
+        return ubicacion;
     }
 
     // --------------------------------------------------------------------------------
@@ -66,6 +71,8 @@ public class UbicacionServiceImpl implements UbicacionService {
         }
 
         ubicacionDAOSQL.save(ubicacion);
+
+        ubicacionDAONeo.actualizar(ubicacion.getId(), ubicacion.getNombre()); //necesito de op especial del dao de neo4j, porque lo tengo acá es un Ubicacion y no un UbicacionNeo4j!!
     }
 
     // --------------------------------------------------------------------------------
@@ -77,12 +84,14 @@ public class UbicacionServiceImpl implements UbicacionService {
         ubicacionDAOSQL.findById(id).ifPresent(ubicacion -> {
             ubicacion.setDeletedAt(true);
             ubicacionDAOSQL.save(ubicacion);
+            ubicacionDAONeo.deleteById(id);
         });
     }
 
     @Override
     public void eliminarTodos() {
         ubicacionDAOSQL.deleteAll();
+        ubicacionDAONeo.deleteAll();
     }
 
     // --------------------------------------------------------------------------------
