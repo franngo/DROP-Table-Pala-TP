@@ -15,8 +15,11 @@ import ar.edu.unq.epersgeist.modelo.reportes.ReporteSantuarioMasCorrupto;
 import ar.edu.unq.epersgeist.servicios.EstadisticaService;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +27,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/ubicaciones")
 @AllArgsConstructor
+@Validated
 public class UbicacionControllerREST {
     private final UbicacionService ubicacionService;
     private final EstadisticaService estadisticaService;
@@ -57,7 +61,7 @@ public class UbicacionControllerREST {
         Ubicacion ubicacionCreada = ubicacionService.crear(ubicacion);
         return MapperUbicacion.toDTO(ubicacionCreada);
     }
-    
+
     // --------------------------------------------------------------------------------
 
     @PutMapping("/{id}")
@@ -110,5 +114,42 @@ public class UbicacionControllerREST {
         ReporteSantuarioMasCorrupto reporte = estadisticaService.santuarioCorrupto();
 
         return EstadisticaMapper.toDTO(reporte);
+    }
+
+    // --------------------------------------------------------------------------------
+
+    @PostMapping("/{idOrigen}/conectar/{idDestino}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void conectar(
+            @PathVariable Long idOrigen,
+            @PathVariable Long idDestino,
+            @RequestParam @Min(0) @Max(100) Long costo
+     ) {
+        ubicacionService.conectar(idOrigen, idDestino, costo);
+    }
+
+    // --------------------------------------------------------------------------------
+
+    @GetMapping("/{idOrigen}/camino-mas-corto/{idDestino}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UbicacionResponseDTO> caminoMasCorto(
+            @PathVariable Long idOrigen,
+            @PathVariable Long idDestino
+    ) {
+        return ubicacionService.caminoMasCorto(idOrigen, idDestino)
+                .stream()
+                .map(MapperUbicacion::toDTO)
+                .toList();
+    }
+
+    // --------------------------------------------------------------------------------
+
+    @GetMapping("/{idOrigen}/estan-conectadas/{idDestino}")
+    @ResponseStatus(HttpStatus.OK)
+    public Boolean estanConectadas(
+            @PathVariable Long idOrigen,
+            @PathVariable Long idDestino
+    ) {
+        return ubicacionService.estanConectadas(idOrigen, idDestino);
     }
 }
