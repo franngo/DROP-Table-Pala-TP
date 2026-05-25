@@ -1,4 +1,4 @@
-package ar.edu.unq.epersgeist.modelo.Ubicacion;
+package ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion;
 
 import ar.edu.unq.epersgeist.modelo.exceptions.EpergeistException;
 
