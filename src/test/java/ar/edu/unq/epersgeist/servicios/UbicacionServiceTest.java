@@ -366,59 +366,144 @@ public class UbicacionServiceTest {
             assertTrue(mediums.isEmpty());
         }
     }
-}
-
-// --------------------------------------------------------------------------------
-// PRUEBAS NEO4J (Clase de testing fea con cosas hardcodeadas. Después hay que hacer el testing como corresponde)
-// --------------------------------------------------------------------------------
-
-@SpringBootTest
-class Neo4jTesting {
-    // --------------------------------------------------------------------------------
-    // CONSTANTES
-    // --------------------------------------------------------------------------------
-
-    private static final String NOMBRE_SANTUARIO = "Santuario de Lumen Silente";
-    private static final String NOMBRE_CEMENTERIO = "Cementerio de Nox Umbra";
-
-    private static final Integer ENERGIA_VALIDA = 50;
-    private static final Integer ENERGIA_MAXIMA = 100;
-
-    private static final Long ID_INEXISTENTE = 999_999_999L;
 
     // --------------------------------------------------------------------------------
-    // DEPENDENCIAS
+    // CONEXIONES ENTRE UBICACIONES EN NEO4J
     // --------------------------------------------------------------------------------
 
-    @Autowired
-    private UbicacionService ubicacionService;
+    @Nested
+    class ConexionesEnNeo4j {
+        private Ubicacion origen;
+        private Ubicacion destino;
+        private Ubicacion otroNodo;
 
-    // --------------------------------------------------------------------------------
-    // ATRIBUTOS
-    // --------------------------------------------------------------------------------
+        @BeforeEach
+        void setUp() {
+            origen = ubicacionService.crear(new Santuario("ORIGEN", 50));
+            destino = ubicacionService.crear(new Cementerio("DESTINO", 50));
+            otroNodo = ubicacionService.crear(new Santuario("OTRO", 50));
+        }
 
-    private Ubicacion santuario;
-    private Ubicacion cementerio;
+        @AfterEach
+        void tearDown() {
+            ubicacionService.eliminarTodos();
+        }
 
-    // --------------------------------------------------------------------------------
-    // SETUP Y TEARDOWN
-    // --------------------------------------------------------------------------------
+        // ------------------------------------------------------------
+        // CASO 1: conexión básica
+        // ------------------------------------------------------------
 
-    @BeforeEach
-    void setUp() {
-        santuario = new Santuario(NOMBRE_SANTUARIO, ENERGIA_VALIDA);
-        cementerio = new Cementerio(NOMBRE_CEMENTERIO, ENERGIA_VALIDA);
+        @Test
+        void conectarDosUbicacionesCreaConexion() {
+            ubicacionService.conectar(origen.getId(), destino.getId(), 10L);
+
+            assertTrue(
+                    ubicacionService.estanConectadas(origen.getId(), destino.getId())
+            );
+        }
+
+        // ------------------------------------------------------------
+        // CASO 2: dirección de la conexión
+        // ------------------------------------------------------------
+
+        @Test
+        void conectarEsUnidireccional() {
+            ubicacionService.conectar(origen.getId(), destino.getId(), 10L);
+
+            assertTrue(
+                    ubicacionService.estanConectadas(origen.getId(), destino.getId())
+            );
+
+            assertFalse(
+                    ubicacionService.estanConectadas(destino.getId(), origen.getId())
+            );
+        }
+
+        // ------------------------------------------------------------
+        // CASO 3: conectar múltiples veces no rompe el grafo
+        // ------------------------------------------------------------
+
+        @Test
+        void conectarMismaRelacionNoDuplicaNiRompe() {
+            ubicacionService.conectar(origen.getId(), destino.getId(), 10L);
+            ubicacionService.conectar(origen.getId(), destino.getId(), 20L);
+
+            assertTrue(
+                    ubicacionService.estanConectadas(origen.getId(), destino.getId())
+            );
+        }
+
+        // ------------------------------------------------------------
+        // CASO 4: conexión bidireccional manual
+        // ------------------------------------------------------------
+
+        @Test
+        void sePuedeCrearConexionBidireccional() {
+            ubicacionService.conectar(origen.getId(), destino.getId(), 10L);
+            ubicacionService.conectar(destino.getId(), origen.getId(), 15L);
+
+            assertTrue(
+                    ubicacionService.estanConectadas(origen.getId(), destino.getId())
+            );
+
+            assertTrue(
+                    ubicacionService.estanConectadas(destino.getId(), origen.getId())
+            );
+        }
+
+        // ------------------------------------------------------------
+        // CASO 5: conectar con nodo distinto no afecta otras conexiones
+        // ------------------------------------------------------------
+
+        @Test
+        void conectarNoAfectaOtrosNodos() {
+            ubicacionService.conectar(origen.getId(), destino.getId(), 10L);
+
+            assertFalse(
+                    ubicacionService.estanConectadas(origen.getId(), otroNodo.getId())
+            );
+
+            assertFalse(
+                    ubicacionService.estanConectadas(otroNodo.getId(), destino.getId())
+            );
+        }
+
+        // ------------------------------------------------------------
+        // CASO 6: costo no afecta conectividad
+        // ------------------------------------------------------------
+
+        @Test
+        void costoNoAfectaSiEstanConectados() {
+            ubicacionService.conectar(origen.getId(), destino.getId(), 999_999_999L);
+
+            assertTrue(
+                    ubicacionService.estanConectadas(origen.getId(), destino.getId())
+            );
+        }
+
+        // ------------------------------------------------------------
+        // CASO 7: conexión con IDs inexistentes
+        // ------------------------------------------------------------
+
+        @Test
+        void conectarConIdInexistenteLanzaExcepcion() {
+            Long idInexistente = 999_999_999L;
+
+            assertThrows(
+                    UbicacionNoEncontradaException.class,
+                    () -> ubicacionService.conectar(idInexistente, destino.getId(), 10L)
+            );
+        }
+
+        @Test
+        void conectarConAmbosIdsInexistentesLanzaExcepcion() {
+            Long idInexistente1 = 999_999_999L;
+            Long idInexistente2 = 777_777_777L;
+
+            assertThrows(
+                    UbicacionNoEncontradaException.class,
+                    () -> ubicacionService.conectar(idInexistente1, idInexistente2, 10L)
+            );
+        }
     }
-
-    @AfterEach
-    void tearDown() {
-        //ubicacionService.eliminarTodos();
-    }
-
-//    @Test
-//    void testFeoHardcodeado() {
-//        //Ubicacion ubicacionCreada = ubicacionService.crear(new Santuario("Villa España", ENERGIA_VALIDA));
-//
-//        assertTrue(ubicacionService.estanConectadas(2937L, 2938L));
-//    }
 }
