@@ -505,5 +505,44 @@ public class UbicacionServiceTest {
                     () -> ubicacionService.conectar(idInexistente1, idInexistente2, 10L)
             );
         }
+
+        // ------------------------------------------------------------
+        // Casos del estanConectadas()
+        // ------------------------------------------------------------
+
+        @Test
+        void estanConectadasEsTransitivo() {
+            ubicacionService.conectar(origen.getId(), destino.getId(), 10L);
+            ubicacionService.conectar(destino.getId(), otroNodo.getId(), 10L);
+
+            assertTrue(
+                    ubicacionService.estanConectadas(origen.getId(), otroNodo.getId())
+            );
+        }
+
+        @Test
+        void estanConectadasSigueSiendoDireccionalDandoDosSaltos() {
+            ubicacionService.conectar(origen.getId(), destino.getId(), 10L);
+            ubicacionService.conectar(destino.getId(), otroNodo.getId(), 10L);
+
+            assertFalse(
+                    ubicacionService.estanConectadas(otroNodo.getId(), origen.getId())
+            );
+        }
+
+        @Test
+        void estanConectadasFuncionaTeniendoMultiplesCaminosParaUnaConexion() {
+            Ubicacion nodoCuatro = ubicacionService.crear(new Santuario("Nodo cuatro", 50));
+
+            ubicacionService.conectar(origen.getId(), destino.getId(), 10L);
+            ubicacionService.conectar(destino.getId(), otroNodo.getId(), 10L);
+
+            ubicacionService.conectar(origen.getId(), nodoCuatro.getId(), 10L);
+            ubicacionService.conectar(nodoCuatro.getId(), otroNodo.getId(), 10L);
+
+            assertTrue(
+                    ubicacionService.estanConectadas(origen.getId(), otroNodo.getId())
+            );
+        }
     }
 }
