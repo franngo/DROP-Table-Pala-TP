@@ -42,5 +42,5 @@ public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long>
                 MATCH (u:Ubicacion {id: $id})
                 SET u.nombre = $nombre
             """)
-    public void actualizar(@Param("id") Long id, @Param("nombre") String nombre);
+    void actualizar(@Param("id") Long id, @Param("nombre") String nombre);
 }
