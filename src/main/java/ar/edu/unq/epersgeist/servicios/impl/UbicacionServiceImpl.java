@@ -113,6 +113,14 @@ public class UbicacionServiceImpl implements UbicacionService {
     // --------------------------------------------------------------------------------
 
     @Override
+    public void conectar(Long idOrigen, Long idDestino, Long costo) {
+        this.recuperar(idOrigen);
+        this.recuperar(idDestino);
+
+        ubicacionDAONeo.conectar(idOrigen, idDestino, costo);
+    }
+
+    @Override
     public Boolean estanConectadas(Long idOrigen, Long idDestino) {
         this.recuperar(idOrigen);
         this.recuperar(idDestino);
