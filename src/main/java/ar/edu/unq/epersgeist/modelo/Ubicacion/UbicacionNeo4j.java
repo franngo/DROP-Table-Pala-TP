@@ -1,7 +1,6 @@
-package ar.edu.unq.epersgeist.persistencia.neo.entity;
+package ar.edu.unq.epersgeist.modelo.Ubicacion;
 
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.TipoUbicacion;
-import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
