@@ -7,7 +7,7 @@ import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadas
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
 import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
-import ar.edu.unq.epersgeist.persistencia.neo.entity.UbicacionNeo4j;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
 import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
 import jakarta.transaction.Transactional;

@@ -1,6 +1,6 @@
 package ar.edu.unq.epersgeist.persistencia.neo;
 
-import ar.edu.unq.epersgeist.persistencia.neo.entity.UbicacionNeo4j;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
 import org.springframework.data.repository.query.Param;
