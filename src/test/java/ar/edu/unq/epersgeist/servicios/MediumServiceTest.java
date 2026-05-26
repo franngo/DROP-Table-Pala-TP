@@ -364,67 +364,6 @@ public class MediumServiceTest {
         assertTrue(es.stream().anyMatch((e) -> e.getId().equals(jaegerP.getId())));
     }
 
-    // MOVER
-//    @Nested
-//    public class MoverViejaImplementacion {
-//        @Test
-//        void elMediumSeMueveAUnaUbicacionExitosamente() {
-//            //ubedaP.moverA(bernal);
-//            serviceMedium.mover(ubedaP.getId(), bernal.getId());
-//
-//            Medium ubedaAct = serviceMedium.recuperar(ubedaP.getId());
-//
-//            assertEquals(bernal.getId(), ubedaAct.getUbicacion().getId());
-//
-//        }
-//
-//        @Test
-//        void siSeQuiereMoverALaMismaUbicacionQuedaEnLaMisma() {
-//            Ubicacion ubiActual = ubedaP.getUbicacion();
-//            serviceMedium.mover(ubedaP.getId(), ubiActual.getId());
-//
-//            Medium ubedaAct = serviceMedium.recuperar(ubedaP.getId());
-//
-//            assertEquals(ubiActual.getId(), ubedaAct.getUbicacion().getId());
-//
-//        }
-//
-
-//
-//
-//        @Test
-//        void losEspiritusDelMediumSeMuevenConEl() {
-//            //se conecta Ubeda con 2 espiritus
-//            espirituService.conectar(jaegerP.getId(), ubedaP.getId());
-//            espirituService.conectar(rikaP.getId(), ubedaP.getId());
-//
-//            serviceMedium.mover(ubedaP.getId(), berazategui.getId());
-//
-//            List<Espiritu> espiritus = serviceMedium.espiritus(ubedaP.getId());
-//
-//            for (Espiritu e : espiritus) {
-//                assertEquals(berazategui.getId(), e.getUbicacion().getId());
-//            }
-//
-//        }
-//
-//        @Test
-//        void losEspiritusNoCambianDeUbicacionSielMediumSeMuevenALaMisma() {
-//            //se conecta Ubeda con 2 espiritus
-//            espirituService.conectar(jaegerP.getId(), ubedaP.getId());
-//            espirituService.conectar(rikaP.getId(), ubedaP.getId());
-//
-//            Long ubiActual = ubedaP.getUbicacion().getId();
-//            serviceMedium.mover(ubedaP.getId(), ubiActual);
-//
-//            List<Espiritu> espiritus = serviceMedium.espiritus(ubedaP.getId());
-//
-//            for (Espiritu e : espiritus) {
-//                assertEquals(ubiActual, e.getUbicacion().getId());
-//            }
-//
-//        }
-//    }
 
     @Nested
     public class MoverConActualizacionDeUbicaciones {
@@ -491,9 +430,61 @@ public class MediumServiceTest {
 
         @Test
         void elMediumSiQuedaSinManaEsEliminado() {
+            Ubicacion laUNQ = ubicacionService.crear(new Santuario("Bernal", 80));
+            ubicacionService.conectar(ranelagh.getId(), laUNQ.getId(), 99L);
+
+            serviceMedium.mover(mediumAMover.getId(), laUNQ.getId());
+            // el medium fue eliminado
+            assertThrows(ErrorDeMediumNoEncontradoException.class, () -> {
+
+                serviceMedium.recuperar(mediumAMover.getId());
+            });
+
+
+        }
+
+        @Test
+        void losEspiritusDelMediumSeMuevenConEl() {
+            //se conecta Ubeda con 2 espiritus
+            espirituService.conectar(jaegerP.getId(), ubedaP.getId());
+            espirituService.conectar(rikaP.getId(), ubedaP.getId());
+
+            serviceMedium.mover(ubedaP.getId(), berazategui.getId());
+
+            List<Espiritu> espiritus = serviceMedium.espiritus(ubedaP.getId());
+
+            for (Espiritu e : espiritus) {
+                assertEquals(berazategui.getId(), e.getUbicacion().getId());
+            }
+
+        }
+
+        @Test
+        void losEspiritusNoCambianDeUbicacionSielMediumSeMuevenALaMisma() {
+            //se conecta Ubeda con 2 espiritus
+            espirituService.conectar(jaegerP.getId(), ubedaP.getId());
+            espirituService.conectar(rikaP.getId(), ubedaP.getId());
+
+            Long ubiActual = ubedaP.getUbicacion().getId();
+            serviceMedium.mover(ubedaP.getId(), ubiActual);
+
+            List<Espiritu> espiritus = serviceMedium.espiritus(ubedaP.getId());
+
+            for (Espiritu e : espiritus) {
+                assertEquals(ubiActual, e.getUbicacion().getId());
+            }
+
+        }
+
+        @AfterEach
+        void tearDown() {
+            espirituService.eliminarTodos();
+            serviceMedium.eliminarTodos();
+            ubicacionService.eliminarTodos();
 
         }
     }
+
 
     @AfterEach
     void tearDown() {

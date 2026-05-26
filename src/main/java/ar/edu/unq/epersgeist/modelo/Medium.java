@@ -153,10 +153,15 @@ public class Medium extends Auditable implements Serializable {
     }
 
 
-    public void moverA(Ubicacion nuevaUbicacion) {
+    public void moverA(Ubicacion nuevaUbicacion, int costoMana) {
 
         this.setUbicacion(nuevaUbicacion);
+        this.pagarCostoMover(costoMana);
         this.moverEspiritusA(getUbicacion());
+    }
+
+    private void pagarCostoMover(int costoMana) {
+        setMana((int) Math.max(0, mana - costoMana));
     }
 
     public void moverEspiritusA(Ubicacion nuevaUbicacion) {

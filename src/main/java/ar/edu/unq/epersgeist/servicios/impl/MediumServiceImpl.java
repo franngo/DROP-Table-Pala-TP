@@ -142,7 +142,7 @@ public class MediumServiceImpl implements MediumService {
             this.validacionUbicacion(mediumAMover.getUbicacion(), ubicacionAMover);
 
             // calculo el costo de moverse
-            double costo = ubicacionDAONeo4j.costoHacia(ubicacionMediumId, ubicacionAIrId);
+            int costo = Math.toIntExact(ubicacionDAONeo4j.costoHacia(ubicacionMediumId, ubicacionAIrId));
 
             // Con los calculos completos, proceso a recuperar la ubicacion de sql
             Ubicacion ubicacionConfirmada = ubicacionDAOSQL.findById(ubicacionId)
@@ -150,7 +150,7 @@ public class MediumServiceImpl implements MediumService {
                             new UbicacionNoEncontradaException(ubicacionId));
 
             // el medium se mueve
-            mediumAMover.moverA(ubicacionConfirmada);
+            mediumAMover.moverA(ubicacionConfirmada, costo);
 
 
             // depende el estado del medium se guardara o se eliminara
