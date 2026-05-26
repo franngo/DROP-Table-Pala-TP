@@ -55,8 +55,12 @@ public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long>
                 SET u.nombre = $nombre
             """)
     void actualizar(@Param("id") Long id, @Param("nombre") String nombre);
-    @Query
-    // recorro la cadena de relaciones entre primera y segunda y consigo el costo segun el enunciado
 
-    double costoHacia(Long idUbiActual, Long ubiAMover);
+    @Query("""
+                MATCH (o:Ubicacion {id: $idOrigen}),
+                      (d:Ubicacion {id: $idDestino})
+                MATCH p = shortestPath((o)-[:CONECTADO_CON*]->(d))
+                RETURN reduce(suma = 0, r IN relationships(p) | suma + r.costo)
+            """)
+    double costoHacia(Long idUbicacionActual, Long idUbicacionAMover);
 }

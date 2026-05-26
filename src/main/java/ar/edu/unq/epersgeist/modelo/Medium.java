@@ -171,4 +171,8 @@ public class Medium extends Auditable implements Serializable {
         });
         aDesvincular.forEach(Espiritu::desvincularse);
     }
+
+    public boolean sinMana() {
+        return mana <= 0;
+    }
 }

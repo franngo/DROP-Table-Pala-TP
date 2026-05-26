@@ -127,7 +127,7 @@ public class MediumServiceImpl implements MediumService {
                         new ErrorDeMediumNoEncontradoException(mediumId)
                 );
 
-        // Ubicacion neo para calcular si se puede mover
+        // Ubicacion neo para calcular si existe a donde se puede mover
         UbicacionNeo4j ubicacionAMover = ubicacionDAONeo4j.findById(ubicacionId)
                 .orElseThrow(() ->
                         new UbicacionNoEncontradaException(ubicacionId)
@@ -138,29 +138,34 @@ public class MediumServiceImpl implements MediumService {
 
         if (!quiereMoverseALaMisma(ubicacionMediumId, ubicacionAIrId)) {
 
-            // valido si estan conectadas
+            // Se valida si las ubicaciones estan conectadas
             this.validacionUbicacion(mediumAMover.getUbicacion(), ubicacionAMover);
 
             // calculo el costo de moverse
             double costo = ubicacionDAONeo4j.costoHacia(ubicacionMediumId, ubicacionAIrId);
 
-            // ubicacion confirmada
+            // Con los calculos completos, proceso a recuperar la ubicacion de sql
             Ubicacion ubicacionConfirmada = ubicacionDAOSQL.findById(ubicacionId)
                     .orElseThrow(() ->
                             new UbicacionNoEncontradaException(ubicacionId));
 
-            // En caso de que el medium se quede sin maná luego de moverse,
-            // el mismo debe ser eliminado.
-
+            // el medium se mueve
             mediumAMover.moverA(ubicacionConfirmada);
-            // this.actualizarEstadoMedium();
-            mediumDao.save(mediumAMover);
+
+
+            // depende el estado del medium se guardara o se eliminara
+            if (mediumAMover.sinMana()) {
+                mediumDao.delete(mediumAMover);
+            } else {
+                mediumDao.save(mediumAMover);
+            }
+
         }
     }
 
     private void validacionUbicacion(Ubicacion ubicacion, UbicacionNeo4j ubicacionAMover) {
         if (!ubicacionDAONeo4j.estanConectadas(ubicacion.getId(), ubicacionAMover.getId())) {
-            throw new UbicaciónLejanaException("La ubicacion esta lejana");
+            throw new UbicacionLejanaException("La ubicacion esta lejana");
         }
     }
 
