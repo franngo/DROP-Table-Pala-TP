@@ -7,12 +7,10 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-
 
 @Repository
 public interface UbicacionDAOSQL extends JpaRepository<Ubicacion, Long> {
@@ -23,9 +21,11 @@ public interface UbicacionDAOSQL extends JpaRepository<Ubicacion, Long> {
     @Query("SELECT u FROM Ubicacion u WHERE u.deletedAt = false")
     List<Ubicacion> findAll();
 
-
     @Query("SELECT COUNT(u) > 0 FROM Ubicacion u WHERE u.nombre = :nombre AND u.deletedAt = false")
     boolean existsByName(String nombre);
+
+    @Query("SELECT u FROM Ubicacion u WHERE u.nombre = :nombre")
+    Ubicacion findByNombre(String nombre);
 
     @Query("SELECT e FROM Espiritu e WHERE e.ubicacion.id = :id")
     List<Espiritu> espiritusEn(Long id);

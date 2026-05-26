@@ -3,11 +3,11 @@ package ar.edu.unq.epersgeist.servicios.impl;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
 import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
-import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
 import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
 import jakarta.transaction.Transactional;
@@ -34,12 +34,26 @@ public class UbicacionServiceImpl implements UbicacionService {
 
     @Override
     public Ubicacion crear(Ubicacion ubicacion) {
-        if (ubicacionDAOSQL.existsByName(ubicacion.getNombre())) {
+        // Busco si ya existe una ubicación con el mismo nombre
+        Ubicacion existente = ubicacionDAOSQL.findByNombre(ubicacion.getNombre());
+
+        // Si existe y NO está eliminada lógicamente, entonces no se puede crear otra con el mismo nombre
+        if (existente != null && !existente.getDeletedAt()) {
             throw new UbicacionYaExisteException(ubicacion.getNombre());
         }
 
-        ubicacionDAOSQL.save(ubicacion); //se actualiza el estado de ubicacion con el id
-        ubicacionDAONeo.save(new UbicacionNeo4j(ubicacion)); //lo persisto en neo4j con dicho id
+        // Si existe pero estaba soft deleted, la elimino físicamente para liberar el unique del nombre
+        if (existente != null) {
+            ubicacionDAOSQL.delete(existente);
+            ubicacionDAOSQL.flush(); // Ejecuta el DELETE antes del INSERT
+        }
+
+        // Guardo la ubicación en SQL
+        ubicacionDAOSQL.save(ubicacion);
+
+        // La persisto también en Neo4j usando el id generado en SQL
+        ubicacionDAONeo.save(new UbicacionNeo4j(ubicacion));
+
         return ubicacion;
     }
 
@@ -139,7 +153,7 @@ public class UbicacionServiceImpl implements UbicacionService {
             return List.of(origen);
         }
 
-        if(!this.estanConectadas(idOrigen, idDestino)) {
+        if (!this.estanConectadas(idOrigen, idDestino)) {
             //new UbicacionesNoConectadasException(idOrigen, idDestino);
         }
 
