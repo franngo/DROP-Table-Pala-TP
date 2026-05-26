@@ -153,10 +153,15 @@ public class Medium extends Auditable implements Serializable {
     }
 
 
-    public void moverA(Ubicacion nuevaUbicacion) {
+    public void moverA(Ubicacion nuevaUbicacion, int costoMana) {
 
         this.setUbicacion(nuevaUbicacion);
+        this.pagarCostoMover(costoMana);
         this.moverEspiritusA(getUbicacion());
+    }
+
+    private void pagarCostoMover(int costoMana) {
+        this.mana -= costoMana;
     }
 
     public void moverEspiritusA(Ubicacion nuevaUbicacion) {
@@ -170,5 +175,9 @@ public class Medium extends Auditable implements Serializable {
             }
         });
         aDesvincular.forEach(Espiritu::desvincularse);
+    }
+
+    public boolean sinMana() {
+        return mana <= 0;
     }
 }

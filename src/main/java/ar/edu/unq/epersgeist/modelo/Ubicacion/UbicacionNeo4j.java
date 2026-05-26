@@ -4,6 +4,8 @@ import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.TipoUbicacion;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
+import lombok.Getter;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 

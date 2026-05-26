@@ -88,6 +88,7 @@ public class GlobalExceptionHandler {
             ErrorManaMayorQueManaMaxAlCrearMedium.class,
             CampoInvalidoTipoEspirituException.class,
             CampoTipoUbicacionInvalido.class
+
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponseDTO badRequestHandler(
@@ -114,7 +115,8 @@ public class GlobalExceptionHandler {
             ErrorDeEspirituNoEncontradoException.class,
             ErrorDeMediumNoEncontradoException.class,
             NoExisteSantuarioCorruptoException.class,
-            UbicacionesNoConectadasException.class,
+            UbicacionesNoConectadasException.class
+
     })
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponseDTO notFoundHandler(
@@ -141,6 +143,7 @@ public class GlobalExceptionHandler {
             ErrorDeMediumExorcizandoAOtroEnDistintaUbicacion.class,
             ExorcismoPropioNoPermitidoException.class,
             ExorcistaSinAngelesException.class,
+            UbicacionLejanaException.class
     })
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponseDTO conflictHandler(
