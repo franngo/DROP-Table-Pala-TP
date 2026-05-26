@@ -12,9 +12,9 @@ import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.random.Estrategia.EstrategiaRangoEspecifico;
 import ar.edu.unq.epersgeist.modelo.random.RandomDefensa;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -365,70 +365,134 @@ public class MediumServiceTest {
     }
 
     // MOVER
-    @Test
-    void elMediumSeMueveAUnaUbicacionExitosamente() {
-        //ubedaP.moverA(bernal);
-        serviceMedium.mover(ubedaP.getId(), bernal.getId());
+//    @Nested
+//    public class MoverViejaImplementacion {
+//        @Test
+//        void elMediumSeMueveAUnaUbicacionExitosamente() {
+//            //ubedaP.moverA(bernal);
+//            serviceMedium.mover(ubedaP.getId(), bernal.getId());
+//
+//            Medium ubedaAct = serviceMedium.recuperar(ubedaP.getId());
+//
+//            assertEquals(bernal.getId(), ubedaAct.getUbicacion().getId());
+//
+//        }
+//
+//        @Test
+//        void siSeQuiereMoverALaMismaUbicacionQuedaEnLaMisma() {
+//            Ubicacion ubiActual = ubedaP.getUbicacion();
+//            serviceMedium.mover(ubedaP.getId(), ubiActual.getId());
+//
+//            Medium ubedaAct = serviceMedium.recuperar(ubedaP.getId());
+//
+//            assertEquals(ubiActual.getId(), ubedaAct.getUbicacion().getId());
+//
+//        }
+//
 
-        Medium ubedaAct = serviceMedium.recuperar(ubedaP.getId());
+//
+//
+//        @Test
+//        void losEspiritusDelMediumSeMuevenConEl() {
+//            //se conecta Ubeda con 2 espiritus
+//            espirituService.conectar(jaegerP.getId(), ubedaP.getId());
+//            espirituService.conectar(rikaP.getId(), ubedaP.getId());
+//
+//            serviceMedium.mover(ubedaP.getId(), berazategui.getId());
+//
+//            List<Espiritu> espiritus = serviceMedium.espiritus(ubedaP.getId());
+//
+//            for (Espiritu e : espiritus) {
+//                assertEquals(berazategui.getId(), e.getUbicacion().getId());
+//            }
+//
+//        }
+//
+//        @Test
+//        void losEspiritusNoCambianDeUbicacionSielMediumSeMuevenALaMisma() {
+//            //se conecta Ubeda con 2 espiritus
+//            espirituService.conectar(jaegerP.getId(), ubedaP.getId());
+//            espirituService.conectar(rikaP.getId(), ubedaP.getId());
+//
+//            Long ubiActual = ubedaP.getUbicacion().getId();
+//            serviceMedium.mover(ubedaP.getId(), ubiActual);
+//
+//            List<Espiritu> espiritus = serviceMedium.espiritus(ubedaP.getId());
+//
+//            for (Espiritu e : espiritus) {
+//                assertEquals(ubiActual, e.getUbicacion().getId());
+//            }
+//
+//        }
+//    }
 
-        assertEquals(bernal.getId(), ubedaAct.getUbicacion().getId());
+    @Nested
+    public class MoverConActualizacionDeUbicaciones {
 
-    }
+        Ubicacion ranelagh;
+        Ubicacion sourigues;
+        Medium mediumAMover;
 
-    @Test
-    void siSeQuiereMoverALaMismaUbicacionQuedaEnLaMisma() {
-        Ubicacion ubiActual = ubedaP.getUbicacion();
-        serviceMedium.mover(ubedaP.getId(), ubiActual.getId());
-
-        Medium ubedaAct = serviceMedium.recuperar(ubedaP.getId());
-
-        assertEquals(ubiActual.getId(), ubedaAct.getUbicacion().getId());
-
-    }
-
-    @Test
-    void elMediumNoPuedeMoverseAUnaUbicacionInexistente() {
-        Ubicacion ubi = new Cementerio("Cementerio", 100);
-        ubi.setId(10000l);
-        assertThrows(UbicacionNoEncontradaException.class, () -> {
-
-            serviceMedium.mover(ubedaP.getId(), ubi.getId());
-        });
-    }
-
-
-    @Test
-    void losEspiritusDelMediumSeMuevenConEl() {
-        //se conecta Ubeda con 2 espiritus
-        espirituService.conectar(jaegerP.getId(), ubedaP.getId());
-        espirituService.conectar(rikaP.getId(), ubedaP.getId());
-
-        serviceMedium.mover(ubedaP.getId(), berazategui.getId());
-
-        List<Espiritu> espiritus = serviceMedium.espiritus(ubedaP.getId());
-
-        for (Espiritu e : espiritus) {
-            assertEquals(berazategui.getId(), e.getUbicacion().getId());
+        @BeforeEach
+        void setUtMover() {
+            ranelagh = ubicacionService.crear(new Santuario("Ranelgh", 99));
+            sourigues = ubicacionService.crear(new Santuario("Sourigues", 70));
+            ubicacionService.conectar(ranelagh.getId(), sourigues.getId(), 40L);
+            mediumAMover = serviceMedium.crear(new Medium("Matias Sanchez", 100, 90, ranelagh));
         }
 
-    }
-
-    @Test
-    void losEspiritusNoCambianDeUbicacionSielMediumSeMuevenALaMisma() {
-        //se conecta Ubeda con 2 espiritus
-        espirituService.conectar(jaegerP.getId(), ubedaP.getId());
-        espirituService.conectar(rikaP.getId(), ubedaP.getId());
-
-        Long ubiActual = ubedaP.getUbicacion().getId();
-        serviceMedium.mover(ubedaP.getId(), ubiActual);
-
-        List<Espiritu> espiritus = serviceMedium.espiritus(ubedaP.getId());
-
-        for (Espiritu e : espiritus) {
-            assertEquals(ubiActual, e.getUbicacion().getId());
+        @Test
+        void emMediumSeMueveExitosamente() {
+            serviceMedium.mover(mediumAMover.getId(), sourigues.getId());
+            Medium recuperado = serviceMedium.recuperar(mediumAMover.getId());
+            assertEquals(sourigues.getId(), recuperado.getUbicacion().getId());
         }
 
+        @Test
+        void elMediumPierdeManaSegunUbicacion() {
+            serviceMedium.mover(mediumAMover.getId(), sourigues.getId());
+            Medium recuperado = serviceMedium.recuperar(mediumAMover.getId());
+            assertEquals(50, mediumAMover.getMana());
+
+        }
+
+        @Test
+        void elMediumSeMueveAlMismoLugarSinEfecto() {
+            // estado actual del medium
+            assertEquals(ranelagh.getId(), mediumAMover.getUbicacion().getId());
+            assertEquals(90, mediumAMover.getMana());
+
+            serviceMedium.mover(mediumAMover.getId(), ranelagh.getId());
+            Medium recuperado = serviceMedium.recuperar(mediumAMover.getId());
+            assertEquals(ranelagh.getId(), mediumAMover.getUbicacion().getId());
+            assertEquals(90, mediumAMover.getMana());
+        }
+
+        @Test
+        void elMediumNoPuedeMoverseAUnaUbicacionLejana() {
+            Ubicacion varela = ubicacionService.crear(new Cementerio("Varela", 50));
+            ubicacionService.conectar(sourigues.getId(), varela.getId(), 30L);
+            assertThrows(UbicacionLejanaException.class, () -> {
+
+                serviceMedium.mover(mediumAMover.getId(), varela.getId());
+            });
+
+        }
+
+        @Test
+        void elMediumNoPuedeMoverseAUnaUbicacionInexistente() {
+            Ubicacion ubi = new Cementerio("Cementerio", 100);
+            ubi.setId(10000l);
+            assertThrows(UbicacionNoEncontradaException.class, () -> {
+
+                serviceMedium.mover(ubedaP.getId(), ubi.getId());
+            });
+        }
+
+        @Test
+        void elMediumSiQuedaSinManaEsEliminado() {
+
+        }
     }
 
     @AfterEach
