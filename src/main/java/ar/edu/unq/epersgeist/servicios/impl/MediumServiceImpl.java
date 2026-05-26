@@ -3,10 +3,10 @@ package ar.edu.unq.epersgeist.servicios.impl;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
-import ar.edu.unq.epersgeist.persistencia.neo.entity.UbicacionNeo4j;
 import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAO;
 import ar.edu.unq.epersgeist.persistencia.sql.MediumDAO;
 import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
@@ -138,28 +138,28 @@ public class MediumServiceImpl implements MediumService {
 
         if (!quiereMoverseALaMisma(ubicacionMediumId, ubicacionAIrId)) {
 
-        // valido si estan conectadas
-        this.validacionUbicacion(mediumAMover.getUbicacion(),ubicacionAMover);
+            // valido si estan conectadas
+            this.validacionUbicacion(mediumAMover.getUbicacion(), ubicacionAMover);
 
-        // calculo el costo de moverse
-        double costo = ubicacionDAONeo4j.costoHacia(ubicacionMediumId,ubicacionAIrId);
+            // calculo el costo de moverse
+            double costo = ubicacionDAONeo4j.costoHacia(ubicacionMediumId, ubicacionAIrId);
 
-        // ubicacion confirmada
-        Ubicacion ubicacionConfirmada = ubicacionDAOSQL.findById(ubicacionId)
+            // ubicacion confirmada
+            Ubicacion ubicacionConfirmada = ubicacionDAOSQL.findById(ubicacionId)
                     .orElseThrow(() ->
                             new UbicacionNoEncontradaException(ubicacionId));
 
             // En caso de que el medium se quede sin maná luego de moverse,
-        // el mismo debe ser eliminado.
+            // el mismo debe ser eliminado.
 
             mediumAMover.moverA(ubicacionConfirmada);
-            this.actualizarEstadoMedium();
+            // this.actualizarEstadoMedium();
             mediumDao.save(mediumAMover);
         }
     }
 
     private void validacionUbicacion(Ubicacion ubicacion, UbicacionNeo4j ubicacionAMover) {
-        if (!ubicacionDAONeo4j.estanConectadas(ubicacion.getId(),ubicacionAMover.getId()){
+        if (!ubicacionDAONeo4j.estanConectadas(ubicacion.getId(), ubicacionAMover.getId())) {
             throw new UbicaciónLejanaException("La ubicacion esta lejana");
         }
     }

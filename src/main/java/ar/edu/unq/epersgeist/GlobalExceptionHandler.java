@@ -6,6 +6,7 @@ import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionInvalidaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -113,6 +114,7 @@ public class GlobalExceptionHandler {
             ErrorDeEspirituNoEncontradoException.class,
             ErrorDeMediumNoEncontradoException.class,
             NoExisteSantuarioCorruptoException.class,
+            UbicacionesNoConectadasException.class,
     })
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponseDTO notFoundHandler(
