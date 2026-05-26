@@ -129,6 +129,25 @@ public class UbicacionServiceImpl implements UbicacionService {
         return ubicacionDAONeo.estanConectadas(idOrigen, idDestino);
     }
 
+    @Override
+    public List<Ubicacion> caminoMasRentable(Long idOrigen, Long idDestino) {
+        Ubicacion origen = this.recuperar(idOrigen);
+        this.recuperar(idDestino);
+
+        //caso borde (si origen y destino son la misma Ubicacion)
+        if (idOrigen.equals(idDestino)) {
+            return List.of(origen);
+        }
+
+        if(!this.estanConectadas(idOrigen, idDestino)) {
+            //new UbicacionesNoConectadasException(idOrigen, idDestino);
+        }
+
+        List<UbicacionNeo4j> ubis = ubicacionDAONeo.caminoMasRentable(idOrigen, idDestino);
+
+        return ubis.stream().map((u) -> this.recuperar(u.getId())).toList();
+    }
+
     // --------------------------------------------------------------------------------
     // CAMINO MÁS CORTO
     // --------------------------------------------------------------------------------

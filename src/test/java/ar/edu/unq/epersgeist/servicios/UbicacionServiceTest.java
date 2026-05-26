@@ -508,6 +508,120 @@ public class UbicacionServiceTest {
                     () -> ubicacionService.conectar(idInexistente1, idInexistente2, 10L)
             );
         }
+
+        // ------------------------------------------------------------
+        // Casos del estanConectadas()
+        // ------------------------------------------------------------
+
+        @Test
+        void estanConectadasEsTransitivo() {
+            ubicacionService.conectar(origen.getId(), otroNodo.getId(), 10L);
+            ubicacionService.conectar(otroNodo.getId(), destino.getId(), 10L);
+
+            assertTrue(
+                    ubicacionService.estanConectadas(origen.getId(), destino.getId())
+            );
+        }
+
+        @Test
+        void estanConectadasSigueSiendoDireccionalDandoDosSaltos() {
+            ubicacionService.conectar(origen.getId(), otroNodo.getId(), 10L);
+            ubicacionService.conectar(otroNodo.getId(), destino.getId(), 10L);
+
+            assertFalse(
+                    ubicacionService.estanConectadas(destino.getId(), origen.getId())
+            );
+        }
+
+        @Test
+        void estanConectadasFuncionaTeniendoMultiplesCaminosParaUnaConexion() {
+            Ubicacion nodoCuatro = ubicacionService.crear(new Santuario("Nodo cuatro", 50));
+
+            ubicacionService.conectar(origen.getId(), otroNodo.getId(), 10L);
+            ubicacionService.conectar(otroNodo.getId(), destino.getId(), 10L);
+
+            ubicacionService.conectar(origen.getId(), nodoCuatro.getId(), 10L);
+            ubicacionService.conectar(nodoCuatro.getId(), destino.getId(), 10L);
+
+            assertTrue(
+                    ubicacionService.estanConectadas(origen.getId(), destino.getId())
+            );
+        }
+
+        // ------------------------------------------------------------
+        // Casos del caminoMasRentable()
+        // ------------------------------------------------------------
+
+        @Test
+        void caminoMasRentableCasoIdOrigenInvalido() {
+            Long idNoExistente = 123456789L;
+
+            assertThrows(UbicacionNoEncontradaException.class, () -> ubicacionService.caminoMasRentable(idNoExistente, destino.getId()));
+        }
+
+        @Test
+        void caminoMasRentableCasoIdDestinoInvalido() {
+            Long idNoExistente = 123456789L;
+
+            assertThrows(UbicacionNoEncontradaException.class, () -> ubicacionService.caminoMasRentable(origen.getId(), idNoExistente));
+        }
+
+        @Test
+        void caminoMasRentableCasoOrigenIgualADestino() {
+            List<Ubicacion> ubis = ubicacionService.caminoMasRentable(origen.getId(), origen.getId());
+
+            assertEquals(1, ubis.size());
+            assertEquals(origen.getId(), ubis.get(0).getId());
+        }
+
+        @Test
+        void caminoMasRentableCasoUbicacionesNoConectadas() {
+
+        }
+
+
+
+        @Test
+        void caminoMasRentableCasoExitoso() {
+            Ubicacion nodoCuatro = ubicacionService.crear(new Santuario("Nodo cuatro", 50));
+
+            ubicacionService.conectar(origen.getId(), otroNodo.getId(), 10L);
+            ubicacionService.conectar(otroNodo.getId(), destino.getId(), 20L);
+
+            ubicacionService.conectar(origen.getId(), nodoCuatro.getId(), 10L);
+            ubicacionService.conectar(nodoCuatro.getId(), destino.getId(), 10L);
+
+            //el camino más rentable de origen a destino es origen-nodoCuatro-destino, que cuesta 20
+
+            List<Ubicacion> ubis = ubicacionService.caminoMasRentable(origen.getId(), destino.getId());
+
+            assertEquals(3, ubis.size());
+            assertEquals(origen.getId(), ubis.get(0).getId());
+            assertEquals(nodoCuatro.getId(), ubis.get(1).getId());
+            assertEquals(destino.getId(), ubis.get(2).getId());
+        }
+
+        @Test
+        void caminoMasRentableNoSeRigePorLongitudDelCamino() {
+            Ubicacion nodoCuatro = ubicacionService.crear(new Santuario("Nodo cuatro", 50));
+
+            ubicacionService.conectar(origen.getId(), destino.getId(), 100L);
+
+            ubicacionService.conectar(origen.getId(), otroNodo.getId(), 10L);
+            ubicacionService.conectar(otroNodo.getId(), nodoCuatro.getId(), 10L);
+            ubicacionService.conectar(nodoCuatro.getId(), destino.getId(), 10L);
+
+            //el camino más rentable de origen a destino es origen-otroNodo-nodoCuatro-destino, a pesar de ser más largo en longitud que origen-destino
+
+            List<Ubicacion> ubis = ubicacionService.caminoMasRentable(origen.getId(), destino.getId());
+
+            assertEquals(4, ubis.size());
+            assertEquals(origen.getId(), ubis.get(0).getId());
+            assertEquals(otroNodo.getId(), ubis.get(1).getId());
+            assertEquals(nodoCuatro.getId(), ubis.get(2).getId());
+            assertEquals(destino.getId(), ubis.get(3).getId());
+        }
+
     }
 
     // --------------------------------------------------------------------------------

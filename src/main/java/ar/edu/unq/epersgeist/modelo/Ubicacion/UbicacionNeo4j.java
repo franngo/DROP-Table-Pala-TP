@@ -14,6 +14,7 @@ import org.springframework.data.neo4j.core.schema.Node;
 @Setter
 @NoArgsConstructor
 public class UbicacionNeo4j {
+
     @Id
     private Long id;
 
@@ -22,8 +23,8 @@ public class UbicacionNeo4j {
     private TipoUbicacion tipo;
 
     public UbicacionNeo4j(Ubicacion ubicacion) {
-        setId(ubicacion.getId());
-        setNombre(ubicacion.getNombre());
-        setTipo(ubicacion.getTipoUbicacion());
+        this.id = ubicacion.getId();
+        this.nombre = ubicacion.getNombre();
+        this.tipo = ubicacion.getTipoUbicacion();
     }
 }
