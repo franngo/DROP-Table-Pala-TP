@@ -25,7 +25,7 @@ public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long>
 
     @Query("""
                 MATCH (u1:Ubicacion {id: $idOrigen}), (u2:Ubicacion {id: $idDestino})
-                MATCH p=(u1)-[:CONECTADO_CON*1..]->(u2)
+                MATCH p=(u1)-[:CONECTADO_CON*1]->(u2)
                 RETURN count(p) > 0
             """)
     Boolean estanConectadas(Long idOrigen, Long idDestino);
