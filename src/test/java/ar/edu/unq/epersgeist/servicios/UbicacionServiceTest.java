@@ -7,6 +7,7 @@ import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
 import org.junit.jupiter.api.AfterEach;
@@ -474,7 +475,9 @@ public class UbicacionServiceTest {
 
         @Test
         void costoNoAfectaSiEstanConectados() {
-            ubicacionService.conectar(origen.getId(), destino.getId(), 999_999_999L);
+            Long idInexistente = 999_999_999L;
+
+            ubicacionService.conectar(origen.getId(), destino.getId(), idInexistente);
 
             assertTrue(
                     ubicacionService.estanConectadas(origen.getId(), destino.getId())
@@ -619,5 +622,138 @@ public class UbicacionServiceTest {
             assertEquals(destino.getId(), ubis.get(3).getId());
         }
 
+    }
+
+    // --------------------------------------------------------------------------------
+    // CAMINO MÁS CORTO ENTRE UBICACIONES EN NEO4J
+    // --------------------------------------------------------------------------------
+
+    @Nested
+    class CaminoMasCortoEnNeo4j {
+        private Ubicacion a;
+        private Ubicacion b;
+        private Ubicacion c;
+        private Ubicacion d;
+
+        @BeforeEach
+        void setUp() {
+            /*
+                GRAFO DIRIGIDO:
+
+                A → B → D      (2 saltos) CAMINO MÁS CORTO
+                A → C → B → D  (3 saltos)
+            */
+
+            a = ubicacionService.crear(new Santuario("A", 50));
+            b = ubicacionService.crear(new Santuario("B", 50));
+            c = ubicacionService.crear(new Santuario("C", 50));
+            d = ubicacionService.crear(new Santuario("D", 50));
+
+            // CAMINO MÁS CORTO
+            ubicacionService.conectar(a.getId(), b.getId(), 1L);
+            ubicacionService.conectar(b.getId(), d.getId(), 1L);
+
+            // CAMINO MÁS LARGO
+            ubicacionService.conectar(a.getId(), c.getId(), 1L);
+            ubicacionService.conectar(c.getId(), b.getId(), 1L);
+        }
+
+        @AfterEach
+        void tearDown() {
+            ubicacionService.eliminarTodos();
+        }
+
+        // ------------------------------------------------------------
+        // CASO 1: devuelve el camino más corto (2 saltos)
+        // ------------------------------------------------------------
+
+        @Test
+        void devuelveCaminoMasCorto() {
+            List<Ubicacion> camino = ubicacionService.caminoMasCorto(a.getId(), d.getId());
+
+            // C no debe aparecer en el camino porque es parte del camino más largo
+            assertFalse(camino.stream().anyMatch(u -> u.getId().equals(c.getId())));
+
+            // CAMINO MÁS CORTO: A → B → D
+            assertEquals(3, camino.size());
+            assertEquals(a.getId(), camino.get(0).getId());
+            assertEquals(b.getId(), camino.get(1).getId());
+            assertEquals(d.getId(), camino.get(2).getId());
+        }
+
+        // ------------------------------------------------------------
+        // CASO 2: origen == destino
+        // ------------------------------------------------------------
+
+        @Test
+        void origenIgualDestinoDevuelveUnSoloNodo() {
+            List<Ubicacion> camino = ubicacionService.caminoMasCorto(a.getId(), a.getId());
+
+            assertEquals(1, camino.size());
+            assertEquals(a.getId(), camino.getFirst().getId());
+        }
+
+        // ------------------------------------------------------------
+        // CASO 3: no hay camino -> excepción
+        // ------------------------------------------------------------
+
+        @Test
+        void siNoExisteCaminoLanzaExcepcion() {
+            Ubicacion sinConexiones = ubicacionService.crear(
+                    new Santuario("SIN_CONEXIONES", 50)
+            );
+
+            assertThrows(
+                    UbicacionesNoConectadasException.class,
+                    () -> ubicacionService.caminoMasCorto(a.getId(), sinConexiones.getId())
+            );
+        }
+
+        // ------------------------------------------------------------
+        // CASO 4: respeta dirección del grafo
+        // ------------------------------------------------------------
+
+        @Test
+        void respetaDireccionDelGrafo() {
+            assertThrows(
+                    UbicacionesNoConectadasException.class,
+                    () -> ubicacionService.caminoMasCorto(d.getId(), a.getId())
+            );
+        }
+
+        // ------------------------------------------------------------
+        // CASO 5: validación de IDs inexistentes
+        // ------------------------------------------------------------
+
+        @Test
+        void origenInexistenteLanzaExcepcion() {
+            Long idInexistente = 999_999_999L;
+
+            assertThrows(
+                    UbicacionNoEncontradaException.class,
+                    () -> ubicacionService.caminoMasCorto(idInexistente, d.getId())
+            );
+        }
+
+        @Test
+        void destinoInexistenteLanzaExcepcion() {
+            Long idInexistente = 999_999_999L;
+
+            assertThrows(
+                    UbicacionNoEncontradaException.class,
+                    () -> ubicacionService.caminoMasCorto(a.getId(), idInexistente)
+            );
+        }
+
+        @Test
+        void ambosInexistentesLanzaExcepcion() {
+            Long idInexistente1 = 999_999_999L;
+            Long idInexistente2 = 777_777_777L;
+
+            assertThrows(
+                    UbicacionNoEncontradaException.class,
+                    () -> ubicacionService.caminoMasCorto(idInexistente1, idInexistente2)
+            );
+        }
     }
 }

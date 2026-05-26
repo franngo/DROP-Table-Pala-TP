@@ -1,6 +1,6 @@
 package ar.edu.unq.epersgeist.persistencia.neo;
 
-import ar.edu.unq.epersgeist.persistencia.neo.entity.UbicacionNeo4j;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,14 +14,12 @@ public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long>
     // --------------------------------------------------------------------------------
 
     @Query("""
-                MATCH (o:Ubicacion {id: $idOrigen})
-                MATCH (d:Ubicacion {id: $idDestino})
+                MATCH (o:Ubicacion {id: $idOrigen}),
+                      (d:Ubicacion {id: $idDestino})
                 MERGE (o)-[r:CONECTADO_CON]->(d)
                 SET r.costo = $costo
             """)
-    void conectar(@Param("idOrigen") Long idOrigen,
-                  @Param("idDestino") Long idDestino,
-                  @Param("costo") Long costo);
+    void conectar(Long idOrigen, Long idDestino, Long costo);
 
     // --------------------------------------------------------------------------------
 
@@ -36,7 +34,17 @@ public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long>
 
     // List<Ubicacion> ubicacionesSobrecargadas(int umbralDeEnergia);
 
-    //List<Ubicacion> caminoMasCorto(Long idOrigen, Long idDestino);
+    // --------------------------------------------------------------------------------
+
+    @Query("""
+                MATCH (o:Ubicacion {id: $idOrigen}),
+                      (d:Ubicacion {id: $idDestino})
+                MATCH p = shortestPath((o)-[:CONECTADO_CON*]->(d))
+                RETURN nodes(p)
+            """)
+    List<UbicacionNeo4j> caminoMasCorto(Long idOrigen, Long idDestino);
+
+    // --------------------------------------------------------------------------------
 
     @Query("""
                 MATCH (u1:Ubicacion {id: $idOrigen}), (u2:Ubicacion {id: $idDestino})
@@ -45,6 +53,8 @@ public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long>
                 ORDER BY reduce(suma = 0, r IN relationships(p) | suma + r.costo) ASC LIMIT 1
             """)
     List<UbicacionNeo4j> caminoMasRentable(Long idOrigen, Long idDestino);
+
+    // --------------------------------------------------------------------------------
 
     @Query("""
                 MATCH (u:Ubicacion {id: $id})

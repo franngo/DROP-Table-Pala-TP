@@ -3,10 +3,11 @@ package ar.edu.unq.epersgeist.servicios.impl;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
 import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
-import ar.edu.unq.epersgeist.persistencia.neo.entity.UbicacionNeo4j;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
 import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
 import jakarta.transaction.Transactional;
@@ -124,7 +125,7 @@ public class UbicacionServiceImpl implements UbicacionService {
     public Boolean estanConectadas(Long idOrigen, Long idDestino) {
         this.recuperar(idOrigen);
         this.recuperar(idDestino);
-        //recuperamos para pasar por la validación y tirar excepción si no están en la DB
+
         return ubicacionDAONeo.estanConectadas(idOrigen, idDestino);
     }
 
@@ -145,6 +146,35 @@ public class UbicacionServiceImpl implements UbicacionService {
         List<UbicacionNeo4j> ubis = ubicacionDAONeo.caminoMasRentable(idOrigen, idDestino);
 
         return ubis.stream().map((u) -> this.recuperar(u.getId())).toList();
+    }
+
+    // --------------------------------------------------------------------------------
+    // CAMINO MÁS CORTO
+    // --------------------------------------------------------------------------------
+
+    @Override
+    public List<Ubicacion> caminoMasCorto(Long idOrigen, Long idDestino) {
+        // 1. Valido que existan ambas ubicaciones
+        Ubicacion origen = recuperar(idOrigen);
+        recuperar(idDestino);
+
+        // 2. Caso borde: mismo nodo (shortestPath no soporta origen = destino)
+        if (idOrigen.equals(idDestino)) {
+            return List.of(origen);
+        }
+
+        // 3. Obtengo el camino más corto en Neo4j
+        List<UbicacionNeo4j> caminoNeo = ubicacionDAONeo.caminoMasCorto(idOrigen, idDestino);
+
+        // 4. Si no hay camino, tiro excepción
+        if (caminoNeo.isEmpty()) {
+            throw new UbicacionesNoConectadasException(idOrigen, idDestino);
+        }
+
+        // 5. Convierto las ubicaciones de Neo4j a las de SQL (para devolver el mismo tipo que el servicio)
+        return caminoNeo.stream()
+                .map(u -> recuperar(u.getId()))
+                .toList();
     }
 
     // --------------------------------------------------------------------------------

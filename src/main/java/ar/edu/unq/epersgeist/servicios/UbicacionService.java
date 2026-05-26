@@ -20,11 +20,15 @@ public interface UbicacionService {
     void eliminarTodos();
 
     // --------------------------------------------------------------------------------
+    // CONSULTAS SQL
+    // --------------------------------------------------------------------------------
 
     List<Espiritu> espiritusEn(Long id);
 
     List<Medium> mediumsSinEspiritusEn(Long ubicacionId);
 
+    // --------------------------------------------------------------------------------
+    // CONSULTAS NEO
     // --------------------------------------------------------------------------------
 
     void conectar(Long idOrigen, Long idDestino, Long costo);
@@ -32,4 +36,6 @@ public interface UbicacionService {
     Boolean estanConectadas(Long idOrigen, Long idDestino);
 
     List<Ubicacion> caminoMasRentable(Long idOrigen, Long idDestino);
+
+    List<Ubicacion> caminoMasCorto(Long idOrigen, Long idDestino);
 }

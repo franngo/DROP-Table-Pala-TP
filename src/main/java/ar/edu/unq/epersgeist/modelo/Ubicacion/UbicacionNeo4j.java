@@ -1,14 +1,13 @@
-package ar.edu.unq.epersgeist.persistencia.neo.entity;
+package ar.edu.unq.epersgeist.modelo.Ubicacion;
 
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.TipoUbicacion;
-import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 
-@Node(primaryLabel = "Ubicacion")
+@Node("Ubicacion")
 @Getter
 @Setter
 @NoArgsConstructor
