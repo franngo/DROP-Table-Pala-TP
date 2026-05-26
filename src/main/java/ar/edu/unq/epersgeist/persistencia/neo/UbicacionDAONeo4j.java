@@ -62,13 +62,6 @@ public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long>
             """)
     void actualizar(@Param("id") Long id, @Param("nombre") String nombre);
 
-//    @Query("""
-//                MATCH (o:Ubicacion {id: $idOrigen}),
-//                      (d:Ubicacion {id: $idDestino})
-//                MATCH p = shortestPath((o)-[:CONECTADO_CON*]->(d))
-//                RETURN reduce(suma = 0, r IN relationships(p) | suma + r.costo)
-//            """)
-//    double costoHacia(Long idUbicacionActual, Long idUbicacionAMover);
 
     @Query("""
                 MATCH (o:Ubicacion {id: $idOrigen})-[r:CONECTADO_CON]->(d:Ubicacion {id: $idDestino})

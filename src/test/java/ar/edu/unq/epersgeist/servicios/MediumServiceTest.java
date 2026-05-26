@@ -378,6 +378,9 @@ public class MediumServiceTest {
             sourigues = ubicacionService.crear(new Santuario("Sourigues", 70));
             ubicacionService.conectar(ranelagh.getId(), sourigues.getId(), 40L);
             mediumAMover = serviceMedium.crear(new Medium("Matias Sanchez", 100, 90, ranelagh));
+
+            espirituService.conectar(jaegerP.getId(), mediumAMover.getId());
+            espirituService.conectar(rikaP.getId(), mediumAMover.getId());
         }
 
         @Test
@@ -445,30 +448,25 @@ public class MediumServiceTest {
 
         @Test
         void losEspiritusDelMediumSeMuevenConEl() {
-            //se conecta Ubeda con 2 espiritus
-            espirituService.conectar(jaegerP.getId(), ubedaP.getId());
-            espirituService.conectar(rikaP.getId(), ubedaP.getId());
 
-            serviceMedium.mover(ubedaP.getId(), berazategui.getId());
 
-            List<Espiritu> espiritus = serviceMedium.espiritus(ubedaP.getId());
+            serviceMedium.mover(mediumAMover.getId(), ranelagh.getId());
+
+            List<Espiritu> espiritus = serviceMedium.espiritus(mediumAMover.getId());
 
             for (Espiritu e : espiritus) {
-                assertEquals(berazategui.getId(), e.getUbicacion().getId());
+                assertEquals(ranelagh.getId(), e.getUbicacion().getId());
             }
 
         }
 
         @Test
         void losEspiritusNoCambianDeUbicacionSielMediumSeMuevenALaMisma() {
-            //se conecta Ubeda con 2 espiritus
-            espirituService.conectar(jaegerP.getId(), ubedaP.getId());
-            espirituService.conectar(rikaP.getId(), ubedaP.getId());
 
-            Long ubiActual = ubedaP.getUbicacion().getId();
-            serviceMedium.mover(ubedaP.getId(), ubiActual);
+            Long ubiActual = mediumAMover.getUbicacion().getId();
+            serviceMedium.mover(mediumAMover.getId(), ubiActual);
 
-            List<Espiritu> espiritus = serviceMedium.espiritus(ubedaP.getId());
+            List<Espiritu> espiritus = serviceMedium.espiritus(mediumAMover.getId());
 
             for (Espiritu e : espiritus) {
                 assertEquals(ubiActual, e.getUbicacion().getId());
