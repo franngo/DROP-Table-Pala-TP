@@ -550,7 +550,7 @@ public class UbicacionServiceTest {
         // ------------------------------------------------------------
 
         @Test
-        void caminoMasRentable() {
+        void caminoMasRentableCasoExitoso() {
             Ubicacion nodoCuatro = ubicacionService.crear(new Santuario("Nodo cuatro", 50));
 
             ubicacionService.conectar(origen.getId(), otroNodo.getId(), 10L);
@@ -561,9 +561,12 @@ public class UbicacionServiceTest {
 
             //el camino más rentable de origen a destino es origen-nodoCuatro-destino, que cuesta 20
 
-//            assertTrue(
-//                    ubicacionService.estanConectadas(origen.getId(), destino.getId())
-//            );
+            List<Ubicacion> ubis = ubicacionService.caminoMasRentable(origen.getId(), destino.getId());
+
+            assertEquals(3, ubis.size());
+            assertEquals(origen.getId(), ubis.get(0).getId());
+            assertEquals(nodoCuatro.getId(), ubis.get(1).getId());
+            assertEquals(destino.getId(), ubis.get(2).getId());
         }
 
     }
