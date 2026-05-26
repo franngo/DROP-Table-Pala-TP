@@ -379,12 +379,16 @@ public class MediumServiceTest {
             ubicacionService.conectar(ranelagh.getId(), sourigues.getId(), 40L);
             mediumAMover = serviceMedium.crear(new Medium("Matias Sanchez", 100, 90, ranelagh));
 
-            espirituService.conectar(jaegerP.getId(), mediumAMover.getId());
-            espirituService.conectar(rikaP.getId(), mediumAMover.getId());
+            // espiritus que acompañanan a
+            Espiritu elChiqui = espirituService.crear(new Angelical("Chi Tapia", ranelagh));
+            Espiritu juanchiElPastelero = espirituService.crear(new Angelical("Juanchito", ranelagh));
+
+            espirituService.conectar(elChiqui.getId(), mediumAMover.getId());
+            espirituService.conectar(juanchiElPastelero.getId(), mediumAMover.getId());
         }
 
         @Test
-        void emMediumSeMueveExitosamente() {
+        void elMediumSeMueveExitosamente() {
             serviceMedium.mover(mediumAMover.getId(), sourigues.getId());
             Medium recuperado = serviceMedium.recuperar(mediumAMover.getId());
             assertEquals(sourigues.getId(), recuperado.getUbicacion().getId());
@@ -394,7 +398,7 @@ public class MediumServiceTest {
         void elMediumPierdeManaSegunUbicacion() {
             serviceMedium.mover(mediumAMover.getId(), sourigues.getId());
             Medium recuperado = serviceMedium.recuperar(mediumAMover.getId());
-            assertEquals(50, mediumAMover.getMana());
+            assertEquals(50, recuperado.getMana());
 
         }
 
@@ -406,8 +410,8 @@ public class MediumServiceTest {
 
             serviceMedium.mover(mediumAMover.getId(), ranelagh.getId());
             Medium recuperado = serviceMedium.recuperar(mediumAMover.getId());
-            assertEquals(ranelagh.getId(), mediumAMover.getUbicacion().getId());
-            assertEquals(90, mediumAMover.getMana());
+            assertEquals(ranelagh.getId(), recuperado.getUbicacion().getId());
+            assertEquals(90, recuperado.getMana());
         }
 
         @Test
@@ -427,13 +431,13 @@ public class MediumServiceTest {
             ubi.setId(10000l);
             assertThrows(UbicacionNoEncontradaException.class, () -> {
 
-                serviceMedium.mover(ubedaP.getId(), ubi.getId());
+                serviceMedium.mover(mediumAMover.getId(), ubi.getId());
             });
         }
 
         @Test
         void elMediumSiQuedaSinManaEsEliminado() {
-            Ubicacion laUNQ = ubicacionService.crear(new Santuario("Bernal", 80));
+            Ubicacion laUNQ = ubicacionService.crear(new Santuario("La Unq", 80));
             ubicacionService.conectar(ranelagh.getId(), laUNQ.getId(), 99L);
 
             serviceMedium.mover(mediumAMover.getId(), laUNQ.getId());

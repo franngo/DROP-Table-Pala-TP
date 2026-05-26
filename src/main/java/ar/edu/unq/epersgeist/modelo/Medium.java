@@ -161,7 +161,7 @@ public class Medium extends Auditable implements Serializable {
     }
 
     private void pagarCostoMover(int costoMana) {
-        setMana((int) Math.max(0, mana - costoMana));
+        this.mana -= costoMana;
     }
 
     public void moverEspiritusA(Ubicacion nuevaUbicacion) {
