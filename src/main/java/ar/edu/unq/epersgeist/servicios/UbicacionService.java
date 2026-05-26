@@ -30,4 +30,6 @@ public interface UbicacionService {
     void conectar(Long idOrigen, Long idDestino, Long costo);
 
     Boolean estanConectadas(Long idOrigen, Long idDestino);
+
+    List<Ubicacion> caminoMasRentable(Long idOrigen, Long idDestino);
 }

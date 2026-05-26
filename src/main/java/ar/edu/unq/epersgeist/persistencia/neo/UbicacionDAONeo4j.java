@@ -39,7 +39,7 @@ public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long>
     //List<Ubicacion> caminoMasCorto(Long idOrigen, Long idDestino);
 
     @Query("""
-                MATCH (u1:Ubicacion {id: 3476}), (u2:Ubicacion {id: 3478})
+                MATCH (u1:Ubicacion {id: $idOrigen}), (u2:Ubicacion {id: $idDestino})
                 MATCH p = (u1)-[c:CONECTADO_CON*1..]->(u2)
                 RETURN nodes(p)
                 ORDER BY reduce(suma = 0, r IN relationships(p) | suma + r.costo) ASC LIMIT 1
