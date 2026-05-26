@@ -130,8 +130,13 @@ public class UbicacionServiceImpl implements UbicacionService {
 
     @Override
     public List<Ubicacion> caminoMasRentable(Long idOrigen, Long idDestino) {
-        this.recuperar(idOrigen);
+        Ubicacion origen = this.recuperar(idOrigen);
         this.recuperar(idDestino);
+
+        //caso borde (si origen y destino son la misma Ubicacion)
+        if (idOrigen.equals(idDestino)) {
+            return List.of(origen);
+        }
 
         if(!this.estanConectadas(idOrigen, idDestino)) {
             //new UbicacionesNoConectadasException(idOrigen, idDestino);
