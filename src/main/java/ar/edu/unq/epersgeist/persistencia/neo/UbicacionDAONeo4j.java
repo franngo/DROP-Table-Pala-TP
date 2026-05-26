@@ -6,6 +6,8 @@ import org.springframework.data.neo4j.repository.query.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long> {
 
@@ -36,7 +38,13 @@ public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long>
 
     //List<Ubicacion> caminoMasCorto(Long idOrigen, Long idDestino);
 
-    // List<Ubicacion> caminoMasRentable(Long idOrigen, Long idDestino);
+    @Query("""
+                MATCH (u1:Ubicacion {id: 3476}), (u2:Ubicacion {id: 3478})
+                MATCH p = (u1)-[c:CONECTADO_CON*1..]->(u2)
+                RETURN nodes(p)
+                ORDER BY reduce(suma = 0, r IN relationships(p) | suma + r.costo) ASC LIMIT 1
+            """)
+    List<UbicacionNeo4j> caminoMasRentable(Long idOrigen, Long idDestino);
 
     @Query("""
                 MATCH (u:Ubicacion {id: $id})
