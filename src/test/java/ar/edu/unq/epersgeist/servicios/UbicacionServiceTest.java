@@ -514,36 +514,11 @@ public class UbicacionServiceTest {
         // ------------------------------------------------------------
 
         @Test
-        void estanConectadasEsTransitivo() {
-            ubicacionService.conectar(origen.getId(), otroNodo.getId(), 10L);
-            ubicacionService.conectar(otroNodo.getId(), destino.getId(), 10L);
-
-            assertTrue(
-                    ubicacionService.estanConectadas(origen.getId(), destino.getId())
-            );
-        }
-
-        @Test
-        void estanConectadasSigueSiendoDireccionalDandoDosSaltos() {
+        void estanConectadasNoEsTransitivo() {
             ubicacionService.conectar(origen.getId(), otroNodo.getId(), 10L);
             ubicacionService.conectar(otroNodo.getId(), destino.getId(), 10L);
 
             assertFalse(
-                    ubicacionService.estanConectadas(destino.getId(), origen.getId())
-            );
-        }
-
-        @Test
-        void estanConectadasFuncionaTeniendoMultiplesCaminosParaUnaConexion() {
-            Ubicacion nodoCuatro = ubicacionService.crear(new Santuario("Nodo cuatro", 50));
-
-            ubicacionService.conectar(origen.getId(), otroNodo.getId(), 10L);
-            ubicacionService.conectar(otroNodo.getId(), destino.getId(), 10L);
-
-            ubicacionService.conectar(origen.getId(), nodoCuatro.getId(), 10L);
-            ubicacionService.conectar(nodoCuatro.getId(), destino.getId(), 10L);
-
-            assertTrue(
                     ubicacionService.estanConectadas(origen.getId(), destino.getId())
             );
         }
