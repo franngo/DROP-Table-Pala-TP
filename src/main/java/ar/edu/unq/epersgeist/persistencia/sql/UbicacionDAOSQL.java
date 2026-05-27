@@ -59,4 +59,12 @@ public interface UbicacionDAOSQL extends JpaRepository<Ubicacion, Long> {
                 AND e.deletedAt = false
             """)
     Long cantidadDemonios(Long santuarioId);
+
+    @Query ("""
+                SELECT COUNT(u)
+                FROM Ubicacion u
+                WHERE u.energia > umbralDeEnergia
+                AND u.deleteAt = false
+            """)
+    List<Ubicacion> ubicacionSobrecargada(int umbralDeEnergia);
 }
