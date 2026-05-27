@@ -36,4 +36,6 @@ public interface UbicacionService {
     Boolean estanConectadas(Long idOrigen, Long idDestino);
 
     List<Ubicacion> caminoMasCorto(Long idOrigen, Long idDestino);
+
+    List<Ubicacion> ubicacionesSobrecargadas(int umbralDeEnergia);
 }
