@@ -153,11 +153,11 @@ public class UbicacionServiceImpl implements UbicacionService {
             return List.of(origen);
         }
 
-        if (!this.estanConectadas(idOrigen, idDestino)) {
-            //new UbicacionesNoConectadasException(idOrigen, idDestino);
-        }
-
         List<UbicacionNeo4j> ubis = ubicacionDAONeo.caminoMasRentable(idOrigen, idDestino);
+
+        if(ubis.isEmpty()) {
+            throw new UbicacionesNoConectadasException(idOrigen, idDestino);
+        }
 
         return ubis.stream().map((u) -> this.recuperar(u.getId())).toList();
     }
