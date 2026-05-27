@@ -761,4 +761,64 @@ public class UbicacionServiceTest {
             );
         }
     }
+
+    @Nested
+    class UbicacionSobrecargada{
+
+        @BeforeEach
+        void setUp() {
+            ubicacionService.crear(new Santuario("Alta energia", 70));
+            ubicacionService.crear(new Cementerio("Media energia", 50));
+            ubicacionService.crear(new Santuario("Baja energia", 20));
+        }
+
+        @AfterEach
+        void tearDown() {
+            ubicacionService.eliminarTodos();
+        }
+
+        @Test
+        void devuelveUbicacionesConEnergiaSupiorAlUmbral() {
+            List<Ubicacion> sobrecargadas = ubicacionService.ubicacionesSobrecargadas(60);
+
+            assertEquals(1, sobrecargadas.size());
+            assertEquals("Alta energia", sobrecargadas.getFirst().getNombre());
+        }
+
+        @Test
+        void devuelveListaVaciaSiNingunaUbicacionSuperaElUmbral() {
+            List<Ubicacion> sobrecargadas = ubicacionService.ubicacionesSobrecargadas(80);
+
+            assertTrue(sobrecargadas.isEmpty());
+        }
+
+        @Test
+        void devuelveTodasSiTodasSuperanElUmbral() {
+            ubicacionService.crear(new Santuario("Primera", 90));
+            ubicacionService.crear(new Cementerio("Segunda", 95));
+            List<Ubicacion> sobrecargadas = ubicacionService.ubicacionesSobrecargadas(80);
+
+            assertEquals(2, sobrecargadas.size());
+        }
+
+        @Test
+        void noDevuelveUbicacionesEliminadas() {
+            Ubicacion alta = ubicacionService.crear(new Santuario("Mucha energia", 90));
+            ubicacionService.eliminar(alta.getId());
+
+            List<Ubicacion> sobrecargadas = ubicacionService.ubicacionesSobrecargadas(80);
+
+            assertTrue(sobrecargadas.isEmpty());
+        }
+
+
+        @Test
+        void elUmbralEsExclusivoNoIncluyeIguales() {
+            ubicacionService.crear(new Santuario("Exacto", 50));
+
+            List<Ubicacion> sobrecargadas = ubicacionService.ubicacionesSobrecargadas(50);
+
+            assertEquals(1, sobrecargadas.size());
+        }
+    }
 }

@@ -166,4 +166,14 @@ public class UbicacionControllerREST {
                 .map((u) -> MapperUbicacion.toDTO(u))
                 .toList();
     }
+
+    @GetMapping("/sobrecargadas/{umbral}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UbicacionResponseDTO> ubicacionSobrecargada(@PathVariable int umbral){
+        return ubicacionService.ubicacionesSobrecargadas(umbral)
+                .stream()
+                .map(MapperUbicacion::toDTO)
+                .toList();
+    }
 }
+
