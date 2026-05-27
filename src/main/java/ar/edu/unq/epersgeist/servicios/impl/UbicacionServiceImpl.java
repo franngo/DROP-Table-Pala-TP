@@ -124,7 +124,7 @@ public class UbicacionServiceImpl implements UbicacionService {
     }
 
     // --------------------------------------------------------------------------------
-    // CONSULTAS DE CONEXIONES ENTRE UBICACIONES
+    // MÉTODOS DE CONEXIONES ENTRE UBICACIONES
     // --------------------------------------------------------------------------------
 
     @Override

@@ -46,6 +46,10 @@ public abstract class Espiritu extends Auditable implements Serializable {
 
     }
 
+    // --------------------------------------------------------------------------------
+    // VALIDACIONES Y MÉTODOS DE CONSULTA
+    // --------------------------------------------------------------------------------
+
     private void validarUbicacionNoNula(Ubicacion ubicacion) {
         if (ubicacion == null) {
             throw new UbicacionInvalidaException();
@@ -55,6 +59,18 @@ public abstract class Espiritu extends Auditable implements Serializable {
     public boolean estaLibre() {
         return mediumCon == null;
     }
+
+    public boolean estaUbicadoEnElMismoLugarQue(Medium mediumAConectar) {
+        return this.getUbicacion().equals(mediumAConectar.getUbicacion());
+    }
+
+    public boolean sinConexion() {
+        return this.getNivelDeConexion() == 0;
+    }
+
+    // --------------------------------------------------------------------------------
+    // MÉTODOS DE ACCIÓN
+    // --------------------------------------------------------------------------------
 
     public void aumentarConexionYConectar(Medium medium) {
         if (!this.estaLibre()) {
@@ -68,48 +84,39 @@ public abstract class Espiritu extends Auditable implements Serializable {
         medium.agregarEspiritu(this);
     }
 
+    //usado en agregarEspiritu() de Medium
+    public void vincular(Medium medium) {
+        this.mediumCon = medium;
+    }
 
     public void fortalecerConexion(double cantidad) {
         this.nivelDeConexion = Math.min(Espiritu.limiteConexion, this.cantidadNuevaConexion(cantidad));
-    }
-
-    public void afectarConexion(double cantidad) {
-        this.nivelDeConexion = Math.max(0, this.getNivelDeConexion() - cantidad);
     }
 
     private double cantidadNuevaConexion(double cantidad) {
         return this.getNivelDeConexion() + cantidad;
     }
 
+    public void moverseA(Ubicacion ubiNueva) {
+        this.setUbicacion(ubiNueva);
+        this.cambiosConexion(getUbicacion());
+    }
+
+    public abstract void cambiosConexion(Ubicacion ubicacion);
+
+    //usado en las implementaciones de cambiosConexion()
+    public void afectarConexion(double cantidad) {
+        this.nivelDeConexion = Math.max(0, this.getNivelDeConexion() - cantidad);
+    }
 
     public void desvincularse() {
-
         this.mediumCon.desvincularseDe(this);
         this.mediumCon = null;
     }
 
     public abstract void recibirAtaqueDe(Espiritu angel);
 
-    public boolean estaUbicadoEnElMismoLugarQue(Medium mediumAConectar) {
-        return this.getUbicacion().equals(mediumAConectar.getUbicacion());
-    }
-
-    public void vincular(Medium medium) {
-        this.mediumCon = medium;
-    }
-
-    public void moverseA(Ubicacion ubiNueva) {
-
-        this.setUbicacion(ubiNueva);
-        this.cambiosConexion(getUbicacion());
-    }
-
-    public boolean sinConexion() {
-        return this.getNivelDeConexion() == 0;
-    }
-
-    public abstract void cambiosConexion(Ubicacion ubicacion);
-
+    //double dispatch para el fortalecerConexionDescansandoEn(), usado en el descansar() de Medium
     public abstract int porcentajeDescansarEn(Ubicacion ubicacion);
 
     public void fortalecerConexionDescansandoEn(Ubicacion ubicacion) {
@@ -117,6 +124,7 @@ public abstract class Espiritu extends Auditable implements Serializable {
         this.fortalecerConexion(recarga);
     }
 
+    //double dispatch para el invocar() de Medium
     public abstract boolean puedeInvocarseEn(Ubicacion ubicacion);
 
 }
