@@ -157,6 +157,11 @@ public class UbicacionServiceImpl implements UbicacionService {
                 .map(u -> recuperar(u.getId()))
                 .toList();
     }
-
     // --------------------------------------------------------------------------------
+    @Override
+    public List<Ubicacion> ubicacionesSobrecargadas(int umbralDeEnergia) {
+        return ubicacionDAOSQL.ubicacionSobrecargada(umbralDeEnergia);
+    }
+
+
 }
