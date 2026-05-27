@@ -46,30 +46,14 @@ public abstract class Espiritu extends Auditable implements Serializable {
 
     }
 
-    // --------------------------------------------------------------------------------
-    // VALIDACIONES Y MÉTODOS DE CONSULTA
-    // --------------------------------------------------------------------------------
-
     private void validarUbicacionNoNula(Ubicacion ubicacion) {
         if (ubicacion == null) {
             throw new UbicacionInvalidaException();
         }
     }
 
-    public boolean estaLibre() {
-        return mediumCon == null;
-    }
-
-    public boolean estaUbicadoEnElMismoLugarQue(Medium mediumAConectar) {
-        return this.getUbicacion().equals(mediumAConectar.getUbicacion());
-    }
-
-    public boolean sinConexion() {
-        return this.getNivelDeConexion() == 0;
-    }
-
     // --------------------------------------------------------------------------------
-    // MÉTODOS DE ACCIÓN
+    // Funcionalidad de conectarse
     // --------------------------------------------------------------------------------
 
     public void aumentarConexionYConectar(Medium medium) {
@@ -84,9 +68,13 @@ public abstract class Espiritu extends Auditable implements Serializable {
         medium.agregarEspiritu(this);
     }
 
-    //usado en agregarEspiritu() de Medium
-    public void vincular(Medium medium) {
-        this.mediumCon = medium;
+    //usado para validar en el aumentarConexionYConectar() y en el invocar() de Medium
+    public boolean estaLibre() {
+        return mediumCon == null;
+    }
+
+    public boolean estaUbicadoEnElMismoLugarQue(Medium mediumAConectar) {
+        return this.getUbicacion().equals(mediumAConectar.getUbicacion());
     }
 
     public void fortalecerConexion(double cantidad) {
@@ -96,6 +84,15 @@ public abstract class Espiritu extends Auditable implements Serializable {
     private double cantidadNuevaConexion(double cantidad) {
         return this.getNivelDeConexion() + cantidad;
     }
+
+    //usado en agregarEspiritu() de Medium
+    public void vincular(Medium medium) {
+        this.mediumCon = medium;
+    }
+
+    // --------------------------------------------------------------------------------
+    // Funcionalidad de moverse
+    // --------------------------------------------------------------------------------
 
     public void moverseA(Ubicacion ubiNueva) {
         this.setUbicacion(ubiNueva);
@@ -109,22 +106,37 @@ public abstract class Espiritu extends Auditable implements Serializable {
         this.nivelDeConexion = Math.max(0, this.getNivelDeConexion() - cantidad);
     }
 
+    //usado en el mover() de Medium
+    public boolean sinConexion() {
+        return this.getNivelDeConexion() == 0;
+    }
+
+    //usado en el mover() y en el invocar() de Medium
     public void desvincularse() {
         this.mediumCon.desvincularseDe(this);
         this.mediumCon = null;
     }
 
-    public abstract void recibirAtaqueDe(Espiritu angel);
-
-    //double dispatch para el fortalecerConexionDescansandoEn(), usado en el descansar() de Medium
-    public abstract int porcentajeDescansarEn(Ubicacion ubicacion);
+    // --------------------------------------------------------------------------------
+    // Funcionalidad de descansar
+    // --------------------------------------------------------------------------------
 
     public void fortalecerConexionDescansandoEn(Ubicacion ubicacion) {
         int recarga = (int)(ubicacion.getEnergia() * this.porcentajeDescansarEn(ubicacion) / 100.0);
         this.fortalecerConexion(recarga);
     }
 
+    //double dispatch para el fortalecerConexionDescansandoEn(), usado en el descansar() de Medium
+    public abstract int porcentajeDescansarEn(Ubicacion ubicacion);
+
+    // --------------------------------------------------------------------------------
+    // Subtareas
+    // --------------------------------------------------------------------------------
+
     //double dispatch para el invocar() de Medium
     public abstract boolean puedeInvocarseEn(Ubicacion ubicacion);
+
+    //usado en la ronda de combate del exorcizar() de Medium
+    public abstract void recibirAtaqueDe(Espiritu angel);
 
 }
