@@ -53,7 +53,7 @@ public abstract class Espiritu extends Auditable implements Serializable {
     }
 
     // --------------------------------------------------------------------------------
-    // Funcionalidad de conectarse
+    // Funcionalidad de conectarse con un Medium
     // --------------------------------------------------------------------------------
 
     public void aumentarConexionYConectar(Medium medium) {
@@ -99,6 +99,7 @@ public abstract class Espiritu extends Auditable implements Serializable {
         this.cambiosConexion(getUbicacion());
     }
 
+    //efectua los cambios correspondientes sobre el nivel de conexión del Espiritu en base a qué tipo de Ubicación se traslada
     public abstract void cambiosConexion(Ubicacion ubicacion);
 
     //usado en las implementaciones de cambiosConexion()
@@ -111,18 +112,12 @@ public abstract class Espiritu extends Auditable implements Serializable {
         return this.getNivelDeConexion() == 0;
     }
 
-    //usado en el mover() y en el invocar() de Medium
-    public void desvincularse() {
-        this.mediumCon.desvincularseDe(this);
-        this.mediumCon = null;
-    }
-
     // --------------------------------------------------------------------------------
     // Funcionalidad de descansar
     // --------------------------------------------------------------------------------
 
     public void fortalecerConexionDescansandoEn(Ubicacion ubicacion) {
-        int recarga = (int)(ubicacion.getEnergia() * this.porcentajeDescansarEn(ubicacion) / 100.0);
+        int recarga = this.porcentajeDescansarEn(ubicacion) * (int)(ubicacion.getEnergia() / 100.0);
         this.fortalecerConexion(recarga);
     }
 
@@ -133,10 +128,16 @@ public abstract class Espiritu extends Auditable implements Serializable {
     // Subtareas
     // --------------------------------------------------------------------------------
 
+    //usado en el mover() de Medium y en la batalla dada en el exorcizar() de Medium en los casos donde el Espiritu queda con nivel de conexión 0
+    public void desvincularse() {
+        this.mediumCon.desvincularseDe(this);
+        this.mediumCon = null;
+    }
+
     //double dispatch para el invocar() de Medium
     public abstract boolean puedeInvocarseEn(Ubicacion ubicacion);
 
     //usado en la ronda de combate del exorcizar() de Medium
-    public abstract void recibirAtaqueDe(Espiritu angel);
+    public abstract void recibirAtaqueDe(Espiritu espiritu);
 
 }
