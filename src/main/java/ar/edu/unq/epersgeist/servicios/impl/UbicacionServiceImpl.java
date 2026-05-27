@@ -99,7 +99,7 @@ public class UbicacionServiceImpl implements UbicacionService {
         ubicacionDAOSQL.findById(id).ifPresent(ubicacion -> {
             ubicacion.setDeletedAt(true);
             ubicacionDAOSQL.save(ubicacion);
-            ubicacionDAONeo.deleteById(id);
+            ubicacionDAONeo.deleteById(id); //hace un DETACH DELETE del nodo en la DB Neo4j con dicho id
         });
     }
 
@@ -124,7 +124,7 @@ public class UbicacionServiceImpl implements UbicacionService {
     }
 
     // --------------------------------------------------------------------------------
-    // CONSULTAS DE CONEXIONES ENTRE UBICACIONES
+    // MÉTODOS DE CONEXIONES ENTRE UBICACIONES
     // --------------------------------------------------------------------------------
 
     @Override

@@ -52,9 +52,9 @@ public abstract class Espiritu extends Auditable implements Serializable {
         }
     }
 
-    public boolean estaLibre() {
-        return mediumCon == null;
-    }
+    // --------------------------------------------------------------------------------
+    // Funcionalidad de conectarse con un Medium
+    // --------------------------------------------------------------------------------
 
     public void aumentarConexionYConectar(Medium medium) {
         if (!this.estaLibre()) {
@@ -68,55 +68,76 @@ public abstract class Espiritu extends Auditable implements Serializable {
         medium.agregarEspiritu(this);
     }
 
+    //usado para validar en el aumentarConexionYConectar() y en el invocar() de Medium
+    public boolean estaLibre() {
+        return mediumCon == null;
+    }
+
+    public boolean estaUbicadoEnElMismoLugarQue(Medium mediumAConectar) {
+        return this.getUbicacion().equals(mediumAConectar.getUbicacion());
+    }
 
     public void fortalecerConexion(double cantidad) {
         this.nivelDeConexion = Math.min(Espiritu.limiteConexion, this.cantidadNuevaConexion(cantidad));
-    }
-
-    public void afectarConexion(double cantidad) {
-        this.nivelDeConexion = Math.max(0, this.getNivelDeConexion() - cantidad);
     }
 
     private double cantidadNuevaConexion(double cantidad) {
         return this.getNivelDeConexion() + cantidad;
     }
 
-
-    public void desvincularse() {
-
-        this.mediumCon.desvincularseDe(this);
-        this.mediumCon = null;
-    }
-
-    public abstract void recibirAtaqueDe(Espiritu angel);
-
-    public boolean estaUbicadoEnElMismoLugarQue(Medium mediumAConectar) {
-        return this.getUbicacion().equals(mediumAConectar.getUbicacion());
-    }
-
+    //usado en agregarEspiritu() de Medium
     public void vincular(Medium medium) {
         this.mediumCon = medium;
     }
 
-    public void moverseA(Ubicacion ubiNueva) {
+    // --------------------------------------------------------------------------------
+    // Funcionalidad de moverse
+    // --------------------------------------------------------------------------------
 
+    public void moverseA(Ubicacion ubiNueva) {
         this.setUbicacion(ubiNueva);
         this.cambiosConexion(getUbicacion());
     }
 
+    //efectua los cambios correspondientes sobre el nivel de conexión del Espiritu en base a qué tipo de Ubicación se traslada
+    public abstract void cambiosConexion(Ubicacion ubicacion);
+
+    //usado en las implementaciones de cambiosConexion()
+    public void afectarConexion(double cantidad) {
+        this.nivelDeConexion = Math.max(0, this.getNivelDeConexion() - cantidad);
+    }
+
+    //usado en el mover() de Medium
     public boolean sinConexion() {
         return this.getNivelDeConexion() == 0;
     }
 
-    public abstract void cambiosConexion(Ubicacion ubicacion);
-
-    public abstract int porcentajeDescansarEn(Ubicacion ubicacion);
+    // --------------------------------------------------------------------------------
+    // Funcionalidad de descansar
+    // --------------------------------------------------------------------------------
 
     public void fortalecerConexionDescansandoEn(Ubicacion ubicacion) {
-        int recarga = (int)(ubicacion.getEnergia() * this.porcentajeDescansarEn(ubicacion) / 100.0);
+        int recarga = this.porcentajeDescansarEn(ubicacion) * (int)(ubicacion.getEnergia() / 100.0);
         this.fortalecerConexion(recarga);
     }
 
+    //double dispatch para el fortalecerConexionDescansandoEn(), usado en el descansar() de Medium
+    public abstract int porcentajeDescansarEn(Ubicacion ubicacion);
+
+    // --------------------------------------------------------------------------------
+    // Subtareas
+    // --------------------------------------------------------------------------------
+
+    //usado en el mover() de Medium y en la batalla dada en el exorcizar() de Medium en los casos donde el Espiritu queda con nivel de conexión 0
+    public void desvincularse() {
+        this.mediumCon.desvincularseDe(this);
+        this.mediumCon = null;
+    }
+
+    //double dispatch para el invocar() de Medium
     public abstract boolean puedeInvocarseEn(Ubicacion ubicacion);
+
+    //usado en la ronda de combate del exorcizar() de Medium
+    public abstract void recibirAtaqueDe(Espiritu espiritu);
 
 }
