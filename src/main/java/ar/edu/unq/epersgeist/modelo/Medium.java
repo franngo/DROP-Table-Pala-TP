@@ -54,10 +54,24 @@ public class Medium extends Auditable implements Serializable {
         }
     }
 
+    // --------------------------------------------------------------------------------
+    // Funcionalidad de conectarse con un Espiritu
+    // --------------------------------------------------------------------------------
+
+    //usado en el aumentarConexionYConectar() de Espiritu para hacer efectiva la conexión entre Espiritu y Medium
     public void agregarEspiritu(Espiritu espiritu) {
         espiritus.add(espiritu);
         espiritu.vincular(this);
     }
+
+    //usado en el aumentarConexionYConectar() de Espiritu para aumentar la conexión en base al maná del Medium
+    public Double cantidadDeFortalecimientoDeConexion() {
+        return this.mana * porcentajeAFortalecer;
+    }
+
+    // --------------------------------------------------------------------------------
+    // Funcionalidad de descansar
+    // --------------------------------------------------------------------------------
 
     public void descansar() {
         this.recuperarMana();
@@ -69,7 +83,7 @@ public class Medium extends Auditable implements Serializable {
     }
 
     private int cantidadAlDescansar() {
-        int recarga = this.ubicacion.getEnergia() * this.ubicacion.porcentajeDescansarMedium() / 100;
+        int recarga = this.ubicacion.porcentajeDescansarMedium() * this.ubicacion.getEnergia() / 100;
         return this.mana + recarga;
     }
 
@@ -79,9 +93,9 @@ public class Medium extends Auditable implements Serializable {
         }
     }
 
-    public Double cantidadDeFortalecimientoDeConexion() {
-        return this.mana * porcentajeAFortalecer;
-    }
+    // --------------------------------------------------------------------------------
+    // Funcionalidad de invocar a un Espiritu a la Ubicacion actual
+    // --------------------------------------------------------------------------------
 
     /*
     Precondición = El Espiritu dado debe estar libre (no debe estar conectado con un Medium).
@@ -102,7 +116,6 @@ public class Medium extends Auditable implements Serializable {
 
         this.mana = Math.max(minimoMana, this.cantidadAlInvocar(manaRequeridoInvocacion));
 
-        //esto cambiara la logica teniendo en cuenta que al invocar dependiendo el lugar cambian la conexion
         espiritu.moverseA(this.ubicacion);
 
         return espiritu;
@@ -111,6 +124,11 @@ public class Medium extends Auditable implements Serializable {
     private int cantidadAlInvocar(int cantidad) {
         return this.mana - cantidad;
     }
+
+
+    // --------------------------------------------------------------------------------
+    // Funcionalidad de exorcizar a otro Medium
+    // --------------------------------------------------------------------------------
 
     public void exorcizar(Medium mediumAExorcizar) throws ExorcistaSinAngelesException {
         this.validarExorcismo();
@@ -126,6 +144,11 @@ public class Medium extends Auditable implements Serializable {
         }
     }
 
+    private boolean tengoAlgunEspirituAngel() {
+        return espiritus.stream().anyMatch(e -> e instanceof Angelical);
+    }
+
+    //usado en el iniciarBatalla() de la Batalla usada en el exorcismo
     public List<Angelical> espiritusAngelicales() {
         return espiritus.stream()
                 .filter(e -> e instanceof Angelical)
@@ -133,6 +156,7 @@ public class Medium extends Auditable implements Serializable {
                 .toList();
     }
 
+    //usado en el iniciarBatalla() de la Batalla usada en el exorcismo
     public List<Demonio> espiritusDemonios() {
         return espiritus.stream()
                 .filter(e -> e instanceof Demonio)
@@ -140,23 +164,19 @@ public class Medium extends Auditable implements Serializable {
                 .toList();
     }
 
+    // --------------------------------------------------------------------------------
+    // Funcionalidad de moverse a otra Ubicacion
+    // --------------------------------------------------------------------------------
 
-    private boolean tengoAlgunEspirituAngel() {
-        return espiritus.stream().anyMatch(e -> e instanceof Angelical);
-    }
-
-    /*
-     * El metodo desvincularseDe lo llama el Espiritu cuando se libera
-     * */
-    public void desvincularseDe(Espiritu espiritu) {
-        this.espiritus.remove(espiritu);
-    }
-
-
-    public void moverA(Ubicacion nuevaUbicacion) {
+    public void moverA(Ubicacion nuevaUbicacion, int costoMana) {
 
         this.setUbicacion(nuevaUbicacion);
+        this.pagarCostoMover(costoMana);
         this.moverEspiritusA(getUbicacion());
+    }
+
+    private void pagarCostoMover(int costoMana) {
+        this.mana -= costoMana;
     }
 
     public void moverEspiritusA(Ubicacion nuevaUbicacion) {
@@ -171,4 +191,20 @@ public class Medium extends Auditable implements Serializable {
         });
         aDesvincular.forEach(Espiritu::desvincularse);
     }
+
+    //llamado desde el service después de haber movido al Medium para saber si debe eliminarlo de la DB o no
+    public boolean sinMana() {
+        return mana <= 0;
+    }
+
+    // --------------------------------------------------------------------------------
+    // Subtareas
+    // --------------------------------------------------------------------------------
+
+    //es llamado por un Espiritu asociado cuando este se libera de la conexión (lo cual puede pasar tras moverse o tras una ronda de combate en un exorcismo)
+    public void desvincularseDe(Espiritu espiritu) {
+        this.espiritus.remove(espiritu);
+    }
+
+
 }

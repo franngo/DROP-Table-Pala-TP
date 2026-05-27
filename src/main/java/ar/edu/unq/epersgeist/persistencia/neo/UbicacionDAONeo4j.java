@@ -25,7 +25,7 @@ public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long>
 
     @Query("""
                 MATCH (u1:Ubicacion {id: $idOrigen}), (u2:Ubicacion {id: $idDestino})
-                MATCH p=(u1)-[:CONECTADO_CON*1..]->(u2)
+                MATCH p=(u1)-[:CONECTADO_CON*1]->(u2)
                 RETURN count(p) > 0
             """)
     Boolean estanConectadas(Long idOrigen, Long idDestino);
@@ -46,7 +46,13 @@ public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long>
 
     // --------------------------------------------------------------------------------
 
-    // List<Ubicacion> caminoMasRentable(Long idOrigen, Long idDestino);
+    @Query("""
+                MATCH (u1:Ubicacion {id: $idOrigen}), (u2:Ubicacion {id: $idDestino})
+                MATCH p = (u1)-[c:CONECTADO_CON*1..]->(u2)
+                RETURN nodes(p)
+                ORDER BY reduce(suma = 0, r IN relationships(p) | suma + r.costo) ASC LIMIT 1
+            """)
+    List<UbicacionNeo4j> caminoMasRentable(Long idOrigen, Long idDestino);
 
     // --------------------------------------------------------------------------------
 
@@ -55,4 +61,14 @@ public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long>
                 SET u.nombre = $nombre
             """)
     void actualizar(@Param("id") Long id, @Param("nombre") String nombre);
+
+
+    @Query("""
+                MATCH (o:Ubicacion {id: $idOrigen})-[r:CONECTADO_CON]->(d:Ubicacion {id: $idDestino})
+                RETURN r.costo
+            """)
+    Long costoHacia(
+            @Param("idOrigen") Long idOrigen,
+            @Param("idDestino") Long idDestino
+    );
 }

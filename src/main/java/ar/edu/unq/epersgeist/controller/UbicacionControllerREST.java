@@ -123,9 +123,20 @@ public class UbicacionControllerREST {
     public void conectar(
             @PathVariable Long idOrigen,
             @PathVariable Long idDestino,
-            @RequestParam @Min(0) @Max(100) Long costo
+            @RequestParam(defaultValue = "0") @Min(0) @Max(100) Long costo
      ) {
         ubicacionService.conectar(idOrigen, idDestino, costo);
+    }
+
+    // --------------------------------------------------------------------------------
+
+    @GetMapping("/{idOrigen}/estan-conectadas/{idDestino}")
+    @ResponseStatus(HttpStatus.OK)
+    public Boolean estanConectadas(
+            @PathVariable Long idOrigen,
+            @PathVariable Long idDestino
+    ) {
+        return ubicacionService.estanConectadas(idOrigen, idDestino);
     }
 
     // --------------------------------------------------------------------------------
@@ -144,13 +155,16 @@ public class UbicacionControllerREST {
 
     // --------------------------------------------------------------------------------
 
-    @GetMapping("/{idOrigen}/estan-conectadas/{idDestino}")
+    @GetMapping("/{idOrigen}/camino-mas-rentable/{idDestino}")
     @ResponseStatus(HttpStatus.OK)
-    public Boolean estanConectadas(
+    public List<UbicacionResponseDTO> caminoMasRentable(
             @PathVariable Long idOrigen,
             @PathVariable Long idDestino
     ) {
-        return ubicacionService.estanConectadas(idOrigen, idDestino);
+        return ubicacionService.caminoMasRentable(idOrigen, idDestino)
+                .stream()
+                .map((u) -> MapperUbicacion.toDTO(u))
+                .toList();
     }
 
     @GetMapping("/sobrecargadas/{umbral}")
