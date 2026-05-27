@@ -152,4 +152,14 @@ public class UbicacionControllerREST {
     ) {
         return ubicacionService.estanConectadas(idOrigen, idDestino);
     }
+
+    @GetMapping("/sobrecargadas/{umbral}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UbicacionResponseDTO> ubicacionSobrecargada(@PathVariable int umbral){
+        return ubicacionService.ubicacionesSobrecargadas(umbral)
+                .stream()
+                .map(MapperUbicacion::toDTO)
+                .toList();
+    }
 }
+
