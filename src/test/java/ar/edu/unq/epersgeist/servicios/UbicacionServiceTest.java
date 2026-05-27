@@ -509,6 +509,19 @@ public class UbicacionServiceTest {
         }
 
         // ------------------------------------------------------------
+        // Las conexiones reflexivas son válidas
+        // ------------------------------------------------------------
+
+        @Test
+        void conexionesReflexivas() {
+            ubicacionService.conectar(origen.getId(), origen.getId(), 10L);
+
+            assertTrue(
+                    ubicacionService.estanConectadas(origen.getId(), origen.getId())
+            );
+        }
+
+        // ------------------------------------------------------------
         // estanConectadas() no funciona por transitividad
         // ------------------------------------------------------------
 
