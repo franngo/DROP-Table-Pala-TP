@@ -551,10 +551,9 @@ public class UbicacionServiceTest {
 
         @Test
         void caminoMasRentableCasoUbicacionesNoConectadas() {
-
+            //Las Ubicaciones origen y destino NO están conectadas, por lo que solicitar el camino más rentable entre estas dos dará error
+            assertThrows(UbicacionesNoConectadasException.class, () -> ubicacionService.caminoMasRentable(origen.getId(), destino.getId()));
         }
-
-
 
         @Test
         void caminoMasRentableCasoExitoso() {
