@@ -359,7 +359,6 @@ public class UbicacionServiceTest {
             assertTrue(mediums.isEmpty());
         }
 
-
         @Test
         void devuelveListaVaciaSiLaUbicacionNoExiste() {
             List<Medium> mediums = ubicacionService.mediumsSinEspiritusEn(ID_INEXISTENTE);
@@ -369,7 +368,7 @@ public class UbicacionServiceTest {
     }
 
     // --------------------------------------------------------------------------------
-    // CONEXIONES ENTRE UBICACIONES EN NEO4J
+    // CONEXIONES ENTRE UBICACIONES EN NEO4J (conectar() y estanConectadas())
     // --------------------------------------------------------------------------------
 
     @Nested
@@ -510,7 +509,7 @@ public class UbicacionServiceTest {
         }
 
         // ------------------------------------------------------------
-        // Casos del estanConectadas()
+        // estanConectadas() no funciona por transitividad
         // ------------------------------------------------------------
 
         @Test
@@ -523,9 +522,29 @@ public class UbicacionServiceTest {
             );
         }
 
-        // ------------------------------------------------------------
-        // Casos del caminoMasRentable()
-        // ------------------------------------------------------------
+    }
+
+    // --------------------------------------------------------------------------------
+    // caminoMasRentable()
+    // --------------------------------------------------------------------------------
+
+    @Nested
+    class CaminoMasRentable {
+        private Ubicacion origen;
+        private Ubicacion destino;
+        private Ubicacion otroNodo;
+
+        @BeforeEach
+        void setUp() {
+            origen = ubicacionService.crear(new Santuario("ORIGEN", 50));
+            destino = ubicacionService.crear(new Cementerio("DESTINO", 50));
+            otroNodo = ubicacionService.crear(new Santuario("OTRO", 50));
+        }
+
+        @AfterEach
+        void tearDown() {
+            ubicacionService.eliminarTodos();
+        }
 
         @Test
         void caminoMasRentableCasoIdOrigenInvalido() {
@@ -595,7 +614,6 @@ public class UbicacionServiceTest {
             assertEquals(nodoCuatro.getId(), ubis.get(2).getId());
             assertEquals(destino.getId(), ubis.get(3).getId());
         }
-
     }
 
     // --------------------------------------------------------------------------------
