@@ -901,7 +901,25 @@ public class UbicacionServiceTest {
             ubicacionService.conectar(cinco.getId(), seis.getId(), 10L);
             ubicacionService.conectar(seis.getId(), siete.getId(), 10L);
 
-            //hacer diagramita!!
+            /*
+            Representación del grafo:
+
+                4
+               /
+              2-----3
+             //    /
+            1-----/
+            \
+             5---6---7
+
+             */
+
+            /*
+            HCs de los nodos consultados (haciéndolo en orden de los nodos de uno a siete):
+
+            HC de uno: 1 + 1 + 0.5 + 1 + 0.5 + 0.333 = 4.333
+            HC de dos: 1 + 1 + 1 + 0.5 + 0.333 + 0.25 = 4.083
+             */
 
             List<HarmonicResult> ubis = ubicacionService.harmonicResult(List.of(dos.getId(), uno.getId()));
 
