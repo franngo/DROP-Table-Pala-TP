@@ -1,6 +1,7 @@
 package ar.edu.unq.epersgeist.servicios.impl;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.HarmonicResult;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
@@ -14,6 +15,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 // --------------------------------------------------------------------------------
@@ -135,6 +137,8 @@ public class UbicacionServiceImpl implements UbicacionService {
         ubicacionDAONeo.conectar(idOrigen, idDestino, costo);
     }
 
+    // --------------------------------------------------------------------------------
+
     @Override
     public Boolean estanConectadas(Long idOrigen, Long idDestino) {
         this.recuperar(idOrigen);
@@ -142,6 +146,8 @@ public class UbicacionServiceImpl implements UbicacionService {
 
         return ubicacionDAONeo.estanConectadas(idOrigen, idDestino);
     }
+
+    // --------------------------------------------------------------------------------
 
     @Override
     public List<Ubicacion> caminoMasRentable(Long idOrigen, Long idDestino) {
@@ -162,8 +168,6 @@ public class UbicacionServiceImpl implements UbicacionService {
         return ubis.stream().map((u) -> this.recuperar(u.getId())).toList();
     }
 
-    // --------------------------------------------------------------------------------
-    // CAMINO MÁS CORTO
     // --------------------------------------------------------------------------------
 
     @Override
@@ -190,11 +194,26 @@ public class UbicacionServiceImpl implements UbicacionService {
                 .map(u -> recuperar(u.getId()))
                 .toList();
     }
+
     // --------------------------------------------------------------------------------
+
     @Override
     public List<Ubicacion> ubicacionesSobrecargadas(int umbralDeEnergia) {
         return ubicacionDAOSQL.ubicacionSobrecargada(umbralDeEnergia);
     }
 
+    // --------------------------------------------------------------------------------
+
+    @Override
+    public List<HarmonicResult> harmonicResult(List<Long> ids) {
+        //validación de la existencia de Ubicaciones
+        ids.stream().forEach((id) -> this.recuperar(id));
+
+        return ids.stream().
+                map((id) -> new HarmonicResult(id, ubicacionDAONeo.harmonicResult(id))).
+                sorted(Comparator.comparingDouble(HarmonicResult::centrality).reversed()).
+                toList();
+        //No queda otra que hacer el sorting en memoria, ya que el method del DAO solo se encarga de calcular el harmonic result para UNA Ubicacion
+    }
 
 }

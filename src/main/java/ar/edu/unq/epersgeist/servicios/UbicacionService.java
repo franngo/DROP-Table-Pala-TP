@@ -1,6 +1,7 @@
 package ar.edu.unq.epersgeist.servicios;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.HarmonicResult;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 
@@ -40,4 +41,7 @@ public interface UbicacionService {
     List<Ubicacion> caminoMasCorto(Long idOrigen, Long idDestino);
 
     List<Ubicacion> ubicacionesSobrecargadas(int umbralDeEnergia);
+
+    List<HarmonicResult> harmonicResult(List<Long> ids);
+
 }

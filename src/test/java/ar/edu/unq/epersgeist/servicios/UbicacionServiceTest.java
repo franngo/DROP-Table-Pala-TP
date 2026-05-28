@@ -3,6 +3,7 @@ package ar.edu.unq.epersgeist.servicios;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.HarmonicResult;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
@@ -762,6 +763,11 @@ public class UbicacionServiceTest {
         }
     }
 
+    // --------------------------------------------------------------------------------
+    // ubicacionesSobrecargadas()
+    // --------------------------------------------------------------------------------
+
+
     @Nested
     class UbicacionSobrecargada{
 
@@ -821,4 +827,100 @@ public class UbicacionServiceTest {
             assertEquals(1, sobrecargadas.size());
         }
     }
+
+    // --------------------------------------------------------------------------------
+    // harmonicResult()
+    // --------------------------------------------------------------------------------
+
+    @Nested
+    class HarmonicResultTesting {
+        private Ubicacion uno;
+        private Ubicacion dos;
+        private Ubicacion tres;
+        private Ubicacion cuatro;
+        private Ubicacion cinco;
+        private Ubicacion seis;
+        private Ubicacion siete;
+
+        @BeforeEach
+        void setUp() {
+            uno = ubicacionService.crear(new Santuario("uno", 50));
+            dos = ubicacionService.crear(new Cementerio("dos", 50));
+            tres = ubicacionService.crear(new Santuario("tres", 50));
+            cuatro = ubicacionService.crear(new Santuario("cuatro", 50));
+            cinco = ubicacionService.crear(new Cementerio("cinco", 50));
+            seis = ubicacionService.crear(new Santuario("seis", 50));
+            siete = ubicacionService.crear(new Santuario("siete", 50));
+        }
+
+        @AfterEach
+        void tearDown() {
+            ubicacionService.eliminarTodos();
+        }
+
+        @Test
+        void harmonicResultFallaUsandoIdInexistente() {
+            Long idNoExistente = 123456789L;
+
+            assertThrows(UbicacionNoEncontradaException.class, () -> ubicacionService.harmonicResult(List.of(idNoExistente)));
+        }
+
+        @Test
+        void harmonicResultDevuelveListaVaciaSiLePasamosListaVacia() {
+            List<HarmonicResult> ubis = ubicacionService.harmonicResult(List.of());
+
+            assertTrue(ubis.isEmpty());
+        }
+
+        @Test
+        void harmonicResultCasoExitoso() {
+
+            ubicacionService.conectar(uno.getId(), dos.getId(), 10L);
+            ubicacionService.conectar(uno.getId(), tres.getId(), 20L);
+            ubicacionService.conectar(dos.getId(), uno.getId(), 20L);
+            ubicacionService.conectar(dos.getId(), tres.getId(), 20L);
+            ubicacionService.conectar(dos.getId(), cuatro.getId(), 20L);
+            ubicacionService.conectar(uno.getId(), cinco.getId(), 10L);
+            ubicacionService.conectar(cinco.getId(), seis.getId(), 10L);
+            ubicacionService.conectar(seis.getId(), siete.getId(), 10L);
+
+            /*
+            Representación del grafo:
+
+                4
+               /
+              2-----3
+             //    /
+            1-----/
+            \
+             5---6---7
+
+             */
+
+            /*
+            HCs de los nodos consultados (haciéndolo en orden de los nodos de uno a siete):
+
+            HC de uno: 1 + 1 + 0.5 + 1 + 0.5 + 0.333 = 4.333
+            HC de dos: 1 + 1 + 1 + 0.5 + 0.333 + 0.25 = 4.083
+            HC de seis: 0 + 0 + 0 + 0 + 0 + 1 = 1
+             */
+
+            List<HarmonicResult> ubis = ubicacionService.harmonicResult(List.of(dos.getId(), seis.getId(), uno.getId()));
+
+            HarmonicResult unoHR = ubis.get(0);
+            HarmonicResult dosHR = ubis.get(1);
+            HarmonicResult seisHR = ubis.get(2);
+
+            assertEquals(uno.getId(), unoHR.id());
+            assertEquals(4.333, unoHR.centrality());
+
+            assertEquals(dos.getId(), dosHR.id());
+            assertEquals(4.083, dosHR.centrality());
+
+            assertEquals(seis.getId(), seisHR.id());
+            assertEquals(1, seisHR.centrality());
+
+        }
+    }
+
 }
