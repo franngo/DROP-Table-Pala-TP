@@ -866,6 +866,13 @@ public class UbicacionServiceTest {
         }
 
         @Test
+        void harmonicResultDevuelveListaVaciaSiLePasamosListaVacia() {
+            List<HarmonicResult> ubis = ubicacionService.harmonicResult(List.of());
+
+            assertTrue(ubis.isEmpty());
+        }
+
+        @Test
         void harmonicResultCasoExitoso() {
 
             ubicacionService.conectar(uno.getId(), dos.getId(), 10L);

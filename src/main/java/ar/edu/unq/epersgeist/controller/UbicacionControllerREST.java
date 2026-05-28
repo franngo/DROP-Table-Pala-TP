@@ -10,6 +10,7 @@ import ar.edu.unq.epersgeist.controller.mappers.EstadisticaMapper;
 import ar.edu.unq.epersgeist.controller.mappers.MapperEspiritu;
 import ar.edu.unq.epersgeist.controller.mappers.MapperMedium;
 import ar.edu.unq.epersgeist.controller.mappers.MapperUbicacion;
+import ar.edu.unq.epersgeist.modelo.HarmonicResult;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.reportes.ReporteSantuarioMasCorrupto;
 import ar.edu.unq.epersgeist.servicios.EstadisticaService;
@@ -167,13 +168,29 @@ public class UbicacionControllerREST {
                 .toList();
     }
 
+    // --------------------------------------------------------------------------------
+
     @GetMapping("/sobrecargadas/{umbral}")
     @ResponseStatus(HttpStatus.OK)
-    public List<UbicacionResponseDTO> ubicacionSobrecargada(@PathVariable int umbral){
+    public List<UbicacionResponseDTO> ubicacionSobrecargada(@PathVariable int umbral) {
         return ubicacionService.ubicacionesSobrecargadas(umbral)
                 .stream()
                 .map(MapperUbicacion::toDTO)
                 .toList();
+    }
+
+    // --------------------------------------------------------------------------------
+
+    @GetMapping("/harmonic-result")
+    @ResponseStatus(HttpStatus.OK)
+    public List<HarmonicResult> harmonicResult(
+            @RequestParam(required = false) List<Long> ids
+    ) {
+        if (ids == null) {
+            ids = List.of();
+        }
+
+        return ubicacionService.harmonicResult(ids);
     }
 }
 
