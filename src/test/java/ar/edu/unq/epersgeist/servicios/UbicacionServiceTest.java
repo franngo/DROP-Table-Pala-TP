@@ -858,36 +858,12 @@ public class UbicacionServiceTest {
             ubicacionService.eliminarTodos();
         }
 
-        /*
         @Test
-        void caminoMasRentableCasoIdOrigenInvalido() {
+        void harmonicResultFallaUsandoIdInexistente() {
             Long idNoExistente = 123456789L;
 
-            assertThrows(UbicacionNoEncontradaException.class, () -> ubicacionService.caminoMasRentable(idNoExistente, destino.getId()));
+            assertThrows(UbicacionNoEncontradaException.class, () -> ubicacionService.harmonicResult(List.of(idNoExistente)));
         }
-
-        @Test
-        void caminoMasRentableCasoIdDestinoInvalido() {
-            Long idNoExistente = 123456789L;
-
-            assertThrows(UbicacionNoEncontradaException.class, () -> ubicacionService.caminoMasRentable(origen.getId(), idNoExistente));
-        }
-
-        @Test
-        void caminoMasRentableCasoOrigenIgualADestino() {
-            List<Ubicacion> ubis = ubicacionService.caminoMasRentable(origen.getId(), origen.getId());
-
-            assertEquals(1, ubis.size());
-            assertEquals(origen.getId(), ubis.get(0).getId());
-        }
-
-        @Test
-        void caminoMasRentableCasoUbicacionesNoConectadas() {
-            //Las Ubicaciones origen y destino NO están conectadas, por lo que solicitar el camino más rentable entre estas dos dará error
-            assertThrows(UbicacionesNoConectadasException.class, () -> ubicacionService.caminoMasRentable(origen.getId(), destino.getId()));
-        }
-
-         */
 
         @Test
         void harmonicResultCasoExitoso() {
@@ -919,18 +895,23 @@ public class UbicacionServiceTest {
 
             HC de uno: 1 + 1 + 0.5 + 1 + 0.5 + 0.333 = 4.333
             HC de dos: 1 + 1 + 1 + 0.5 + 0.333 + 0.25 = 4.083
+            HC de seis: 0 + 0 + 0 + 0 + 0 + 1 = 1
              */
 
-            List<HarmonicResult> ubis = ubicacionService.harmonicResult(List.of(dos.getId(), uno.getId()));
+            List<HarmonicResult> ubis = ubicacionService.harmonicResult(List.of(dos.getId(), seis.getId(), uno.getId()));
 
             HarmonicResult unoHR = ubis.get(0);
             HarmonicResult dosHR = ubis.get(1);
+            HarmonicResult seisHR = ubis.get(2);
 
             assertEquals(uno.getId(), unoHR.id());
             assertEquals(4.333, unoHR.centrality());
 
             assertEquals(dos.getId(), dosHR.id());
             assertEquals(4.083, dosHR.centrality());
+
+            assertEquals(seis.getId(), seisHR.id());
+            assertEquals(1, seisHR.centrality());
 
         }
     }

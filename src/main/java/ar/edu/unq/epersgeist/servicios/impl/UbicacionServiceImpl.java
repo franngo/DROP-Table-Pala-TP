@@ -206,6 +206,9 @@ public class UbicacionServiceImpl implements UbicacionService {
 
     @Override
     public List<HarmonicResult> harmonicResult(List<Long> ids) {
+        //validación de la existencia de Ubicaciones
+        ids.stream().forEach((id) -> this.recuperar(id));
+
         return ids.stream().
                 map((id) -> new HarmonicResult(id, ubicacionDAONeo.harmonicResult(id))).
                 sorted(Comparator.comparingDouble(HarmonicResult::centrality).reversed()).
