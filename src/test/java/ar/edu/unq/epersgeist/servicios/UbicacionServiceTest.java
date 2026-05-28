@@ -894,20 +894,25 @@ public class UbicacionServiceTest {
 
             ubicacionService.conectar(uno.getId(), dos.getId(), 10L);
             ubicacionService.conectar(uno.getId(), tres.getId(), 20L);
+            ubicacionService.conectar(dos.getId(), uno.getId(), 20L);
             ubicacionService.conectar(dos.getId(), tres.getId(), 20L);
             ubicacionService.conectar(dos.getId(), cuatro.getId(), 20L);
             ubicacionService.conectar(uno.getId(), cinco.getId(), 10L);
             ubicacionService.conectar(cinco.getId(), seis.getId(), 10L);
             ubicacionService.conectar(seis.getId(), siete.getId(), 10L);
 
-            //el camino más rentable de origen a destino es origen-nodoCuatro-destino, que cuesta 20
+            //hacer diagramita!!
 
-            List<HarmonicResult> ubis = ubicacionService.harmonicResult(List.of(uno.getId()));
+            List<HarmonicResult> ubis = ubicacionService.harmonicResult(List.of(dos.getId(), uno.getId()));
 
             HarmonicResult unoHR = ubis.get(0);
+            HarmonicResult dosHR = ubis.get(1);
 
             assertEquals(uno.getId(), unoHR.id());
             assertEquals(4.333, unoHR.centrality());
+
+            assertEquals(dos.getId(), dosHR.id());
+            assertEquals(4.083, dosHR.centrality());
 
         }
     }
