@@ -15,6 +15,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 // --------------------------------------------------------------------------------
@@ -207,7 +208,9 @@ public class UbicacionServiceImpl implements UbicacionService {
     public List<HarmonicResult> harmonicResult(List<Long> ids) {
         return ids.stream().
                 map((id) -> new HarmonicResult(id, ubicacionDAONeo.harmonicResult(id))).
+                sorted(Comparator.comparingDouble(HarmonicResult::centrality).reversed()).
                 toList();
+        //No queda otra que hacer el sorting en memoria, ya que el method del DAO solo se encarga de calcular el harmonic result para UNA Ubicacion
     }
 
 }

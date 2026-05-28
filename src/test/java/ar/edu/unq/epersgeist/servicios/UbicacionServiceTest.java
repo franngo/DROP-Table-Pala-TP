@@ -3,6 +3,7 @@ package ar.edu.unq.epersgeist.servicios;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.HarmonicResult;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
@@ -762,6 +763,11 @@ public class UbicacionServiceTest {
         }
     }
 
+    // --------------------------------------------------------------------------------
+    // ubicacionesSobrecargadas()
+    // --------------------------------------------------------------------------------
+
+
     @Nested
     class UbicacionSobrecargada{
 
@@ -821,4 +827,89 @@ public class UbicacionServiceTest {
             assertEquals(1, sobrecargadas.size());
         }
     }
+
+    // --------------------------------------------------------------------------------
+    // harmonicResult()
+    // --------------------------------------------------------------------------------
+
+    @Nested
+    class HarmonicResultTesting {
+        private Ubicacion uno;
+        private Ubicacion dos;
+        private Ubicacion tres;
+        private Ubicacion cuatro;
+        private Ubicacion cinco;
+        private Ubicacion seis;
+        private Ubicacion siete;
+
+        @BeforeEach
+        void setUp() {
+            uno = ubicacionService.crear(new Santuario("uno", 50));
+            dos = ubicacionService.crear(new Cementerio("dos", 50));
+            tres = ubicacionService.crear(new Santuario("tres", 50));
+            cuatro = ubicacionService.crear(new Santuario("cuatro", 50));
+            cinco = ubicacionService.crear(new Cementerio("cinco", 50));
+            seis = ubicacionService.crear(new Santuario("seis", 50));
+            siete = ubicacionService.crear(new Santuario("siete", 50));
+        }
+
+        @AfterEach
+        void tearDown() {
+            ubicacionService.eliminarTodos();
+        }
+
+        /*
+        @Test
+        void caminoMasRentableCasoIdOrigenInvalido() {
+            Long idNoExistente = 123456789L;
+
+            assertThrows(UbicacionNoEncontradaException.class, () -> ubicacionService.caminoMasRentable(idNoExistente, destino.getId()));
+        }
+
+        @Test
+        void caminoMasRentableCasoIdDestinoInvalido() {
+            Long idNoExistente = 123456789L;
+
+            assertThrows(UbicacionNoEncontradaException.class, () -> ubicacionService.caminoMasRentable(origen.getId(), idNoExistente));
+        }
+
+        @Test
+        void caminoMasRentableCasoOrigenIgualADestino() {
+            List<Ubicacion> ubis = ubicacionService.caminoMasRentable(origen.getId(), origen.getId());
+
+            assertEquals(1, ubis.size());
+            assertEquals(origen.getId(), ubis.get(0).getId());
+        }
+
+        @Test
+        void caminoMasRentableCasoUbicacionesNoConectadas() {
+            //Las Ubicaciones origen y destino NO están conectadas, por lo que solicitar el camino más rentable entre estas dos dará error
+            assertThrows(UbicacionesNoConectadasException.class, () -> ubicacionService.caminoMasRentable(origen.getId(), destino.getId()));
+        }
+
+         */
+
+        @Test
+        void harmonicResultCasoExitoso() {
+
+            ubicacionService.conectar(uno.getId(), dos.getId(), 10L);
+            ubicacionService.conectar(uno.getId(), tres.getId(), 20L);
+            ubicacionService.conectar(dos.getId(), tres.getId(), 20L);
+            ubicacionService.conectar(dos.getId(), cuatro.getId(), 20L);
+            ubicacionService.conectar(uno.getId(), cinco.getId(), 10L);
+            ubicacionService.conectar(cinco.getId(), seis.getId(), 10L);
+            ubicacionService.conectar(seis.getId(), siete.getId(), 10L);
+
+            //el camino más rentable de origen a destino es origen-nodoCuatro-destino, que cuesta 20
+
+            List<HarmonicResult> ubis = ubicacionService.harmonicResult(List.of(uno.getId()));
+
+            HarmonicResult unoHR = ubis.get(0);
+
+            assertEquals(uno.getId(), unoHR.id());
+            assertEquals(4.333, unoHR.centrality());
+
+        }
+    }
+
 }
