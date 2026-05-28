@@ -53,10 +53,15 @@ public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long>
     // --------------------------------------------------------------------------------
 
     @Query("""
-                MATCH (o:Ubicacion {id: $id})
-                MATCH p = SHORTEST 1 ((o)-[:CONECTADO_CON*]->(d:Ubicacion))
-                WHERE d.id <> $id
-                RETURN round(sum(toFloat(1) / size(tail(nodes(p)))), 3)
+                UNWIND $ids AS id
+                CALL (id) {
+                  MATCH (o:Ubicacion {id: id})
+                  MATCH p = SHORTEST 1 ((o)-[:CONECTADO_CON*]->(d:Ubicacion))
+                  WHERE d.id <> id
+                  RETURN round(sum(toFloat(1) / size(tail(nodes(p)))), 3) AS centrality
+                }
+                RETURN id, centrality
+                ORDER BY centrality DESC
             """)
     Double harmonicResult(Long id);
 
