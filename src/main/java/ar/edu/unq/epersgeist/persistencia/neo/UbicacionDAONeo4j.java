@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.persistencia.neo;
 
+import ar.edu.unq.epersgeist.modelo.HarmonicResult;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
@@ -63,7 +64,7 @@ public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long>
                 RETURN id, centrality
                 ORDER BY centrality DESC
             """)
-    Double harmonicResult(Long id);
+    List<HarmonicResult> harmonicResult(List<Long> ids);
 
     // --------------------------------------------------------------------------------
 

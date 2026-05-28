@@ -209,11 +209,8 @@ public class UbicacionServiceImpl implements UbicacionService {
         //validación de la existencia de Ubicaciones
         ids.stream().forEach((id) -> this.recuperar(id));
 
-        return ids.stream().
-                map((id) -> new HarmonicResult(id, ubicacionDAONeo.harmonicResult(id))).
-                sorted(Comparator.comparingDouble(HarmonicResult::centrality).reversed()).
-                toList();
-        //No queda otra que hacer el sorting en memoria, ya que el method del DAO solo se encarga de calcular el harmonic result para UNA Ubicacion
+        return ubicacionDAONeo.harmonicResult(ids);
+
     }
 
 }
