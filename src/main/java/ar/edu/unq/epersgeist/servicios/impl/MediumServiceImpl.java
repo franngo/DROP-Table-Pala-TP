@@ -132,28 +132,27 @@ public class MediumServiceImpl implements MediumService {
                 .orElseThrow(() ->
                         new UbicacionNoEncontradaException(ubicacionId)
                 );
-
-        Long ubicacionMediumId = mediumAMover.getUbicacion().getId();
+        Ubicacion ubicacionActualMedium = mediumAMover.getUbicacion();
+        Long ubicacionMediumId = ubicacionActualMedium.getId();
         Long ubicacionAIrId = ubicacionAMover.getId();
 
-        if (!quiereMoverseALaMisma(ubicacionMediumId, ubicacionAIrId)) {
+        if (!quiereMoverseALaMisma(ubicacionActualMedium.getId(), ubicacionAIrId)) {
+
+            // Procedo a recuperar la ubicacion destino de la fuente de la verdad
+            Ubicacion ubicacionDestino = ubicacionDAOSQL.findById(ubicacionId)
+                    .orElseThrow(() ->
+                            new UbicacionNoEncontradaException(ubicacionId));
 
             // Se valida si las ubicaciones estan conectadas
-            this.validacionUbicacion(mediumAMover.getUbicacion(), ubicacionAMover);
+            this.validarConexion(ubicacionActualMedium, ubicacionAMover);
 
             // calculo el costo de moverse
             int costo = Math.toIntExact(ubicacionDAONeo4j.costoHacia(ubicacionMediumId, ubicacionAIrId));
 
-            // Con los calculos completos, proceso a recuperar la ubicacion de sql
-            Ubicacion ubicacionConfirmada = ubicacionDAOSQL.findById(ubicacionId)
-                    .orElseThrow(() ->
-                            new UbicacionNoEncontradaException(ubicacionId));
-
             // el medium se mueve
-            mediumAMover.moverA(ubicacionConfirmada, costo);
+            mediumAMover.moverA(ubicacionDestino, costo);
 
-
-            // depende el estado del medium se guardara o se eliminara
+            // depende el estado del medium se guarda o se elimina
             if (mediumAMover.sinMana()) {
                 mediumDao.delete(mediumAMover);
             } else {
@@ -163,7 +162,7 @@ public class MediumServiceImpl implements MediumService {
         }
     }
 
-    private void validacionUbicacion(Ubicacion ubicacion, UbicacionNeo4j ubicacionAMover) {
+    private void validarConexion(Ubicacion ubicacion, UbicacionNeo4j ubicacionAMover) {
         if (!ubicacionDAONeo4j.estanConectadas(ubicacion.getId(), ubicacionAMover.getId())) {
             throw new UbicacionLejanaException("La ubicacion esta lejana");
         }
