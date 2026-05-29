@@ -447,38 +447,34 @@ public class MediumServiceTest {
             serviceMedium.mover(mediumAMover.getId(), laUNQ.getId());
             // el medium fue eliminado
 
-            assertThatThrownBy(
-                    () -> serviceMedium.recuperar(mediumAMover.getId()))
-                    .isInstanceOf(ErrorDeMediumNoEncontradoException.class
-                    );
-            
+            assertThatThrownBy(() -> serviceMedium.recuperar(mediumAMover.getId()))
+                    .isInstanceOf(ErrorDeMediumNoEncontradoException.class);
+
         }
 
         @Test
         void losEspiritusDelMediumSeMuevenConEl() {
 
-
             serviceMedium.mover(mediumAMover.getId(), ranelagh.getId());
 
             List<Espiritu> espiritus = serviceMedium.espiritus(mediumAMover.getId());
 
-            for (Espiritu e : espiritus) {
-                assertEquals(ranelagh.getId(), e.getUbicacion().getId());
-            }
-
+            assertThat(espiritus)
+                    .extracting(e -> e.getUbicacion().getId())
+                    .containsOnly(ranelagh.getId());
         }
 
         @Test
         void losEspiritusNoCambianDeUbicacionSielMediumSeMuevenALaMisma() {
 
-            Long ubiActual = mediumAMover.getUbicacion().getId();
-            serviceMedium.mover(mediumAMover.getId(), ubiActual);
+            Long idUbiActual = mediumAMover.getUbicacion().getId();
+            serviceMedium.mover(mediumAMover.getId(), idUbiActual);
 
             List<Espiritu> espiritus = serviceMedium.espiritus(mediumAMover.getId());
 
-            for (Espiritu e : espiritus) {
-                assertEquals(ubiActual, e.getUbicacion().getId());
-            }
+            assertThat(espiritus)
+                    .extracting(e -> e.getUbicacion().getId())
+                    .containsOnly(idUbiActual);
 
         }
 
