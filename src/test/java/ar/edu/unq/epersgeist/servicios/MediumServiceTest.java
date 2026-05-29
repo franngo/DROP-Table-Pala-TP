@@ -21,6 +21,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -374,13 +376,13 @@ public class MediumServiceTest {
 
         @BeforeEach
         void setUtMover() {
-            ranelagh = ubicacionService.crear(new Santuario("Ranelgh", 99));
+            ranelagh = ubicacionService.crear(new Santuario("Ranelagh", 99));
             sourigues = ubicacionService.crear(new Santuario("Sourigues", 70));
             ubicacionService.conectar(ranelagh.getId(), sourigues.getId(), 40L);
             mediumAMover = serviceMedium.crear(new Medium("Matias Sanchez", 100, 90, ranelagh));
 
             // espiritus que acompañanan a
-            Espiritu elChiqui = espirituService.crear(new Angelical("Chi Tapia", ranelagh));
+            Espiritu elChiqui = espirituService.crear(new Angelical("Chiqui Tapia", ranelagh));
             Espiritu juanchiElPastelero = espirituService.crear(new Angelical("Juanchito", ranelagh));
 
             espirituService.conectar(elChiqui.getId(), mediumAMover.getId());
@@ -388,17 +390,18 @@ public class MediumServiceTest {
         }
 
         @Test
-        void elMediumSeMueveExitosamente() {
+        void elMediumSeMueveExitosamenteALaUbicacionDada() {
             serviceMedium.mover(mediumAMover.getId(), sourigues.getId());
             Medium recuperado = serviceMedium.recuperar(mediumAMover.getId());
-            assertEquals(sourigues.getId(), recuperado.getUbicacion().getId());
+            assertThat(sourigues.getId()).isEqualTo(recuperado.getUbicacion().getId());
         }
 
         @Test
-        void elMediumPierdeManaSegunUbicacion() {
+        void elMediumPierdeManaConcistentementeConElCosto() {
             serviceMedium.mover(mediumAMover.getId(), sourigues.getId());
             Medium recuperado = serviceMedium.recuperar(mediumAMover.getId());
-            assertEquals(50, recuperado.getMana());
+
+            assertThat(50).isEqualTo(recuperado.getMana());
 
         }
 
@@ -410,18 +413,19 @@ public class MediumServiceTest {
 
             serviceMedium.mover(mediumAMover.getId(), ranelagh.getId());
             Medium recuperado = serviceMedium.recuperar(mediumAMover.getId());
-            assertEquals(ranelagh.getId(), recuperado.getUbicacion().getId());
-            assertEquals(90, recuperado.getMana());
+
+            assertThat(ranelagh.getId()).isEqualTo(recuperado.getUbicacion().getId());
+            assertThat(90).isEqualTo(recuperado.getMana());
         }
 
         @Test
         void elMediumNoPuedeMoverseAUnaUbicacionLejana() {
             Ubicacion varela = ubicacionService.crear(new Cementerio("Varela", 50));
             ubicacionService.conectar(sourigues.getId(), varela.getId(), 30L);
-            assertThrows(UbicacionLejanaException.class, () -> {
 
-                serviceMedium.mover(mediumAMover.getId(), varela.getId());
-            });
+            assertThatThrownBy(
+                    () -> serviceMedium.mover(mediumAMover.getId(), varela.getId()))
+                    .isInstanceOf(UbicacionLejanaException.class);
 
         }
 
@@ -429,10 +433,10 @@ public class MediumServiceTest {
         void elMediumNoPuedeMoverseAUnaUbicacionInexistente() {
             Ubicacion ubi = new Cementerio("Cementerio", 100);
             ubi.setId(10000l);
-            assertThrows(UbicacionNoEncontradaException.class, () -> {
 
-                serviceMedium.mover(mediumAMover.getId(), ubi.getId());
-            });
+            assertThatThrownBy(
+                    () -> serviceMedium.mover(mediumAMover.getId(), ubi.getId()))
+                    .isInstanceOf(UbicacionNoEncontradaException.class);
         }
 
         @Test
@@ -442,12 +446,12 @@ public class MediumServiceTest {
 
             serviceMedium.mover(mediumAMover.getId(), laUNQ.getId());
             // el medium fue eliminado
-            assertThrows(ErrorDeMediumNoEncontradoException.class, () -> {
 
-                serviceMedium.recuperar(mediumAMover.getId());
-            });
-
-
+            assertThatThrownBy(
+                    () -> serviceMedium.recuperar(mediumAMover.getId()))
+                    .isInstanceOf(ErrorDeMediumNoEncontradoException.class
+                    );
+            
         }
 
         @Test
