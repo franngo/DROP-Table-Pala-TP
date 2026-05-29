@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.modelo.Espiritu;
 
+import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.TipoEspiritu;
 import ar.edu.unq.epersgeist.modelo.Auditable;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
@@ -10,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.io.Serializable;
 
@@ -35,6 +38,7 @@ public abstract class Espiritu extends Auditable implements Serializable {
     @JoinColumn(name = "mediumCon_id")
     private Medium mediumCon;
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Ubicacion ubicacion;
 
     public Espiritu(@NonNull String nombre, Ubicacion ubicacion) {
@@ -139,5 +143,7 @@ public abstract class Espiritu extends Auditable implements Serializable {
 
     //usado en la ronda de combate del exorcizar() de Medium
     public abstract void recibirAtaqueDe(Espiritu espiritu);
+
+    abstract public TipoEspiritu getTipoEspiritu();
 
 }

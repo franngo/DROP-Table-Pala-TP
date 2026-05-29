@@ -13,6 +13,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -36,6 +38,7 @@ public class Medium extends Auditable implements Serializable {
     @OneToMany(mappedBy = "mediumCon", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Espiritu> espiritus;
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Ubicacion ubicacion;
 
     public Medium(@NonNull String nombre, @NonNull Integer manaMax, @NonNull Integer mana, Ubicacion ubicacion) {

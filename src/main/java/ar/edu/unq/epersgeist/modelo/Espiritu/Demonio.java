@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.modelo.Espiritu;
 
+import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.TipoEspiritu;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import jakarta.persistence.DiscriminatorValue;
@@ -52,5 +53,8 @@ public class Demonio extends Espiritu implements Combatiente {
     public boolean puedeInvocarseEn(Ubicacion ubicacion) {
         return ubicacion.puedeInvocarseUnDemonio();
     }
+
+    @Override
+    public TipoEspiritu getTipoEspiritu() { return TipoEspiritu.DEMONIO; }
 
 }
