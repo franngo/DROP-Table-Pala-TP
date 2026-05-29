@@ -69,14 +69,6 @@ public interface UbicacionDAONeo4j extends Neo4jRepository<UbicacionNeo4j, Long>
     // --------------------------------------------------------------------------------
 
     @Query("""
-                MATCH (u:Ubicacion {id: $id})
-                SET u.nombre = $nombre
-            """)
-    void actualizar(@Param("id") Long id, @Param("nombre") String nombre);
-
-    // --------------------------------------------------------------------------------
-
-    @Query("""
                 MATCH (o:Ubicacion {id: $idOrigen})-[r:CONECTADO_CON]->(d:Ubicacion {id: $idDestino})
                 RETURN r.costo
             """)

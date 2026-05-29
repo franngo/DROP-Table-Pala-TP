@@ -18,13 +18,7 @@ public class UbicacionNeo4j {
     @Id
     private Long id;
 
-    private String nombre;
-
-    private TipoUbicacion tipo;
-
     public UbicacionNeo4j(Ubicacion ubicacion) {
         this.id = ubicacion.getId();
-        this.nombre = ubicacion.getNombre();
-        this.tipo = ubicacion.getTipoUbicacion();
     }
 }
