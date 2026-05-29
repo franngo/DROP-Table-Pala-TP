@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.controller.dtos.espiritus.response;
 
+import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.TipoEspiritu;
 import ar.edu.unq.epersgeist.controller.dtos.mediums.response.MediumResponseDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionResponseDTO;
 
@@ -8,7 +9,8 @@ public record EspirituResponseDTO(
         String nombre,
         MediumResponseDTO medium,
         UbicacionResponseDTO ubicacion,
-        double nivelConexion
+        double nivelConexion,
+        TipoEspiritu tipo
 ) {
 }
 

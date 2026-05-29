@@ -29,7 +29,8 @@ public class MapperEspiritu {
                 espirituP.getNombre(),
                 espirituP.getMediumCon() == null ? null : MapperMedium.toDTO(espirituP.getMediumCon()),
                 MapperUbicacion.toDTO(espirituP.getUbicacion()),
-                espirituP.getNivelDeConexion()
+                espirituP.getNivelDeConexion(),
+                espirituP.getTipoEspiritu()
         );
     }
 
