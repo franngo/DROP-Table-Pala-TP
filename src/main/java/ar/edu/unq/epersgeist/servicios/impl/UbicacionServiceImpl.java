@@ -1,13 +1,16 @@
 package ar.edu.unq.epersgeist.servicios.impl;
 
+import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.HarmonicResult;
 import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionMongo;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
+import ar.edu.unq.epersgeist.persistencia.mongo.UbicacionDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
 import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
@@ -29,13 +32,14 @@ import java.util.List;
 public class UbicacionServiceImpl implements UbicacionService {
     private final UbicacionDAOSQL ubicacionDAOSQL;
     private final UbicacionDAONeo4j ubicacionDAONeo;
+    private final UbicacionDAOMongo ubicacionDAOMongo;
 
     // --------------------------------------------------------------------------------
     // CREAR
     // --------------------------------------------------------------------------------
 
     @Override
-    public Ubicacion crear(Ubicacion ubicacion) {
+    public Ubicacion crear(Ubicacion ubicacion, List<Coordenada> coordenadas) {
         // Busco si ya existe una ubicación con el mismo nombre
         Ubicacion existente = ubicacionDAOSQL.findByNombre(ubicacion.getNombre());
 
@@ -55,6 +59,9 @@ public class UbicacionServiceImpl implements UbicacionService {
 
         // La persisto también en Neo4j usando el id generado en SQL
         ubicacionDAONeo.save(new UbicacionNeo4j(ubicacion));
+
+        //La persisto también en Mongo
+        ubicacionDAOMongo.save(new UbicacionMongo(ubicacion, coordenadas));
 
         return ubicacion;
     }
@@ -100,6 +107,7 @@ public class UbicacionServiceImpl implements UbicacionService {
             ubicacion.setDeletedAt(true);
             ubicacionDAOSQL.save(ubicacion);
             ubicacionDAONeo.deleteById(id); //hace un DETACH DELETE del nodo en la DB Neo4j con dicho id
+            ubicacionDAOMongo.deleteById(id);
         });
     }
 
@@ -107,6 +115,7 @@ public class UbicacionServiceImpl implements UbicacionService {
     public void eliminarTodos() {
         ubicacionDAOSQL.deleteAll();
         ubicacionDAONeo.deleteAll();
+        ubicacionDAOMongo.deleteAll();
     }
 
     // --------------------------------------------------------------------------------
