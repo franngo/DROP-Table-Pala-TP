@@ -1,15 +1,21 @@
 package ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+import java.util.List;
 
 public record UbicacionCreateDTO(
         @NotBlank String nombre,
         @NotNull @Min(0) @Max(100) Integer energia,
-   
+
         @NotNull(message = "El tipo indicado no es correcto")
-        TipoUbicacion tipoUbicacion
-) {
+        TipoUbicacion tipoUbicacion,
+
+        @Valid
+        @NotEmpty
+        @Size(min=3)
+        List<CoordenadaDTO> coordenadas
+){
+
 }
+
