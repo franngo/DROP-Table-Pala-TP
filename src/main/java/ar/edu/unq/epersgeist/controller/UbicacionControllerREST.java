@@ -3,6 +3,7 @@ package ar.edu.unq.epersgeist.controller;
 import ar.edu.unq.epersgeist.controller.dtos.espiritus.response.EspirituResponseDTO;
 import ar.edu.unq.epersgeist.controller.dtos.mediums.response.MediumResponseDTO;
 import ar.edu.unq.epersgeist.controller.dtos.reportes.responses.ReporteSantuarioMasCorruptoResponseDTO;
+import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.CoordenadaDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionCreateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionUpdateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionResponseDTO;
@@ -10,6 +11,7 @@ import ar.edu.unq.epersgeist.controller.mappers.EstadisticaMapper;
 import ar.edu.unq.epersgeist.controller.mappers.MapperEspiritu;
 import ar.edu.unq.epersgeist.controller.mappers.MapperMedium;
 import ar.edu.unq.epersgeist.controller.mappers.MapperUbicacion;
+import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.HarmonicResult;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.reportes.ReporteSantuarioMasCorrupto;
@@ -59,7 +61,12 @@ public class UbicacionControllerREST {
     @ResponseStatus(HttpStatus.CREATED)
     public UbicacionResponseDTO crear(@Valid @RequestBody UbicacionCreateDTO dto) {
         Ubicacion ubicacion = MapperUbicacion.toModelo(dto);
-        Ubicacion ubicacionCreada = ubicacionService.crear(ubicacion);
+        List<Coordenada> coordenadas =
+                dto.coordenadas()
+                        .stream()
+                        .map(CoordenadaDTO::aModelo)
+                        .toList();
+        Ubicacion ubicacionCreada = ubicacionService.crear(ubicacion, coordenadas);
         return MapperUbicacion.toDTO(ubicacionCreada);
     }
 
