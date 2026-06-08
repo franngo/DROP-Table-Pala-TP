@@ -5,7 +5,7 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.HarmonicResult;
-import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
@@ -272,8 +272,8 @@ public class UbicacionServiceTest {
 
             Ubicacion cementerioPersistido = ubicacionService.crear(cementerio, coordenadas);
 
-            espirituService.crear(new Angelical(NOMBRE_ANGEL, santuarioPersistido));
-            espirituService.crear(new Demonio(NOMBRE_DEMONIO, cementerioPersistido));
+            espirituService.crear(new Angelical(NOMBRE_ANGEL, santuarioPersistido), new Coordenada(-34.81, -58.22));
+            espirituService.crear(new Demonio(NOMBRE_DEMONIO, cementerioPersistido), new Coordenada(-34.82, -58.24));
         }
 
         @AfterEach
@@ -329,14 +329,14 @@ public class UbicacionServiceTest {
             santuarioPersistido = ubicacionService.crear(santuario, coordenadas);
 
             mediumService.crear(
-                    new Medium(NOMBRE_MEDIUM_SIN_ESPIRITUS, 100, 50, santuarioPersistido)
+                    new Medium(NOMBRE_MEDIUM_SIN_ESPIRITUS, 100, 50, santuarioPersistido), new Coordenada(-34.81, -58.22)
             );
 
             Medium mediumConEspiritus = mediumService.crear(
-                    new Medium(NOMBRE_MEDIUM_CON_ESPIRITUS, 100, 50, santuarioPersistido)
+                    new Medium(NOMBRE_MEDIUM_CON_ESPIRITUS, 100, 50, santuarioPersistido), new Coordenada(-34.82, -58.24)
             );
             Espiritu espiritu = espirituService.crear(
-                    new Angelical(NOMBRE_ANGEL, santuarioPersistido)
+                    new Angelical(NOMBRE_ANGEL, santuarioPersistido), new Coordenada(-34.80, -58.20)
             );
             espirituService.conectar(espiritu.getId(), mediumConEspiritus.getId());
         }
