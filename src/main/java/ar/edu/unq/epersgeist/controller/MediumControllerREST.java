@@ -46,7 +46,7 @@ public class MediumControllerREST {
         Long idUbicacion = dtoRequest.ubicacionId();
         Ubicacion ubicacion = ubicacionService.recuperar(idUbicacion);
 
-        Medium medium = mediumService.crear(MapperMedium.toModelo(dtoRequest, ubicacion));
+        Medium medium = mediumService.crear(MapperMedium.toModelo(dtoRequest, ubicacion), dtoRequest.coordenada().aModelo());
         return MapperMedium.toDTO(medium);
     }
 
