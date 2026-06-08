@@ -75,7 +75,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             UbicacionInvalidaException.class,
-            CoordenadasInsuficientesException.class,
             ErrorAlCrearEspirituException.class,
             ErrorAlActualizarEspirituSinIdException.class,
             ErrorAlCrearMediumException.class,

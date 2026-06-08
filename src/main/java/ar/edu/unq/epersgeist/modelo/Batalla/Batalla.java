@@ -2,7 +2,7 @@ package ar.edu.unq.epersgeist.modelo.Batalla;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
-import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 
 import java.util.ArrayList;
 import java.util.Iterator;

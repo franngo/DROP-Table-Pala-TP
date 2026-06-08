@@ -1,11 +1,11 @@
 package ar.edu.unq.epersgeist.servicios.impl;
 
-import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.exceptions.NoExisteSantuarioCorruptoException;
 import ar.edu.unq.epersgeist.modelo.reportes.ReporteSantuarioMasCorrupto;
-import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAO;
-import ar.edu.unq.epersgeist.persistencia.sql.MediumDAO;
+import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAOSQL;
+import ar.edu.unq.epersgeist.persistencia.sql.MediumDAOSQL;
 import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
 import ar.edu.unq.epersgeist.servicios.EstadisticaService;
 import jakarta.transaction.Transactional;
@@ -15,13 +15,13 @@ import org.springframework.stereotype.Service;
 @Service
 @Transactional
 public class EstadisticaServiceImpl implements EstadisticaService {
-    private final MediumDAO mediumDao;
-    private final EspirituDAO espirituDao; //se requiere para usar en el invocar()
+    private final MediumDAOSQL mediumDAOSQL;
+    private final EspirituDAOSQL espirituDAOSQL; //se requiere para usar en el invocar()
     private final UbicacionDAOSQL ubicacionDAOSQL;
 
-    public EstadisticaServiceImpl(MediumDAO mediumDao, EspirituDAO espirituDao, UbicacionDAOSQL ubicacionDAOSQL) {
-        this.mediumDao = mediumDao;
-        this.espirituDao = espirituDao;
+    public EstadisticaServiceImpl(MediumDAOSQL mediumDAOSQL, EspirituDAOSQL espirituDAOSQL, UbicacionDAOSQL ubicacionDAOSQL) {
+        this.mediumDAOSQL = mediumDAOSQL;
+        this.espirituDAOSQL = espirituDAOSQL;
         this.ubicacionDAOSQL = ubicacionDAOSQL;
     }
 
@@ -40,10 +40,10 @@ public class EstadisticaServiceImpl implements EstadisticaService {
                 ubicacionDAOSQL.cantidadDemonios(santuario.getId());
 
         Long cantLibres =
-                espirituDao.demoniosLibres(santuario.getId());
+                espirituDAOSQL.demoniosLibres(santuario.getId());
 
         Medium medium =
-                mediumDao
+                mediumDAOSQL
                         .mediumConMasDemonios(
                                 santuario.getId(),
                                 PageRequest.of(0, 1)

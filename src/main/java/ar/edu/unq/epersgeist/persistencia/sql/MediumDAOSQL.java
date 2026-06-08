@@ -1,6 +1,6 @@
 package ar.edu.unq.epersgeist.persistencia.sql;
 
-import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface MediumDAO extends JpaRepository<Medium, Long> {
+public interface MediumDAOSQL extends JpaRepository<Medium, Long> {
 
     @Query("SELECT m FROM Medium m WHERE m.id = :id AND m.deletedAt = false")
     Optional<Medium> findById(Long id);

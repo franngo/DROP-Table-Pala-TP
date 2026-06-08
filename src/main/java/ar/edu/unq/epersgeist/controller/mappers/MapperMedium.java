@@ -3,7 +3,7 @@ package ar.edu.unq.epersgeist.controller.mappers;
 import ar.edu.unq.epersgeist.controller.dtos.mediums.request.MediumCreateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.mediums.request.MediumUpdateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.mediums.response.MediumResponseDTO;
-import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 
 public class MapperMedium {

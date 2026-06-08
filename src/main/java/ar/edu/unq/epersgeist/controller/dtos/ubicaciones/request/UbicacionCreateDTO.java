@@ -12,7 +12,6 @@ public record UbicacionCreateDTO(
         TipoUbicacion tipoUbicacion,
 
         @Valid
-        @NotEmpty
         @Size(min=3)
         List<CoordenadaDTO> coordenadas
 ){
