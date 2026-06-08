@@ -3,10 +3,7 @@ package ar.edu.unq.epersgeist;
 import ar.edu.unq.epersgeist.controller.dtos.ErrorMessageDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ErrorResponseDTO;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionInvalidaException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -78,6 +75,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             UbicacionInvalidaException.class,
+            CoordenadasInsuficientesException.class,
             ErrorAlCrearEspirituException.class,
             ErrorAlActualizarEspirituSinIdException.class,
             ErrorAlCrearMediumException.class,
