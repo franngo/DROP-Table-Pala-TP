@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.servicios;
 
+import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
@@ -9,7 +10,7 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 public interface EspirituService {
-    Espiritu crear(Espiritu espiritu);
+    Espiritu crear(Espiritu espiritu, Coordenada coordenada);
 
     Espiritu recuperar(Long espirituId);
 

@@ -1,10 +1,13 @@
 package ar.edu.unq.epersgeist.servicios.impl;
 
+import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.Espiritu.EspirituMongo;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
+import ar.edu.unq.epersgeist.persistencia.mongo.EspirituDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAOSQL;
 import ar.edu.unq.epersgeist.persistencia.sql.MediumDAOSQL;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
@@ -27,12 +30,16 @@ import java.util.Optional;
 public class EspirituServiceImpl implements EspirituService {
     private EspirituDAOSQL espirituDAOSQL;
 
+    private EspirituDAOMongo espirituDAOMongo;
+
     private MediumDAOSQL mediumDAOSQL;
 
     @Override
-    public Espiritu crear(Espiritu espiritu) {
+    public Espiritu crear(Espiritu espiritu, Coordenada coordenada) {
         this.validarEspiritu(espiritu);
-        return espirituDAOSQL.save(espiritu);
+        espirituDAOSQL.save(espiritu);
+        espirituDAOMongo.save(new EspirituMongo(espiritu, coordenada));
+        return espiritu;
 
     }
 
@@ -72,6 +79,7 @@ public class EspirituServiceImpl implements EspirituService {
         Espiritu espiritu = this.recuperar(espirituId);
         espiritu.setDeletedAt(true);
         espirituDAOSQL.save(espiritu);
+        espirituDAOMongo.deleteById(espirituId);
 
     }
 
@@ -140,6 +148,7 @@ public class EspirituServiceImpl implements EspirituService {
     public void eliminarTodos() {
 
         espirituDAOSQL.deleteAll();
+        espirituDAOMongo.deleteAll();
 
     }
 
