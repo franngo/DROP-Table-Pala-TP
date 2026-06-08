@@ -1002,7 +1002,7 @@ public class UbicacionServiceTest {
         void crearUbicacionSinCoordenadasLanzaExcepcion() {
 
             assertThrows(
-                    IllegalArgumentException.class,
+                    CoordenadasInsuficientesException.class,
                     () -> ubicacionService.crear(
                             santuario,
                             List.of()
