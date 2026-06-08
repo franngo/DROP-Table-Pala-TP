@@ -32,7 +32,7 @@ public class EspirituControllerREST {
 
 
         Espiritu espirituM = MapperEspiritu.toModelo(dto, ubicacion);
-        Espiritu espirituP = espirituService.crear(espirituM);
+        Espiritu espirituP = espirituService.crear(espirituM, dto.coordenada().aModelo());
         return MapperEspiritu.toDTO(espirituP);
     }
 

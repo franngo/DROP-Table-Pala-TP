@@ -1,10 +1,11 @@
 package ar.edu.unq.epersgeist.servicios;
 
 
+import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
@@ -47,28 +48,40 @@ public class MediumServiceTest {
     private Medium ubedaM;
     private Medium epifanioP;
     private Medium ubedaP;
+    private List<Coordenada> coordenadas;
+    private Coordenada coordenadaMedium;
+    private Coordenada coordenadaEspiritu;
 
 
     @BeforeEach
     public void setUp() {
-        berazategui = ubicacionService.crear(new Santuario("Berazategui", ENERGIA));
-        bernal = ubicacionService.crear(new Santuario("Bernal", ENERGIA));
+        coordenadas = List.of(
+                new Coordenada(-34.81, -58.22),
+                new Coordenada(-34.82, -58.24),
+                new Coordenada(-34.80, -58.20)
+        );
+
+        coordenadaMedium = new Coordenada(-34.812, -58.214);
+        coordenadaEspiritu = new Coordenada(-34.815, -58.220);
+
+        berazategui = ubicacionService.crear(new Santuario("Berazategui", ENERGIA),coordenadas);
+        bernal = ubicacionService.crear(new Santuario("Bernal", ENERGIA),coordenadas);
 
         espirituM = new Angelical("Charizard", berazategui);
         espirituM2 = new Angelical("Bulbasor", berazategui);
         epifanioM = new Medium("Epifanio el poderoso", 150, 50, bernal);
         ubedaM = new Medium("Ubeda el dt", 100, 20, bernal);
 
-        epifanioP = serviceMedium.crear(epifanioM);
-        ubedaP = serviceMedium.crear(ubedaM);
+        epifanioP = serviceMedium.crear(epifanioM, coordenadaMedium);
+        ubedaP = serviceMedium.crear(ubedaM, coordenadaMedium);
 
         rikaM = new Angelical("Rika", bernal);
         rikaM.setNivelDeConexion(60);
-        rikaP = espirituService.crear(rikaM);
+        rikaP = espirituService.crear(rikaM, coordenadaEspiritu);
 
         jaegerM = new Demonio("Jaeger", bernal);
         jaegerM.setNivelDeConexion(50);
-        jaegerP = espirituService.crear(jaegerM);
+        jaegerP = espirituService.crear(jaegerM, coordenadaEspiritu);
     }
 
     //crear
@@ -84,7 +97,7 @@ public class MediumServiceTest {
     @Test
     void fallaAlCrearMediumNulo() {
         assertThrows(ErrorAlCrearMediumException.class, () -> {
-            Medium mediumP = serviceMedium.crear(null);
+            Medium mediumP = serviceMedium.crear(null, new Coordenada(-0.0, -0.0));
         });
     }
 
@@ -94,7 +107,7 @@ public class MediumServiceTest {
         matiasM.setId(1L);
 
         assertThrows(ErrorAlCrearMediumException.class, () -> {
-            serviceMedium.crear(matiasM);
+            serviceMedium.crear(matiasM, new Coordenada(-0.0, -0.0));
         });
     }
 
@@ -128,7 +141,7 @@ public class MediumServiceTest {
 
         Medium mediumPrueba = new Medium("MediumTest", 1, 1, berazategui);
 
-        Long id = serviceMedium.crear(mediumPrueba).getId();
+        Long id = serviceMedium.crear(mediumPrueba, coordenadaMedium).getId();
 
         Medium modificado = new Medium("Rolando el audaz", 120, 50, berazategui);
         modificado.setId(id);
@@ -149,7 +162,7 @@ public class MediumServiceTest {
     void deberiaActualizarSoloLosCamposModificados2() {
 
         Medium mediumPrueba = new Medium("MediumTest", 1, 1, berazategui);
-        Long id = serviceMedium.crear(mediumPrueba).getId();
+        Long id = serviceMedium.crear(mediumPrueba, coordenadaMedium).getId();
 
         mediumPrueba.setNombre("Rolando el audaz");
         mediumPrueba.setMana(120);
@@ -196,7 +209,7 @@ public class MediumServiceTest {
     @Test
     void deberiaEliminarYNoPoderRecuperarloLuego() {
         Medium mediumPrueba = new Medium("MediumTest", 1, 1, berazategui);
-        Long id = serviceMedium.crear(mediumPrueba).getId();
+        Long id = serviceMedium.crear(mediumPrueba, coordenadaMedium).getId();
 
         serviceMedium.eliminar(id);
 
@@ -210,7 +223,7 @@ public class MediumServiceTest {
     public void descansarCasoExitoso() {
 
         Medium mediumPrueba = new Medium("MediumTest", 200, 50, bernal);
-        Medium mediumPruebaP = serviceMedium.crear(mediumPrueba);
+        Medium mediumPruebaP = serviceMedium.crear(mediumPrueba, coordenadaMedium);
 
         rikaP.setNivelDeConexion(0);
         jaegerP.setNivelDeConexion(0);
@@ -252,7 +265,7 @@ public class MediumServiceTest {
         assertEquals(20, ubedaP.getMana());
 
         //espirituM es un Angelical que está en berazategui
-        Espiritu espirituP = espirituService.crear(espirituM);
+        Espiritu espirituP = espirituService.crear(espirituM, coordenadaEspiritu);
 
         //al ser un Angelical libre, espirituP puede ser invocado por ubedaP, quien cuenta con suficiente mana para hacerlo
         serviceMedium.invocar(ubedaP.getId(), espirituP.getId());
@@ -275,7 +288,7 @@ public class MediumServiceTest {
     @Test
     public void invocarFallaPorEspirituIdNulo() {
         Medium mediumPrueba = new Medium("MediumTest", 100, 50, berazategui);
-        Medium mediumPruebaP = serviceMedium.crear(mediumPrueba);
+        Medium mediumPruebaP = serviceMedium.crear(mediumPrueba, coordenadaMedium);
 
         Long idInexistente = mediumPruebaP.getId() + 1;
         ErrorDeEspirituNoEncontradoException exception = assertThrows(ErrorDeEspirituNoEncontradoException.class,
@@ -288,22 +301,22 @@ public class MediumServiceTest {
     @Test
     void exorcismoNoExitosoDeberiaAfectarElAngelDelMedium() {
         // Por una cuestion de comodidad voy a crear el contexto con nuevas variables
-        Ubicacion quilmes = ubicacionService.crear(new Santuario("Quilmes", ENERGIA));
+        Ubicacion quilmes = ubicacionService.crear(new Santuario("Quilmes", ENERGIA), coordenadas);
 
         Medium matiasM = new Medium("Matias", 150, 50, quilmes);
 
         Medium francoM = new Medium("Franco", 100, 20, quilmes);
 
-        Medium matiasP = serviceMedium.crear(matiasM);
-        Medium francoP = serviceMedium.crear(francoM);
+        Medium matiasP = serviceMedium.crear(matiasM, coordenadaMedium);
+        Medium francoP = serviceMedium.crear(francoM, coordenadaMedium);
 
         Espiritu omnimanM = new Angelical("Omniman", quilmes);
         omnimanM.setNivelDeConexion(60);
-        Espiritu omnimanP = espirituService.crear(omnimanM);
+        Espiritu omnimanP = espirituService.crear(omnimanM, coordenadaEspiritu);
 
         Espiritu markM = new Demonio("Mark", quilmes);
         markM.setNivelDeConexion(50);
-        Espiritu markP = espirituService.crear(markM);
+        Espiritu markP = espirituService.crear(markM, coordenadaEspiritu);
         // el demonio siempre gana
         RandomDefensa.setEstrategiaNumero(new EstrategiaRangoEspecifico(99, 99));
 
@@ -323,11 +336,11 @@ public class MediumServiceTest {
     @Test
     void unMediumNoSePuedeExorcizarASiMismo() {
         // Por una cuestion de comodidad voy a crear el contexto con nuevas variables
-        Ubicacion quilmes = ubicacionService.crear(new Santuario("Quilmes", ENERGIA));
+        Ubicacion quilmes = ubicacionService.crear(new Santuario("Quilmes", ENERGIA), coordenadas);
 
         Medium matiasM = new Medium("Matias", 150, 50, quilmes);
 
-        Medium matiasP = serviceMedium.crear(matiasM);
+        Medium matiasP = serviceMedium.crear(matiasM, coordenadaMedium);
 
         assertThrows(ExorcismoPropioNoPermitidoException.class, () -> serviceMedium.exorcizar(matiasP.getId(), matiasP.getId()));
     }
@@ -335,15 +348,15 @@ public class MediumServiceTest {
     @Test
     void unMediumNoPuedeExorcizarAOtroEnUbicacionDiferente() {
         // Por una cuestion de comodidad voy a crear el contexto con nuevas variables
-        Ubicacion quilmes = ubicacionService.crear(new Santuario("Quilmes", ENERGIA));
-        Ubicacion wilde = ubicacionService.crear(new Santuario("Wilde", ENERGIA));
+        Ubicacion quilmes = ubicacionService.crear(new Santuario("Quilmes", ENERGIA), coordenadas);
+        Ubicacion wilde = ubicacionService.crear(new Santuario("Wilde", ENERGIA), coordenadas);
 
         Medium matiasM = new Medium("Matias", 150, 50, quilmes);
 
         Medium francoM = new Medium("Franco", 100, 20, wilde);
 
-        Medium matiasP = serviceMedium.crear(matiasM);
-        Medium francoP = serviceMedium.crear(francoM);
+        Medium matiasP = serviceMedium.crear(matiasM, coordenadaMedium);
+        Medium francoP = serviceMedium.crear(francoM, coordenadaMedium);
 
         assertThrows(ErrorDeMediumExorcizandoAOtroEnDistintaUbicacion.class, () -> serviceMedium.exorcizar(matiasP.getId(), francoP.getId()));
     }
@@ -376,14 +389,14 @@ public class MediumServiceTest {
 
         @BeforeEach
         void setUtMover() {
-            ranelagh = ubicacionService.crear(new Santuario("Ranelagh", 99));
-            sourigues = ubicacionService.crear(new Santuario("Sourigues", 70));
+            ranelagh = ubicacionService.crear(new Santuario("Ranelagh", 99), coordenadas);
+            sourigues = ubicacionService.crear(new Santuario("Sourigues", 70), coordenadas);
             ubicacionService.conectar(ranelagh.getId(), sourigues.getId(), 40L);
-            mediumAMover = serviceMedium.crear(new Medium("Matias Sanchez", 100, 90, ranelagh));
+            mediumAMover = serviceMedium.crear(new Medium("Matias Sanchez", 100, 90, ranelagh),coordenadaMedium);
 
             // espiritus que acompañanan a
-            Espiritu elChiqui = espirituService.crear(new Angelical("Chiqui Tapia", ranelagh));
-            Espiritu juanchiElPastelero = espirituService.crear(new Angelical("Juanchito", ranelagh));
+            Espiritu elChiqui = espirituService.crear(new Angelical("Chiqui Tapia", ranelagh), coordenadaEspiritu);
+            Espiritu juanchiElPastelero = espirituService.crear(new Angelical("Juanchito", ranelagh), coordenadaEspiritu);
 
             espirituService.conectar(elChiqui.getId(), mediumAMover.getId());
             espirituService.conectar(juanchiElPastelero.getId(), mediumAMover.getId());
@@ -420,7 +433,7 @@ public class MediumServiceTest {
 
         @Test
         void elMediumNoPuedeMoverseAUnaUbicacionLejana() {
-            Ubicacion varela = ubicacionService.crear(new Cementerio("Varela", 50));
+            Ubicacion varela = ubicacionService.crear(new Cementerio("Varela", 50), coordenadas);
             ubicacionService.conectar(sourigues.getId(), varela.getId(), 30L);
 
             assertThatThrownBy(
@@ -441,7 +454,7 @@ public class MediumServiceTest {
 
         @Test
         void elMediumSiQuedaSinManaEsEliminado() {
-            Ubicacion laUNQ = ubicacionService.crear(new Santuario("La Unq", 80));
+            Ubicacion laUNQ = ubicacionService.crear(new Santuario("La Unq", 80), coordenadas);
             ubicacionService.conectar(ranelagh.getId(), laUNQ.getId(), 99L);
 
             serviceMedium.mover(mediumAMover.getId(), laUNQ.getId());

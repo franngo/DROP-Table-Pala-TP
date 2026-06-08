@@ -7,7 +7,7 @@ import ar.edu.unq.epersgeist.controller.dtos.mediums.response.MediumResponseDTO;
 import ar.edu.unq.epersgeist.controller.mappers.MapperEspiritu;
 import ar.edu.unq.epersgeist.controller.mappers.MapperMedium;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.servicios.MediumService;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
@@ -46,7 +46,7 @@ public class MediumControllerREST {
         Long idUbicacion = dtoRequest.ubicacionId();
         Ubicacion ubicacion = ubicacionService.recuperar(idUbicacion);
 
-        Medium medium = mediumService.crear(MapperMedium.toModelo(dtoRequest, ubicacion));
+        Medium medium = mediumService.crear(MapperMedium.toModelo(dtoRequest, ubicacion), dtoRequest.coordenada().aModelo());
         return MapperMedium.toDTO(medium);
     }
 

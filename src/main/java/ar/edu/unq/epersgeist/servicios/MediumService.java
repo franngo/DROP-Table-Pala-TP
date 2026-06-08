@@ -1,13 +1,14 @@
 package ar.edu.unq.epersgeist.servicios;
 
+import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ExorcismoPropioNoPermitidoException;
 
 import java.util.List;
 
 public interface MediumService {
-    Medium crear(Medium medium);
+    Medium crear(Medium medium, Coordenada coordenada);
 
     Medium recuperar(Long idMedium);
 

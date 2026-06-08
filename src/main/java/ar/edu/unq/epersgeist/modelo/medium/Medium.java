@@ -1,5 +1,6 @@
-package ar.edu.unq.epersgeist.modelo;
+package ar.edu.unq.epersgeist.modelo.medium;
 
+import ar.edu.unq.epersgeist.modelo.Auditable;
 import ar.edu.unq.epersgeist.modelo.Batalla.Batalla;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;

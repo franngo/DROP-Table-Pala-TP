@@ -1,12 +1,15 @@
 package ar.edu.unq.epersgeist.servicios.impl;
 
+import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.Espiritu.EspirituMongo;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
-import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAO;
-import ar.edu.unq.epersgeist.persistencia.sql.MediumDAO;
+import ar.edu.unq.epersgeist.persistencia.mongo.EspirituDAOMongo;
+import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAOSQL;
+import ar.edu.unq.epersgeist.persistencia.sql.MediumDAOSQL;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -25,14 +28,18 @@ import java.util.Optional;
 @Transactional
 @AllArgsConstructor
 public class EspirituServiceImpl implements EspirituService {
-    private EspirituDAO espirituDao;
+    private EspirituDAOSQL espirituDAOSQL;
 
-    private MediumDAO mediumDao;
+    private EspirituDAOMongo espirituDAOMongo;
+
+    private MediumDAOSQL mediumDAOSQL;
 
     @Override
-    public Espiritu crear(Espiritu espiritu) {
+    public Espiritu crear(Espiritu espiritu, Coordenada coordenada) {
         this.validarEspiritu(espiritu);
-        return espirituDao.save(espiritu);
+        espirituDAOSQL.save(espiritu);
+        espirituDAOMongo.save(new EspirituMongo(espiritu, coordenada));
+        return espiritu;
 
     }
 
@@ -49,7 +56,7 @@ public class EspirituServiceImpl implements EspirituService {
     @Override
     public Espiritu recuperar(Long espirituId) {
 
-        return espirituDao.findById(espirituId).orElseThrow(
+        return espirituDAOSQL.findById(espirituId).orElseThrow(
                 () -> new ErrorDeEspirituNoEncontradoException(espirituId)
         );
     }
@@ -61,9 +68,9 @@ public class EspirituServiceImpl implements EspirituService {
         }
 
         Long espirituId = espiritu.getId();
-        espirituDao.findById(espirituId).orElseThrow(() -> new ErrorAlActualizarEspirituException("No existe en la BD el espiritu con id: " + espirituId));
+        espirituDAOSQL.findById(espirituId).orElseThrow(() -> new ErrorAlActualizarEspirituException("No existe en la BD el espiritu con id: " + espirituId));
 
-        this.espirituDao.save(espiritu);
+        this.espirituDAOSQL.save(espiritu);
     }
 
     @Override
@@ -71,21 +78,22 @@ public class EspirituServiceImpl implements EspirituService {
 
         Espiritu espiritu = this.recuperar(espirituId);
         espiritu.setDeletedAt(true);
-        espirituDao.save(espiritu);
+        espirituDAOSQL.save(espiritu);
+        espirituDAOMongo.deleteById(espirituId);
 
     }
 
     @Override
     public List<Espiritu> recuperarTodos() {
 
-        return espirituDao.findAll();
+        return espirituDAOSQL.findAll();
     }
 
     @Override
     public Medium conectar(Long espirituId, Long mediumId) {
-        Optional<Espiritu> espirituAConectar = espirituDao.findById(espirituId);
+        Optional<Espiritu> espirituAConectar = espirituDAOSQL.findById(espirituId);
 
-        Optional<Medium> mediumAConectar = mediumDao.findById(mediumId);
+        Optional<Medium> mediumAConectar = mediumDAOSQL.findById(mediumId);
 
         if (espirituAConectar.isEmpty()) {
             throw new ErrorAlConectarEspirituConMedium("El espiritu no existe en la bbdd");
@@ -98,7 +106,7 @@ public class EspirituServiceImpl implements EspirituService {
         //las validaciones sobre si está libre y en la misma ubicación se dan en el method del modelo.
         espirituEncontrado.aumentarConexionYConectar(mediumEncontrado);
 
-        return mediumDao.save(mediumEncontrado);
+        return mediumDAOSQL.save(mediumEncontrado);
 
 
     }
@@ -106,7 +114,7 @@ public class EspirituServiceImpl implements EspirituService {
     @Override
     public List<Demonio> espiritusDemoniacos() {
 
-        return espirituDao.espiritusDemoniacos();
+        return espirituDAOSQL.espiritusDemoniacos();
     }
 
     //versión que implementa la paginación
@@ -130,7 +138,7 @@ public class EspirituServiceImpl implements EspirituService {
 
         Pageable pageable = PageRequest.of(pag - 1, cantPorPag, sort);
 
-        return espirituDao.espiritusDemoniacos(pageable);
+        return espirituDAOSQL.espiritusDemoniacos(pageable);
 
     }
 
@@ -139,7 +147,8 @@ public class EspirituServiceImpl implements EspirituService {
 
     public void eliminarTodos() {
 
-        espirituDao.deleteAll();
+        espirituDAOSQL.deleteAll();
+        espirituDAOMongo.deleteAll();
 
     }
 

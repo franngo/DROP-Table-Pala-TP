@@ -1,14 +1,17 @@
 package ar.edu.unq.epersgeist.servicios.impl;
 
+import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
+import ar.edu.unq.epersgeist.modelo.medium.MediumMongo;
+import ar.edu.unq.epersgeist.persistencia.mongo.MediumDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
-import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAO;
-import ar.edu.unq.epersgeist.persistencia.sql.MediumDAO;
+import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAOSQL;
+import ar.edu.unq.epersgeist.persistencia.sql.MediumDAOSQL;
 import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
 import ar.edu.unq.epersgeist.servicios.MediumService;
 import jakarta.transaction.Transactional;
@@ -20,20 +23,22 @@ import java.util.Objects;
 @Service
 @Transactional
 public class MediumServiceImpl implements MediumService {
-    private final MediumDAO mediumDao;
-    private final EspirituDAO espirituDao; //se requiere para usar en el invocar()
+    private final MediumDAOSQL mediumDAOSQL;
+    private final MediumDAOMongo mediumDAOMongo;
+    private final EspirituDAOSQL espirituDAOSQL; //se requiere para usar en el invocar()
     private final UbicacionDAOSQL ubicacionDAOSQL;
     private final UbicacionDAONeo4j ubicacionDAONeo4j;
 
-    public MediumServiceImpl(MediumDAO mediumDao, EspirituDAO espirituDao, UbicacionDAOSQL ubicacionDAOSQL, UbicacionDAONeo4j ubicacionDAONeo4j) {
-        this.mediumDao = mediumDao;
-        this.espirituDao = espirituDao;
+    public MediumServiceImpl(MediumDAOSQL mediumDAOSQL, EspirituDAOSQL espirituDAOSQL, UbicacionDAOSQL ubicacionDAOSQL, UbicacionDAONeo4j ubicacionDAONeo4j, MediumDAOMongo mediumDAOMongo) {
+        this.mediumDAOSQL = mediumDAOSQL;
+        this.mediumDAOMongo = mediumDAOMongo;
+        this.espirituDAOSQL = espirituDAOSQL;
         this.ubicacionDAOSQL = ubicacionDAOSQL;
         this.ubicacionDAONeo4j = ubicacionDAONeo4j;
     }
 
     @Override
-    public Medium crear(Medium medium) {
+    public Medium crear(Medium medium, Coordenada coordenada) {
         if (medium == null) {
             throw new ErrorAlCrearMediumException("medium nulo.");
         }
@@ -42,13 +47,17 @@ public class MediumServiceImpl implements MediumService {
             throw new ErrorAlCrearMediumException("ya tiene un id asignado.");
         }
 
-        return this.mediumDao.save(medium);
+        mediumDAOSQL.save(medium);
+
+        mediumDAOMongo.save(new MediumMongo(medium, coordenada));
+
+        return medium;
     }
 
     @Override
     public Medium recuperar(Long idMedium) {
 
-        return mediumDao.findById(idMedium).orElseThrow(() -> new ErrorDeMediumNoEncontradoException(idMedium));
+        return mediumDAOSQL.findById(idMedium).orElseThrow(() -> new ErrorDeMediumNoEncontradoException(idMedium));
     }
 
     @Override
@@ -59,21 +68,22 @@ public class MediumServiceImpl implements MediumService {
 
         //lo intento recuperar solo para saber si está o no en la DB y si debo tirar el error
         Long idMedium = medium.getId();
-        mediumDao.findById(idMedium).orElseThrow(() -> new ErrorAlActualizarMediumException("No existe en la BD el medium con id: " + idMedium));
+        mediumDAOSQL.findById(idMedium).orElseThrow(() -> new ErrorAlActualizarMediumException("No existe en la BD el medium con id: " + idMedium));
 
-        this.mediumDao.save(medium);
+        this.mediumDAOSQL.save(medium);
     }
 
     @Override
     public void eliminar(Long idMedium) {
         Medium medium = this.recuperar(idMedium);
         medium.setDeletedAt(true);
-        mediumDao.save(medium);
+        mediumDAOSQL.save(medium);
+        mediumDAOMongo.deleteById(idMedium);
     }
 
     @Override
     public List<Medium> recuperarTodos() {
-        return mediumDao.findAll();
+        return mediumDAOSQL.findAll();
     }
 
     @Override
@@ -87,7 +97,7 @@ public class MediumServiceImpl implements MediumService {
     public Espiritu invocar(Long mediumId, Long espirituId) {
         Medium m = this.recuperar(mediumId);
 
-        Espiritu e = espirituDao.findById(espirituId).orElseThrow(() -> new ErrorDeEspirituNoEncontradoException(espirituId));
+        Espiritu e = espirituDAOSQL.findById(espirituId).orElseThrow(() -> new ErrorDeEspirituNoEncontradoException(espirituId));
 
         return m.invocar(e);
     }
@@ -122,7 +132,7 @@ public class MediumServiceImpl implements MediumService {
     @Override
     public void mover(Long mediumId, Long ubicacionId) {
 
-        Medium mediumAMover = mediumDao.findById(mediumId)
+        Medium mediumAMover = mediumDAOSQL.findById(mediumId)
                 .orElseThrow(() ->
                         new ErrorDeMediumNoEncontradoException(mediumId)
                 );
@@ -154,9 +164,9 @@ public class MediumServiceImpl implements MediumService {
 
             // depende el estado del medium se guarda o se elimina
             if (mediumAMover.sinMana()) {
-                mediumDao.delete(mediumAMover);
+                mediumDAOSQL.delete(mediumAMover);
             } else {
-                mediumDao.save(mediumAMover);
+                mediumDAOSQL.save(mediumAMover);
             }
 
         }
@@ -174,7 +184,8 @@ public class MediumServiceImpl implements MediumService {
 
     @Override
     public void eliminarTodos() {
-        mediumDao.deleteAll();
+        mediumDAOSQL.deleteAll();
+        mediumDAOMongo.deleteAll();
     }
 
 
