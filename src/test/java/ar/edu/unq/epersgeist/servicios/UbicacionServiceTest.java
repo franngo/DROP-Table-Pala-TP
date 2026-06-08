@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.servicios;
 
+import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
@@ -8,6 +9,7 @@ import ar.edu.unq.epersgeist.modelo.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.CoordenadasInsuficientesException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
@@ -56,6 +58,7 @@ public class UbicacionServiceTest {
 
     private Ubicacion santuario;
     private Ubicacion cementerio;
+    private List<Coordenada> coordenadas;
 
     // --------------------------------------------------------------------------------
     // SETUP Y TEARDOWN
@@ -65,6 +68,10 @@ public class UbicacionServiceTest {
     void setUp() {
         santuario = new Santuario(NOMBRE_SANTUARIO, ENERGIA_VALIDA);
         cementerio = new Cementerio(NOMBRE_CEMENTERIO, ENERGIA_VALIDA);
+        coordenadas = List.of(new Coordenada(-34.81, -58.22),
+                new Coordenada(-34.82, -58.24),
+                new Coordenada(-34.80, -58.20)
+        );
     }
 
     @AfterEach
@@ -80,7 +87,7 @@ public class UbicacionServiceTest {
     class Crear {
         @Test
         void sePuedeCrearUnaUbicacion() {
-            Ubicacion ubicacionCreada = ubicacionService.crear(santuario);
+            Ubicacion ubicacionCreada = ubicacionService.crear(santuario,coordenadas);
 
             assertNotNull(ubicacionCreada.getId());
             assertEquals(NOMBRE_SANTUARIO, ubicacionCreada.getNombre());
@@ -88,11 +95,11 @@ public class UbicacionServiceTest {
 
         @Test
         void noSePuedeCrearUbicacionConNombreRepetido() {
-            ubicacionService.crear(santuario);
+            ubicacionService.crear(santuario, coordenadas);
 
             assertThrows(
                     UbicacionYaExisteException.class,
-                    () -> ubicacionService.crear(santuario)
+                    () -> ubicacionService.crear(santuario, coordenadas)
             );
         }
     }
@@ -105,7 +112,7 @@ public class UbicacionServiceTest {
     class Recuperar {
         @Test
         void sePuedeRecuperarUnaUbicacionPorId() {
-            Ubicacion ubicacionCreada = ubicacionService.crear(santuario);
+            Ubicacion ubicacionCreada = ubicacionService.crear(santuario, coordenadas);
 
             Ubicacion ubicacionRecuperada = ubicacionService.recuperar(ubicacionCreada.getId());
 
@@ -131,8 +138,8 @@ public class UbicacionServiceTest {
     class RecuperarTodos {
         @Test
         void sePuedenRecuperarTodasLasUbicaciones() {
-            ubicacionService.crear(santuario);
-            ubicacionService.crear(cementerio);
+            ubicacionService.crear(santuario, coordenadas);
+            ubicacionService.crear(cementerio, coordenadas);
 
             List<Ubicacion> ubicaciones = ubicacionService.recuperarTodos();
 
@@ -157,7 +164,7 @@ public class UbicacionServiceTest {
     class Actualizar {
         @Test
         void sePuedeActualizarUnaUbicacion() {
-            Ubicacion ubicacionCreada = ubicacionService.crear(santuario);
+            Ubicacion ubicacionCreada = ubicacionService.crear(santuario, coordenadas);
 
             ubicacionCreada.setEnergia(ENERGIA_MAXIMA);
             ubicacionService.actualizar(ubicacionCreada);
@@ -187,7 +194,7 @@ public class UbicacionServiceTest {
 
         @Test
         void actualizarMantieneNombreYModificaEnergia() {
-            Ubicacion ubicacionCreada = ubicacionService.crear(santuario);
+            Ubicacion ubicacionCreada = ubicacionService.crear(santuario, coordenadas);
 
             ubicacionCreada.setEnergia(ENERGIA_MAXIMA);
             ubicacionService.actualizar(ubicacionCreada);
@@ -207,7 +214,7 @@ public class UbicacionServiceTest {
     class Eliminar {
         @Test
         void sePuedeEliminarUnaUbicacionPorId() {
-            Ubicacion ubicacionCreada = ubicacionService.crear(santuario);
+            Ubicacion ubicacionCreada = ubicacionService.crear(santuario, coordenadas);
 
             ubicacionService.eliminar(ubicacionCreada.getId());
 
@@ -230,8 +237,8 @@ public class UbicacionServiceTest {
     class EliminarTodos {
         @Test
         void sePuedenEliminarTodasLasUbicaciones() {
-            ubicacionService.crear(santuario);
-            ubicacionService.crear(cementerio);
+            ubicacionService.crear(santuario, coordenadas);
+            ubicacionService.crear(cementerio, coordenadas);
 
             ubicacionService.eliminarTodos();
 
@@ -261,9 +268,9 @@ public class UbicacionServiceTest {
 
         @BeforeEach
         void setUp() {
-            santuarioPersistido = ubicacionService.crear(santuario);
+            santuarioPersistido = ubicacionService.crear(santuario, coordenadas);
 
-            Ubicacion cementerioPersistido = ubicacionService.crear(cementerio);
+            Ubicacion cementerioPersistido = ubicacionService.crear(cementerio, coordenadas);
 
             espirituService.crear(new Angelical(NOMBRE_ANGEL, santuarioPersistido));
             espirituService.crear(new Demonio(NOMBRE_DEMONIO, cementerioPersistido));
@@ -287,7 +294,7 @@ public class UbicacionServiceTest {
 
         @Test
         void devuelveListaVaciaSiNoHayEspiritusEnLaUbicacion() {
-            Ubicacion nuevaUbicacion = ubicacionService.crear(new Santuario("Otro santuario", ENERGIA_VALIDA));
+            Ubicacion nuevaUbicacion = ubicacionService.crear(new Santuario("Otro santuario", ENERGIA_VALIDA), coordenadas);
 
             List<Espiritu> espiritus = ubicacionService.espiritusEn(nuevaUbicacion.getId());
 
@@ -319,7 +326,7 @@ public class UbicacionServiceTest {
 
         @BeforeEach
         void setUp() {
-            santuarioPersistido = ubicacionService.crear(santuario);
+            santuarioPersistido = ubicacionService.crear(santuario, coordenadas);
 
             mediumService.crear(
                     new Medium(NOMBRE_MEDIUM_SIN_ESPIRITUS, 100, 50, santuarioPersistido)
@@ -353,7 +360,7 @@ public class UbicacionServiceTest {
 
         @Test
         void devuelveListaVaciaSiLaUbicacionNoTieneMediums() {
-            Ubicacion otraUbicacion = ubicacionService.crear(new Santuario("Santuario Vacío", ENERGIA_VALIDA));
+            Ubicacion otraUbicacion = ubicacionService.crear(new Santuario("Santuario Vacío", ENERGIA_VALIDA), coordenadas);
 
             List<Medium> mediums = ubicacionService.mediumsSinEspiritusEn(otraUbicacion.getId());
 
@@ -380,9 +387,9 @@ public class UbicacionServiceTest {
 
         @BeforeEach
         void setUp() {
-            origen = ubicacionService.crear(new Santuario("ORIGEN", 50));
-            destino = ubicacionService.crear(new Cementerio("DESTINO", 50));
-            otroNodo = ubicacionService.crear(new Santuario("OTRO", 50));
+            origen = ubicacionService.crear(new Santuario("ORIGEN", 50), coordenadas);
+            destino = ubicacionService.crear(new Cementerio("DESTINO", 50), coordenadas);
+            otroNodo = ubicacionService.crear(new Santuario("OTRO", 50), coordenadas);
         }
 
         @AfterEach
@@ -550,9 +557,9 @@ public class UbicacionServiceTest {
 
         @BeforeEach
         void setUp() {
-            origen = ubicacionService.crear(new Santuario("ORIGEN", 50));
-            destino = ubicacionService.crear(new Cementerio("DESTINO", 50));
-            otroNodo = ubicacionService.crear(new Santuario("OTRO", 50));
+            origen = ubicacionService.crear(new Santuario("ORIGEN", 50), coordenadas);
+            destino = ubicacionService.crear(new Cementerio("DESTINO", 50), coordenadas);
+            otroNodo = ubicacionService.crear(new Santuario("OTRO", 50), coordenadas);
         }
 
         @AfterEach
@@ -590,7 +597,7 @@ public class UbicacionServiceTest {
 
         @Test
         void caminoMasRentableCasoExitoso() {
-            Ubicacion nodoCuatro = ubicacionService.crear(new Santuario("Nodo cuatro", 50));
+            Ubicacion nodoCuatro = ubicacionService.crear(new Santuario("Nodo cuatro", 50), coordenadas);
 
             ubicacionService.conectar(origen.getId(), otroNodo.getId(), 10L);
             ubicacionService.conectar(otroNodo.getId(), destino.getId(), 20L);
@@ -610,7 +617,7 @@ public class UbicacionServiceTest {
 
         @Test
         void caminoMasRentableNoSeRigePorLongitudDelCamino() {
-            Ubicacion nodoCuatro = ubicacionService.crear(new Santuario("Nodo cuatro", 50));
+            Ubicacion nodoCuatro = ubicacionService.crear(new Santuario("Nodo cuatro", 50),coordenadas);
 
             ubicacionService.conectar(origen.getId(), destino.getId(), 100L);
 
@@ -650,10 +657,10 @@ public class UbicacionServiceTest {
                 A → C → B → D  (3 saltos)
             */
 
-            a = ubicacionService.crear(new Santuario("A", 50));
-            b = ubicacionService.crear(new Santuario("B", 50));
-            c = ubicacionService.crear(new Santuario("C", 50));
-            d = ubicacionService.crear(new Santuario("D", 50));
+            a = ubicacionService.crear(new Santuario("A", 50), coordenadas);
+            b = ubicacionService.crear(new Santuario("B", 50), coordenadas);
+            c = ubicacionService.crear(new Santuario("C", 50), coordenadas);
+            d = ubicacionService.crear(new Santuario("D", 50), coordenadas);
 
             // CAMINO MÁS CORTO
             ubicacionService.conectar(a.getId(), b.getId(), 1L);
@@ -706,7 +713,7 @@ public class UbicacionServiceTest {
         @Test
         void siNoExisteCaminoLanzaExcepcion() {
             Ubicacion sinConexiones = ubicacionService.crear(
-                    new Santuario("SIN_CONEXIONES", 50)
+                    new Santuario("SIN_CONEXIONES", 50), coordenadas
             );
 
             assertThrows(
@@ -773,9 +780,9 @@ public class UbicacionServiceTest {
 
         @BeforeEach
         void setUp() {
-            ubicacionService.crear(new Santuario("Alta energia", 70));
-            ubicacionService.crear(new Cementerio("Media energia", 50));
-            ubicacionService.crear(new Santuario("Baja energia", 20));
+            ubicacionService.crear(new Santuario("Alta energia", 70),coordenadas);
+            ubicacionService.crear(new Cementerio("Media energia", 50), coordenadas);
+            ubicacionService.crear(new Santuario("Baja energia", 20), coordenadas);
         }
 
         @AfterEach
@@ -800,8 +807,8 @@ public class UbicacionServiceTest {
 
         @Test
         void devuelveTodasSiTodasSuperanElUmbral() {
-            ubicacionService.crear(new Santuario("Primera", 90));
-            ubicacionService.crear(new Cementerio("Segunda", 95));
+            ubicacionService.crear(new Santuario("Primera", 90), coordenadas);
+            ubicacionService.crear(new Cementerio("Segunda", 95), coordenadas);
             List<Ubicacion> sobrecargadas = ubicacionService.ubicacionesSobrecargadas(80);
 
             assertEquals(2, sobrecargadas.size());
@@ -809,7 +816,7 @@ public class UbicacionServiceTest {
 
         @Test
         void noDevuelveUbicacionesEliminadas() {
-            Ubicacion alta = ubicacionService.crear(new Santuario("Mucha energia", 90));
+            Ubicacion alta = ubicacionService.crear(new Santuario("Mucha energia", 90),coordenadas);
             ubicacionService.eliminar(alta.getId());
 
             List<Ubicacion> sobrecargadas = ubicacionService.ubicacionesSobrecargadas(80);
@@ -820,7 +827,7 @@ public class UbicacionServiceTest {
 
         @Test
         void elUmbralEsExclusivoNoIncluyeIguales() {
-            ubicacionService.crear(new Santuario("Exacto", 50));
+            ubicacionService.crear(new Santuario("Exacto", 50), coordenadas);
 
             List<Ubicacion> sobrecargadas = ubicacionService.ubicacionesSobrecargadas(50);
 
@@ -844,13 +851,13 @@ public class UbicacionServiceTest {
 
         @BeforeEach
         void setUp() {
-            uno = ubicacionService.crear(new Santuario("uno", 50));
-            dos = ubicacionService.crear(new Cementerio("dos", 50));
-            tres = ubicacionService.crear(new Santuario("tres", 50));
-            cuatro = ubicacionService.crear(new Santuario("cuatro", 50));
-            cinco = ubicacionService.crear(new Cementerio("cinco", 50));
-            seis = ubicacionService.crear(new Santuario("seis", 50));
-            siete = ubicacionService.crear(new Santuario("siete", 50));
+            uno = ubicacionService.crear(new Santuario("uno", 50), coordenadas);
+            dos = ubicacionService.crear(new Cementerio("dos", 50), coordenadas);
+            tres = ubicacionService.crear(new Santuario("tres", 50), coordenadas);
+            cuatro = ubicacionService.crear(new Santuario("cuatro", 50), coordenadas);
+            cinco = ubicacionService.crear(new Cementerio("cinco", 50), coordenadas);
+            seis = ubicacionService.crear(new Santuario("seis", 50), coordenadas);
+            siete = ubicacionService.crear(new Santuario("siete", 50), coordenadas);
         }
 
         @AfterEach
@@ -920,6 +927,158 @@ public class UbicacionServiceTest {
             assertEquals(seis.getId(), seisHR.id());
             assertEquals(1, seisHR.centrality());
 
+        }
+    }
+
+    // --------------------------------------------------------------------------------
+    // PERSISTENCIA DE COORDENADAS EN MONGO
+    // --------------------------------------------------------------------------------
+
+
+    @Nested
+    class PersistenciaMongo {
+
+        @Test
+        void sePuedeCrearUbicacionConCoordenadas() {
+
+            Ubicacion ubicacion =
+                    ubicacionService.crear(
+                            santuario,
+                            coordenadas
+                    );
+
+            Ubicacion recuperada =
+                    ubicacionService.recuperar(
+                            ubicacion.getId()
+                    );
+
+            assertNotNull(recuperada);
+            assertEquals(
+                    NOMBRE_SANTUARIO,
+                    recuperada.getNombre()
+            );
+        }
+
+        @Test
+        void crearUbicacionConTresCoordenadasFunciona() {
+
+            List<Coordenada> tresCoords = List.of(
+                    new Coordenada(-34.81, -58.22),
+                    new Coordenada(-34.82, -58.24),
+                    new Coordenada(-34.80, -58.20)
+            );
+
+            assertDoesNotThrow(() ->
+                    ubicacionService.crear(
+                            santuario,
+                            tresCoords
+                    )
+            );
+        }
+
+        @Test
+        void crearUbicacionConMasDeTresCoordenadasFunciona() {
+
+            List<Coordenada> muchasCoords = List.of(
+                    new Coordenada(-34.81, -58.22),
+                    new Coordenada(-34.82, -58.24),
+                    new Coordenada(-34.80, -58.20),
+                    new Coordenada(-34.83, -58.21)
+            );
+
+            assertDoesNotThrow(() ->
+                    ubicacionService.crear(
+                            santuario,
+                            muchasCoords
+                    )
+            );
+        }
+
+        // ------------------------------------------------------------
+        // CASOS DESFAVORABLES
+        // ------------------------------------------------------------
+
+        @Test
+        void crearUbicacionSinCoordenadasLanzaExcepcion() {
+
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> ubicacionService.crear(
+                            santuario,
+                            List.of()
+                    )
+            );
+        }
+
+        @Test
+        void crearUbicacionConUnaCoordenadaLanzaExcepcion() {
+
+            List<Coordenada> unaCoord = List.of(
+                    new Coordenada(-34.81, -58.22)
+            );
+
+            assertThrows(
+                    CoordenadasInsuficientesException.class,
+                    () -> ubicacionService.crear(
+                            santuario,
+                            unaCoord
+                    )
+            );
+        }
+
+        @Test
+        void crearUbicacionConDosCoordenadasLanzaExcepcion() {
+
+            List<Coordenada> dosCoords = List.of(
+                    new Coordenada(-34.81, -58.22),
+                    new Coordenada(-34.82, -58.24)
+            );
+
+            assertThrows(
+                    CoordenadasInsuficientesException.class,
+                    () -> ubicacionService.crear(
+                            santuario,
+                            dosCoords
+                    )
+            );
+        }
+
+        @Test
+        void crearUbicacionConCoordenadasNullLanzaExcepcion() {
+
+            assertThrows(
+                    CoordenadasInsuficientesException.class,
+                    () -> ubicacionService.crear(
+                            santuario,
+                            null
+                    )
+            );
+        }
+
+        @Test
+        void noSePuedeCrearUbicacionConNombreRepetidoAunqueTengaOtrasCoordenadas() {
+
+            ubicacionService.crear(
+                    santuario,
+                    coordenadas
+            );
+
+            List<Coordenada> otrasCoordenadas = List.of(
+                    new Coordenada(-10.0, -10.0),
+                    new Coordenada(-11.0, -11.0),
+                    new Coordenada(-12.0, -12.0)
+            );
+
+            assertThrows(
+                    UbicacionYaExisteException.class,
+                    () -> ubicacionService.crear(
+                            new Santuario(
+                                    NOMBRE_SANTUARIO,
+                                    ENERGIA_VALIDA
+                            ),
+                            otrasCoordenadas
+                    )
+            );
         }
     }
 
