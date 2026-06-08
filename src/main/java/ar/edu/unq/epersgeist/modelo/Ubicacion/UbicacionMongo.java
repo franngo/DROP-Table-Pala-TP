@@ -2,6 +2,7 @@ package ar.edu.unq.epersgeist.modelo.Ubicacion;
 
 import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.CoordenadasInsuficientesException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,9 +12,11 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
 
-import java.awt.*;
 import org.springframework.data.geo.Point;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Getter
@@ -37,23 +40,39 @@ public class UbicacionMongo {
 
     private GeoJsonPolygon crearPoligono(List<Coordenada> coords) {
         if (coords == null || coords.size() < 3) {
-            throw new IllegalArgumentException("Un polígono requiere al menos 3 coordenadas para definir un área");
+            throw new CoordenadasInsuficientesException();
         }
 
-        List<Point> puntos = coords.stream()
-                .map(c -> new Point(c.getLongitud(), c.getLatitud()))
-                .collect(Collectors.toList());
+        List<Point> puntos =
+                new ArrayList<>(
+                        coords.stream()
+                                .map(c ->
+                                        new Point(
+                                                c.getLongitud(),
+                                                c.getLatitud()
+                                        )
+                                )
+                                .toList()
+                );
 
         Coordenada primero = coords.get(0);
         Coordenada ultimo = coords.get(coords.size() - 1);
 
-        boolean estaCerrado = primero.getLongitud() == ultimo.getLongitud()
-                && primero.getLatitud() == ultimo.getLatitud();
+        boolean estaCerrado =
+                Objects.equals(
+                        primero.getLongitud(),
+                        ultimo.getLongitud()
+                )
+                        &&
+                        Objects.equals(
+                                primero.getLatitud(),
+                                ultimo.getLatitud()
+                        );
 
         if (!estaCerrado) {
             puntos.add(new Point(primero.getLongitud(), primero.getLatitud()));
         }
 
-        return new GeoJsonPolygon(puntos); // Devuelve GeoJsonPolygon
+        return new GeoJsonPolygon(puntos);
     }
 }
