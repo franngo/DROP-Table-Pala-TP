@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record EspirituCreateDTO(
-        @NotBlank(message = "El nombre del demonio es obligatorio")
+        @NotBlank(message = "El nombre del espíritu es obligatorio")
         String nombre,
         @NotNull(message = "El id de la ubicacion del demonio es obligatoria")
         Long ubicacionId,
