@@ -5,7 +5,9 @@ import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDominacionInvalidaCandidatoLoDominaException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
@@ -15,6 +17,7 @@ import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoExcept
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,8 +40,6 @@ public class EspirituServiceTest {
 
     @Autowired
     private EspirituService serviceEspiritu;
-
-
     @Autowired
     private MediumService mediumService;
     @Autowired
@@ -514,18 +515,36 @@ public class EspirituServiceTest {
     // dominar()
     // --------------------------------------------------------------------------------
 
-    @Test
-    void dominar() {
-        Espiritu matiasP = serviceEspiritu.crear(matias, new Coordenada(-34.81, -58.22));
-        Espiritu pepeP = serviceEspiritu.crear(new Angelical("Pepe", berazategui), new Coordenada(-34.80, -58.20));
-        //La distancia entre ambos es de 2140.339474411033 metros
+    @Nested
+    class Dominar {
 
-        serviceEspiritu.dominar(matiasP.getId(), pepeP.getId());
+        Espiritu matiasP;
+        Espiritu pepeP;
 
-        //...
+        @BeforeEach
+        void setUp() {
+            matiasP = serviceEspiritu.crear(matias, new Coordenada(-34.81, -58.22));
+            pepeP = serviceEspiritu.crear(new Angelical("Pepe", berazategui), new Coordenada(-34.80, -58.20));
+        }
 
-    }
-/*
+        @Test
+        void fallSiElDominanteNoEstaPersistido() {
+            assertThrows(ErrorDeEspirituNoEncontradoException.class, () -> serviceEspiritu.dominar(999L, pepeP.getId()));
+        }
+
+        @Test
+        void fallSiElObjetivoNoEstaPersistido() {
+            assertThrows(ErrorDeEspirituNoEncontradoException.class, () -> serviceEspiritu.dominar(matiasP.getId(), 999L));
+        }
+
+        @Test
+        void dominar() {
+            //La distancia entre matiasP y pepeP es de 2140.339474411033 metros
+
+            serviceEspiritu.dominar(matiasP.getId(), pepeP.getId());
+        }
+
+        /*
     @Test
     void fallaCuandoElObjetivoLoDomina() {
         espirituM.dominar(pepe, 3000.0);
@@ -535,10 +554,10 @@ public class EspirituServiceTest {
 
  */
 
-    //probar tmb caso donde a puede dominar varios
-    //probar caso donde a domina a b, y b puede dominar a otros excepto a a
+        //probar tmb caso donde a puede dominar varios
+        //probar caso donde a domina a b, y b puede dominar a otros excepto a a
 
-
+    }
 
     @AfterEach
     void tearDown() {
@@ -547,6 +566,5 @@ public class EspirituServiceTest {
         ubicacionService.eliminarTodos();
 
     }
-
 
 }
