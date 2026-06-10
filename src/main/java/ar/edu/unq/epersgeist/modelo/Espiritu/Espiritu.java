@@ -2,6 +2,8 @@ package ar.edu.unq.epersgeist.modelo.Espiritu;
 
 import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.TipoEspiritu;
 import ar.edu.unq.epersgeist.modelo.Auditable;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDominacionInvalidaCandidatoLoDominaException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDominacionInvalidaCandidatoNoAptoException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDominacionInvalidaPorDistanciaException;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
@@ -143,6 +145,14 @@ public abstract class Espiritu extends Auditable implements Serializable {
     private void validarDominacion(Espiritu espirituADominar, double distanciaEspiritus) {
         if(!(distanciaEspiritus >= 2000.0 && distanciaEspiritus <= 5000.0)) {
             throw new ErrorDominacionInvalidaPorDistanciaException(this.getId(), espirituADominar.getId(), distanciaEspiritus);
+        }
+
+        if(!espirituADominar.estaLibre() || espirituADominar.estaDominado() || espirituADominar.getNivelDeConexion() >= 50) {
+            throw new ErrorDominacionInvalidaCandidatoNoAptoException(this.getId(), espirituADominar.getId());
+        }
+
+        if(this.estaDominado() && espirituADominar.getId().equals(this.espirituDominante.getId())) {
+            throw new ErrorDominacionInvalidaCandidatoLoDominaException(this.getId(), espirituADominar.getId());
         }
     }
 
