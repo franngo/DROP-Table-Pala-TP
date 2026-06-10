@@ -984,10 +984,10 @@ public class UbicacionServiceTest {
         void crearUbicacionConMasDeTresCoordenadasFunciona() {
 
             List<Coordenada> muchasCoords = List.of(
-                    new Coordenada(-34.81, -58.22),
+                    new Coordenada(-34.83, -58.21),
                     new Coordenada(-34.82, -58.24),
-                    new Coordenada(-34.80, -58.20),
-                    new Coordenada(-34.83, -58.21)
+                    new Coordenada(-34.81, -58.22),
+                    new Coordenada(-34.80, -58.20)
             );
 
             assertDoesNotThrow(() ->

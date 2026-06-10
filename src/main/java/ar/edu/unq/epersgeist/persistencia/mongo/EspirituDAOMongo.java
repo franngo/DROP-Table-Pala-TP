@@ -14,6 +14,7 @@ public interface EspirituDAOMongo extends MongoRepository<EspirituMongo, Long> {
     @Aggregation(pipeline = {
             "{ $geoNear: { " +
                     "near: { type: 'Point', coordinates: [?0, ?1] }, " +
+                    "key: 'coordenada', " +
                     "distanceField: 'distanciaCalculada', " +
                     "spherical: true, " +
                     "query: { _id: ?2 } " +
