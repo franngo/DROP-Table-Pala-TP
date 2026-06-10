@@ -27,8 +27,8 @@ import java.io.Serializable;
 
 public abstract class Espiritu extends Auditable implements Serializable {
 
-
     public static final int limiteConexion = 100;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
