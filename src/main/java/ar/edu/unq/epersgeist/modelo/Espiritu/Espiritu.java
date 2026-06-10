@@ -151,10 +151,6 @@ public abstract class Espiritu extends Auditable implements Serializable {
             throw new ErrorDominacionInvalidaCandidatoNoAptoException(this.getId(), espirituADominar.getId());
         }
 
-//        if(this.estaDominado() && espirituADominar.getId().equals(this.espirituDominante.getId())) {
-//            throw new ErrorDominacionInvalidaCandidatoLoDominaException(this.getId(), espirituADominar.getId());
-//        }
-
         espirituADominar.efectuarDominanciaPor(this);
     }
 
