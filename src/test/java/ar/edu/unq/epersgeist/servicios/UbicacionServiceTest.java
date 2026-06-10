@@ -5,14 +5,11 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.HarmonicResult;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.*;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.CoordenadasInsuficientesException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -869,7 +866,14 @@ public class UbicacionServiceTest {
         void harmonicResultFallaUsandoIdInexistente() {
             Long idNoExistente = 123456789L;
 
-            assertThrows(UbicacionNoEncontradaException.class, () -> ubicacionService.harmonicResult(List.of(idNoExistente)));
+            assertThrows(NoTodasLasUbicacionesExistenException.class, () -> ubicacionService.harmonicResult(List.of(idNoExistente)));
+        }
+
+        @Test
+        void harmonicResultFallaTeniendoTanSoloUnIdInexistente() {
+            Long idNoExistente = 123456789L;
+
+            assertThrows(NoTodasLasUbicacionesExistenException.class, () -> ubicacionService.harmonicResult(List.of(uno.getId(), idNoExistente, dos.getId())));
         }
 
         @Test
@@ -980,10 +984,10 @@ public class UbicacionServiceTest {
         void crearUbicacionConMasDeTresCoordenadasFunciona() {
 
             List<Coordenada> muchasCoords = List.of(
-                    new Coordenada(-34.81, -58.22),
+                    new Coordenada(-34.83, -58.21),
                     new Coordenada(-34.82, -58.24),
-                    new Coordenada(-34.80, -58.20),
-                    new Coordenada(-34.83, -58.21)
+                    new Coordenada(-34.81, -58.22),
+                    new Coordenada(-34.80, -58.20)
             );
 
             assertDoesNotThrow(() ->

@@ -3,6 +3,7 @@ package ar.edu.unq.epersgeist.servicios.impl;
 import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.HarmonicResult;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.NoTodasLasUbicacionesExistenException;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionMongo;
@@ -213,7 +214,11 @@ public class UbicacionServiceImpl implements UbicacionService {
     @Override
     public List<HarmonicResult> harmonicResult(List<Long> ids) {
         //validación de la existencia de Ubicaciones
-        ids.stream().forEach((id) -> this.recuperar(id));
+//        ids.stream().forEach((id) -> this.recuperar(id));
+        List<Ubicacion> ubisExistentes = ubicacionDAOSQL.findAllById(ids);
+        if(ubisExistentes.size() != ids.size()) {
+            throw new NoTodasLasUbicacionesExistenException();
+        }
 
         return ubicacionDAONeo.harmonicResult(ids);
 

@@ -28,5 +28,6 @@ public interface EspirituService {
 
     Page<Espiritu> espiritusDemoniacos(Direccion direccion, int pag, int cantPorPag);
 
+    void dominar(Long espirituDominanteId, Long espirituADominarId);
 
 }
