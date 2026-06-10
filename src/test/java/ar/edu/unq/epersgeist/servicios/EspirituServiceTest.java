@@ -535,7 +535,8 @@ public class EspirituServiceTest {
 
  */
 
-    //probar tmb caso donde a puede dominar varios, y otro donde b ...
+    //probar tmb caso donde a puede dominar varios
+    //probar caso donde a domina a b, y b puede dominar a otros excepto a a
 
 
 

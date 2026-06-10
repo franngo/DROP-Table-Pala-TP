@@ -136,6 +136,7 @@ public class EspirituTest {
 //            Ya partimos de:
 //            ubicacion = new Santuario("Berazategui", ENERGIA);
 //            espirituM = new Angelical("Matias", ubicacion); (nivel de conexión: 0)
+//            medium = new Medium("Juan", 100, 10, ubicacion);
 
             pepe = new Angelical("Pepe", ubicacion); //(nivel de conexión: 0)
         }
@@ -151,33 +152,35 @@ public class EspirituTest {
         }
 
         @Test
-        void fallaCuandoElObjetivoYaEstaDominado() {
-            espirituM.dominar(pepe, 3000.0);
-            //en este punto, pepe ya está dominado y no puede ser dominado nuevamente por un Espiritu.
+        void fallaCuandoElObjetivoNoEstaLibre() {
+            pepe.aumentarConexionYConectar(medium);
+            //pepe ya no está libre, por lo que ya no es apto para ser dominado.
+
             assertThrows(ErrorDominacionInvalidaCandidatoNoAptoException.class, () -> espirituM.dominar(pepe, 3000.0));
         }
 
         @Test
-        void fallaCuandoElObjetivoLoDomina() {
-            espirituM.dominar(pepe, 3000.0);
-            //en este punto, pepe ya está dominado y no podría dominar a espirituM
+        void fallaCuandoElObjetivoNoTieneMenosDeCincuentaDeNivelDeConexion() {
+            pepe.setNivelDeConexion(60);
+            //en este punto, pepe tiene un nivel de energía tal que no es apto para ser dominado.
+            assertThrows(ErrorDominacionInvalidaCandidatoNoAptoException.class, () -> espirituM.dominar(pepe, 3000.0));
         }
 
-//        public void dominar(Espiritu espirituADominar, double distanciaEspiritus) {
-//            this.validarDominacion(espirituADominar, distanciaEspiritus);
-//        }
-//
-//        private void validarDominacion(Espiritu espirituADominar, double distanciaEspiritus) {
-//            if(!(distanciaEspiritus >= 2000.0 && distanciaEspiritus <= 5000.0)) {
-//                throw new ErrorDominacionInvalidaPorDistanciaException(this.getId(), espirituADominar.getId(), distanciaEspiritus);
-//            }
-//
-//            if(!espirituADominar.estaLibre() || espirituADominar.estaDominado() || espirituADominar.getNivelDeConexion() >= 50) {
-//                throw new ErrorDominacionInvalidaCandidatoNoAptoException(this.getId(), espirituADominar.getId());
-//            }
-//
-//            espirituADominar.efectuarDominanciaPor(this);
-//        }
+        @Test
+        void fallaCuandoElObjetivoYaEstaDominado() {
+            espirituM.dominar(pepe, 3000.0);
+            //en este punto, pepe ya está dominado y no puede ser dominado nuevamente por un Espiritu (sea cual sea).
+            assertThrows(ErrorDominacionInvalidaCandidatoNoAptoException.class, () -> espirituM.dominar(pepe, 3000.0));
+        }
+
+        @Test
+        void casoExitoso() {
+            espirituM.dominar(pepe, 3000.0);
+
+            assertTrue(pepe.estaDominado());
+            assertEquals(pepe.getEspirituDominante(), espirituM);
+        }
+
     }
 
 
