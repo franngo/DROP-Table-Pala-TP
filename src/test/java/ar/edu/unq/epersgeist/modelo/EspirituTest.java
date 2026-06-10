@@ -2,11 +2,18 @@ package ar.edu.unq.epersgeist.modelo;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDominacionInvalidaCandidatoLoDominaException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDominacionInvalidaCandidatoNoAptoException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDominacionInvalidaPorDistanciaException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -115,4 +122,64 @@ public class EspirituTest {
         // Intento conectar al angel con otroMedium, sin estar estos en la misma Ubicacion, y fallo
         assertThrows(ErrorAlConectarEspirituConMedium.class, () -> espirituM.aumentarConexionYConectar(otroMedium));
     }
+
+    // --------------------------------------------------------------------------------
+    // dominar()
+    // --------------------------------------------------------------------------------
+
+    @Nested
+    class Dominar {
+        private Espiritu pepe;
+
+        @BeforeEach
+        void setUp() {
+//            Ya partimos de:
+//            ubicacion = new Santuario("Berazategui", ENERGIA);
+//            espirituM = new Angelical("Matias", ubicacion); (nivel de conexión: 0)
+
+            pepe = new Angelical("Pepe", ubicacion); //(nivel de conexión: 0)
+        }
+
+        @Test
+        void fallaCuandoLaDistanciaEsMenorA2000() {
+            assertThrows(ErrorDominacionInvalidaPorDistanciaException.class, () -> espirituM.dominar(pepe, 1000.0));
+        }
+
+        @Test
+        void fallaCuandoLaDistanciaEsMayorA5000() {
+            assertThrows(ErrorDominacionInvalidaPorDistanciaException.class, () -> espirituM.dominar(pepe, 6000.0));
+        }
+
+        @Test
+        void fallaCuandoElObjetivoYaEstaDominado() {
+            espirituM.dominar(pepe, 3000.0);
+            //en este punto, pepe ya está dominado y no puede ser dominado nuevamente por un Espiritu.
+            assertThrows(ErrorDominacionInvalidaCandidatoNoAptoException.class, () -> espirituM.dominar(pepe, 3000.0));
+        }
+
+        @Test
+        void fallaCuandoElObjetivoLoDomina() {
+            espirituM.dominar(pepe, 3000.0);
+            //en este punto, pepe ya está dominado y no podría dominar a espirituM
+        }
+
+//        public void dominar(Espiritu espirituADominar, double distanciaEspiritus) {
+//            this.validarDominacion(espirituADominar, distanciaEspiritus);
+//        }
+//
+//        private void validarDominacion(Espiritu espirituADominar, double distanciaEspiritus) {
+//            if(!(distanciaEspiritus >= 2000.0 && distanciaEspiritus <= 5000.0)) {
+//                throw new ErrorDominacionInvalidaPorDistanciaException(this.getId(), espirituADominar.getId(), distanciaEspiritus);
+//            }
+//
+//            if(!espirituADominar.estaLibre() || espirituADominar.estaDominado() || espirituADominar.getNivelDeConexion() >= 50) {
+//                throw new ErrorDominacionInvalidaCandidatoNoAptoException(this.getId(), espirituADominar.getId());
+//            }
+//
+//            espirituADominar.efectuarDominanciaPor(this);
+//        }
+    }
+
+
+
 }

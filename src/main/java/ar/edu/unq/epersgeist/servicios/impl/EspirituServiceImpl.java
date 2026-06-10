@@ -167,6 +167,11 @@ public class EspirituServiceImpl implements EspirituService {
 
         double distanciaEspiritus = this.espirituDAOMongo.distanciaHastaEspiritu(longitud, latitud, espirituADominarId).distanciaCalculada();
 
+        //Se realiza esta validación en service porque involucra ids y no tiene sentido en modelo.
+        if(espirituDominante.estaDominado() && espirituADominar.getId().equals(espirituDominante.getEspirituDominante().getId())) {
+            throw new ErrorDominacionInvalidaCandidatoLoDominaException(espirituDominante.getId(), espirituADominar.getId());
+        }
+
         espirituDominante.dominar(espirituADominar, distanciaEspiritus);
     }
 

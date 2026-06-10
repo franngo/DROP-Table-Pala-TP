@@ -5,6 +5,7 @@ import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDominacionInvalidaCandidatoLoDominaException;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
@@ -524,6 +525,17 @@ public class EspirituServiceTest {
         //...
 
     }
+/*
+    @Test
+    void fallaCuandoElObjetivoLoDomina() {
+        espirituM.dominar(pepe, 3000.0);
+        //en este punto, pepe ya está dominado y no podría dominar a espirituM
+        assertThrows(ErrorDominacionInvalidaCandidatoLoDominaException.class, () -> pepe.dominar(espirituM, 3000.0));
+    }
+
+ */
+
+    //probar tmb caso donde a puede dominar varios, y otro donde b ...
 
 
 
