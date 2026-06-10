@@ -2,6 +2,7 @@ package ar.edu.unq.epersgeist.modelo.Espiritu;
 
 import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.TipoEspiritu;
 import ar.edu.unq.epersgeist.modelo.Auditable;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDominacionInvalidaPorDistanciaException;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
@@ -40,6 +41,9 @@ public abstract class Espiritu extends Auditable implements Serializable {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Ubicacion ubicacion;
+    @ManyToOne
+    @JoinColumn(name = "espirituDominante_id")
+    private Espiritu espirituDominante;
 
     public Espiritu(@NonNull String nombre, Ubicacion ubicacion) {
         this.validarUbicacionNoNula(ubicacion);
@@ -127,6 +131,24 @@ public abstract class Espiritu extends Auditable implements Serializable {
 
     //double dispatch para el fortalecerConexionDescansandoEn(), usado en el descansar() de Medium
     public abstract int porcentajeDescansarEn(Ubicacion ubicacion);
+
+    // --------------------------------------------------------------------------------
+    // Funcionalidad de dominar
+    // --------------------------------------------------------------------------------
+
+    public void dominar(Espiritu espirituADominar, double distanciaEspiritus) {
+        this.validarDominacion(espirituADominar, distanciaEspiritus);
+    }
+
+    private void validarDominacion(Espiritu espirituADominar, double distanciaEspiritus) {
+        if(!(distanciaEspiritus >= 2000.0 && distanciaEspiritus <= 5000.0)) {
+            throw new ErrorDominacionInvalidaPorDistanciaException(this.getId(), espirituADominar.getId(), distanciaEspiritus);
+        }
+    }
+
+    public boolean estaDominado() {
+        return espirituDominante != null;
+    }
 
     // --------------------------------------------------------------------------------
     // Subtareas

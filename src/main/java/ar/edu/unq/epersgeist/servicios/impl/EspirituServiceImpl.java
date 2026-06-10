@@ -167,7 +167,7 @@ public class EspirituServiceImpl implements EspirituService {
 
         double distanciaEspiritus = this.espirituDAOMongo.distanciaHastaEspiritu(longitud, latitud, espirituADominarId).distanciaCalculada();
 
-        //...
+        espirituDominante.dominar(espirituADominar, distanciaEspiritus);
     }
 
 }

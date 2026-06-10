@@ -517,6 +517,7 @@ public class EspirituServiceTest {
     void dominar() {
         Espiritu matiasP = serviceEspiritu.crear(matias, new Coordenada(-34.81, -58.22));
         Espiritu pepeP = serviceEspiritu.crear(new Angelical("Pepe", berazategui), new Coordenada(-34.80, -58.20));
+        //La distancia entre ambos es de 2140.339474411033 metros
 
         serviceEspiritu.dominar(matiasP.getId(), pepeP.getId());
 
