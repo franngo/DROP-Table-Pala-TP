@@ -27,6 +27,7 @@ import org.springframework.data.mongodb.core.aggregation.ConditionalOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -304,9 +305,12 @@ public class UbicacionServiceImpl implements UbicacionService {
 
         Document resultado = resultados.getUniqueMappedResult();
 
-        //transformar el Document al Map
+        Map<String, Integer> map = new HashMap<String, Integer>();
+        map.put("exorcismos", resultado.getInteger("exorcismos"));
+        map.put("invocaciones demoniacas", resultado.getInteger("invocaciones_demoniacas"));
+        map.put("sucesos desconocidos", resultado.getInteger("sucesos_desconocidos"));
 
-        return null;
+        return map;
     }
 
 }
