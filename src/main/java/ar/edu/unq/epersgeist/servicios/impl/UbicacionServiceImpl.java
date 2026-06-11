@@ -22,10 +22,13 @@ import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.ComparisonOperators;
+import org.springframework.data.mongodb.core.aggregation.ConditionalOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 // --------------------------------------------------------------------------------
 
@@ -259,6 +262,51 @@ public class UbicacionServiceImpl implements UbicacionService {
                 .stream()
                 .map(doc -> doc.getString("_id"))
                 .toList();
+    }
+
+    @Override
+    public Map<String, Integer> sucesos() {
+
+        final double tope_decibeles = 90.0;
+        final double tope_temperatura = 5.0;
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.group() //agrupo todos los docs en un mismo grupo para poder emplear agg functions sobre estos
+                        .sum(ConditionalOperators
+                                .when(
+                                        Criteria.where("decibeles").gt(tope_decibeles)
+                                )
+                                .then(1)
+                                .otherwise(0))
+                        .as("exorcismos")
+                        .sum(ConditionalOperators
+                                .when(
+                                        Criteria.where("temperatura.grados").lt(tope_temperatura)
+                                )
+                                .then(1)
+                                .otherwise(0))
+                        .as("invocaciones_demoniacas")
+                        .sum(ConditionalOperators
+                                .when(
+                                        Criteria.where("l3kTUr4").exists(true)
+                                )
+                                .then(1)
+                                .otherwise(0))
+                        .as("sucesos_desconocidos")
+        );
+
+        AggregationResults<Document> resultados =
+                mongoTemplate.aggregate(
+                        aggregation,
+                        "datos_sensores",
+                        Document.class
+                );
+
+        Document resultado = resultados.getUniqueMappedResult();
+
+        //transformar el Document al Map
+
+        return null;
     }
 
 }

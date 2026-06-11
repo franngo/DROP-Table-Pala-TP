@@ -7,6 +7,7 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UbicacionService {
     Ubicacion crear(Ubicacion ubicacion, List<Coordenada> coordenadas);
@@ -46,5 +47,7 @@ public interface UbicacionService {
     List<HarmonicResult> harmonicResult(List<Long> ids);
 
     List<String> ubicacionesFrias();
+
+    Map<String, Integer> sucesos();
 
 }
