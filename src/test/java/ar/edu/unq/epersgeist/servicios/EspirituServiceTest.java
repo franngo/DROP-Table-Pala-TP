@@ -5,12 +5,13 @@ import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlCrearEspirituException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoException;
+import ar.edu.unq.epersgeist.modelo.exceptions.EspirituDominadoException;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,7 +55,7 @@ public class EspirituServiceTest {
         coordenadaEspiritu = new Coordenada(-34.81, -58.22);
         coordenadaMedium = new Coordenada(-34.81, -58.22);
 
-        berazategui = ubicacionService.crear(new Santuario("Berazategui", ENERGIA),coordenadas);
+        berazategui = ubicacionService.crear(new Santuario("Berazategui", ENERGIA), coordenadas);
         matias = new Angelical("Matias", berazategui);
     }
 
@@ -289,7 +290,7 @@ public class EspirituServiceTest {
     @Test
     void noDeberiaConectarUnEspirituInexistenteConUnMedium() {
         Medium medium = new Medium("Juan", 120, 10, berazategui);
-        Medium mediumP = mediumService.crear(medium,coordenadaMedium);
+        Medium mediumP = mediumService.crear(medium, coordenadaMedium);
 
         assertThrows(ErrorAlConectarEspirituConMedium.class, () -> {
             serviceEspiritu.conectar(9999L, mediumP.getId());
@@ -311,7 +312,7 @@ public class EspirituServiceTest {
         serviceEspiritu.eliminar(espiritu.getId()); //eliminado de la DB, pero el objeto en la VM sigue con su id
 
         Medium medium = new Medium("Juan", 120, 10, berazategui);
-        Medium mediumP = mediumService.crear(medium,coordenadaMedium);
+        Medium mediumP = mediumService.crear(medium, coordenadaMedium);
 
         assertThrows(ErrorAlConectarEspirituConMedium.class, () -> {
             serviceEspiritu.conectar(espiritu.getId(), mediumP.getId());
@@ -507,6 +508,39 @@ public class EspirituServiceTest {
         assertEquals(matias.getId(), recuperado.getId());
 
 
+    }
+
+    @Test
+    void noDeberiaConectarUnEspirituQueEstaSiendoDominado() {
+
+        Espiritu dominante =
+                serviceEspiritu.crear(
+                        new Demonio("Dominante", berazategui),
+                        coordenadaEspiritu
+                );
+
+        Espiritu dominado =
+                serviceEspiritu.crear(
+                        new Angelical("Dominado", berazategui),
+                        coordenadaEspiritu
+                );
+
+        dominado.setEspirituDominante(dominante);
+        serviceEspiritu.actualizar(dominado);
+
+        Medium medium =
+                mediumService.crear(
+                        new Medium("Juan", 120, 10, berazategui),
+                        coordenadaMedium
+                );
+
+        assertThrows(
+                EspirituDominadoException.class,
+                () -> serviceEspiritu.conectar(
+                        dominado.getId(),
+                        medium.getId()
+                )
+        );
     }
 
     @AfterEach
