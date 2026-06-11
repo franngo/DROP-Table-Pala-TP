@@ -2,39 +2,48 @@ package ar.edu.unq.epersgeist.servicios.impl;
 
 import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionMongo;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.medium.MediumMongo;
+import ar.edu.unq.epersgeist.persistencia.mongo.EspirituDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.mongo.MediumDAOMongo;
+import ar.edu.unq.epersgeist.persistencia.mongo.UbicacionDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
 import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAOSQL;
 import ar.edu.unq.epersgeist.persistencia.sql.MediumDAOSQL;
 import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
 import ar.edu.unq.epersgeist.servicios.MediumService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Transactional
 public class MediumServiceImpl implements MediumService {
     private final MediumDAOSQL mediumDAOSQL;
     private final MediumDAOMongo mediumDAOMongo;
-    private final EspirituDAOSQL espirituDAOSQL; //se requiere para usar en el invocar()
+    private final EspirituDAOSQL espirituDAOSQL;
+    private final EspirituDAOMongo espirituDAOMongo;;
     private final UbicacionDAOSQL ubicacionDAOSQL;
     private final UbicacionDAONeo4j ubicacionDAONeo4j;
+    private final UbicacionDAOMongo ubicacionDAOMongo;
 
-    public MediumServiceImpl(MediumDAOSQL mediumDAOSQL, EspirituDAOSQL espirituDAOSQL, UbicacionDAOSQL ubicacionDAOSQL, UbicacionDAONeo4j ubicacionDAONeo4j, MediumDAOMongo mediumDAOMongo) {
+    public MediumServiceImpl(MediumDAOSQL mediumDAOSQL, EspirituDAOSQL espirituDAOSQL, UbicacionDAOSQL ubicacionDAOSQL, UbicacionDAONeo4j ubicacionDAONeo4j, MediumDAOMongo mediumDAOMongo, UbicacionDAOMongo ubicacionDAOMongo, EspirituDAOMongo espirituDAOMongo) {
         this.mediumDAOSQL = mediumDAOSQL;
         this.mediumDAOMongo = mediumDAOMongo;
         this.espirituDAOSQL = espirituDAOSQL;
+        this.espirituDAOMongo = espirituDAOMongo;
         this.ubicacionDAOSQL = ubicacionDAOSQL;
         this.ubicacionDAONeo4j = ubicacionDAONeo4j;
+        this.ubicacionDAOMongo = ubicacionDAOMongo;
     }
 
     @Override
@@ -130,31 +139,45 @@ public class MediumServiceImpl implements MediumService {
     }
 
     @Override
-    public void mover(Long mediumId, Long ubicacionId) {
+    public void mover(Long mediumId, Double latitud, Double longitud) {
 
         Medium mediumAMover = mediumDAOSQL.findById(mediumId)
                 .orElseThrow(() ->
                         new ErrorDeMediumNoEncontradoException(mediumId)
                 );
 
+        // Busco en ubicacion mongo si existe una ubicacion dada.
+        UbicacionMongo ubicacionMongoDestino = ubicacionDAOMongo.buscarUbicacionQueContiene(latitud, longitud)
+                        .orElseThrow(() ->
+                                new CoordenadasSinUbicacion()
+                        );
+
+        Long idDestino = ubicacionMongoDestino.getId();
+
         // Ubicacion neo para calcular si existe a donde se puede mover
-        UbicacionNeo4j ubicacionAMover = ubicacionDAONeo4j.findById(ubicacionId)
-                .orElseThrow(() ->
-                        new UbicacionNoEncontradaException(ubicacionId)
-                );
+        UbicacionNeo4j ubicacionNeoDestino =
+                ubicacionDAONeo4j.findById(idDestino)
+                        .orElseThrow(() ->
+                                new UbicacionNoEncontradaException(idDestino)
+                        );
         Ubicacion ubicacionActualMedium = mediumAMover.getUbicacion();
         Long ubicacionMediumId = ubicacionActualMedium.getId();
-        Long ubicacionAIrId = ubicacionAMover.getId();
+        Long ubicacionAIrId = idDestino;
 
         if (!quiereMoverseALaMisma(ubicacionActualMedium.getId(), ubicacionAIrId)) {
 
             // Procedo a recuperar la ubicacion destino de la fuente de la verdad
-            Ubicacion ubicacionDestino = ubicacionDAOSQL.findById(ubicacionId)
+            Ubicacion ubicacionDestino = ubicacionDAOSQL.findById(idDestino)
                     .orElseThrow(() ->
-                            new UbicacionNoEncontradaException(ubicacionId));
+                            new UbicacionNoEncontradaException(idDestino));
 
             // Se valida si las ubicaciones estan conectadas
-            this.validarConexion(ubicacionActualMedium, ubicacionAMover);
+            this.validarConexion(ubicacionActualMedium, ubicacionNeoDestino);
+
+            // Calculo si esta a menos de 30km de distacia
+            mediumDAOMongo.mediumDentroDeDistancia(mediumId, latitud, longitud, 30000.0)
+                    .orElseThrow(()->
+                            new UbicacionLejanaException("La ubicacion esta a mas de 30km"));
 
             // calculo el costo de moverse
             int costo = Math.toIntExact(ubicacionDAONeo4j.costoHacia(ubicacionMediumId, ubicacionAIrId));
@@ -162,13 +185,33 @@ public class MediumServiceImpl implements MediumService {
             // el medium se mueve
             mediumAMover.moverA(ubicacionDestino, costo);
 
+
+            // actualizo en mongo
+            MediumMongo mediumMongo =
+                    mediumDAOMongo.findById(mediumId)
+                            .orElseThrow();
+
+            mediumMongo.setCoordenada(
+                    new GeoJsonPoint(longitud, latitud)
+            );
+
+            mediumAMover.getEspiritus()
+                    .forEach(e ->
+                            espirituDAOMongo.actualizarCoordenada(
+                                    e.getId(),
+                                    longitud,
+                                    latitud
+                            )
+                    );
+
             // depende el estado del medium se guarda o se elimina
             if (mediumAMover.sinMana()) {
                 mediumDAOSQL.delete(mediumAMover);
+                mediumDAOMongo.deleteById(mediumAMover.getId());
             } else {
                 mediumDAOSQL.save(mediumAMover);
+                mediumDAOMongo.actualizarCoordenada(mediumId, longitud, latitud);
             }
-
         }
     }
 
@@ -177,6 +220,7 @@ public class MediumServiceImpl implements MediumService {
             throw new UbicacionLejanaException("La ubicacion esta lejana");
         }
     }
+
 
     private boolean quiereMoverseALaMisma(Long idUbicacionActual, Long idUbicacionAMover) {
         return Objects.equals(idUbicacionActual, idUbicacionAMover);
