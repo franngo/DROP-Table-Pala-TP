@@ -2,10 +2,10 @@ package ar.edu.unq.epersgeist.modelo.Espiritu;
 
 import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.TipoEspiritu;
 import ar.edu.unq.epersgeist.modelo.Auditable;
-import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionInvalidaException;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,8 +26,7 @@ import java.io.Serializable;
 @DiscriminatorColumn(name = "tipo_espiritu")
 
 public abstract class Espiritu extends Auditable implements Serializable {
-
-
+    
     public static final int limiteConexion = 100;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -40,6 +39,10 @@ public abstract class Espiritu extends Auditable implements Serializable {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Ubicacion ubicacion;
+
+    @ManyToOne
+    @JoinColumn(name = "espiritu_dominante_id")
+    private Espiritu espirituDominante;
 
     public Espiritu(@NonNull String nombre, Ubicacion ubicacion) {
         this.validarUbicacionNoNula(ubicacion);
@@ -121,7 +124,7 @@ public abstract class Espiritu extends Auditable implements Serializable {
     // --------------------------------------------------------------------------------
 
     public void fortalecerConexionDescansandoEn(Ubicacion ubicacion) {
-        int recarga = this.porcentajeDescansarEn(ubicacion) * (int)(ubicacion.getEnergia() / 100.0);
+        int recarga = this.porcentajeDescansarEn(ubicacion) * (int) (ubicacion.getEnergia() / 100.0);
         this.fortalecerConexion(recarga);
     }
 
@@ -146,4 +149,11 @@ public abstract class Espiritu extends Auditable implements Serializable {
 
     abstract public TipoEspiritu getTipoEspiritu();
 
+    // --------------------------------------------------------------------------------
+    // Dominaciones
+    // --------------------------------------------------------------------------------
+
+    public boolean estaDominado() {
+        return this.espirituDominante != null;
+    }
 }
