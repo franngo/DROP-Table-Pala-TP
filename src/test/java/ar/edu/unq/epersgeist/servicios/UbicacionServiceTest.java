@@ -1233,8 +1233,7 @@ public class UbicacionServiceTest {
         @Autowired
         private MongoTemplate mongoTemplate;
 
-        final double tope_decibeles = 90.0;
-        final double tope_temperatura = 5.0;
+        //Reminder: el tope de decibeles es de 90.0 y el tope de temperatura es de 5.0
 
         @BeforeEach
         void setUp() {
@@ -1486,8 +1485,8 @@ public class UbicacionServiceTest {
 
         @Test
         void ignoraDocumentosQueNoSonSonido() {
-            insertTemperatura("A");
-            insertTemperatura("B");
+            insertTemperatura("A", 10);
+            insertTemperatura("B", 10);
 
             List<String> resultado = ubicacionService.ubicacionesConflictivas();
 
@@ -1501,7 +1500,7 @@ public class UbicacionServiceTest {
         @Test
         void mezclaDeDatosSoloDevuelveValidos() {
             insertSonido("A", 120); // VALIDO
-            insertTemperatura("A");
+            insertTemperatura("A", 10);
             insertSonido("B", 30);
             insertSonido("C", 200); // VALIDO
 

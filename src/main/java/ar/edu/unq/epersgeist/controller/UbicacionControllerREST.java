@@ -8,7 +8,6 @@ import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionCreate
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionUpdateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.SucesosResponseDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionResponseDTO;
-import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionesFriasResponse;
 import ar.edu.unq.epersgeist.controller.mappers.*;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionesSensadasResponse;
 import ar.edu.unq.epersgeist.modelo.Coordenada;
@@ -220,8 +219,6 @@ public class UbicacionControllerREST {
         return SucesosMapper.toDto(map);
     }
 
-}
-
     // --------------------------------------------------------------------------------
 
     @GetMapping("/conflictivas")
@@ -231,4 +228,5 @@ public class UbicacionControllerREST {
                 ubicacionService.ubicacionesConflictivas()
         );
     }
+
 }
