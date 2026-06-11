@@ -1295,17 +1295,96 @@ public class UbicacionServiceTest {
         }
 
         @Test
-        void sucesos() {
-            insertTemperatura("A", 2);
-            insertTemperatura("A", 4); // promedio = 3
+        void sucesosInsertandoDocsSonido() {
+            insertSonido("A", 80);
+            insertSonido("A", 83);
+            insertSonido("A", 87);
+            insertSonido("A", 92);
+            insertSonido("A", 105);
 
             Map<String, Integer> map = ubicacionService.sucesos();
 
-            System.out.println("aaaaaaaaaaaaaaaaaaaaaa");
-            System.out.println(map.get("exorcismos"));
-            System.out.println(map.get("invocaciones demoniacas"));
-            System.out.println(map.get("sucesos desconocidos"));
-            System.out.println("aaaaaaaaaaaaaaaaaaaaaa");
+            assertEquals(2, map.get("exorcismos"));
+            assertEquals(0, map.get("invocaciones demoniacas"));
+            assertEquals(0, map.get("sucesos desconocidos"));
+        }
+
+        @Test
+        void sucesosInsertandoDoscTemperatura() {
+            insertTemperatura("A", 2);
+            insertTemperatura("A", 4);
+            insertTemperatura("A", 6);
+            insertTemperatura("A", 8);
+            insertTemperatura("A", 10);
+
+            Map<String, Integer> map = ubicacionService.sucesos();
+
+            assertEquals(0, map.get("exorcismos"));
+            assertEquals(2, map.get("invocaciones demoniacas"));
+            assertEquals(0, map.get("sucesos desconocidos"));
+        }
+
+        @Test
+        void sucesosInsertandoDoscPresion() {
+            insertPresion("A", 940);
+            insertPresion("A", 960);
+            insertPresion("A", 980);
+            insertPresion("A", 1000);
+            insertPresion("A", 1020);
+
+            Map<String, Integer> map = ubicacionService.sucesos();
+
+            assertEquals(0, map.get("exorcismos"));
+            assertEquals(0, map.get("invocaciones demoniacas"));
+            assertEquals(0, map.get("sucesos desconocidos"));
+        }
+
+        @Test
+        void sucesosInsertandoDoscDesconocidos() {
+            insertLectura("A", "aK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "bK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "cK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "dK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "eK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+
+            Map<String, Integer> map = ubicacionService.sucesos();
+
+            assertEquals(0, map.get("exorcismos"));
+            assertEquals(0, map.get("invocaciones demoniacas"));
+            assertEquals(5, map.get("sucesos desconocidos"));
+        }
+
+        @Test
+        void sucesosInsertandoMultiplesDocumentos() {
+            insertSonido("A", 80);
+            insertSonido("A", 83);
+            insertSonido("A", 87);
+            insertSonido("A", 92);
+            insertSonido("A", 105);
+
+            insertTemperatura("A", 2);
+            insertTemperatura("A", 4);
+            insertTemperatura("A", 6);
+            insertTemperatura("A", 8);
+            insertTemperatura("A", 10);
+
+            insertPresion("A", 940);
+            insertPresion("A", 960);
+            insertPresion("A", 980);
+            insertPresion("A", 1000);
+            insertPresion("A", 1020);
+
+            insertLectura("A", "aK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "bK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "cK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "dK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "eK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+
+            Map<String, Integer> map = ubicacionService.sucesos();
+
+            assertEquals(2, map.get("exorcismos"));
+            assertEquals(2, map.get("invocaciones demoniacas"));
+            assertEquals(5, map.get("sucesos desconocidos"));
         }
 
     }
