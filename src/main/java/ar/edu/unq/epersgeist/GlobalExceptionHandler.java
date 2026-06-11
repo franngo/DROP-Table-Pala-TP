@@ -3,7 +3,10 @@ package ar.edu.unq.epersgeist;
 import ar.edu.unq.epersgeist.controller.dtos.ErrorMessageDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ErrorResponseDTO;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.*;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionInvalidaException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -143,7 +146,9 @@ public class GlobalExceptionHandler {
             UbicacionLejanaException.class,
             ErrorDominacionInvalidaCandidatoLoDominaException.class,
             ErrorDominacionInvalidaPorDistanciaException.class,
-            ErrorDominacionInvalidaCandidatoNoAptoException.class
+            ErrorDominacionInvalidaCandidatoNoAptoException.class,
+            UbicacionLejanaException.class,
+            EspirituDominadoException.class
     })
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponseDTO conflictHandler(

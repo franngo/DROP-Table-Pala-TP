@@ -46,8 +46,13 @@ public interface UbicacionService {
 
     List<HarmonicResult> harmonicResult(List<Long> ids);
 
-    List<String> ubicacionesFrias();
+    // --------------------------------------------------------------------------------
+    // CONSULTAS MONGO
+    // --------------------------------------------------------------------------------
 
     Map<String, Integer> sucesos();
 
+    List<String> ubicacionesConflictivas();
+
+    List<String> ubicacionesFrias();
 }

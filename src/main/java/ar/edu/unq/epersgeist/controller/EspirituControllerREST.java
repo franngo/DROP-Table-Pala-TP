@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @RestController
 @RequestMapping("/espiritus")
 @AllArgsConstructor
@@ -90,7 +91,7 @@ public class EspirituControllerREST {
                 MapperEspiritu::toDTO,
                 direccion);
     }
-
+    
     @PostMapping("/{espirituDominanteId}/dominar/{espirituADominarId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void dominar(@PathVariable Long espirituDominanteId,

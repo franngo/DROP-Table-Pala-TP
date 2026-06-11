@@ -10,6 +10,7 @@ import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.SucesosRespons
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionResponseDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionesFriasResponse;
 import ar.edu.unq.epersgeist.controller.mappers.*;
+import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionesSensadasResponse;
 import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.HarmonicResult;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
@@ -171,7 +172,7 @@ public class UbicacionControllerREST {
     ) {
         return ubicacionService.caminoMasRentable(idOrigen, idDestino)
                 .stream()
-                .map((u) -> MapperUbicacion.toDTO(u))
+                .map(MapperUbicacion::toDTO)
                 .toList();
     }
 
@@ -204,8 +205,8 @@ public class UbicacionControllerREST {
 
     @GetMapping("/frias")
     @ResponseStatus(HttpStatus.OK)
-    public UbicacionesFriasResponse ubicacionesFrias() {
-        return new UbicacionesFriasResponse(
+    public UbicacionesSensadasResponse ubicacionesFrias() {
+        return new UbicacionesSensadasResponse(
                 ubicacionService.ubicacionesFrias()
         );
     }
@@ -221,3 +222,13 @@ public class UbicacionControllerREST {
 
 }
 
+    // --------------------------------------------------------------------------------
+
+    @GetMapping("/conflictivas")
+    @ResponseStatus(HttpStatus.OK)
+    public UbicacionesSensadasResponse ubicacionesConflictivas() {
+        return new UbicacionesSensadasResponse(
+                ubicacionService.ubicacionesConflictivas()
+        );
+    }
+}

@@ -2,11 +2,11 @@ package ar.edu.unq.epersgeist.servicios.impl;
 
 import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.medium.MediumMongo;
 import ar.edu.unq.epersgeist.persistencia.mongo.MediumDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;

@@ -3,11 +3,10 @@ package ar.edu.unq.epersgeist.servicios.impl;
 import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.HarmonicResult;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.NoTodasLasUbicacionesExistenException;
-import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionMongo;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.NoTodasLasUbicacionesExistenException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
@@ -22,11 +21,13 @@ import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 // --------------------------------------------------------------------------------
 
@@ -176,7 +177,7 @@ public class UbicacionServiceImpl implements UbicacionService {
 
         List<UbicacionNeo4j> ubis = ubicacionDAONeo.caminoMasRentable(idOrigen, idDestino);
 
-        if(ubis.isEmpty()) {
+        if (ubis.isEmpty()) {
             throw new UbicacionesNoConectadasException(idOrigen, idDestino);
         }
 
@@ -224,12 +225,40 @@ public class UbicacionServiceImpl implements UbicacionService {
         //validación de la existencia de Ubicaciones
 //        ids.stream().forEach((id) -> this.recuperar(id));
         List<Ubicacion> ubisExistentes = ubicacionDAOSQL.findAllById(ids);
-        if(ubisExistentes.size() != ids.size()) {
+        if (ubisExistentes.size() != ids.size()) {
             throw new NoTodasLasUbicacionesExistenException();
         }
 
         return ubicacionDAONeo.harmonicResult(ids);
+    }
 
+    // --------------------------------------------------------------------------------
+    // CONSULTAS MONGO
+    // --------------------------------------------------------------------------------
+
+    @Override
+    public List<String> ubicacionesConflictivas() {
+        // 1. Defino el valor mínimo de decibeles para considerar un evento como exorcismo.
+        final double UMBRAL_DECIBELES = 90.0;
+
+        // 2. Creo una consulta vacía que luego será configurada con criterios de búsqueda.
+        Query query = new Query();
+
+        // 3. Agrego la condición de que el campo "decibeles" sea mayor al umbral definido.
+        query.addCriteria(
+                Criteria.where("decibeles").gt(UMBRAL_DECIBELES)
+        );
+
+        // 4. Ejecuto la consulta sobre la colección "datos_sensores".
+        List<Document> resultados =
+                mongoTemplate.find(query, Document.class, "datos_sensores");
+
+        // 5. Convierto las ubicaciones de los documentos obtenidos a una lista de strings.
+        return resultados.stream()
+                .map(doc -> doc.getString("ubicacion"))
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
     }
 
     // --------------------------------------------------------------------------------
