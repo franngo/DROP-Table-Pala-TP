@@ -5,8 +5,8 @@ import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Espiritu.EspirituMongo;
-import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.persistencia.mongo.EspirituDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAOSQL;
 import ar.edu.unq.epersgeist.persistencia.sql.MediumDAOSQL;
@@ -104,12 +104,16 @@ public class EspirituServiceImpl implements EspirituService {
         }
         Espiritu espirituEncontrado = espirituAConectar.get();
         Medium mediumEncontrado = mediumAConectar.get();
+
+        // No puede conectarse si está siendo dominado
+        if (espirituEncontrado.estaDominado()) {
+            throw new EspirituDominadoException();
+        }
+
         //las validaciones sobre si está libre y en la misma ubicación se dan en el method del modelo.
         espirituEncontrado.aumentarConexionYConectar(mediumEncontrado);
 
         return mediumDAOSQL.save(mediumEncontrado);
-
-
     }
 
     @Override
