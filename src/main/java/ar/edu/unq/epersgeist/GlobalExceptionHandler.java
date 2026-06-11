@@ -140,7 +140,10 @@ public class GlobalExceptionHandler {
             ErrorDeMediumExorcizandoAOtroEnDistintaUbicacion.class,
             ExorcismoPropioNoPermitidoException.class,
             ExorcistaSinAngelesException.class,
-            UbicacionLejanaException.class
+            UbicacionLejanaException.class,
+            ErrorDominacionInvalidaCandidatoLoDominaException.class,
+            ErrorDominacionInvalidaPorDistanciaException.class,
+            ErrorDominacionInvalidaCandidatoNoAptoException.class
     })
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponseDTO conflictHandler(
