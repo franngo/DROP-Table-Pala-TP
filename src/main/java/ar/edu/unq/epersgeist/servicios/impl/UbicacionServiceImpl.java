@@ -20,10 +20,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.aggregation.ComparisonOperators;
-import org.springframework.data.mongodb.core.aggregation.ConditionalOperators;
+import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
@@ -265,11 +262,47 @@ public class UbicacionServiceImpl implements UbicacionService {
                 .toList();
     }
 
+    // --------------------------------------------------------------------------------
+
     @Override
     public Map<String, Integer> sucesos() {
 
         final double tope_decibeles = 90.0;
         final double tope_temperatura = 5.0;
+
+        final AggregationExpression existeTemperatura = context ->
+                new Document("$ne",
+                        List.of(
+                                new Document("$type", "$temperatura"),
+                                "missing"
+                        ));
+        //o sea, { temperatura: { $exists: true} }
+
+        final AggregationExpression temperaturaMenorAlTope = context ->
+                new Document(
+                        "$lt",
+                        List.of(
+                                "$temperatura.grados",
+                                tope_temperatura
+                        )
+                );
+        //o sea, { "temperatura.grados": { $lt: 5.0} }
+
+        final AggregationExpression condicionTemperatura =
+                BooleanOperators.And.and(
+                        existeTemperatura,
+                        temperaturaMenorAlTope
+                );
+        //tengo que preguntar si existe el campo tambien porque el $lt, al comparar un null con un número, entiende que
+        // el null es valor númerico menor y da por cumplida la condición. Esto no pasa con el gt.
+
+        final AggregationExpression existeLectura = context ->
+                new Document("$ne",
+                        List.of(
+                                new Document("$type", "$l3kTUr4"),
+                                "missing"
+                        ));
+        //o sea, { $l3kTUr4: { $exists: true} }
 
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.group() //agrupo todos los docs en un mismo grupo para poder emplear agg functions sobre estos
@@ -281,16 +314,12 @@ public class UbicacionServiceImpl implements UbicacionService {
                                 .otherwise(0))
                         .as("exorcismos")
                         .sum(ConditionalOperators
-                                .when(
-                                        Criteria.where("temperatura.grados").lt(tope_temperatura)
-                                )
+                                .when(condicionTemperatura)
                                 .then(1)
                                 .otherwise(0))
                         .as("invocaciones_demoniacas")
                         .sum(ConditionalOperators
-                                .when(
-                                        Criteria.where("l3kTUr4").exists(true)
-                                )
+                                .when(existeLectura)
                                 .then(1)
                                 .otherwise(0))
                         .as("sucesos_desconocidos")

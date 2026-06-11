@@ -1229,4 +1229,34 @@ public class UbicacionServiceTest {
             assertTrue(resultado.isEmpty());
         }
     }
+
+    @Nested
+    class Sucesos {
+
+        @Autowired
+        private MongoTemplate mongoTemplate;
+//
+//        private static final double UMBRAL = 5.0;
+
+        @BeforeEach
+        void setUp() {
+            mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
+        }
+
+        @AfterEach
+        void tearDown() {
+            mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
+            ubicacionService.eliminarTodos();
+        }
+
+        @Test
+        void ignoraDocumentosQueNoSonTemperatura() {
+            //ubicacionService.sucesos();
+            //exorcismos: 62340
+            //invocaciondes demoníacas: 52131
+            //sucesos desconocidos: 125409
+        }
+
+    }
+
 }
