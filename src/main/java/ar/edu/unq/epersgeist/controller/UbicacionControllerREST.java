@@ -132,7 +132,7 @@ public class UbicacionControllerREST {
             @PathVariable Long idOrigen,
             @PathVariable Long idDestino,
             @RequestParam(defaultValue = "0") @Min(0) @Max(100) Long costo
-     ) {
+    ) {
         ubicacionService.conectar(idOrigen, idDestino, costo);
     }
 
@@ -199,5 +199,12 @@ public class UbicacionControllerREST {
 
         return ubicacionService.harmonicResult(ids);
     }
-}
 
+    // --------------------------------------------------------------------------------
+
+    @GetMapping("/conflictivas")
+    @ResponseStatus(HttpStatus.OK)
+    public List<String> ubicacionesConflictivas() {
+        return ubicacionService.ubicacionesConflictivas();
+    }
+}
