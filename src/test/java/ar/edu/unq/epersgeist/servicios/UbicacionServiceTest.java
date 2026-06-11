@@ -5,15 +5,10 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.HarmonicResult;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.*;
-import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.CoordenadasInsuficientesException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.*;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import org.bson.Document;
 import org.junit.jupiter.api.AfterEach;
@@ -590,7 +585,7 @@ public class UbicacionServiceTest {
             List<Ubicacion> ubis = ubicacionService.caminoMasRentable(origen.getId(), origen.getId());
 
             assertEquals(1, ubis.size());
-            assertEquals(origen.getId(), ubis.get(0).getId());
+            assertEquals(origen.getId(), ubis.getFirst().getId());
         }
 
         @Test
@@ -780,11 +775,11 @@ public class UbicacionServiceTest {
 
 
     @Nested
-    class UbicacionSobrecargada{
+    class UbicacionSobrecargada {
 
         @BeforeEach
         void setUp() {
-            ubicacionService.crear(new Santuario("Alta energia", 70),coordenadas);
+            ubicacionService.crear(new Santuario("Alta energia", 70), coordenadas);
             ubicacionService.crear(new Cementerio("Media energia", 50), coordenadas);
             ubicacionService.crear(new Santuario("Baja energia", 20), coordenadas);
         }
@@ -820,7 +815,7 @@ public class UbicacionServiceTest {
 
         @Test
         void noDevuelveUbicacionesEliminadas() {
-            Ubicacion alta = ubicacionService.crear(new Santuario("Mucha energia", 90),coordenadas);
+            Ubicacion alta = ubicacionService.crear(new Santuario("Mucha energia", 90), coordenadas);
             ubicacionService.eliminar(alta.getId());
 
             List<Ubicacion> sobrecargadas = ubicacionService.ubicacionesSobrecargadas(80);
@@ -1222,6 +1217,127 @@ public class UbicacionServiceTest {
             List<String> resultado = ubicacionService.ubicacionesFrias();
 
             assertTrue(resultado.isEmpty());
+        }
+    }
+    // --------------------------------------------------------------------------------
+    // MONGO: ubicacionesConflictivas()
+    // --------------------------------------------------------------------------------
+
+    @Nested
+    class UbicacionesConflictivas {
+        @Autowired
+        private MongoTemplate mongoTemplate;
+
+        private static final Integer UMBRAL = 90;
+
+        @BeforeEach
+        void setUp() {
+            mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
+        }
+
+        @AfterEach
+        void tearDown() {
+            mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
+            ubicacionService.eliminarTodos();
+        }
+
+        private void insertSonido(String ubicacion, double decibeles) {
+            mongoTemplate.getCollection("datos_sensores")
+                    .insertOne(
+                            new Document()
+                                    .append("ubicacion", ubicacion)
+                                    .append("decibeles", decibeles)
+                                    .append("sensor_id", 1)
+                    );
+        }
+
+        private void insertTemperatura(String ubicacion) {
+            mongoTemplate.getCollection("datos_sensores")
+                    .insertOne(
+                            new Document()
+                                    .append("ubicacion", ubicacion)
+                                    .append("temperatura", new org.bson.Document()
+                                            .append("grados", -10))
+                    );
+        }
+
+        // ------------------------------------------------------------
+        // CASO 1: retorna ubicaciones con decibeles altos
+        // ------------------------------------------------------------
+
+        @Test
+        void devuelveUbicacionesConExorcismos() {
+            insertSonido("A", 100);
+            insertSonido("A", 110);
+            insertSonido("B", 95);
+
+            List<String> resultado = ubicacionService.ubicacionesConflictivas();
+
+            assertEquals(2, resultado.size());
+            assertTrue(resultado.contains("A"));
+            assertTrue(resultado.contains("B"));
+        }
+
+        // ------------------------------------------------------------
+        // CASO 2: elimina duplicados
+        // ------------------------------------------------------------
+
+        @Test
+        void noDevuelveUbicacionesDuplicadas() {
+            insertSonido("A", 100);
+            insertSonido("A", 110);
+
+            List<String> resultado = ubicacionService.ubicacionesConflictivas();
+
+            assertEquals(1, resultado.size());
+            assertEquals("A", resultado.getFirst());
+        }
+
+        // ------------------------------------------------------------
+        // CASO 3: ignora sonidos por debajo del umbral
+        // ------------------------------------------------------------
+
+        @Test
+        void ignoraDecibelesBajos() {
+            insertSonido("A", 50);
+            insertSonido("B", 89);
+            insertSonido("C", UMBRAL);
+
+            List<String> resultado = ubicacionService.ubicacionesConflictivas();
+
+            assertTrue(resultado.isEmpty());
+        }
+
+        // ------------------------------------------------------------
+        // CASO 4: ignora otros tipos de sensores (temperatura)
+        // ------------------------------------------------------------
+
+        @Test
+        void ignoraDocumentosQueNoSonSonido() {
+            insertTemperatura("A");
+            insertTemperatura("B");
+
+            List<String> resultado = ubicacionService.ubicacionesConflictivas();
+
+            assertTrue(resultado.isEmpty());
+        }
+
+        // ------------------------------------------------------------
+        // CASO 5: mezcla de datos válidos e inválidos
+        // ------------------------------------------------------------
+
+        @Test
+        void mezclaDeDatosSoloDevuelveValidos() {
+            insertSonido("A", 120); // VALIDO
+            insertTemperatura("A");
+            insertSonido("B", 30);
+            insertSonido("C", 200); // VALIDO
+
+            List<String> resultado = ubicacionService.ubicacionesConflictivas();
+
+            assertEquals(2, resultado.size());
+            assertTrue(resultado.contains("A"));
+            assertTrue(resultado.contains("C"));
         }
     }
 }
