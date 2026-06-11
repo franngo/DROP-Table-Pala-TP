@@ -8,6 +8,7 @@ import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.medium.MediumMongo;
+import ar.edu.unq.epersgeist.persistencia.mongo.EspirituDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.mongo.MediumDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
 import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAOSQL;
@@ -15,6 +16,7 @@ import ar.edu.unq.epersgeist.persistencia.sql.MediumDAOSQL;
 import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
 import ar.edu.unq.epersgeist.servicios.MediumService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,13 +30,22 @@ public class MediumServiceImpl implements MediumService {
     private final EspirituDAOSQL espirituDAOSQL; //se requiere para usar en el invocar()
     private final UbicacionDAOSQL ubicacionDAOSQL;
     private final UbicacionDAONeo4j ubicacionDAONeo4j;
+    private final EspirituDAOMongo espirituDAOMongo;
 
-    public MediumServiceImpl(MediumDAOSQL mediumDAOSQL, EspirituDAOSQL espirituDAOSQL, UbicacionDAOSQL ubicacionDAOSQL, UbicacionDAONeo4j ubicacionDAONeo4j, MediumDAOMongo mediumDAOMongo) {
+    public MediumServiceImpl(
+            MediumDAOSQL mediumDAOSQL,
+            EspirituDAOSQL espirituDAOSQL,
+            UbicacionDAOSQL ubicacionDAOSQL,
+            UbicacionDAONeo4j ubicacionDAONeo4j,
+            MediumDAOMongo mediumDAOMongo,
+            EspirituDAOMongo espirituDAOMongo
+    ) {
         this.mediumDAOSQL = mediumDAOSQL;
         this.mediumDAOMongo = mediumDAOMongo;
         this.espirituDAOSQL = espirituDAOSQL;
         this.ubicacionDAOSQL = ubicacionDAOSQL;
         this.ubicacionDAONeo4j = ubicacionDAONeo4j;
+        this.espirituDAOMongo = espirituDAOMongo;
     }
 
     @Override
@@ -92,14 +103,39 @@ public class MediumServiceImpl implements MediumService {
         m.descansar();
     }
 
-
     @Override
     public Espiritu invocar(Long mediumId, Long espirituId) {
-        Medium m = this.recuperar(mediumId);
 
-        Espiritu e = espirituDAOSQL.findById(espirituId).orElseThrow(() -> new ErrorDeEspirituNoEncontradoException(espirituId));
+        Medium medium = this.recuperar(mediumId);
 
-        return m.invocar(e);
+        Espiritu espiritu = espirituDAOSQL
+                .findById(espirituId)
+                .orElseThrow(
+                        () -> new ErrorDeEspirituNoEncontradoException(espirituId)
+                );
+
+        MediumMongo mediumMongo = mediumDAOMongo
+                .findById(mediumId)
+                .orElseThrow(
+                        () -> new ErrorDeMediumNoEncontradoException(mediumId)
+                );
+
+        GeoJsonPoint coordenadasMedium = mediumMongo.getCoordenada();
+
+        double longitud = coordenadasMedium.getX();
+        double latitud = coordenadasMedium.getY();
+
+        double distancia =
+                espirituDAOMongo
+                        .distanciaHastaEspiritu(longitud, latitud, espirituId)
+                        .distanciaCalculada();
+
+        // 50 KM EN METROS
+        if (distancia > 50000) {
+            throw new EspirituMuyLejanoException();
+        }
+
+        return medium.invocar(espiritu);
     }
 
     @Override
