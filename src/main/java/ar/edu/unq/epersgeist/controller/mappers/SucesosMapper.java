@@ -14,8 +14,4 @@ public class SucesosMapper {
         );
     }
 
-//    assertEquals(2, map.get("exorcismos"));
-//    assertEquals(2, map.get("invocaciones demoniacas"));
-//    assertEquals(5, map.get("sucesos desconocidos"));
-
 }
