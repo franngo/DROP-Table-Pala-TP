@@ -2,6 +2,9 @@ package ar.edu.unq.epersgeist.modelo.Espiritu;
 
 import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.TipoEspiritu;
 import ar.edu.unq.epersgeist.modelo.Auditable;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDominacionInvalidaCandidatoLoDominaException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDominacionInvalidaCandidatoNoAptoException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDominacionInvalidaPorDistanciaException;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
@@ -27,8 +30,8 @@ import java.io.Serializable;
 
 public abstract class Espiritu extends Auditable implements Serializable {
 
-
     public static final int limiteConexion = 100;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -40,6 +43,9 @@ public abstract class Espiritu extends Auditable implements Serializable {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Ubicacion ubicacion;
+    @ManyToOne
+    @JoinColumn(name = "espirituDominante_id")
+    private Espiritu espirituDominante;
 
     public Espiritu(@NonNull String nombre, Ubicacion ubicacion) {
         this.validarUbicacionNoNula(ubicacion);
@@ -127,6 +133,34 @@ public abstract class Espiritu extends Auditable implements Serializable {
 
     //double dispatch para el fortalecerConexionDescansandoEn(), usado en el descansar() de Medium
     public abstract int porcentajeDescansarEn(Ubicacion ubicacion);
+
+    // --------------------------------------------------------------------------------
+    // Funcionalidad de dominar
+    // --------------------------------------------------------------------------------
+
+    public void dominar(Espiritu espirituADominar, double distanciaEspiritus) {
+        this.validarDominacion(espirituADominar, distanciaEspiritus);
+    }
+
+    private void validarDominacion(Espiritu espirituADominar, double distanciaEspiritus) {
+        if(!(distanciaEspiritus >= 2000.0 && distanciaEspiritus <= 5000.0)) {
+            throw new ErrorDominacionInvalidaPorDistanciaException(this.getId(), espirituADominar.getId(), distanciaEspiritus);
+        }
+
+        if(!espirituADominar.estaLibre() || espirituADominar.getNivelDeConexion() >= 50 || espirituADominar.estaDominado()) {
+            throw new ErrorDominacionInvalidaCandidatoNoAptoException(this.getId(), espirituADominar.getId());
+        }
+
+        espirituADominar.efectuarDominanciaPor(this);
+    }
+
+    public boolean estaDominado() {
+        return espirituDominante != null;
+    }
+
+    public void efectuarDominanciaPor(Espiritu espirituDominante) {
+        this.espirituDominante = espirituDominante;
+    }
 
     // --------------------------------------------------------------------------------
     // Subtareas

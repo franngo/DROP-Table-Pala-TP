@@ -5,6 +5,8 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.HarmonicResult;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.*;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
@@ -778,11 +780,11 @@ public class UbicacionServiceTest {
 
 
     @Nested
-    class UbicacionSobrecargada {
+    class UbicacionSobrecargada{
 
         @BeforeEach
         void setUp() {
-            ubicacionService.crear(new Santuario("Alta energia", 70), coordenadas);
+            ubicacionService.crear(new Santuario("Alta energia", 70),coordenadas);
             ubicacionService.crear(new Cementerio("Media energia", 50), coordenadas);
             ubicacionService.crear(new Santuario("Baja energia", 20), coordenadas);
         }
@@ -818,7 +820,7 @@ public class UbicacionServiceTest {
 
         @Test
         void noDevuelveUbicacionesEliminadas() {
-            Ubicacion alta = ubicacionService.crear(new Santuario("Mucha energia", 90), coordenadas);
+            Ubicacion alta = ubicacionService.crear(new Santuario("Mucha energia", 90),coordenadas);
             ubicacionService.eliminar(alta.getId());
 
             List<Ubicacion> sobrecargadas = ubicacionService.ubicacionesSobrecargadas(80);
@@ -871,7 +873,14 @@ public class UbicacionServiceTest {
         void harmonicResultFallaUsandoIdInexistente() {
             Long idNoExistente = 123456789L;
 
-            assertThrows(UbicacionNoEncontradaException.class, () -> ubicacionService.harmonicResult(List.of(idNoExistente)));
+            assertThrows(NoTodasLasUbicacionesExistenException.class, () -> ubicacionService.harmonicResult(List.of(idNoExistente)));
+        }
+
+        @Test
+        void harmonicResultFallaTeniendoTanSoloUnIdInexistente() {
+            Long idNoExistente = 123456789L;
+
+            assertThrows(NoTodasLasUbicacionesExistenException.class, () -> ubicacionService.harmonicResult(List.of(uno.getId(), idNoExistente, dos.getId())));
         }
 
         @Test
@@ -982,10 +991,10 @@ public class UbicacionServiceTest {
         void crearUbicacionConMasDeTresCoordenadasFunciona() {
 
             List<Coordenada> muchasCoords = List.of(
-                    new Coordenada(-34.81, -58.22),
+                    new Coordenada(-34.83, -58.21),
                     new Coordenada(-34.82, -58.24),
-                    new Coordenada(-34.80, -58.20),
-                    new Coordenada(-34.83, -58.21)
+                    new Coordenada(-34.81, -58.22),
+                    new Coordenada(-34.80, -58.20)
             );
 
             assertDoesNotThrow(() ->
