@@ -144,6 +144,10 @@ public class GlobalExceptionHandler {
             ExorcismoPropioNoPermitidoException.class,
             ExorcistaSinAngelesException.class,
             UbicacionLejanaException.class,
+            ErrorDominacionInvalidaCandidatoLoDominaException.class,
+            ErrorDominacionInvalidaPorDistanciaException.class,
+            ErrorDominacionInvalidaCandidatoNoAptoException.class,
+            UbicacionLejanaException.class,
             EspirituDominadoException.class
     })
     @ResponseStatus(HttpStatus.CONFLICT)

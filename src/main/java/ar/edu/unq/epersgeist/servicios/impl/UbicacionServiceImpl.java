@@ -3,6 +3,7 @@ package ar.edu.unq.epersgeist.servicios.impl;
 import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.HarmonicResult;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.NoTodasLasUbicacionesExistenException;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionMongo;
@@ -10,12 +11,18 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.persistencia.mongo.UbicacionDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
 import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.bson.Document;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,6 +39,7 @@ public class UbicacionServiceImpl implements UbicacionService {
     private final UbicacionDAOSQL ubicacionDAOSQL;
     private final UbicacionDAONeo4j ubicacionDAONeo;
     private final UbicacionDAOMongo ubicacionDAOMongo;
+    private final MongoTemplate mongoTemplate;
 
     // --------------------------------------------------------------------------------
     // CREAR
@@ -213,10 +221,44 @@ public class UbicacionServiceImpl implements UbicacionService {
     @Override
     public List<HarmonicResult> harmonicResult(List<Long> ids) {
         //validación de la existencia de Ubicaciones
-        ids.stream().forEach((id) -> this.recuperar(id));
+//        ids.stream().forEach((id) -> this.recuperar(id));
+        List<Ubicacion> ubisExistentes = ubicacionDAOSQL.findAllById(ids);
+        if(ubisExistentes.size() != ids.size()) {
+            throw new NoTodasLasUbicacionesExistenException();
+        }
 
         return ubicacionDAONeo.harmonicResult(ids);
 
+    }
+
+    // --------------------------------------------------------------------------------
+
+    @Override
+    public List<String> ubicacionesFrias() {
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(
+                        Criteria.where("temperatura.grados").exists(true)
+                ),
+                Aggregation.group("ubicacion")
+                        .avg("temperatura.grados")
+                        .as("promedio"),
+                Aggregation.match(
+                        Criteria.where("promedio").lt(5)
+                )
+        );
+
+        AggregationResults<Document> resultados =
+                mongoTemplate.aggregate(
+                        aggregation,
+                        "datos_sensores",
+                        Document.class
+                );
+
+        return resultados.getMappedResults()
+                .stream()
+                .map(doc -> doc.getString("_id"))
+                .toList();
     }
 
 }

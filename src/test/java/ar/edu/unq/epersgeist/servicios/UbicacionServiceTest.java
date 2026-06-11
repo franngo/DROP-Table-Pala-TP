@@ -5,20 +5,24 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.HarmonicResult;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.*;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.CoordenadasInsuficientesException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
+import org.bson.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.List;
 import java.util.Objects;
@@ -87,7 +91,7 @@ public class UbicacionServiceTest {
     class Crear {
         @Test
         void sePuedeCrearUnaUbicacion() {
-            Ubicacion ubicacionCreada = ubicacionService.crear(santuario,coordenadas);
+            Ubicacion ubicacionCreada = ubicacionService.crear(santuario, coordenadas);
 
             assertNotNull(ubicacionCreada.getId());
             assertEquals(NOMBRE_SANTUARIO, ubicacionCreada.getNombre());
@@ -617,7 +621,7 @@ public class UbicacionServiceTest {
 
         @Test
         void caminoMasRentableNoSeRigePorLongitudDelCamino() {
-            Ubicacion nodoCuatro = ubicacionService.crear(new Santuario("Nodo cuatro", 50),coordenadas);
+            Ubicacion nodoCuatro = ubicacionService.crear(new Santuario("Nodo cuatro", 50), coordenadas);
 
             ubicacionService.conectar(origen.getId(), destino.getId(), 100L);
 
@@ -869,7 +873,14 @@ public class UbicacionServiceTest {
         void harmonicResultFallaUsandoIdInexistente() {
             Long idNoExistente = 123456789L;
 
-            assertThrows(UbicacionNoEncontradaException.class, () -> ubicacionService.harmonicResult(List.of(idNoExistente)));
+            assertThrows(NoTodasLasUbicacionesExistenException.class, () -> ubicacionService.harmonicResult(List.of(idNoExistente)));
+        }
+
+        @Test
+        void harmonicResultFallaTeniendoTanSoloUnIdInexistente() {
+            Long idNoExistente = 123456789L;
+
+            assertThrows(NoTodasLasUbicacionesExistenException.class, () -> ubicacionService.harmonicResult(List.of(uno.getId(), idNoExistente, dos.getId())));
         }
 
         @Test
@@ -980,10 +991,10 @@ public class UbicacionServiceTest {
         void crearUbicacionConMasDeTresCoordenadasFunciona() {
 
             List<Coordenada> muchasCoords = List.of(
-                    new Coordenada(-34.81, -58.22),
+                    new Coordenada(-34.83, -58.21),
                     new Coordenada(-34.82, -58.24),
-                    new Coordenada(-34.80, -58.20),
-                    new Coordenada(-34.83, -58.21)
+                    new Coordenada(-34.81, -58.22),
+                    new Coordenada(-34.80, -58.20)
             );
 
             assertDoesNotThrow(() ->
@@ -1082,4 +1093,135 @@ public class UbicacionServiceTest {
         }
     }
 
+    @Nested
+    class UbicacionesFrias {
+
+        @Autowired
+        private MongoTemplate mongoTemplate;
+
+        private static final double UMBRAL = 5.0;
+
+        @AfterEach
+        void tearDown() {
+            mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
+            ubicacionService.eliminarTodos();
+        }
+
+        private void insertTemperatura(String ubicacion, double grados) {
+            mongoTemplate.getCollection("datos_sensores")
+                    .insertOne(
+                            new Document()
+                                    .append("ubicacion", ubicacion)
+                                    .append("sensor_id", 1)
+                                    .append("temperatura",
+                                            new Document()
+                                                    .append("grados", grados)
+                                                    .append("unidad", "°C"))
+                    );
+        }
+
+        private void insertSonido(String ubicacion, double decibeles) {
+            mongoTemplate.getCollection("datos_sensores")
+                    .insertOne(
+                            new Document()
+                                    .append("ubicacion", ubicacion)
+                                    .append("sensor_id", 1)
+                                    .append("decibeles", decibeles)
+                    );
+        }
+
+        // ------------------------------------------------------------
+        // CASO 1: devuelve una ubicación con promedio menor a 5
+        // ------------------------------------------------------------
+
+        @Test
+        void devuelveUbicacionesConPromedioMenorACinco() {
+            insertTemperatura("A", 2);
+            insertTemperatura("A", 4); // promedio = 3
+
+            List<String> resultado = ubicacionService.ubicacionesFrias();
+
+            assertEquals(1, resultado.size());
+            assertTrue(resultado.contains("A"));
+        }
+
+        // ------------------------------------------------------------
+        // CASO 2: no incluye promedio exactamente igual a 5
+        // ------------------------------------------------------------
+
+        @Test
+        void noIncluyePromedioIgualACinco() {
+            insertTemperatura("A", 4);
+            insertTemperatura("A", 6); // promedio = 5
+
+            List<String> resultado = ubicacionService.ubicacionesFrias();
+
+            assertTrue(resultado.isEmpty());
+        }
+
+        // ------------------------------------------------------------
+        // CASO 3: devuelve solo las ubicaciones frías
+        // ------------------------------------------------------------
+
+        @Test
+        void devuelveSoloUbicacionesFrias() {
+            insertTemperatura("A", 0);
+            insertTemperatura("A", 2);   // promedio = 1
+
+            insertTemperatura("B", 8);
+            insertTemperatura("B", 10);  // promedio = 9
+
+            insertTemperatura("C", -5);
+            insertTemperatura("C", 3);   // promedio = -1
+
+            List<String> resultado = ubicacionService.ubicacionesFrias();
+
+            assertEquals(2, resultado.size());
+            assertTrue(resultado.contains("A"));
+            assertTrue(resultado.contains("C"));
+        }
+
+        // ------------------------------------------------------------
+        // CASO 4: ignora documentos que no son de temperatura
+        // ------------------------------------------------------------
+
+        @Test
+        void ignoraDocumentosQueNoSonTemperatura() {
+            insertSonido("A", 120);
+
+            List<String> resultado = ubicacionService.ubicacionesFrias();
+
+            assertTrue(resultado.isEmpty());
+        }
+
+        // ------------------------------------------------------------
+        // CASO 5: mezcla de datos válidos e inválidos
+        // ------------------------------------------------------------
+
+        @Test
+        void mezclaDeDatosSoloDevuelveUbicacionesFrias() {
+            insertTemperatura("A", 0);
+            insertTemperatura("A", 4);    // promedio = 2
+
+            insertTemperatura("B", 8);
+            insertTemperatura("B", 12);   // promedio = 10
+
+            insertSonido("C", 150);       // debe ignorarse
+
+            List<String> resultado = ubicacionService.ubicacionesFrias();
+
+            assertEquals(1, resultado.size());
+            assertTrue(resultado.contains("A"));
+        }
+
+        @Test
+        void unaMedicionFriaNoAlcanzaSiElPromedioNoEsMenorACinco() {
+            insertTemperatura("A", 2);
+            insertTemperatura("A", 20); // promedio = 11
+
+            List<String> resultado = ubicacionService.ubicacionesFrias();
+
+            assertTrue(resultado.isEmpty());
+        }
+    }
 }

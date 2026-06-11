@@ -4,6 +4,8 @@ import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.TipoEspiritu;
 import ar.edu.unq.epersgeist.modelo.Auditable;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDominacionInvalidaCandidatoNoAptoException;
+import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDominacionInvalidaPorDistanciaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionInvalidaException;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import jakarta.persistence.*;
@@ -26,8 +28,9 @@ import java.io.Serializable;
 @DiscriminatorColumn(name = "tipo_espiritu")
 
 public abstract class Espiritu extends Auditable implements Serializable {
-    
+
     public static final int limiteConexion = 100;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -39,9 +42,8 @@ public abstract class Espiritu extends Auditable implements Serializable {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Ubicacion ubicacion;
-
     @ManyToOne
-    @JoinColumn(name = "espiritu_dominante_id")
+    @JoinColumn(name = "espirituDominante_id")
     private Espiritu espirituDominante;
 
     public Espiritu(@NonNull String nombre, Ubicacion ubicacion) {
@@ -132,6 +134,34 @@ public abstract class Espiritu extends Auditable implements Serializable {
     public abstract int porcentajeDescansarEn(Ubicacion ubicacion);
 
     // --------------------------------------------------------------------------------
+    // Funcionalidad de dominar
+    // --------------------------------------------------------------------------------
+
+    public void dominar(Espiritu espirituADominar, double distanciaEspiritus) {
+        this.validarDominacion(espirituADominar, distanciaEspiritus);
+    }
+
+    private void validarDominacion(Espiritu espirituADominar, double distanciaEspiritus) {
+        if (!(distanciaEspiritus >= 2000.0 && distanciaEspiritus <= 5000.0)) {
+            throw new ErrorDominacionInvalidaPorDistanciaException(this.getId(), espirituADominar.getId(), distanciaEspiritus);
+        }
+
+        if (!espirituADominar.estaLibre() || espirituADominar.getNivelDeConexion() >= 50 || espirituADominar.estaDominado()) {
+            throw new ErrorDominacionInvalidaCandidatoNoAptoException(this.getId(), espirituADominar.getId());
+        }
+
+        espirituADominar.efectuarDominanciaPor(this);
+    }
+
+    public boolean estaDominado() {
+        return espirituDominante != null;
+    }
+
+    public void efectuarDominanciaPor(Espiritu espirituDominante) {
+        this.espirituDominante = espirituDominante;
+    }
+
+    // --------------------------------------------------------------------------------
     // Subtareas
     // --------------------------------------------------------------------------------
 
@@ -149,11 +179,4 @@ public abstract class Espiritu extends Auditable implements Serializable {
 
     abstract public TipoEspiritu getTipoEspiritu();
 
-    // --------------------------------------------------------------------------------
-    // Dominaciones
-    // --------------------------------------------------------------------------------
-
-    public boolean estaDominado() {
-        return this.espirituDominante != null;
-    }
 }
