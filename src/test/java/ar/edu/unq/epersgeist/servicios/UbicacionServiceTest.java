@@ -1095,6 +1095,11 @@ public class UbicacionServiceTest {
 
         private static final Integer UMBRAL = 90;
 
+        @BeforeEach
+        void setUp() {
+            mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
+        }
+
         @AfterEach
         void tearDown() {
             mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
