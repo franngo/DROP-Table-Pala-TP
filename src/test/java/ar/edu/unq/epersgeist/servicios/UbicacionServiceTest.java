@@ -25,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -1235,8 +1236,9 @@ public class UbicacionServiceTest {
 
         @Autowired
         private MongoTemplate mongoTemplate;
-//
-//        private static final double UMBRAL = 5.0;
+
+        final double tope_decibeles = 90.0;
+        final double tope_temperatura = 5.0;
 
         @BeforeEach
         void setUp() {
@@ -1249,12 +1251,61 @@ public class UbicacionServiceTest {
             ubicacionService.eliminarTodos();
         }
 
+        private void insertSonido(String ubicacion, double decibeles) {
+            mongoTemplate.getCollection("datos_sensores")
+                    .insertOne(
+                            new Document()
+                                    .append("ubicacion", ubicacion)
+                                    .append("sensor_id", 1)
+                                    .append("decibeles", decibeles)
+                    );
+        }
+
+        private void insertTemperatura(String ubicacion, double grados) {
+            mongoTemplate.getCollection("datos_sensores")
+                    .insertOne(
+                            new Document()
+                                    .append("ubicacion", ubicacion)
+                                    .append("sensor_id", 1)
+                                    .append("temperatura",
+                                            new Document()
+                                                    .append("grados", grados)
+                                                    .append("unidad", "°C"))
+                    );
+        }
+
+        private void insertPresion(String ubicacion, double hectopascales) {
+            mongoTemplate.getCollection("datos_sensores")
+                    .insertOne(
+                            new Document()
+                                    .append("ubicacion", ubicacion)
+                                    .append("sensor_id", 1)
+                                    .append("presionAtmosferica", hectopascales)
+                    );
+        }
+
+        private void insertLectura(String ubicacion, String lectura) {
+            mongoTemplate.getCollection("datos_sensores")
+                    .insertOne(
+                            new Document()
+                                    .append("ubicacion", ubicacion)
+                                    .append("sensor_id", 1)
+                                    .append("l3kTUr4", lectura)
+                    );
+        }
+
         @Test
-        void ignoraDocumentosQueNoSonTemperatura() {
-            //ubicacionService.sucesos();
-            //exorcismos: 62340
-            //invocaciondes demoníacas: 52131
-            //sucesos desconocidos: 125409
+        void sucesos() {
+            insertTemperatura("A", 2);
+            insertTemperatura("A", 4); // promedio = 3
+
+            Map<String, Integer> map = ubicacionService.sucesos();
+
+            System.out.println("aaaaaaaaaaaaaaaaaaaaaa");
+            System.out.println(map.get("exorcismos"));
+            System.out.println(map.get("invocaciones demoniacas"));
+            System.out.println(map.get("sucesos desconocidos"));
+            System.out.println("aaaaaaaaaaaaaaaaaaaaaa");
         }
 
     }
