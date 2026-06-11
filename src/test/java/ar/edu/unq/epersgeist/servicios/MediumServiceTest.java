@@ -5,14 +5,15 @@ import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.random.Estrategia.EstrategiaRangoEspecifico;
 import ar.edu.unq.epersgeist.modelo.random.RandomDefensa;
+import ar.edu.unq.epersgeist.persistencia.mongo.MediumDAOMongo;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -64,8 +65,8 @@ public class MediumServiceTest {
         coordenadaMedium = new Coordenada(-34.812, -58.214);
         coordenadaEspiritu = new Coordenada(-34.815, -58.220);
 
-        berazategui = ubicacionService.crear(new Santuario("Berazategui", ENERGIA),coordenadas);
-        bernal = ubicacionService.crear(new Santuario("Bernal", ENERGIA),coordenadas);
+        berazategui = ubicacionService.crear(new Santuario("Berazategui", ENERGIA), coordenadas);
+        bernal = ubicacionService.crear(new Santuario("Bernal", ENERGIA), coordenadas);
 
         espirituM = new Angelical("Charizard", berazategui);
         espirituM2 = new Angelical("Bulbasor", berazategui);
@@ -392,7 +393,7 @@ public class MediumServiceTest {
             ranelagh = ubicacionService.crear(new Santuario("Ranelagh", 99), coordenadas);
             sourigues = ubicacionService.crear(new Santuario("Sourigues", 70), coordenadas);
             ubicacionService.conectar(ranelagh.getId(), sourigues.getId(), 40L);
-            mediumAMover = serviceMedium.crear(new Medium("Matias Sanchez", 100, 90, ranelagh),coordenadaMedium);
+            mediumAMover = serviceMedium.crear(new Medium("Matias Sanchez", 100, 90, ranelagh), coordenadaMedium);
 
             // espiritus que acompañanan a
             Espiritu elChiqui = espirituService.crear(new Angelical("Chiqui Tapia", ranelagh), coordenadaEspiritu);
@@ -497,6 +498,113 @@ public class MediumServiceTest {
             serviceMedium.eliminarTodos();
             ubicacionService.eliminarTodos();
 
+        }
+    }
+
+    @Nested
+    class InvocarConDistancia {
+
+        @Autowired
+        private MediumDAOMongo mediumDAOMongo;
+
+        @Test
+        void invocaCorrectamenteSiElEspirituEstaAMenosDe50Km() {
+
+            Medium medium = new Medium("Juan", 120, 20, berazategui);
+            Medium mediumP = serviceMedium.crear(medium, coordenadaMedium);
+
+            Espiritu espiritu = new Angelical("Matias", berazategui);
+            Espiritu espirituP = espirituService.crear(espiritu, coordenadaEspiritu);
+
+            Espiritu invocado =
+                    serviceMedium.invocar(mediumP.getId(), espirituP.getId());
+
+            assertNotNull(invocado);
+            assertEquals(
+                    mediumP.getUbicacion().getId(),
+                    invocado.getUbicacion().getId()
+            );
+        }
+
+        @Test
+        void fallaSiElEspirituEstaAMasDe50Km() {
+
+            Coordenada coordenadaLejana =
+                    new Coordenada(-35.50, -58.22);
+
+            Medium medium = new Medium("Juan", 120, 20, berazategui);
+            Medium mediumP = serviceMedium.crear(medium, coordenadaMedium);
+
+            Espiritu espiritu = new Angelical("Matias", berazategui);
+            Espiritu espirituP =
+                    espirituService.crear(espiritu, coordenadaLejana);
+
+            assertThrows(
+                    EspirituMuyLejanoException.class,
+                    () -> serviceMedium.invocar(
+                            mediumP.getId(),
+                            espirituP.getId()
+                    )
+            );
+        }
+
+        @Test
+        void fallaSiElEspirituNoExiste() {
+
+            Medium medium = new Medium("Juan", 120, 20, berazategui);
+            Medium mediumP = serviceMedium.crear(medium, coordenadaMedium);
+
+            assertThrows(
+                    ErrorDeEspirituNoEncontradoException.class,
+                    () -> serviceMedium.invocar(
+                            mediumP.getId(),
+                            99999L
+                    )
+            );
+        }
+
+        @Test
+        void fallaSiElMediumNoExiste() {
+
+            Espiritu espiritu = new Angelical("Matias", berazategui);
+            Espiritu espirituP =
+                    espirituService.crear(espiritu, coordenadaEspiritu);
+
+            assertThrows(
+                    ErrorDeMediumNoEncontradoException.class,
+                    () -> serviceMedium.invocar(
+                            99999L,
+                            espirituP.getId()
+                    )
+            );
+        }
+
+        @Test
+        void fallaSiElMediumExisteEnSqlPeroNoEnMongo() {
+
+            Medium medium = new Medium("Juan", 120, 20, berazategui);
+            Medium mediumP = serviceMedium.crear(medium, coordenadaMedium);
+
+            Espiritu espiritu = new Angelical("Matias", berazategui);
+            Espiritu espirituP =
+                    espirituService.crear(espiritu, coordenadaEspiritu);
+
+            mediumDAOMongo.deleteById(mediumP.getId());
+
+            assertThrows(
+                    ErrorDeMediumNoEncontradoException.class,
+                    () -> serviceMedium.invocar(
+                            mediumP.getId(),
+                            espirituP.getId()
+                    )
+            );
+        }
+
+        @AfterEach
+        void tearDown() {
+            espirituService.eliminarTodos();
+            serviceMedium.eliminarTodos();
+            ubicacionService.eliminarTodos();
         }
     }
 
