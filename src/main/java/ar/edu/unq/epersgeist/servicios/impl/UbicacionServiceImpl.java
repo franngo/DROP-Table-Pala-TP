@@ -6,6 +6,7 @@ import ar.edu.unq.epersgeist.modelo.HarmonicResult;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionMongo;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.NoTodasLasUbicacionesExistenException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
@@ -18,6 +19,8 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -219,7 +222,11 @@ public class UbicacionServiceImpl implements UbicacionService {
     @Override
     public List<HarmonicResult> harmonicResult(List<Long> ids) {
         //validación de la existencia de Ubicaciones
-        ids.stream().forEach((id) -> this.recuperar(id));
+//        ids.stream().forEach((id) -> this.recuperar(id));
+        List<Ubicacion> ubisExistentes = ubicacionDAOSQL.findAllById(ids);
+        if (ubisExistentes.size() != ids.size()) {
+            throw new NoTodasLasUbicacionesExistenException();
+        }
 
         return ubicacionDAONeo.harmonicResult(ids);
     }
@@ -252,4 +259,35 @@ public class UbicacionServiceImpl implements UbicacionService {
                 .distinct()
                 .toList();
     }
+
+    // --------------------------------------------------------------------------------
+
+    @Override
+    public List<String> ubicacionesFrias() {
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(
+                        Criteria.where("temperatura.grados").exists(true)
+                ),
+                Aggregation.group("ubicacion")
+                        .avg("temperatura.grados")
+                        .as("promedio"),
+                Aggregation.match(
+                        Criteria.where("promedio").lt(5)
+                )
+        );
+
+        AggregationResults<Document> resultados =
+                mongoTemplate.aggregate(
+                        aggregation,
+                        "datos_sensores",
+                        Document.class
+                );
+
+        return resultados.getMappedResults()
+                .stream()
+                .map(doc -> doc.getString("_id"))
+                .toList();
+    }
+
 }

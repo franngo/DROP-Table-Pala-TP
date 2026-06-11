@@ -5,15 +5,14 @@ import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlCrearEspirituException;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeEspirituNoEncontradoException;
+import ar.edu.unq.epersgeist.modelo.exceptions.*;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,8 +35,6 @@ public class EspirituServiceTest {
 
     @Autowired
     private EspirituService serviceEspiritu;
-
-
     @Autowired
     private MediumService mediumService;
     @Autowired
@@ -54,7 +51,7 @@ public class EspirituServiceTest {
         coordenadaEspiritu = new Coordenada(-34.81, -58.22);
         coordenadaMedium = new Coordenada(-34.81, -58.22);
 
-        berazategui = ubicacionService.crear(new Santuario("Berazategui", ENERGIA),coordenadas);
+        berazategui = ubicacionService.crear(new Santuario("Berazategui", ENERGIA), coordenadas);
         matias = new Angelical("Matias", berazategui);
     }
 
@@ -289,7 +286,7 @@ public class EspirituServiceTest {
     @Test
     void noDeberiaConectarUnEspirituInexistenteConUnMedium() {
         Medium medium = new Medium("Juan", 120, 10, berazategui);
-        Medium mediumP = mediumService.crear(medium,coordenadaMedium);
+        Medium mediumP = mediumService.crear(medium, coordenadaMedium);
 
         assertThrows(ErrorAlConectarEspirituConMedium.class, () -> {
             serviceEspiritu.conectar(9999L, mediumP.getId());
@@ -311,7 +308,7 @@ public class EspirituServiceTest {
         serviceEspiritu.eliminar(espiritu.getId()); //eliminado de la DB, pero el objeto en la VM sigue con su id
 
         Medium medium = new Medium("Juan", 120, 10, berazategui);
-        Medium mediumP = mediumService.crear(medium,coordenadaMedium);
+        Medium mediumP = mediumService.crear(medium, coordenadaMedium);
 
         assertThrows(ErrorAlConectarEspirituConMedium.class, () -> {
             serviceEspiritu.conectar(espiritu.getId(), mediumP.getId());
@@ -508,6 +505,127 @@ public class EspirituServiceTest {
 
 
     }
+
+    // --------------------------------------------------------------------------------
+    // dominar()
+    // --------------------------------------------------------------------------------
+
+    @Nested
+    class Dominar {
+
+        Espiritu matiasP;
+        Espiritu pepeP;
+
+        @BeforeEach
+        void setUp() {
+            matiasP = serviceEspiritu.crear(matias, new Coordenada(-34.81, -58.22));
+            pepeP = serviceEspiritu.crear(new Angelical("Pepe", berazategui), new Coordenada(-34.80, -58.20));
+        }
+
+        @Test
+        void fallSiElDominanteNoEstaPersistido() {
+            assertThrows(ErrorDeEspirituNoEncontradoException.class, () -> serviceEspiritu.dominar(999L, pepeP.getId()));
+        }
+
+        @Test
+        void fallSiElObjetivoNoEstaPersistido() {
+            assertThrows(ErrorDeEspirituNoEncontradoException.class, () -> serviceEspiritu.dominar(matiasP.getId(), 999L));
+        }
+
+        @Test
+        void fallaCuandoElObjetivoLoDomina() {
+            serviceEspiritu.dominar(matiasP.getId(), pepeP.getId());
+            //en este punto, pepe está dominado por matiasP y no podría dominarlo.
+            assertThrows(ErrorDominacionInvalidaCandidatoLoDominaException.class, () -> serviceEspiritu.dominar(pepeP.getId(), matiasP.getId()));
+        }
+
+        @Test
+        void casoExitoso() {
+            //La distancia entre matiasP y pepeP es de 2140.339474411033 metros, por lo que está dentro del rango válido
+            //pepeP está libre, su energia es 0 y no está dominado. Tampoco se da que pepeP esté dominando a matiasP.
+            //Por tanto, matiasP puede dominar a pepeP
+            serviceEspiritu.dominar(matiasP.getId(), pepeP.getId());
+
+            assertTrue(pepeP.estaDominado());
+            assertEquals(pepeP.getEspirituDominante().getId(), matiasP.getId());
+        }
+
+        @Test
+        void unEspirituPuedeDominarAMuchos() {
+            Espiritu coquiP = serviceEspiritu.crear(new Angelical("Coqui", berazategui), new Coordenada(-34.80, -58.20));
+            Espiritu mariaenemaP = serviceEspiritu.crear(new Angelical("María Enema", berazategui), new Coordenada(-34.80, -58.20));
+
+            //matiasP puede dominar a pepeP, coquiP y mariaenemaP
+            serviceEspiritu.dominar(matiasP.getId(), pepeP.getId());
+            serviceEspiritu.dominar(matiasP.getId(), coquiP.getId());
+            serviceEspiritu.dominar(matiasP.getId(), mariaenemaP.getId());
+
+            assertTrue(pepeP.estaDominado());
+            assertEquals(pepeP.getEspirituDominante().getId(), matiasP.getId());
+            assertTrue(coquiP.estaDominado());
+            assertEquals(coquiP.getEspirituDominante().getId(), matiasP.getId());
+            assertTrue(mariaenemaP.estaDominado());
+            assertEquals(mariaenemaP.getEspirituDominante().getId(), matiasP.getId());
+        }
+
+        @Test
+        void unEspirituDominadoPuedeDominarAMuchos() {
+            Espiritu coquiP = serviceEspiritu.crear(new Angelical("Coqui", berazategui), new Coordenada(-34.80, -58.23));
+            Espiritu mariaenemaP = serviceEspiritu.crear(new Angelical("María Enema", berazategui), new Coordenada(-34.80, -58.23));
+
+            //matiasP puede dominar a pepeP
+            serviceEspiritu.dominar(matiasP.getId(), pepeP.getId());
+
+            //pepeP puede dominar a coquiP y a mariaenemaP a pesar de estar siendo dominado por matiasP
+            //la distancia entre pepeP y estos dos es de 2.739km, los 2 están libres, su energía es 0 y  no están siendo dominados
+            serviceEspiritu.dominar(pepeP.getId(), coquiP.getId());
+            serviceEspiritu.dominar(pepeP.getId(), mariaenemaP.getId());
+
+            assertTrue(pepeP.estaDominado());
+            assertEquals(pepeP.getEspirituDominante().getId(), matiasP.getId());
+            assertTrue(coquiP.estaDominado());
+            assertEquals(coquiP.getEspirituDominante().getId(), pepeP.getId());
+            assertTrue(mariaenemaP.estaDominado());
+            assertEquals(mariaenemaP.getEspirituDominante().getId(), pepeP.getId());
+        }
+
+        //probar tmb caso donde a puede dominar varios
+        //probar caso donde a domina a b, y b puede dominar a otros excepto a a
+
+        @Test
+        void noDeberiaConectarUnEspirituQueEstaSiendoDominado() {
+
+            Espiritu dominante =
+                    serviceEspiritu.crear(
+                            new Demonio("Dominante", berazategui),
+                            coordenadaEspiritu
+                    );
+
+            Espiritu dominado =
+                    serviceEspiritu.crear(
+                            new Angelical("Dominado", berazategui),
+                            coordenadaEspiritu
+                    );
+
+            dominado.setEspirituDominante(dominante);
+            serviceEspiritu.actualizar(dominado);
+
+            Medium medium =
+                    mediumService.crear(
+                            new Medium("Juan", 120, 10, berazategui),
+                            coordenadaMedium
+                    );
+
+            assertThrows(
+                    EspirituDominadoException.class,
+                    () -> serviceEspiritu.conectar(
+                            dominado.getId(),
+                            medium.getId()
+                    )
+            );
+        }
+    }
+
 
     @AfterEach
     void tearDown() {

@@ -7,6 +7,7 @@ import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.CoordenadaDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionCreateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionUpdateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionResponseDTO;
+import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionesFriasResponse;
 import ar.edu.unq.epersgeist.controller.mappers.EstadisticaMapper;
 import ar.edu.unq.epersgeist.controller.mappers.MapperEspiritu;
 import ar.edu.unq.epersgeist.controller.mappers.MapperMedium;
@@ -198,6 +199,16 @@ public class UbicacionControllerREST {
         }
 
         return ubicacionService.harmonicResult(ids);
+    }
+
+    // ---------------------------------------------------------------------------------
+
+    @GetMapping("/frias")
+    @ResponseStatus(HttpStatus.OK)
+    public UbicacionesFriasResponse ubicacionesFrias() {
+        return new UbicacionesFriasResponse(
+                ubicacionService.ubicacionesFrias()
+        );
     }
 
     // --------------------------------------------------------------------------------
