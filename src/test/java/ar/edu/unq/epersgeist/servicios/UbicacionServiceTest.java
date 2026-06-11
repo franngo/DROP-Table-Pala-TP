@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -1096,6 +1097,11 @@ public class UbicacionServiceTest {
 
         private static final double UMBRAL = 5.0;
 
+        @BeforeEach
+        void setUp() {
+            mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
+        }
+
         @AfterEach
         void tearDown() {
             mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
@@ -1219,16 +1225,15 @@ public class UbicacionServiceTest {
             assertTrue(resultado.isEmpty());
         }
     }
-    // --------------------------------------------------------------------------------
-    // MONGO: ubicacionesConflictivas()
-    // --------------------------------------------------------------------------------
+
 
     @Nested
-    class UbicacionesConflictivas {
+    class Sucesos {
+
         @Autowired
         private MongoTemplate mongoTemplate;
 
-        private static final Integer UMBRAL = 90;
+        //Reminder: el tope de decibeles es de 90.0 y el tope de temperatura es de 5.0
 
         @BeforeEach
         void setUp() {
@@ -1246,20 +1251,186 @@ public class UbicacionServiceTest {
                     .insertOne(
                             new Document()
                                     .append("ubicacion", ubicacion)
-                                    .append("decibeles", decibeles)
                                     .append("sensor_id", 1)
+                                    .append("decibeles", decibeles)
                     );
         }
 
-        private void insertTemperatura(String ubicacion) {
+        private void insertTemperatura(String ubicacion, double grados) {
             mongoTemplate.getCollection("datos_sensores")
                     .insertOne(
                             new Document()
                                     .append("ubicacion", ubicacion)
-                                    .append("temperatura", new org.bson.Document()
-                                            .append("grados", -10))
+                                    .append("sensor_id", 1)
+                                    .append("temperatura",
+                                            new Document()
+                                                    .append("grados", grados)
+                                                    .append("unidad", "°C"))
                     );
         }
+
+        private void insertPresion(String ubicacion, double hectopascales) {
+            mongoTemplate.getCollection("datos_sensores")
+                    .insertOne(
+                            new Document()
+                                    .append("ubicacion", ubicacion)
+                                    .append("sensor_id", 1)
+                                    .append("presionAtmosferica", hectopascales)
+                    );
+        }
+
+        private void insertLectura(String ubicacion, String lectura) {
+            mongoTemplate.getCollection("datos_sensores")
+                    .insertOne(
+                            new Document()
+                                    .append("ubicacion", ubicacion)
+                                    .append("sensor_id", 1)
+                                    .append("l3kTUr4", lectura)
+                    );
+        }
+
+        @Test
+        void sucesosInsertandoDocsSonido() {
+            insertSonido("A", 80);
+            insertSonido("A", 83);
+            insertSonido("A", 87);
+            insertSonido("A", 92);
+            insertSonido("A", 105);
+
+            Map<String, Integer> map = ubicacionService.sucesos();
+
+            assertEquals(2, map.get("exorcismos"));
+            assertEquals(0, map.get("invocaciones demoniacas"));
+            assertEquals(0, map.get("sucesos desconocidos"));
+        }
+
+        @Test
+        void sucesosInsertandoDoscTemperatura() {
+            insertTemperatura("A", 2);
+            insertTemperatura("A", 4);
+            insertTemperatura("A", 6);
+            insertTemperatura("A", 8);
+            insertTemperatura("A", 10);
+
+            Map<String, Integer> map = ubicacionService.sucesos();
+
+            assertEquals(0, map.get("exorcismos"));
+            assertEquals(2, map.get("invocaciones demoniacas"));
+            assertEquals(0, map.get("sucesos desconocidos"));
+        }
+
+        @Test
+        void sucesosInsertandoDoscPresion() {
+            insertPresion("A", 940);
+            insertPresion("A", 960);
+            insertPresion("A", 980);
+            insertPresion("A", 1000);
+            insertPresion("A", 1020);
+
+            Map<String, Integer> map = ubicacionService.sucesos();
+
+            assertEquals(0, map.get("exorcismos"));
+            assertEquals(0, map.get("invocaciones demoniacas"));
+            assertEquals(0, map.get("sucesos desconocidos"));
+        }
+
+        @Test
+        void sucesosInsertandoDoscDesconocidos() {
+            insertLectura("A", "aK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "bK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "cK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "dK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "eK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+
+            Map<String, Integer> map = ubicacionService.sucesos();
+
+            assertEquals(0, map.get("exorcismos"));
+            assertEquals(0, map.get("invocaciones demoniacas"));
+            assertEquals(5, map.get("sucesos desconocidos"));
+        }
+
+        @Test
+        void sucesosInsertandoMultiplesDocumentos() {
+            insertSonido("A", 80);
+            insertSonido("A", 83);
+            insertSonido("A", 87);
+            insertSonido("A", 92);
+            insertSonido("A", 105);
+
+            insertTemperatura("A", 2);
+            insertTemperatura("A", 4);
+            insertTemperatura("A", 6);
+            insertTemperatura("A", 8);
+            insertTemperatura("A", 10);
+
+            insertPresion("A", 940);
+            insertPresion("A", 960);
+            insertPresion("A", 980);
+            insertPresion("A", 1000);
+            insertPresion("A", 1020);
+
+            insertLectura("A", "aK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "bK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "cK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "dK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "eK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+
+            Map<String, Integer> map = ubicacionService.sucesos();
+
+            assertEquals(2, map.get("exorcismos"));
+            assertEquals(2, map.get("invocaciones demoniacas"));
+            assertEquals(5, map.get("sucesos desconocidos"));
+        }
+
+    }
+
+    // --------------------------------------------------------------------------------
+    // MONGO: ubicacionesConflictivas()
+    // --------------------------------------------------------------------------------
+
+    @Nested
+    class UbicacionesConflictivas {
+        @Autowired
+        private MongoTemplate mongoTemplate;
+
+        private static final Integer UMBRAL = 90;
+
+
+        @BeforeEach
+        void setUp() {
+            mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
+        }
+
+        @AfterEach
+        void tearDown() {
+            mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
+            ubicacionService.eliminarTodos();
+        }
+
+        private void insertSonido(String ubicacion, double decibeles) {
+            mongoTemplate.getCollection("datos_sensores")
+                    .insertOne(
+                            new Document()
+                                    .append("ubicacion", ubicacion)
+                                    .append("sensor_id", 1)
+                                    .append("decibeles", decibeles)
+                    );
+        }
+
+        private void insertTemperatura(String ubicacion, double grados) {
+            mongoTemplate.getCollection("datos_sensores")
+                    .insertOne(
+                            new Document()
+                                    .append("ubicacion", ubicacion)
+                                    .append("sensor_id", 1)
+                                    .append("temperatura",
+                                            new Document()
+                                                    .append("grados", grados)
+                                                    .append("unidad", "°C"))
+                    );
+        }
+
+        
 
         // ------------------------------------------------------------
         // CASO 1: retorna ubicaciones con decibeles altos
@@ -1314,8 +1485,8 @@ public class UbicacionServiceTest {
 
         @Test
         void ignoraDocumentosQueNoSonSonido() {
-            insertTemperatura("A");
-            insertTemperatura("B");
+            insertTemperatura("A", 10);
+            insertTemperatura("B", 10);
 
             List<String> resultado = ubicacionService.ubicacionesConflictivas();
 
@@ -1329,7 +1500,7 @@ public class UbicacionServiceTest {
         @Test
         void mezclaDeDatosSoloDevuelveValidos() {
             insertSonido("A", 120); // VALIDO
-            insertTemperatura("A");
+            insertTemperatura("A", 10);
             insertSonido("B", 30);
             insertSonido("C", 200); // VALIDO
 
@@ -1340,4 +1511,5 @@ public class UbicacionServiceTest {
             assertTrue(resultado.contains("C"));
         }
     }
+
 }
