@@ -148,7 +148,8 @@ public class GlobalExceptionHandler {
             ErrorDominacionInvalidaPorDistanciaException.class,
             ErrorDominacionInvalidaCandidatoNoAptoException.class,
             UbicacionLejanaException.class,
-            EspirituDominadoException.class
+            EspirituDominadoException.class,
+            EspirituMuyLejanoException.class
     })
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponseDTO conflictHandler(
