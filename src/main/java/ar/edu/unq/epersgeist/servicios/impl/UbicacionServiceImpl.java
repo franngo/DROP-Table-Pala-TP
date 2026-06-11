@@ -19,13 +19,14 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 // --------------------------------------------------------------------------------
@@ -288,6 +289,86 @@ public class UbicacionServiceImpl implements UbicacionService {
                 .stream()
                 .map(doc -> doc.getString("_id"))
                 .toList();
+    }
+
+    // --------------------------------------------------------------------------------
+
+    @Override
+    public Map<String, Integer> sucesos() {
+
+        final double tope_decibeles = 90.0;
+        final double tope_temperatura = 5.0;
+
+        final AggregationExpression existeTemperatura = context ->
+                new Document("$ne",
+                        List.of(
+                                new Document("$type", "$temperatura"),
+                                "missing"
+                        ));
+        //o sea, { temperatura: { $exists: true} }
+
+        final AggregationExpression temperaturaMenorAlTope = context ->
+                new Document(
+                        "$lt",
+                        List.of(
+                                "$temperatura.grados",
+                                tope_temperatura
+                        )
+                );
+        //o sea, { "temperatura.grados": { $lt: 5.0} }
+
+        final AggregationExpression condicionTemperatura =
+                BooleanOperators.And.and(
+                        existeTemperatura,
+                        temperaturaMenorAlTope
+                );
+        //tengo que preguntar si existe el campo tambien porque el $lt, al comparar un null con un número, entiende que
+        // el null es valor númerico menor y da por cumplida la condición. Esto no pasa con el gt.
+
+        final AggregationExpression existeLectura = context ->
+                new Document("$ne",
+                        List.of(
+                                new Document("$type", "$l3kTUr4"),
+                                "missing"
+                        ));
+        //o sea, { $l3kTUr4: { $exists: true} }
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.group() //agrupo todos los docs en un mismo grupo para poder emplear agg functions sobre estos
+                        .sum(ConditionalOperators
+                                .when(
+                                        Criteria.where("decibeles").gt(tope_decibeles)
+                                )
+                                .then(1)
+                                .otherwise(0))
+                        .as("exorcismos")
+                        .sum(ConditionalOperators
+                                .when(condicionTemperatura)
+                                .then(1)
+                                .otherwise(0))
+                        .as("invocaciones_demoniacas")
+                        .sum(ConditionalOperators
+                                .when(existeLectura)
+                                .then(1)
+                                .otherwise(0))
+                        .as("sucesos_desconocidos")
+        );
+
+        AggregationResults<Document> resultados =
+                mongoTemplate.aggregate(
+                        aggregation,
+                        "datos_sensores",
+                        Document.class
+                );
+
+        Document resultado = resultados.getUniqueMappedResult();
+
+        Map<String, Integer> map = new HashMap<String, Integer>();
+        map.put("exorcismos", resultado.getInteger("exorcismos"));
+        map.put("invocaciones demoniacas", resultado.getInteger("invocaciones_demoniacas"));
+        map.put("sucesos desconocidos", resultado.getInteger("sucesos_desconocidos"));
+
+        return map;
     }
 
 }

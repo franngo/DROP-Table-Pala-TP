@@ -6,12 +6,11 @@ import ar.edu.unq.epersgeist.controller.dtos.reportes.responses.ReporteSantuario
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.CoordenadaDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionCreateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionUpdateDTO;
+import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.SucesosResponseDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionResponseDTO;
+import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionesFriasResponse;
+import ar.edu.unq.epersgeist.controller.mappers.*;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionesSensadasResponse;
-import ar.edu.unq.epersgeist.controller.mappers.EstadisticaMapper;
-import ar.edu.unq.epersgeist.controller.mappers.MapperEspiritu;
-import ar.edu.unq.epersgeist.controller.mappers.MapperMedium;
-import ar.edu.unq.epersgeist.controller.mappers.MapperUbicacion;
 import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.HarmonicResult;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
@@ -27,6 +26,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/ubicaciones")
@@ -210,6 +210,17 @@ public class UbicacionControllerREST {
                 ubicacionService.ubicacionesFrias()
         );
     }
+
+    // ---------------------------------------------------------------------------------
+
+    @GetMapping("/sucesos")
+    @ResponseStatus(HttpStatus.OK)
+    public SucesosResponseDTO sucesos() {
+        Map<String, Integer> map = ubicacionService.sucesos();
+        return SucesosMapper.toDto(map);
+    }
+
+}
 
     // --------------------------------------------------------------------------------
 
