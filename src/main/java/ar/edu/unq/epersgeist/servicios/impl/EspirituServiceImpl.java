@@ -5,8 +5,8 @@ import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Espiritu.EspirituMongo;
-import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.persistencia.mongo.EspirituDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAOSQL;
 import ar.edu.unq.epersgeist.persistencia.sql.MediumDAOSQL;
@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -103,12 +104,16 @@ public class EspirituServiceImpl implements EspirituService {
         }
         Espiritu espirituEncontrado = espirituAConectar.get();
         Medium mediumEncontrado = mediumAConectar.get();
+
+        // No puede conectarse si está siendo dominado
+        if (espirituEncontrado.estaDominado()) {
+            throw new EspirituDominadoException();
+        }
+
         //las validaciones sobre si está libre y en la misma ubicación se dan en el method del modelo.
         espirituEncontrado.aumentarConexionYConectar(mediumEncontrado);
 
         return mediumDAOSQL.save(mediumEncontrado);
-
-
     }
 
     @Override
@@ -142,14 +147,36 @@ public class EspirituServiceImpl implements EspirituService {
 
     }
 
-
     @Override
-
     public void eliminarTodos() {
 
         espirituDAOSQL.deleteAll();
         espirituDAOMongo.deleteAll();
 
+    }
+
+    @Override
+    public void dominar(Long espirituDominanteId, Long espirituADominarId) {
+        Espiritu espirituDominante = this.recuperar(espirituDominanteId);
+        Espiritu espirituADominar = this.recuperar(espirituADominarId);
+
+        EspirituMongo dominanteMongo =
+                espirituDAOMongo.findById(espirituDominanteId).orElseThrow(() -> new ErrorDeEspirituNoEncontradoException(espirituDominanteId));
+        //Se evita la mala práctica de hacer get() directamente sobre un Optional, aunque, a menos que haya inconsistencias, no será vacío.
+
+        GeoJsonPoint coordenadasDom = dominanteMongo.getCoordenada();
+
+        double longitud = coordenadasDom.getX();
+        double latitud = coordenadasDom.getY();
+
+        double distanciaEspiritus = this.espirituDAOMongo.distanciaHastaEspiritu(longitud, latitud, espirituADominarId).distanciaCalculada();
+
+        //Se realiza esta validación en service porque involucra ids y no tiene sentido en modelo.
+        if (espirituDominante.estaDominado() && espirituADominar.getId().equals(espirituDominante.getEspirituDominante().getId())) {
+            throw new ErrorDominacionInvalidaCandidatoLoDominaException(espirituDominante.getId(), espirituADominar.getId());
+        }
+
+        espirituDominante.dominar(espirituADominar, distanciaEspiritus);
     }
 
 }

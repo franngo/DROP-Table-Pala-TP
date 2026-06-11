@@ -96,8 +96,8 @@ public class MediumControllerREST {
 
     @PutMapping("/{idM}/mover/{idU}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void mover(@PathVariable Long idM, @PathVariable Long idU) {
-        mediumService.mover(idM, idU);
+    public void mover(@PathVariable Long idM, @RequestParam Double latitud, @RequestParam Double longitud) {
+        mediumService.mover(idM, latitud, longitud);
     }
 
 }

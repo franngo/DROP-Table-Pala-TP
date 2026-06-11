@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @RestController
 @RequestMapping("/espiritus")
 @AllArgsConstructor
@@ -51,7 +52,7 @@ public class EspirituControllerREST {
     }
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT) // 204
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void actualizarEspiritu(@Valid @RequestBody EspirituUpdateDTO dto, @PathVariable Long id) {
 
         Espiritu espirituP = espirituService.recuperar(id);
@@ -63,9 +64,8 @@ public class EspirituControllerREST {
 
     }
 
-
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT) // 204
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void eliminar(@PathVariable Long id) {
         espirituService.eliminar(id);
     }
@@ -90,6 +90,14 @@ public class EspirituControllerREST {
         return PageMapper.toEspirituPage(paginada,
                 MapperEspiritu::toDTO,
                 direccion);
+    }
+    
+    @PostMapping("/{espirituDominanteId}/dominar/{espirituADominarId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void dominar(@PathVariable Long espirituDominanteId,
+                        @PathVariable Long espirituADominarId) {
+
+        espirituService.dominar(espirituDominanteId, espirituADominarId);
     }
 
 }

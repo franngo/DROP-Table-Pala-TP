@@ -10,7 +10,8 @@ public record EspirituResponseDTO(
         MediumResponseDTO medium,
         UbicacionResponseDTO ubicacion,
         double nivelConexion,
-        TipoEspiritu tipo
+        TipoEspiritu tipo,
+        EspirituResponseDTO espirituDominante
 ) {
 }
 

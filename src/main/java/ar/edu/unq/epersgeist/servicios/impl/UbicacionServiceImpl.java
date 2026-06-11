@@ -3,22 +3,31 @@ package ar.edu.unq.epersgeist.servicios.impl;
 import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.HarmonicResult;
-import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionMongo;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.NoTodasLasUbicacionesExistenException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.persistencia.mongo.UbicacionDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
 import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.bson.Document;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 // --------------------------------------------------------------------------------
 
@@ -32,6 +41,7 @@ public class UbicacionServiceImpl implements UbicacionService {
     private final UbicacionDAOSQL ubicacionDAOSQL;
     private final UbicacionDAONeo4j ubicacionDAONeo;
     private final UbicacionDAOMongo ubicacionDAOMongo;
+    private final MongoTemplate mongoTemplate;
 
     // --------------------------------------------------------------------------------
     // CREAR
@@ -167,7 +177,7 @@ public class UbicacionServiceImpl implements UbicacionService {
 
         List<UbicacionNeo4j> ubis = ubicacionDAONeo.caminoMasRentable(idOrigen, idDestino);
 
-        if(ubis.isEmpty()) {
+        if (ubis.isEmpty()) {
             throw new UbicacionesNoConectadasException(idOrigen, idDestino);
         }
 
@@ -213,10 +223,152 @@ public class UbicacionServiceImpl implements UbicacionService {
     @Override
     public List<HarmonicResult> harmonicResult(List<Long> ids) {
         //validación de la existencia de Ubicaciones
-        ids.stream().forEach((id) -> this.recuperar(id));
+//        ids.stream().forEach((id) -> this.recuperar(id));
+        List<Ubicacion> ubisExistentes = ubicacionDAOSQL.findAllById(ids);
+        if (ubisExistentes.size() != ids.size()) {
+            throw new NoTodasLasUbicacionesExistenException();
+        }
 
         return ubicacionDAONeo.harmonicResult(ids);
+    }
 
+    // --------------------------------------------------------------------------------
+    // CONSULTAS MONGO
+    // --------------------------------------------------------------------------------
+
+    @Override
+    public List<String> ubicacionesConflictivas() {
+        // 1. Defino el valor mínimo de decibeles para considerar un evento como exorcismo.
+        final double UMBRAL_DECIBELES = 90.0;
+
+        // 2. Creo una consulta vacía que luego será configurada con criterios de búsqueda.
+        Query query = new Query();
+
+        // 3. Agrego la condición de que el campo "decibeles" sea mayor al umbral definido.
+        query.addCriteria(
+                Criteria.where("decibeles").gt(UMBRAL_DECIBELES)
+        );
+
+        // 4. Ejecuto la consulta sobre la colección "datos_sensores".
+        List<Document> resultados =
+                mongoTemplate.find(query, Document.class, "datos_sensores");
+
+        // 5. Convierto las ubicaciones de los documentos obtenidos a una lista de strings.
+        return resultados.stream()
+                .map(doc -> doc.getString("ubicacion"))
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+    }
+
+    // --------------------------------------------------------------------------------
+
+    @Override
+    public List<String> ubicacionesFrias() {
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(
+                        Criteria.where("temperatura.grados").exists(true)
+                ),
+                Aggregation.group("ubicacion")
+                        .avg("temperatura.grados")
+                        .as("promedio"),
+                Aggregation.match(
+                        Criteria.where("promedio").lt(5)
+                )
+        );
+
+        AggregationResults<Document> resultados =
+                mongoTemplate.aggregate(
+                        aggregation,
+                        "datos_sensores",
+                        Document.class
+                );
+
+        return resultados.getMappedResults()
+                .stream()
+                .map(doc -> doc.getString("_id"))
+                .toList();
+    }
+
+    // --------------------------------------------------------------------------------
+
+    @Override
+    public Map<String, Integer> sucesos() {
+
+        final double tope_decibeles = 90.0;
+        final double tope_temperatura = 5.0;
+
+        final AggregationExpression existeTemperatura = context ->
+                new Document("$ne",
+                        List.of(
+                                new Document("$type", "$temperatura"),
+                                "missing"
+                        ));
+        //o sea, { temperatura: { $exists: true} }
+
+        final AggregationExpression temperaturaMenorAlTope = context ->
+                new Document(
+                        "$lt",
+                        List.of(
+                                "$temperatura.grados",
+                                tope_temperatura
+                        )
+                );
+        //o sea, { "temperatura.grados": { $lt: 5.0} }
+
+        final AggregationExpression condicionTemperatura =
+                BooleanOperators.And.and(
+                        existeTemperatura,
+                        temperaturaMenorAlTope
+                );
+        //tengo que preguntar si existe el campo tambien porque el $lt, al comparar un null con un número, entiende que
+        // el null es valor númerico menor y da por cumplida la condición. Esto no pasa con el gt.
+
+        final AggregationExpression existeLectura = context ->
+                new Document("$ne",
+                        List.of(
+                                new Document("$type", "$l3kTUr4"),
+                                "missing"
+                        ));
+        //o sea, { $l3kTUr4: { $exists: true} }
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.group() //agrupo todos los docs en un mismo grupo para poder emplear agg functions sobre estos
+                        .sum(ConditionalOperators
+                                .when(
+                                        Criteria.where("decibeles").gt(tope_decibeles)
+                                )
+                                .then(1)
+                                .otherwise(0))
+                        .as("exorcismos")
+                        .sum(ConditionalOperators
+                                .when(condicionTemperatura)
+                                .then(1)
+                                .otherwise(0))
+                        .as("invocaciones_demoniacas")
+                        .sum(ConditionalOperators
+                                .when(existeLectura)
+                                .then(1)
+                                .otherwise(0))
+                        .as("sucesos_desconocidos")
+        );
+
+        AggregationResults<Document> resultados =
+                mongoTemplate.aggregate(
+                        aggregation,
+                        "datos_sensores",
+                        Document.class
+                );
+
+        Document resultado = resultados.getUniqueMappedResult();
+
+        Map<String, Integer> map = new HashMap<String, Integer>();
+        map.put("exorcismos", resultado.getInteger("exorcismos"));
+        map.put("invocaciones demoniacas", resultado.getInteger("invocaciones_demoniacas"));
+        map.put("sucesos desconocidos", resultado.getInteger("sucesos_desconocidos"));
+
+        return map;
     }
 
 }

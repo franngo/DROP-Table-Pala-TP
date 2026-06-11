@@ -8,6 +8,7 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.medium.MediumMongo;
 import ar.edu.unq.epersgeist.persistencia.mongo.EspirituDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.mongo.MediumDAOMongo;
@@ -23,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -36,7 +36,15 @@ public class MediumServiceImpl implements MediumService {
     private final UbicacionDAONeo4j ubicacionDAONeo4j;
     private final UbicacionDAOMongo ubicacionDAOMongo;
 
-    public MediumServiceImpl(MediumDAOSQL mediumDAOSQL, EspirituDAOSQL espirituDAOSQL, UbicacionDAOSQL ubicacionDAOSQL, UbicacionDAONeo4j ubicacionDAONeo4j, MediumDAOMongo mediumDAOMongo, UbicacionDAOMongo ubicacionDAOMongo, EspirituDAOMongo espirituDAOMongo) {
+    public MediumServiceImpl(
+            MediumDAOSQL mediumDAOSQL,
+            EspirituDAOSQL espirituDAOSQL,
+            UbicacionDAOSQL ubicacionDAOSQL,
+            UbicacionDAONeo4j ubicacionDAONeo4j,
+            UbicacionDAOMongo ubicacionDAOMongo,
+            MediumDAOMongo mediumDAOMongo,
+            EspirituDAOMongo espirituDAOMongo
+    ) {
         this.mediumDAOSQL = mediumDAOSQL;
         this.mediumDAOMongo = mediumDAOMongo;
         this.espirituDAOSQL = espirituDAOSQL;
@@ -101,14 +109,39 @@ public class MediumServiceImpl implements MediumService {
         m.descansar();
     }
 
-
     @Override
     public Espiritu invocar(Long mediumId, Long espirituId) {
-        Medium m = this.recuperar(mediumId);
 
-        Espiritu e = espirituDAOSQL.findById(espirituId).orElseThrow(() -> new ErrorDeEspirituNoEncontradoException(espirituId));
+        Medium medium = this.recuperar(mediumId);
 
-        return m.invocar(e);
+        Espiritu espiritu = espirituDAOSQL
+                .findById(espirituId)
+                .orElseThrow(
+                        () -> new ErrorDeEspirituNoEncontradoException(espirituId)
+                );
+
+        MediumMongo mediumMongo = mediumDAOMongo
+                .findById(mediumId)
+                .orElseThrow(
+                        () -> new ErrorDeMediumNoEncontradoException(mediumId)
+                );
+
+        GeoJsonPoint coordenadasMedium = mediumMongo.getCoordenada();
+
+        double longitud = coordenadasMedium.getX();
+        double latitud = coordenadasMedium.getY();
+
+        double distancia =
+                espirituDAOMongo
+                        .distanciaHastaEspiritu(longitud, latitud, espirituId)
+                        .distanciaCalculada();
+
+        // 50 KM EN METROS
+        if (distancia > 50000) {
+            throw new EspirituMuyLejanoException();
+        }
+
+        return medium.invocar(espiritu);
     }
 
     @Override
@@ -147,12 +180,12 @@ public class MediumServiceImpl implements MediumService {
                 );
 
         // Busco en ubicacion mongo si existe una ubicacion dada.
-        UbicacionMongo ubicacionMongoDestino = ubicacionDAOMongo.buscarUbicacionQueContiene(latitud, longitud)
-                        .orElseThrow(() ->
-                                new CoordenadasSinUbicacion()
-                        );
+        List<UbicacionMongo> ubicaciones = ubicacionDAOMongo.buscarUbicacionQueContiene(latitud, longitud);
+        if (ubicaciones.isEmpty()) {
+            throw new CoordenadasSinUbicacion();
+        }
 
-        Long idDestino = ubicacionMongoDestino.getId();
+        Long idDestino = ubicaciones.getFirst().getId();
 
         // Ubicacion neo para calcular si existe a donde se puede mover
         UbicacionNeo4j ubicacionNeoDestino =
@@ -206,6 +239,7 @@ public class MediumServiceImpl implements MediumService {
 
             // depende el estado del medium se guarda o se elimina
             if (mediumAMover.sinMana()) {
+                this.eliminar(mediumAMover.getId());
                 mediumDAOSQL.delete(mediumAMover);
                 mediumDAOMongo.deleteById(mediumAMover.getId());
             } else {
@@ -231,6 +265,5 @@ public class MediumServiceImpl implements MediumService {
         mediumDAOSQL.deleteAll();
         mediumDAOMongo.deleteAll();
     }
-
 
 }

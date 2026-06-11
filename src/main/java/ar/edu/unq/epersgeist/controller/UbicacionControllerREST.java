@@ -6,11 +6,10 @@ import ar.edu.unq.epersgeist.controller.dtos.reportes.responses.ReporteSantuario
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.CoordenadaDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionCreateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionUpdateDTO;
+import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.SucesosResponseDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionResponseDTO;
-import ar.edu.unq.epersgeist.controller.mappers.EstadisticaMapper;
-import ar.edu.unq.epersgeist.controller.mappers.MapperEspiritu;
-import ar.edu.unq.epersgeist.controller.mappers.MapperMedium;
-import ar.edu.unq.epersgeist.controller.mappers.MapperUbicacion;
+import ar.edu.unq.epersgeist.controller.mappers.*;
+import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionesSensadasResponse;
 import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.HarmonicResult;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
@@ -26,6 +25,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/ubicaciones")
@@ -132,7 +132,7 @@ public class UbicacionControllerREST {
             @PathVariable Long idOrigen,
             @PathVariable Long idDestino,
             @RequestParam(defaultValue = "0") @Min(0) @Max(100) Long costo
-     ) {
+    ) {
         ubicacionService.conectar(idOrigen, idDestino, costo);
     }
 
@@ -171,7 +171,7 @@ public class UbicacionControllerREST {
     ) {
         return ubicacionService.caminoMasRentable(idOrigen, idDestino)
                 .stream()
-                .map((u) -> MapperUbicacion.toDTO(u))
+                .map(MapperUbicacion::toDTO)
                 .toList();
     }
 
@@ -199,5 +199,34 @@ public class UbicacionControllerREST {
 
         return ubicacionService.harmonicResult(ids);
     }
-}
 
+    // ---------------------------------------------------------------------------------
+
+    @GetMapping("/frias")
+    @ResponseStatus(HttpStatus.OK)
+    public UbicacionesSensadasResponse ubicacionesFrias() {
+        return new UbicacionesSensadasResponse(
+                ubicacionService.ubicacionesFrias()
+        );
+    }
+
+    // ---------------------------------------------------------------------------------
+
+    @GetMapping("/sucesos")
+    @ResponseStatus(HttpStatus.OK)
+    public SucesosResponseDTO sucesos() {
+        Map<String, Integer> map = ubicacionService.sucesos();
+        return SucesosMapper.toDto(map);
+    }
+
+    // --------------------------------------------------------------------------------
+
+    @GetMapping("/conflictivas")
+    @ResponseStatus(HttpStatus.OK)
+    public UbicacionesSensadasResponse ubicacionesConflictivas() {
+        return new UbicacionesSensadasResponse(
+                ubicacionService.ubicacionesConflictivas()
+        );
+    }
+
+}

@@ -5,9 +5,12 @@ import ar.edu.unq.epersgeist.modelo.medium.MediumMongo;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UbicacionDAOMongo extends MongoRepository<UbicacionMongo, Long> {
+
+
 
     @Query("""
             {
@@ -21,6 +24,7 @@ public interface UbicacionDAOMongo extends MongoRepository<UbicacionMongo, Long>
                         }
             }
             """)
-    Optional<UbicacionMongo> buscarUbicacionQueContiene(Double latitud, Double longitud);
+    List<UbicacionMongo> buscarUbicacionQueContiene(Double latitud, Double longitud);
 }
+
 
