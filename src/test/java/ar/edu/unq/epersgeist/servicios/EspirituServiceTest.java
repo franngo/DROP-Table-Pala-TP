@@ -362,7 +362,7 @@ public class EspirituServiceTest {
 
         Medium lolo = new Medium("Lolo", 120, 20, bernalito);
 
-        Medium loloP = mediumService.crear(lolo, coordenadaMedium);
+        Medium loloP = mediumService.crear(lolo, coordenadaMedium2);
 
         assertEquals(
                 bernalito.getId(),
@@ -389,31 +389,24 @@ public class EspirituServiceTest {
 
     @Test
     void noDeberiaConectarUnEspirituQueNoEstaLibre() {
-        Ubicacion bernalM = new Santuario("Bernal", ENERGIA);
-        Ubicacion bernalP = ubicacionService.crear(bernalM, coordenadas2);
-
         Medium juan = new Medium("Juan", 120, 20, berazategui);
-
         Medium juanP = mediumService.crear(juan, coordenadaMedium);
 
-        Espiritu espiritu = serviceEspiritu.crear(matias, coordenadaEspiritu2);
-        Espiritu espiritu2 = mediumService.invocar(juanP.getId(), espiritu.getId());
+        Espiritu espiritu = serviceEspiritu.crear(matias, coordenadaEspiritu);
 
-        //ahora espiritu2 está en una Ubicacion
-        assertEquals(espiritu2.getUbicacion().getId(), juanP.getUbicacion().getId());
+        assertEquals(espiritu.getUbicacion().getId(), juanP.getUbicacion().getId());
 
         Medium lolo = new Medium("Lolo", 120, 20, berazategui);
         Medium loloP = mediumService.crear(lolo, coordenadaMedium);
 
-
         //loloP está en la misma Ubicacion que espiritu2
-        serviceEspiritu.conectar(espiritu2.getId(), loloP.getId());
+        serviceEspiritu.conectar(espiritu.getId(), loloP.getId());
 
         Medium pipo = new Medium("Pipo", 120, 20, berazategui);
         Medium pipoP = mediumService.crear(pipo, coordenadaMedium);
 
         assertThrows(ErrorAlConectarEspirituConMedium.class, () -> {
-            serviceEspiritu.conectar(espiritu2.getId(), pipoP.getId());
+            serviceEspiritu.conectar(espiritu.getId(), pipoP.getId());
         });
     }
 
@@ -577,8 +570,8 @@ public class EspirituServiceTest {
 
         @Test
         void unEspirituDominadoPuedeDominarAMuchos() {
-            Espiritu coquiP = serviceEspiritu.crear(new Angelical("Coqui", berazategui), new Coordenada(-34.80, -58.23));
-            Espiritu mariaenemaP = serviceEspiritu.crear(new Angelical("María Enema", berazategui), new Coordenada(-34.80, -58.23));
+            Espiritu coquiP = serviceEspiritu.crear(new Angelical("Coqui", berazategui), coordenadaEspiritu);
+            Espiritu mariaenemaP = serviceEspiritu.crear(new Angelical("María Enema", berazategui), coordenadaEspiritu);
 
             //matiasP puede dominar a pepeP
             serviceEspiritu.dominar(matiasP.getId(), pepeP.getId());
