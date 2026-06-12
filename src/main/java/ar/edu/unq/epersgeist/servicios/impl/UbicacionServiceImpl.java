@@ -6,10 +6,7 @@ import ar.edu.unq.epersgeist.modelo.HarmonicResult;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionMongo;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.NoTodasLasUbicacionesExistenException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.*;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.persistencia.mongo.UbicacionDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
@@ -64,7 +61,7 @@ public class UbicacionServiceImpl implements UbicacionService {
         GeoJsonPolygon polygon = UbicacionMongo.crearPoligono(coordenadas);
         List<UbicacionMongo> intersectan = ubicacionDAOMongo.ubicacionesQueIntersectan(polygon);
         if(!intersectan.isEmpty()) {
-            throw new RuntimeException("oh no");
+            throw new InterseccionInvalidaException();
         }
 
         // Si existe pero estaba soft deleted, la elimino físicamente para liberar el unique del nombre

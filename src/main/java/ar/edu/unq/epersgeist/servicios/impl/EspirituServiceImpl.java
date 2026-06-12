@@ -41,7 +41,8 @@ public class EspirituServiceImpl implements EspirituService {
     @Override
     public Espiritu crear(Espiritu espiritu, Coordenada coordenada) {
         this.validarEspiritu(espiritu);
-        //chequeo con ubicacionDAOMongo.buscarUbicacionQueContiene(coordenada.getLatitud(), coordenada.getLongitud());
+        //chequeo con
+        ubicacionDAOMongo.buscarUbicacionQueContiene(coordenada.getLatitud(), coordenada.getLongitud());
         espirituDAOSQL.save(espiritu);
         espirituDAOMongo.save(new EspirituMongo(espiritu, coordenada));
         return espiritu;
