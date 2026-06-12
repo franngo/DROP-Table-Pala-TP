@@ -317,26 +317,22 @@ public class MediumServiceTest {
 
     @Test
     void exorcismoNoExitosoDeberiaAfectarElAngelDelMedium() {
-        // Por una cuestion de comodidad voy a crear el contexto con nuevas variables
-        Ubicacion quilmes = ubicacionService.crear(new Santuario("Quilmes", ENERGIA), coordenadas);
+        Medium matiasM = new Medium("Matias", 150, 50, berazategui);
 
-        Medium matiasM = new Medium("Matias", 150, 50, quilmes);
-
-        Medium francoM = new Medium("Franco", 100, 20, quilmes);
+        Medium francoM = new Medium("Franco", 100, 20, berazategui);
 
         Medium matiasP = serviceMedium.crear(matiasM, coordenadaMedium);
         Medium francoP = serviceMedium.crear(francoM, coordenadaMedium);
 
-        Espiritu omnimanM = new Angelical("Omniman", quilmes);
+        Espiritu omnimanM = new Angelical("Omniman", berazategui);
         omnimanM.setNivelDeConexion(60);
         Espiritu omnimanP = espirituService.crear(omnimanM, coordenadaEspiritu);
 
-        Espiritu markM = new Demonio("Mark", quilmes);
+        Espiritu markM = new Demonio("Mark", berazategui);
         markM.setNivelDeConexion(50);
         Espiritu markP = espirituService.crear(markM, coordenadaEspiritu);
         // el demonio siempre gana
         RandomDefensa.setEstrategiaNumero(new EstrategiaRangoEspecifico(99, 99));
-
 
         espirituService.conectar(omnimanP.getId(), matiasP.getId());
         espirituService.conectar(markM.getId(), francoP.getId());
@@ -353,9 +349,7 @@ public class MediumServiceTest {
     @Test
     void unMediumNoSePuedeExorcizarASiMismo() {
         // Por una cuestion de comodidad voy a crear el contexto con nuevas variables
-        Ubicacion quilmes = ubicacionService.crear(new Santuario("Quilmes", ENERGIA), coordenadas);
-
-        Medium matiasM = new Medium("Matias", 150, 50, quilmes);
+        Medium matiasM = new Medium("Matias", 150, 50, berazategui);
 
         Medium matiasP = serviceMedium.crear(matiasM, coordenadaMedium);
 
@@ -364,16 +358,12 @@ public class MediumServiceTest {
 
     @Test
     void unMediumNoPuedeExorcizarAOtroEnUbicacionDiferente() {
-        // Por una cuestion de comodidad voy a crear el contexto con nuevas variables
-        Ubicacion quilmes = ubicacionService.crear(new Santuario("Quilmes", ENERGIA), coordenadas);
-        Ubicacion wilde = ubicacionService.crear(new Santuario("Wilde", ENERGIA), coordenadas);
+        Medium matiasM = new Medium("Matias", 150, 50, berazategui);
 
-        Medium matiasM = new Medium("Matias", 150, 50, quilmes);
-
-        Medium francoM = new Medium("Franco", 100, 20, wilde);
+        Medium francoM = new Medium("Franco", 100, 20, bernal);
 
         Medium matiasP = serviceMedium.crear(matiasM, coordenadaMedium);
-        Medium francoP = serviceMedium.crear(francoM, coordenadaMedium);
+        Medium francoP = serviceMedium.crear(francoM, coordenadaMedium2);
 
         assertThrows(ErrorDeMediumExorcizandoAOtroEnDistintaUbicacion.class, () -> serviceMedium.exorcizar(matiasP.getId(), francoP.getId()));
     }
