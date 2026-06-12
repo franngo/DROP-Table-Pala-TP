@@ -405,6 +405,10 @@ public class MediumServiceTest {
         Ubicacion ranelagh;
         Ubicacion sourigues;
         Medium mediumAMover;
+        Coordenada coordenadaEspirituA;
+        Coordenada coordenadaMediumA;
+        Coordenada coordenadaEspirituB;
+        Coordenada coordenadaMediumB;
 
         @BeforeEach
         void setUtMover() {
@@ -422,14 +426,21 @@ public class MediumServiceTest {
                     new Coordenada(-34.83, -58.25)
             );
 
+            coordenadaEspirituA = new Coordenada(-34.80, -58.20);
+            coordenadaMediumA = new Coordenada(-34.78, -58.20);
+            coordenadaEspirituB = new Coordenada(-34.85, -58.25);
+            coordenadaMediumB = new Coordenada(-34.83, -58.25);
+
             ranelagh = ubicacionService.crear(new Santuario("Ranelagh", 99), coordsRanelagh);
             sourigues = ubicacionService.crear(new Santuario("Sourigues", 70), coordsSourigues);
+
             ubicacionService.conectar(ranelagh.getId(), sourigues.getId(), 40L);
-            mediumAMover = serviceMedium.crear(new Medium("Matias Sanchez", 100, 90, ranelagh), coordenadaMedium);
+
+            mediumAMover = serviceMedium.crear(new Medium("Matias Sanchez", 100, 90, ranelagh), coordenadaMediumA);
 
             // espiritus que acompañanan a
-            Espiritu elChiqui = espirituService.crear(new Angelical("Chiqui Tapia", ranelagh), coordenadaEspiritu);
-            Espiritu juanchiElPastelero = espirituService.crear(new Angelical("Juanchito", ranelagh), coordenadaEspiritu);
+            Espiritu elChiqui = espirituService.crear(new Angelical("Chiqui Tapia", ranelagh), coordenadaEspirituA);
+            Espiritu juanchiElPastelero = espirituService.crear(new Angelical("Juanchito", ranelagh), coordenadaEspirituA);
 
             espirituService.conectar(elChiqui.getId(), mediumAMover.getId());
             espirituService.conectar(juanchiElPastelero.getId(), mediumAMover.getId());
@@ -514,7 +525,7 @@ public class MediumServiceTest {
 
             Medium mediumMover = serviceMedium.crear(
                     new Medium("Juan", 50, 50, ezpeleta),
-                    new Coordenada(-34.70, -58.28)
+                    new Coordenada(-34.75, -58.21)
             );
 
 
