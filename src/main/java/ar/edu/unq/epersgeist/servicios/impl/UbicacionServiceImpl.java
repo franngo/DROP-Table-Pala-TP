@@ -374,16 +374,14 @@ public class UbicacionServiceImpl implements UbicacionService {
     // --------------------------------------------------------------------------------
     @Override
     public void normalize() {
-        final double tope_decibeles = 90.0;
-        final double tope_temperatura = 5.0;
-
-        AggregationOperation etapaProyeccion = context -> Document.parse(String.format("""
+        AggregationOperation etapaProyeccion = context -> org.bson.Document.parse("""
         {
           "$project": {
             "_id": "$_id",
             "ubicacion": "$ubicacion",
             "sensor_id": "$sensor_id",
             "fecha": "$fecha",
+            
             "medicion": {
               "$switch": {
                 "branches": [
@@ -394,13 +392,14 @@ public class UbicacionServiceImpl implements UbicacionService {
                 "default": "desconocido"
               }
             },
+            
             "evento": {
               "$cond": [
-                { "$gt": ["$decibeles", %f] }, "Exorcismo",
+                { "$gt": ["$decibeles", 90.0] }, "Exorcismo",
                 { "$cond": [
                   { "$and": [
                     { "$ne": [{ "$type": "$temperatura" }, "missing"] },
-                    { "$lt": ["$temperatura.grados", %f] }
+                    { "$lt": ["$temperatura.grados", 5.0] }
                   ]}, "Invocación Demoníaca",
                   { "$cond": [
                     { "$ne": [{ "$type": "$l3kTUr4" }, "missing"] }, "Suceso Desconocido",
@@ -409,6 +408,7 @@ public class UbicacionServiceImpl implements UbicacionService {
                 ]}
               ]
             },
+            
             "resultado_sensor": {
               "$switch": {
                 "branches": [
@@ -421,12 +421,12 @@ public class UbicacionServiceImpl implements UbicacionService {
             }
           }
         }
-        """, tope_decibeles, tope_temperatura));
+        """);
 
-        AggregationOperation etapaSalida = context -> new Document("$out", "datos_normalizados");
+        AggregationOperation etapaSalida = context -> new org.bson.Document("$out", "datos_normalizados");
 
         Aggregation aggregation = Aggregation.newAggregation(etapaProyeccion, etapaSalida);
-        mongoTemplate.aggregate(aggregation, "datos_sensores", Document.class);
+        mongoTemplate.aggregate(aggregation, "datos_sensores", org.bson.Document.class);
     }
 
 
