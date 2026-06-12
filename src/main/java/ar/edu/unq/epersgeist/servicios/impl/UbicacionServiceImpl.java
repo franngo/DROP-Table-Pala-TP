@@ -64,7 +64,7 @@ public class UbicacionServiceImpl implements UbicacionService {
         GeoJsonPolygon polygon = UbicacionMongo.crearPoligono(coordenadas);
         List<UbicacionMongo> intersectan = ubicacionDAOMongo.ubicacionesQueIntersectan(polygon);
         if(!intersectan.isEmpty()) {
-            //bombazo
+            throw new RuntimeException("oh no");
         }
 
         // Si existe pero estaba soft deleted, la elimino físicamente para liberar el unique del nombre

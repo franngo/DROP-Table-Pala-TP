@@ -29,6 +29,9 @@ public class EspirituServiceTest {
     private List<Coordenada> coordenadas;
     private Coordenada coordenadaEspiritu;
     private Coordenada coordenadaMedium;
+    private List<Coordenada> coordenadas2;
+    private Coordenada coordenadaEspiritu2;
+    private Coordenada coordenadaMedium2;
 
     private Espiritu matias;
     private Ubicacion berazategui;
@@ -50,6 +53,15 @@ public class EspirituServiceTest {
 
         coordenadaEspiritu = new Coordenada(-34.81, -58.22);
         coordenadaMedium = new Coordenada(-34.81, -58.22);
+
+        coordenadas2 = List.of(
+                new Coordenada(-34.91, -58.92),
+                new Coordenada(-34.92, -58.94),
+                new Coordenada(-34.90, -58.90)
+        );
+
+        coordenadaEspiritu2 = new Coordenada(-34.91, -58.32);
+        coordenadaMedium2 = new Coordenada(-34.91, -58.32);
 
         berazategui = ubicacionService.crear(new Santuario("Berazategui", ENERGIA), coordenadas);
         matias = new Angelical("Matias", berazategui);
@@ -378,13 +390,13 @@ public class EspirituServiceTest {
     @Test
     void noDeberiaConectarUnEspirituQueNoEstaLibre() {
         Ubicacion bernalM = new Santuario("Bernal", ENERGIA);
-        Ubicacion bernalP = ubicacionService.crear(bernalM, coordenadas);
+        Ubicacion bernalP = ubicacionService.crear(bernalM, coordenadas2);
 
         Medium juan = new Medium("Juan", 120, 20, berazategui);
 
         Medium juanP = mediumService.crear(juan, coordenadaMedium);
 
-        Espiritu espiritu = serviceEspiritu.crear(matias, coordenadaEspiritu);
+        Espiritu espiritu = serviceEspiritu.crear(matias, coordenadaEspiritu2);
         Espiritu espiritu2 = mediumService.invocar(juanP.getId(), espiritu.getId());
 
         //ahora espiritu2 está en una Ubicacion
