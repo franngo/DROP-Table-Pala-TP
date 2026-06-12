@@ -1512,4 +1512,172 @@ public class UbicacionServiceTest {
         }
     }
 
+    // --------------------------------------------------------------------------------
+    // MONGO: normalize()
+    // --------------------------------------------------------------------------------
+
+    @Nested
+    class Normalize{
+        @Autowired
+        private MongoTemplate mongoTemplate;
+
+        private static final double TOPE_DECIBELES = 90.0;
+        private static final double TOPE_TEMPERATURA = 5.0;
+
+        @BeforeEach
+        void setUp() {
+            mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
+            mongoTemplate.getCollection("datos_normalizados").deleteMany(new Document());
+        }
+
+        @AfterEach
+        void tearDown() {
+            mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
+            mongoTemplate.getCollection("datos_normalizados").deleteMany(new Document());
+            ubicacionService.eliminarTodos();
+        }
+
+        private void insertSonido(String ubicacion, double decibeles) {
+            mongoTemplate.getCollection("datos_sensores").insertOne(
+                    new Document()
+                            .append("ubicacion", ubicacion)
+                            .append("sensor_id", 12)
+                            .append("decibeles", decibeles)
+                            .append("fecha", "2025-04-10T21:30:00Z")
+            );
+        }
+
+        private void insertTemperatura(String ubicacion, double grados) {
+            mongoTemplate.getCollection("datos_sensores").insertOne(
+                    new Document()
+                            .append("ubicacion", ubicacion)
+                            .append("sensor_id", 5)
+                            .append("temperatura", new Document()
+                                    .append("grados", grados)
+                                    .append("unidad", "°C"))
+                            .append("fecha", "2025-04-10T21:30:00Z")
+            );
+        }
+
+        private void insertPresion(String ubicacion, double hectopascales) {
+            mongoTemplate.getCollection("datos_sensores").insertOne(
+                    new Document()
+                            .append("ubicacion", ubicacion)
+                            .append("sensor_id", 17)
+                            .append("presionAtmosferica", hectopascales)
+                            .append("fecha", "2025-04-10T21:30:00Z")
+            );
+        }
+
+        private void insertLectura(String ubicacion, String lectura) {
+            mongoTemplate.getCollection("datos_sensores").insertOne(
+                    new Document()
+                            .append("ubicacion", ubicacion)
+                            .append("sensor_id", null)
+                            .append("l3kTUr4", lectura)
+                            .append("fecha", "2025-04-10T21:30:00Z")
+            );
+        }
+
+        // ------------------------------------------------------------
+        // CASO 1: Documento de sonido que supera el umbral (Exorcismo)
+        // ------------------------------------------------------------
+        @Test
+        void normalizaDocumentoDeSonidoComoExorcismoCorrectamente() {
+            insertSonido("Cementerio", 97.4); // > 90.0
+
+            ubicacionService.normalize();
+
+            Document doc = mongoTemplate.getCollection("datos_normalizados").find().first();
+            assertNotNull(doc);
+            assertEquals("Cementerio", doc.getString("ubicacion"));
+            assertEquals(12, doc.getInteger("sensor_id"));
+            assertEquals("sonido", doc.getString("medicion"));
+            assertEquals("Exorcismo", doc.getString("evento"));
+            assertEquals("2025-04-10T21:30:00Z", doc.get("fecha"));
+
+            Document resultadoSensor = (Document) doc.get("resultado_sensor");
+            assertNotNull(resultadoSensor);
+            assertEquals(97.4, resultadoSensor.getDouble("valor"), 0.01);
+            assertEquals("dB", resultadoSensor.getString("medida"));
+        }
+
+        // ------------------------------------------------------------
+        // CASO 2: Documento de temperatura bajo el umbral (Invocación)
+        // ------------------------------------------------------------
+        @Test
+        void normalizaDocumentoDeTemperaturaComoInvocacionDemoniaca() {
+            insertTemperatura("Catedral Oscura", 2.0); // < 5.0
+
+            ubicacionService.normalize();
+
+            Document doc = mongoTemplate.getCollection("datos_normalizados").find().first();
+            assertNotNull(doc);
+            assertEquals("temperatura", doc.getString("medicion"));
+            assertEquals("Invocación Demoníaca", doc.getString("evento"));
+
+            Document resultadoSensor = (Document) doc.get("resultado_sensor");
+            assertEquals(2.0, resultadoSensor.getDouble("valor"), 0.01);
+            assertEquals("°C", resultadoSensor.getString("medida"));
+        }
+
+        // ------------------------------------------------------------
+        // CASO 3: Documento de presión atmosférica (Presencia)
+        // ------------------------------------------------------------
+        @Test
+        void normalizaDocumentoDePresionComoPresenciaDeDemonios() {
+            insertPresion("Bosque Arcano", 980.0);
+
+            ubicacionService.normalize();
+
+            Document doc = mongoTemplate.getCollection("datos_normalizados").find().first();
+            assertNotNull(doc);
+            assertEquals("presión", doc.getString("medicion"));
+            assertEquals("Presencia de Demonios", doc.getString("evento"));
+
+            Document resultadoSensor = (Document) doc.get("resultado_sensor");
+            assertEquals(980.0, resultadoSensor.getDouble("valor"), 0.01);
+            assertEquals("hPa", resultadoSensor.getString("medida"));
+        }
+
+        // ------------------------------------------------------------
+        // CASO 4: Documento corrupto o desconocido (Anomalía)
+        // ------------------------------------------------------------
+        @Test
+        void normalizaDocumentoDesconocidoComoSucesoDesconocido() {
+            insertLectura("Ruinas del Sur", "xK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+
+            ubicacionService.normalize();
+
+            Document doc = mongoTemplate.getCollection("datos_normalizados").find().first();
+            assertNotNull(doc);
+            assertNull(doc.get("sensor_id"));
+            assertEquals("desconocido", doc.getString("medicion"));
+            assertEquals("Suceso Desconocido", doc.getString("evento"));
+
+            Document resultadoSensor = (Document) doc.get("resultado_sensor");
+            assertNull(resultadoSensor.get("valor"));
+            assertEquals("N/A", resultadoSensor.getString("medida"));
+        }
+
+        // ------------------------------------------------------------
+        // CASO 5: Simulación de lote completo (Contador total)
+        // ------------------------------------------------------------
+        @Test
+        void alNormalizarMultiplesDocumentosLaCantidadFinalCoincide() {
+            insertSonido("A", 95.0);
+            insertTemperatura("B", 1.0);
+            insertPresion("C", 1020.0);
+            insertLectura("D", "lecturaEncriptada");
+
+            ubicacionService.normalize();
+
+            long totalOriginales = mongoTemplate.getCollection("datos_sensores").countDocuments();
+            long totalNormalizados = mongoTemplate.getCollection("datos_normalizados").countDocuments();
+
+            assertEquals(4, totalOriginales);
+            assertEquals(totalOriginales, totalNormalizados);
+        }
+    }
+
 }
