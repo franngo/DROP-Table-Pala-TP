@@ -60,26 +60,14 @@ public class UbicacionServiceTest {
     private Ubicacion cementerio;
 
     private List<Coordenada> coordenadas;
-    private Coordenada coordenadaMedium;
     private Coordenada coordenadaEspiritu;
     private List<Coordenada> coordenadas2;
     private Coordenada coordenadaEspiritu2;
-    private Coordenada coordenadaMedium2;
     private List<Coordenada> coordenadas3;
-    private Coordenada coordenadaEspiritu3;
-    private Coordenada coordenadaMedium3;
     private List<Coordenada> coordenadas4;
-    private Coordenada coordenadaEspiritu4;
-    private Coordenada coordenadaMedium4;
     private List<Coordenada> coordenadas5;
-    private Coordenada coordenadaEspiritu5;
-    private Coordenada coordenadaMedium5;
     private List<Coordenada> coordenadas6;
-    private Coordenada coordenadaEspiritu6;
-    private Coordenada coordenadaMedium6;
     private List<Coordenada> coordenadas7;
-    private Coordenada coordenadaEspiritu7;
-    private Coordenada coordenadaMedium7;
 
     // --------------------------------------------------------------------------------
     // SETUP Y TEARDOWN
@@ -97,7 +85,6 @@ public class UbicacionServiceTest {
         );
 
         coordenadaEspiritu = new Coordenada(-34.81, -58.22);
-        coordenadaMedium = new Coordenada(-34.80, -58.20);
 
         coordenadas2 = List.of(
                 new Coordenada(-34.91, -58.32),
@@ -106,7 +93,6 @@ public class UbicacionServiceTest {
         );
 
         coordenadaEspiritu2 = new Coordenada(-34.91, -58.32);
-        coordenadaMedium2 = new Coordenada(-34.90, -58.30);
 
         coordenadas3 = List.of(
                 new Coordenada(-35.01, -58.42),
@@ -114,17 +100,11 @@ public class UbicacionServiceTest {
                 new Coordenada(-35.00, -58.40)
         );
 
-        coordenadaEspiritu3 = new Coordenada(-35.01, -58.42);
-        coordenadaMedium3 = new Coordenada(-35.00, -58.40);
-
         coordenadas4 = List.of(
                 new Coordenada(-35.11, -58.52),
                 new Coordenada(-35.12, -58.54),
                 new Coordenada(-35.10, -58.50)
         );
-
-        coordenadaEspiritu4 = new Coordenada(-35.11, -58.52);
-        coordenadaMedium4 = new Coordenada(-35.10, -58.50);
 
         coordenadas5 = List.of(
                 new Coordenada(-35.21, -58.62),
@@ -132,26 +112,17 @@ public class UbicacionServiceTest {
                 new Coordenada(-35.20, -58.60)
         );
 
-        coordenadaEspiritu5 = new Coordenada(-35.21, -58.62);
-        coordenadaMedium5 = new Coordenada(-35.20, -58.60);
-
         coordenadas6 = List.of(
                 new Coordenada(-35.31, -58.72),
                 new Coordenada(-35.32, -58.74),
                 new Coordenada(-35.30, -58.70)
         );
 
-        coordenadaEspiritu6 = new Coordenada(-35.31, -58.72);
-        coordenadaMedium6 = new Coordenada(-35.30, -58.70);
-
         coordenadas7 = List.of(
                 new Coordenada(-35.41, -58.82),
                 new Coordenada(-35.42, -58.84),
                 new Coordenada(-35.40, -58.80)
         );
-
-        coordenadaEspiritu7 = new Coordenada(-35.41, -58.82);
-        coordenadaMedium7 = new Coordenada(-35.40, -58.80);
     }
 
     @AfterEach
