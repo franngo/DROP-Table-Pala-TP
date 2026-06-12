@@ -33,27 +33,33 @@ import static org.junit.jupiter.api.Assertions.*;
 public class MediumServiceTest {
     private static final Integer ENERGIA = 100;
 
-    Espiritu rikaM;
-    Espiritu jaegerM;
-    Espiritu rikaP;
-    Espiritu jaegerP;
     @Autowired
     private EspirituService espirituService;
     @Autowired
     private MediumService serviceMedium;
     @Autowired
     private UbicacionService ubicacionService;
+
     private Ubicacion berazategui;
     private Ubicacion bernal;
+
     private Espiritu espirituM;
-    private Espiritu espirituM2;
+    private Espiritu rikaM;
+    private Espiritu jaegerM;
+    private Espiritu rikaP;
+    private Espiritu jaegerP;
+
     private Medium epifanioM;
     private Medium ubedaM;
     private Medium epifanioP;
     private Medium ubedaP;
+
     private List<Coordenada> coordenadas;
     private Coordenada coordenadaMedium;
     private Coordenada coordenadaEspiritu;
+    private List<Coordenada> coordenadas2;
+    private Coordenada coordenadaEspiritu2;
+    private Coordenada coordenadaMedium2;
 
 
     @BeforeEach
@@ -67,24 +73,32 @@ public class MediumServiceTest {
         coordenadaMedium = new Coordenada(-34.812, -58.214);
         coordenadaEspiritu = new Coordenada(-34.815, -58.220);
 
+        coordenadas2 = List.of(
+                new Coordenada(-34.91, -58.32),
+                new Coordenada(-34.92, -58.34),
+                new Coordenada(-34.90, -58.30)
+        );
+
+        coordenadaEspiritu2 = new Coordenada(-34.91, -58.32);
+        coordenadaMedium2 = new Coordenada(-34.90, -58.30);
+
         berazategui = ubicacionService.crear(new Santuario("Berazategui", ENERGIA), coordenadas);
-        bernal = ubicacionService.crear(new Santuario("Bernal", ENERGIA), coordenadas);
+        bernal = ubicacionService.crear(new Santuario("Bernal", ENERGIA), coordenadas2);
 
         espirituM = new Angelical("Charizard", berazategui);
-        espirituM2 = new Angelical("Bulbasor", berazategui);
         epifanioM = new Medium("Epifanio el poderoso", 150, 50, bernal);
         ubedaM = new Medium("Ubeda el dt", 100, 20, bernal);
 
-        epifanioP = serviceMedium.crear(epifanioM, coordenadaMedium);
-        ubedaP = serviceMedium.crear(ubedaM, coordenadaMedium);
+        epifanioP = serviceMedium.crear(epifanioM, coordenadaMedium2);
+        ubedaP = serviceMedium.crear(ubedaM, coordenadaMedium2);
 
         rikaM = new Angelical("Rika", bernal);
         rikaM.setNivelDeConexion(60);
-        rikaP = espirituService.crear(rikaM, coordenadaEspiritu);
+        rikaP = espirituService.crear(rikaM, coordenadaEspiritu2);
 
         jaegerM = new Demonio("Jaeger", bernal);
         jaegerM.setNivelDeConexion(50);
-        jaegerP = espirituService.crear(jaegerM, coordenadaEspiritu);
+        jaegerP = espirituService.crear(jaegerM, coordenadaEspiritu2);
     }
 
     //crear
