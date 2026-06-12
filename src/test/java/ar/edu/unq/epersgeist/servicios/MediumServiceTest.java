@@ -60,6 +60,9 @@ public class MediumServiceTest {
     private List<Coordenada> coordenadas2;
     private Coordenada coordenadaEspiritu2;
     private Coordenada coordenadaMedium2;
+    private List<Coordenada> coordenadas3;
+    private Coordenada coordenadaEspiritu3;
+    private Coordenada coordenadaMedium3;
 
 
     @BeforeEach
@@ -70,8 +73,8 @@ public class MediumServiceTest {
                 new Coordenada(-34.80, -58.20)
         );
 
-        coordenadaMedium = new Coordenada(-34.812, -58.214);
-        coordenadaEspiritu = new Coordenada(-34.815, -58.220);
+        coordenadaMedium = new Coordenada(-34.81, -58.22);
+        coordenadaEspiritu = new Coordenada(-34.82, -58.24);
 
         coordenadas2 = List.of(
                 new Coordenada(-34.91, -58.32),
@@ -81,6 +84,15 @@ public class MediumServiceTest {
 
         coordenadaEspiritu2 = new Coordenada(-34.91, -58.32);
         coordenadaMedium2 = new Coordenada(-34.90, -58.30);
+
+        coordenadas3 = List.of(
+                new Coordenada(-54.91, -78.32),
+                new Coordenada(-54.92, -78.34),
+                new Coordenada(-54.90, -78.30)
+        );
+
+        coordenadaEspiritu3 = new Coordenada(-54.91, -78.32);
+        coordenadaMedium3 = new Coordenada(-54.90, -78.30);
 
         berazategui = ubicacionService.crear(new Santuario("Berazategui", ENERGIA), coordenadas);
         bernal = ubicacionService.crear(new Santuario("Bernal", ENERGIA), coordenadas2);
@@ -240,7 +252,7 @@ public class MediumServiceTest {
     public void descansarCasoExitoso() {
 
         Medium mediumPrueba = new Medium("MediumTest", 200, 50, bernal);
-        Medium mediumPruebaP = serviceMedium.crear(mediumPrueba, coordenadaMedium);
+        Medium mediumPruebaP = serviceMedium.crear(mediumPrueba, coordenadaMedium2);
 
         rikaP.setNivelDeConexion(0);
         jaegerP.setNivelDeConexion(0);
@@ -695,13 +707,13 @@ public class MediumServiceTest {
         @Test
         void fallaSiElEspirituEstaAMasDe50Km() {
 
-            Coordenada coordenadaLejana =
-                    new Coordenada(-35.50, -58.22);
-
             Medium medium = new Medium("Juan", 120, 20, berazategui);
             Medium mediumP = serviceMedium.crear(medium, coordenadaMedium);
 
-            Espiritu espiritu = new Angelical("Matias", berazategui);
+            Coordenada coordenadaLejana = coordenadaEspiritu3;
+            Ubicacion ubiLejana = ubicacionService.crear(new Santuario("Lugar LEJANO", ENERGIA), coordenadas3);
+
+            Espiritu espiritu = new Angelical("Matias", ubiLejana);
             Espiritu espirituP =
                     espirituService.crear(espiritu, coordenadaLejana);
 
