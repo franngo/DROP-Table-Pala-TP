@@ -175,6 +175,7 @@ public class MediumServiceImpl implements MediumService {
     @Override
     public void mover(Long mediumId, Double latitud, Double longitud) {
 
+
         Medium mediumAMover = mediumDAOSQL.findById(mediumId)
                 .orElseThrow(() ->
                         new ErrorDeMediumNoEncontradoException(mediumId)
@@ -205,7 +206,7 @@ public class MediumServiceImpl implements MediumService {
                             new UbicacionNoEncontradaException(idDestino));
 
             // Se valida si las ubicaciones estan conectadas
-            this.validarConexion(ubicacionMediumId, idDestino);
+            this.validarConexion(ubicacionMediumId, ubicacionNeoDestino.getId());
 
             // Calculo si esta a menos de 30km de distacia
             mediumDAOMongo.mediumDentroDeDistancia(mediumId, latitud, longitud, 30000.0)

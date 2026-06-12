@@ -10,6 +10,7 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.medium.MediumMongo;
 import ar.edu.unq.epersgeist.modelo.random.Estrategia.EstrategiaRangoEspecifico;
@@ -448,7 +449,7 @@ public class MediumServiceTest {
         }
 
         @Test
-        void elMediumNoPuedeMoverseAUnaUbicacionLejana() {
+        void elMediumNoPuedeMoverseAUnaUbicacionSinConexion() {
             List<Coordenada> coordsVarela = List.of(
                     new Coordenada(-35.20, -58.70),
                     new Coordenada(-35.20, -58.68),
@@ -460,7 +461,7 @@ public class MediumServiceTest {
 
             assertThatThrownBy(
                     () -> serviceMedium.mover(mediumAMover.getId(), -35.19, -58.69))
-                    .isInstanceOf(UbicacionLejanaException.class);
+                    .isInstanceOf(UbicacionesNoConectadasException.class);
 
         }
 
@@ -478,35 +479,25 @@ public class MediumServiceTest {
 
         @Test
         void elMediumSiQuedaSinManaEsEliminado() {
-            List<Coordenada> coordenadasQuilmes = List.of(
-                    new Coordenada(-34.70, -58.28),
-                    new Coordenada(-34.71, -58.29),
-                    new Coordenada(-34.69, -58.27)
+            List<Coordenada> coordenadasEzpeleta = List.of(
+                    new Coordenada(-34.75, -58.21),
+                    new Coordenada(-34.76, -58.23),
+                    new Coordenada(-34.74, -58.19)
             );
-            Ubicacion quilmes = ubicacionService.crear(
-                    new Santuario("Santuario Quilmes", 50),
-                    coordenadasQuilmes
-            );
-
-            List<Coordenada> coordenadasLaUnq = List.of(
-                    new Coordenada(-34.81, -58.22),
-                    new Coordenada(-34.82, -58.24),
-                    new Coordenada(-34.80, -58.20)
-            );
-            Ubicacion laUNQ = ubicacionService.crear(
-                    new Santuario("La Unq", 80),
-                    coordenadasLaUnq
+            Ubicacion ezpeleta = ubicacionService.crear(
+                    new Santuario("Ezpeleta Origen", 50),
+                    coordenadasEzpeleta
             );
 
             ubicacionService.conectar(
-                    quilmes.getId(),
-                    laUNQ.getId(),
+                    ezpeleta.getId(),
+                    berazategui.getId(),
                     50L
             );
 
 
             Medium mediumMover = serviceMedium.crear(
-                    new Medium("Juan", 50, 50, quilmes),
+                    new Medium("Juan", 50, 50, ezpeleta),
                     new Coordenada(-34.70, -58.28)
             );
 
