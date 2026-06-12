@@ -478,14 +478,14 @@ public class MediumServiceTest {
 
         @Test
         void elMediumSiQuedaSinManaEsEliminado() {
-            List<Coordenada> coordenadasBernal = List.of(
+            List<Coordenada> coordenadasQuilmes = List.of(
                     new Coordenada(-34.70, -58.28),
                     new Coordenada(-34.71, -58.29),
                     new Coordenada(-34.69, -58.27)
             );
             Ubicacion quilmes = ubicacionService.crear(
-                    new Santuario("Santuario Bernal", 50),
-                    coordenadasBernal
+                    new Santuario("Santuario Quilmes", 50),
+                    coordenadasQuilmes
             );
 
             List<Coordenada> coordenadasLaUnq = List.of(
