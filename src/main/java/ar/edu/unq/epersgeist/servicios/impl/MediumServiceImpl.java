@@ -196,9 +196,8 @@ public class MediumServiceImpl implements MediumService {
                         );
         Ubicacion ubicacionActualMedium = mediumAMover.getUbicacion();
         Long ubicacionMediumId = ubicacionActualMedium.getId();
-        Long ubicacionAIrId = idDestino;
 
-        if (!quiereMoverseALaMisma(ubicacionActualMedium.getId(), ubicacionAIrId)) {
+        if (!quiereMoverseALaMisma(ubicacionMediumId, idDestino)) {
 
             // Procedo a recuperar la ubicacion destino de la fuente de la verdad
             Ubicacion ubicacionDestino = ubicacionDAOSQL.findById(idDestino)
@@ -206,7 +205,7 @@ public class MediumServiceImpl implements MediumService {
                             new UbicacionNoEncontradaException(idDestino));
 
             // Se valida si las ubicaciones estan conectadas
-            this.validarConexion(ubicacionActualMedium.getId(), idDestino);
+            this.validarConexion(ubicacionMediumId, idDestino);
 
             // Calculo si esta a menos de 30km de distacia
             mediumDAOMongo.mediumDentroDeDistancia(mediumId, latitud, longitud, 30000.0)
@@ -214,7 +213,7 @@ public class MediumServiceImpl implements MediumService {
                             new UbicacionLejanaException("La ubicacion esta a mas de 30km"));
 
             // calculo el costo de moverse
-            int costo = Math.toIntExact(ubicacionDAONeo4j.costoHacia(ubicacionMediumId, ubicacionAIrId));
+            int costo = Math.toIntExact(ubicacionDAONeo4j.costoHacia(ubicacionMediumId, idDestino));
 
             // el medium se mueve
             mediumAMover.moverA(ubicacionDestino, costo);
