@@ -55,9 +55,9 @@ public class EspirituServiceTest {
         coordenadaMedium = new Coordenada(-34.81, -58.22);
 
         coordenadas2 = List.of(
-                new Coordenada(-34.91, -58.92),
-                new Coordenada(-34.92, -58.94),
-                new Coordenada(-34.90, -58.90)
+                new Coordenada(-34.91, -58.32),
+                new Coordenada(-34.92, -58.34),
+                new Coordenada(-34.90, -58.30)
         );
 
         coordenadaEspiritu2 = new Coordenada(-34.91, -58.32);
@@ -331,15 +331,13 @@ public class EspirituServiceTest {
     @Test
     void noDeberiaConectarUnEspirituQueEstaEnDiferenteUbicacion() {
 
-        Ubicacion bera = ubicacionService.crear(new Santuario("Bera", ENERGIA), coordenadas);
-
-        Ubicacion bernalito = ubicacionService.crear(new Santuario("Bernalito", ENERGIA), coordenadas);
+        Ubicacion bernalito = ubicacionService.crear(new Santuario("Bernalito", ENERGIA), coordenadas2);
 
         // ------------------------------------------------------------
         // Medium que invoca al espiritu
         // ------------------------------------------------------------
 
-        Medium juan = new Medium("Juan", 120, 20, bera);
+        Medium juan = new Medium("Juan", 120, 20, berazategui);
 
         Medium juanP = mediumService.crear(juan, coordenadaMedium);
 
@@ -347,12 +345,14 @@ public class EspirituServiceTest {
         // Espiritu invocado en Berazategui
         // ------------------------------------------------------------
 
-        Espiritu espiritu = serviceEspiritu.crear(matias, coordenadaEspiritu);
+        Espiritu pepe = new Angelical("Pepe", bernalito);
+
+        Espiritu espiritu = serviceEspiritu.crear(pepe, coordenadaEspiritu2);
 
         Espiritu espirituInvocado = mediumService.invocar(juanP.getId(), espiritu.getId());
 
         assertEquals(
-                bera.getId(),
+                berazategui.getId(),
                 espirituInvocado.getUbicacion().getId()
         );
 
@@ -421,14 +421,15 @@ public class EspirituServiceTest {
     @Test
     public void seConectaUnEspirituConUnMedium() {
         Ubicacion bernalM = new Santuario("Bernal", ENERGIA);
-        Ubicacion bernalP = ubicacionService.crear(bernalM, coordenadas);
+        Ubicacion bernalP = ubicacionService.crear(bernalM, coordenadas2);
         Espiritu juanM = new Angelical("Juan", bernalP);
-        Espiritu espirituP = serviceEspiritu.crear(juanM, coordenadaMedium);
-        Medium mediumM = new Medium("Juan", 120, 10, berazategui);
+        Espiritu espirituP = serviceEspiritu.crear(juanM, coordenadaEspiritu2);
 
         assertEquals(0, espirituP.getNivelDeConexion());
-        mediumM.setUbicacion(bernalP);
-        Medium mediumP = mediumService.crear(mediumM, coordenadaMedium);
+
+        Medium mediumM = new Medium("Enrique", 120, 10, bernalP);
+
+        Medium mediumP = mediumService.crear(mediumM, coordenadaMedium2);
         Medium medium2 = serviceEspiritu.conectar(espirituP.getId(), mediumM.getId());
 
         assertFalse(medium2.getEspiritus().isEmpty());
@@ -461,14 +462,11 @@ public class EspirituServiceTest {
 
     @Test
     void deberiaPersistirElNivelDeConexionLuegoDeConectar() {
-        Ubicacion ubicacion = new Santuario("Tailandia", ENERGIA);
-        Ubicacion ubicacionP = ubicacionService.crear(ubicacion, coordenadas);
         Medium medium = new Medium("Juan", 120, 25, berazategui);
         Espiritu nuevoEspiritu = new Angelical("Juan", berazategui);
 
         Medium mediumP = mediumService.crear(medium, coordenadaMedium);
         Espiritu espirituP = serviceEspiritu.crear(nuevoEspiritu, coordenadaEspiritu);
-        ubicacionService.actualizar(ubicacionP);
 
 
         serviceEspiritu.conectar(espirituP.getId(), mediumP.getId());
@@ -480,8 +478,6 @@ public class EspirituServiceTest {
 
     @Test
     void deberiaPermitirConectarVariosEspiritusAlMismoMedium() {
-        Ubicacion ubicacion = new Santuario("Tailandia", ENERGIA);
-        Ubicacion ubiPersistida = ubicacionService.crear(ubicacion, coordenadas);
         Medium medium = new Medium("Juan", 120, 10, berazategui);
         Espiritu pepe = new Angelical("Pepe", berazategui);
         Espiritu raul = new Angelical("Raul", berazategui);
@@ -491,7 +487,6 @@ public class EspirituServiceTest {
         Espiritu espiritu2 = serviceEspiritu.crear(raul, coordenadaEspiritu);
 
         Medium mediumP = mediumService.crear(medium, coordenadaMedium);
-        ubicacionService.actualizar(ubiPersistida);
         serviceEspiritu.conectar(espiritu1.getId(), mediumP.getId());
         serviceEspiritu.conectar(espiritu2.getId(), mediumP.getId());
 
