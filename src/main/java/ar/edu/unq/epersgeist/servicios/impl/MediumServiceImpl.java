@@ -3,6 +3,7 @@ package ar.edu.unq.epersgeist.servicios.impl;
 import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionMongo;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
@@ -205,7 +206,7 @@ public class MediumServiceImpl implements MediumService {
                             new UbicacionNoEncontradaException(idDestino));
 
             // Se valida si las ubicaciones estan conectadas
-            this.validarConexion(ubicacionActualMedium, ubicacionNeoDestino);
+            this.validarConexion(ubicacionActualMedium.getId(), idDestino);
 
             // Calculo si esta a menos de 30km de distacia
             mediumDAOMongo.mediumDentroDeDistancia(mediumId, latitud, longitud, 30000.0)
@@ -239,8 +240,7 @@ public class MediumServiceImpl implements MediumService {
 
             // depende el estado del medium se guarda o se elimina
             if (mediumAMover.sinMana()) {
-                this.eliminar(mediumAMover.getId());
-                mediumDAOSQL.delete(mediumAMover);
+                mediumDAOSQL.deleteById(mediumAMover.getId());
                 mediumDAOMongo.deleteById(mediumAMover.getId());
             } else {
                 mediumDAOSQL.save(mediumAMover);
@@ -249,9 +249,9 @@ public class MediumServiceImpl implements MediumService {
         }
     }
 
-    private void validarConexion(Ubicacion ubicacion, UbicacionNeo4j ubicacionAMover) {
-        if (!ubicacionDAONeo4j.estanConectadas(ubicacion.getId(), ubicacionAMover.getId())) {
-            throw new UbicacionLejanaException("La ubicacion esta lejana");
+    private void validarConexion(Long idOrigen, Long idDestino) {
+        if (!ubicacionDAONeo4j.estanConectadas(idOrigen, idDestino)) {
+            throw new UbicacionesNoConectadasException(idOrigen, idDestino);
         }
     }
 

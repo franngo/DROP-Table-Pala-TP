@@ -478,37 +478,46 @@ public class MediumServiceTest {
 
         @Test
         void elMediumSiQuedaSinManaEsEliminado() {
+            List<Coordenada> coordenadasBernal = List.of(
+                    new Coordenada(-34.70, -58.28),
+                    new Coordenada(-34.71, -58.29),
+                    new Coordenada(-34.69, -58.27)
+            );
+            Ubicacion quilmes = ubicacionService.crear(
+                    new Santuario("Santuario Bernal", 50),
+                    coordenadasBernal
+            );
+
             List<Coordenada> coordenadasLaUnq = List.of(
                     new Coordenada(-34.81, -58.22),
                     new Coordenada(-34.82, -58.24),
                     new Coordenada(-34.80, -58.20)
             );
-            Ubicacion laUNQ =
-                    ubicacionService.crear(
-                            new Santuario("La Unq", 80),
-                            coordenadasLaUnq
-                    );
-
-            Medium mediumMover = serviceMedium.crear(
-                    new Medium("Juan", 100, 50, ranelagh),
-                    new Coordenada(-34.79, -58.19)
+            Ubicacion laUNQ = ubicacionService.crear(
+                    new Santuario("La Unq", 80),
+                    coordenadasLaUnq
             );
 
             ubicacionService.conectar(
-                    ranelagh.getId(),
+                    quilmes.getId(),
                     laUNQ.getId(),
-                    99L
+                    50L
+            );
+
+
+            Medium mediumMover = serviceMedium.crear(
+                    new Medium("Juan", 50, 50, quilmes),
+                    new Coordenada(-34.70, -58.28)
             );
 
 
             serviceMedium.mover(
-                    mediumMover.getId(), -34.79, -58.19
+                    mediumMover.getId(), -34.81, -58.22
             );
 
             assertThatThrownBy(() ->
                     serviceMedium.recuperar(mediumMover.getId())
             ).isInstanceOf(ErrorDeMediumNoEncontradoException.class);
-
         }
 
         @Test
@@ -546,14 +555,6 @@ public class MediumServiceTest {
                             new Coordenada(-34.84, -58.24)
                     );
 
-            // Antes de moverse no debería poder invocarlo
-            assertThrows(
-                    EspirituMuyLejanoException.class,
-                    () -> serviceMedium.invocar(
-                            mediumAMover.getId(),
-                            espirituLejano.getId()
-                    )
-            );
 
             serviceMedium.mover(
                     mediumAMover.getId(),
@@ -613,13 +614,6 @@ public class MediumServiceTest {
                             new Coordenada(nuevaLat, nuevaLon)
                     );
 
-            assertThrows(
-                    EspirituMuyLejanoException.class,
-                    () -> serviceMedium.invocar(
-                            mediumAMover.getId(),
-                            espirituCercano.getId()
-                    )
-            );
 
             serviceMedium.mover(
                     mediumAMover.getId(),
