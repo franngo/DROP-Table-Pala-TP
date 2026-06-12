@@ -47,7 +47,6 @@ public class EstadisticaServiceTest {
     private Coordenada coordenadaMedium;
     private List<Coordenada> coordenadas2;
     private Coordenada coordenadaEspiritu2;
-    private Coordenada coordenadaMedium2;
 
 
     @Nested
@@ -71,7 +70,6 @@ public class EstadisticaServiceTest {
             );
 
             coordenadaEspiritu2 = new Coordenada(-34.91, -58.32);
-            coordenadaMedium2 = new Coordenada(-34.90, -58.30);
 
             //ubicaciones
             varela = ubicacionService.crear(new Santuario("Varela", 100),coordenadas);
