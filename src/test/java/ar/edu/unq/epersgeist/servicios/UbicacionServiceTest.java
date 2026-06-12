@@ -5,22 +5,22 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.HarmonicResult;
-import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.CoordenadasInsuficientesException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.*;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
+import org.bson.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -87,7 +87,7 @@ public class UbicacionServiceTest {
     class Crear {
         @Test
         void sePuedeCrearUnaUbicacion() {
-            Ubicacion ubicacionCreada = ubicacionService.crear(santuario,coordenadas);
+            Ubicacion ubicacionCreada = ubicacionService.crear(santuario, coordenadas);
 
             assertNotNull(ubicacionCreada.getId());
             assertEquals(NOMBRE_SANTUARIO, ubicacionCreada.getNombre());
@@ -586,7 +586,7 @@ public class UbicacionServiceTest {
             List<Ubicacion> ubis = ubicacionService.caminoMasRentable(origen.getId(), origen.getId());
 
             assertEquals(1, ubis.size());
-            assertEquals(origen.getId(), ubis.get(0).getId());
+            assertEquals(origen.getId(), ubis.getFirst().getId());
         }
 
         @Test
@@ -617,7 +617,7 @@ public class UbicacionServiceTest {
 
         @Test
         void caminoMasRentableNoSeRigePorLongitudDelCamino() {
-            Ubicacion nodoCuatro = ubicacionService.crear(new Santuario("Nodo cuatro", 50),coordenadas);
+            Ubicacion nodoCuatro = ubicacionService.crear(new Santuario("Nodo cuatro", 50), coordenadas);
 
             ubicacionService.conectar(origen.getId(), destino.getId(), 100L);
 
@@ -776,11 +776,11 @@ public class UbicacionServiceTest {
 
 
     @Nested
-    class UbicacionSobrecargada{
+    class UbicacionSobrecargada {
 
         @BeforeEach
         void setUp() {
-            ubicacionService.crear(new Santuario("Alta energia", 70),coordenadas);
+            ubicacionService.crear(new Santuario("Alta energia", 70), coordenadas);
             ubicacionService.crear(new Cementerio("Media energia", 50), coordenadas);
             ubicacionService.crear(new Santuario("Baja energia", 20), coordenadas);
         }
@@ -816,7 +816,7 @@ public class UbicacionServiceTest {
 
         @Test
         void noDevuelveUbicacionesEliminadas() {
-            Ubicacion alta = ubicacionService.crear(new Santuario("Mucha energia", 90),coordenadas);
+            Ubicacion alta = ubicacionService.crear(new Santuario("Mucha energia", 90), coordenadas);
             ubicacionService.eliminar(alta.getId());
 
             List<Ubicacion> sobrecargadas = ubicacionService.ubicacionesSobrecargadas(80);
@@ -869,7 +869,14 @@ public class UbicacionServiceTest {
         void harmonicResultFallaUsandoIdInexistente() {
             Long idNoExistente = 123456789L;
 
-            assertThrows(UbicacionNoEncontradaException.class, () -> ubicacionService.harmonicResult(List.of(idNoExistente)));
+            assertThrows(NoTodasLasUbicacionesExistenException.class, () -> ubicacionService.harmonicResult(List.of(idNoExistente)));
+        }
+
+        @Test
+        void harmonicResultFallaTeniendoTanSoloUnIdInexistente() {
+            Long idNoExistente = 123456789L;
+
+            assertThrows(NoTodasLasUbicacionesExistenException.class, () -> ubicacionService.harmonicResult(List.of(uno.getId(), idNoExistente, dos.getId())));
         }
 
         @Test
@@ -980,10 +987,10 @@ public class UbicacionServiceTest {
         void crearUbicacionConMasDeTresCoordenadasFunciona() {
 
             List<Coordenada> muchasCoords = List.of(
-                    new Coordenada(-34.81, -58.22),
+                    new Coordenada(-34.83, -58.21),
                     new Coordenada(-34.82, -58.24),
-                    new Coordenada(-34.80, -58.20),
-                    new Coordenada(-34.83, -58.21)
+                    new Coordenada(-34.81, -58.22),
+                    new Coordenada(-34.80, -58.20)
             );
 
             assertDoesNotThrow(() ->
@@ -1079,6 +1086,429 @@ public class UbicacionServiceTest {
                             otrasCoordenadas
                     )
             );
+        }
+    }
+
+    @Nested
+    class UbicacionesFrias {
+
+        @Autowired
+        private MongoTemplate mongoTemplate;
+
+        private static final double UMBRAL = 5.0;
+
+        @BeforeEach
+        void setUp() {
+            mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
+        }
+
+        @AfterEach
+        void tearDown() {
+            mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
+            ubicacionService.eliminarTodos();
+        }
+
+        private void insertTemperatura(String ubicacion, double grados) {
+            mongoTemplate.getCollection("datos_sensores")
+                    .insertOne(
+                            new Document()
+                                    .append("ubicacion", ubicacion)
+                                    .append("sensor_id", 1)
+                                    .append("temperatura",
+                                            new Document()
+                                                    .append("grados", grados)
+                                                    .append("unidad", "°C"))
+                    );
+        }
+
+        private void insertSonido(String ubicacion, double decibeles) {
+            mongoTemplate.getCollection("datos_sensores")
+                    .insertOne(
+                            new Document()
+                                    .append("ubicacion", ubicacion)
+                                    .append("sensor_id", 1)
+                                    .append("decibeles", decibeles)
+                    );
+        }
+
+        // ------------------------------------------------------------
+        // CASO 1: devuelve una ubicación con promedio menor a 5
+        // ------------------------------------------------------------
+
+        @Test
+        void devuelveUbicacionesConPromedioMenorACinco() {
+            insertTemperatura("A", 2);
+            insertTemperatura("A", 4); // promedio = 3
+
+            List<String> resultado = ubicacionService.ubicacionesFrias();
+
+            assertEquals(1, resultado.size());
+            assertTrue(resultado.contains("A"));
+        }
+
+        // ------------------------------------------------------------
+        // CASO 2: no incluye promedio exactamente igual a 5
+        // ------------------------------------------------------------
+
+        @Test
+        void noIncluyePromedioIgualACinco() {
+            insertTemperatura("A", 4);
+            insertTemperatura("A", 6); // promedio = 5
+
+            List<String> resultado = ubicacionService.ubicacionesFrias();
+
+            assertTrue(resultado.isEmpty());
+        }
+
+        // ------------------------------------------------------------
+        // CASO 3: devuelve solo las ubicaciones frías
+        // ------------------------------------------------------------
+
+        @Test
+        void devuelveSoloUbicacionesFrias() {
+            insertTemperatura("A", 0);
+            insertTemperatura("A", 2);   // promedio = 1
+
+            insertTemperatura("B", 8);
+            insertTemperatura("B", 10);  // promedio = 9
+
+            insertTemperatura("C", -5);
+            insertTemperatura("C", 3);   // promedio = -1
+
+            List<String> resultado = ubicacionService.ubicacionesFrias();
+
+            assertEquals(2, resultado.size());
+            assertTrue(resultado.contains("A"));
+            assertTrue(resultado.contains("C"));
+        }
+
+        // ------------------------------------------------------------
+        // CASO 4: ignora documentos que no son de temperatura
+        // ------------------------------------------------------------
+
+        @Test
+        void ignoraDocumentosQueNoSonTemperatura() {
+            insertSonido("A", 120);
+
+            List<String> resultado = ubicacionService.ubicacionesFrias();
+
+            assertTrue(resultado.isEmpty());
+        }
+
+        // ------------------------------------------------------------
+        // CASO 5: mezcla de datos válidos e inválidos
+        // ------------------------------------------------------------
+
+        @Test
+        void mezclaDeDatosSoloDevuelveUbicacionesFrias() {
+            insertTemperatura("A", 0);
+            insertTemperatura("A", 4);    // promedio = 2
+
+            insertTemperatura("B", 8);
+            insertTemperatura("B", 12);   // promedio = 10
+
+            insertSonido("C", 150);       // debe ignorarse
+
+            List<String> resultado = ubicacionService.ubicacionesFrias();
+
+            assertEquals(1, resultado.size());
+            assertTrue(resultado.contains("A"));
+        }
+
+        @Test
+        void unaMedicionFriaNoAlcanzaSiElPromedioNoEsMenorACinco() {
+            insertTemperatura("A", 2);
+            insertTemperatura("A", 20); // promedio = 11
+
+            List<String> resultado = ubicacionService.ubicacionesFrias();
+
+            assertTrue(resultado.isEmpty());
+        }
+    }
+
+
+    @Nested
+    class Sucesos {
+
+        @Autowired
+        private MongoTemplate mongoTemplate;
+
+        //Reminder: el tope de decibeles es de 90.0 y el tope de temperatura es de 5.0
+
+        @BeforeEach
+        void setUp() {
+            mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
+        }
+
+        @AfterEach
+        void tearDown() {
+            mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
+            ubicacionService.eliminarTodos();
+        }
+
+        private void insertSonido(String ubicacion, double decibeles) {
+            mongoTemplate.getCollection("datos_sensores")
+                    .insertOne(
+                            new Document()
+                                    .append("ubicacion", ubicacion)
+                                    .append("sensor_id", 1)
+                                    .append("decibeles", decibeles)
+                    );
+        }
+
+        private void insertTemperatura(String ubicacion, double grados) {
+            mongoTemplate.getCollection("datos_sensores")
+                    .insertOne(
+                            new Document()
+                                    .append("ubicacion", ubicacion)
+                                    .append("sensor_id", 1)
+                                    .append("temperatura",
+                                            new Document()
+                                                    .append("grados", grados)
+                                                    .append("unidad", "°C"))
+                    );
+        }
+
+        private void insertPresion(String ubicacion, double hectopascales) {
+            mongoTemplate.getCollection("datos_sensores")
+                    .insertOne(
+                            new Document()
+                                    .append("ubicacion", ubicacion)
+                                    .append("sensor_id", 1)
+                                    .append("presionAtmosferica", hectopascales)
+                    );
+        }
+
+        private void insertLectura(String ubicacion, String lectura) {
+            mongoTemplate.getCollection("datos_sensores")
+                    .insertOne(
+                            new Document()
+                                    .append("ubicacion", ubicacion)
+                                    .append("sensor_id", 1)
+                                    .append("l3kTUr4", lectura)
+                    );
+        }
+
+        @Test
+        void sucesosInsertandoDocsSonido() {
+            insertSonido("A", 80);
+            insertSonido("A", 83);
+            insertSonido("A", 87);
+            insertSonido("A", 92);
+            insertSonido("A", 105);
+
+            Map<String, Integer> map = ubicacionService.sucesos();
+
+            assertEquals(2, map.get("exorcismos"));
+            assertEquals(0, map.get("invocaciones demoniacas"));
+            assertEquals(0, map.get("sucesos desconocidos"));
+        }
+
+        @Test
+        void sucesosInsertandoDoscTemperatura() {
+            insertTemperatura("A", 2);
+            insertTemperatura("A", 4);
+            insertTemperatura("A", 6);
+            insertTemperatura("A", 8);
+            insertTemperatura("A", 10);
+
+            Map<String, Integer> map = ubicacionService.sucesos();
+
+            assertEquals(0, map.get("exorcismos"));
+            assertEquals(2, map.get("invocaciones demoniacas"));
+            assertEquals(0, map.get("sucesos desconocidos"));
+        }
+
+        @Test
+        void sucesosInsertandoDoscPresion() {
+            insertPresion("A", 940);
+            insertPresion("A", 960);
+            insertPresion("A", 980);
+            insertPresion("A", 1000);
+            insertPresion("A", 1020);
+
+            Map<String, Integer> map = ubicacionService.sucesos();
+
+            assertEquals(0, map.get("exorcismos"));
+            assertEquals(0, map.get("invocaciones demoniacas"));
+            assertEquals(0, map.get("sucesos desconocidos"));
+        }
+
+        @Test
+        void sucesosInsertandoDoscDesconocidos() {
+            insertLectura("A", "aK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "bK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "cK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "dK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "eK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+
+            Map<String, Integer> map = ubicacionService.sucesos();
+
+            assertEquals(0, map.get("exorcismos"));
+            assertEquals(0, map.get("invocaciones demoniacas"));
+            assertEquals(5, map.get("sucesos desconocidos"));
+        }
+
+        @Test
+        void sucesosInsertandoMultiplesDocumentos() {
+            insertSonido("A", 80);
+            insertSonido("A", 83);
+            insertSonido("A", 87);
+            insertSonido("A", 92);
+            insertSonido("A", 105);
+
+            insertTemperatura("A", 2);
+            insertTemperatura("A", 4);
+            insertTemperatura("A", 6);
+            insertTemperatura("A", 8);
+            insertTemperatura("A", 10);
+
+            insertPresion("A", 940);
+            insertPresion("A", 960);
+            insertPresion("A", 980);
+            insertPresion("A", 1000);
+            insertPresion("A", 1020);
+
+            insertLectura("A", "aK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "bK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "cK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "dK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+            insertLectura("A", "eK3mP9qL2rV8nW1oY4zA7bC6dE0fGhIjJ5");
+
+            Map<String, Integer> map = ubicacionService.sucesos();
+
+            assertEquals(2, map.get("exorcismos"));
+            assertEquals(2, map.get("invocaciones demoniacas"));
+            assertEquals(5, map.get("sucesos desconocidos"));
+        }
+
+    }
+
+    // --------------------------------------------------------------------------------
+    // MONGO: ubicacionesConflictivas()
+    // --------------------------------------------------------------------------------
+
+    @Nested
+    class UbicacionesConflictivas {
+        @Autowired
+        private MongoTemplate mongoTemplate;
+
+        private static final Integer UMBRAL = 90;
+
+
+        @BeforeEach
+        void setUp() {
+            mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
+        }
+
+        @AfterEach
+        void tearDown() {
+            mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
+            ubicacionService.eliminarTodos();
+        }
+
+        private void insertSonido(String ubicacion, double decibeles) {
+            mongoTemplate.getCollection("datos_sensores")
+                    .insertOne(
+                            new Document()
+                                    .append("ubicacion", ubicacion)
+                                    .append("sensor_id", 1)
+                                    .append("decibeles", decibeles)
+                    );
+        }
+
+        private void insertTemperatura(String ubicacion, double grados) {
+            mongoTemplate.getCollection("datos_sensores")
+                    .insertOne(
+                            new Document()
+                                    .append("ubicacion", ubicacion)
+                                    .append("sensor_id", 1)
+                                    .append("temperatura",
+                                            new Document()
+                                                    .append("grados", grados)
+                                                    .append("unidad", "°C"))
+                    );
+        }
+
+        
+
+        // ------------------------------------------------------------
+        // CASO 1: retorna ubicaciones con decibeles altos
+        // ------------------------------------------------------------
+
+        @Test
+        void devuelveUbicacionesConExorcismos() {
+            insertSonido("A", 100);
+            insertSonido("A", 110);
+            insertSonido("B", 95);
+
+            List<String> resultado = ubicacionService.ubicacionesConflictivas();
+
+            assertEquals(2, resultado.size());
+            assertTrue(resultado.contains("A"));
+            assertTrue(resultado.contains("B"));
+        }
+
+        // ------------------------------------------------------------
+        // CASO 2: elimina duplicados
+        // ------------------------------------------------------------
+
+        @Test
+        void noDevuelveUbicacionesDuplicadas() {
+            insertSonido("A", 100);
+            insertSonido("A", 110);
+
+            List<String> resultado = ubicacionService.ubicacionesConflictivas();
+
+            assertEquals(1, resultado.size());
+            assertEquals("A", resultado.getFirst());
+        }
+
+        // ------------------------------------------------------------
+        // CASO 3: ignora sonidos por debajo del umbral
+        // ------------------------------------------------------------
+
+        @Test
+        void ignoraDecibelesBajos() {
+            insertSonido("A", 50);
+            insertSonido("B", 89);
+            insertSonido("C", UMBRAL);
+
+            List<String> resultado = ubicacionService.ubicacionesConflictivas();
+
+            assertTrue(resultado.isEmpty());
+        }
+
+        // ------------------------------------------------------------
+        // CASO 4: ignora otros tipos de sensores (temperatura)
+        // ------------------------------------------------------------
+
+        @Test
+        void ignoraDocumentosQueNoSonSonido() {
+            insertTemperatura("A", 10);
+            insertTemperatura("B", 10);
+
+            List<String> resultado = ubicacionService.ubicacionesConflictivas();
+
+            assertTrue(resultado.isEmpty());
+        }
+
+        // ------------------------------------------------------------
+        // CASO 5: mezcla de datos válidos e inválidos
+        // ------------------------------------------------------------
+
+        @Test
+        void mezclaDeDatosSoloDevuelveValidos() {
+            insertSonido("A", 120); // VALIDO
+            insertTemperatura("A", 10);
+            insertSonido("B", 30);
+            insertSonido("C", 200); // VALIDO
+
+            List<String> resultado = ubicacionService.ubicacionesConflictivas();
+
+            assertEquals(2, resultado.size());
+            assertTrue(resultado.contains("A"));
+            assertTrue(resultado.contains("C"));
         }
     }
 
