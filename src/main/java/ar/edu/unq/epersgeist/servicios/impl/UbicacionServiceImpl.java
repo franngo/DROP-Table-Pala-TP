@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.geo.GeoJsonPolygon;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -55,6 +56,15 @@ public class UbicacionServiceImpl implements UbicacionService {
         // Si existe y NO está eliminada lógicamente, entonces no se puede crear otra con el mismo nombre
         if (existente != null && !existente.getDeletedAt()) {
             throw new UbicacionYaExisteException(ubicacion.getNombre());
+        }
+
+        //en este punto, ya está decidido que la Ubicacion como tal es válida para ser creada, PERO falta realizar un chequeo sobre las coordenadas.
+
+        // Se chequea que las coordenadas dadas no pertenezcan al área de otra Ubicacion existente, ya que las Ubicaciones no se pueden intersectar.
+        GeoJsonPolygon polygon = UbicacionMongo.crearPoligono(coordenadas);
+        List<UbicacionMongo> intersectan = ubicacionDAOMongo.ubicacionesQueIntersectan(polygon);
+        if(!intersectan.isEmpty()) {
+            //bombazo
         }
 
         // Si existe pero estaba soft deleted, la elimino físicamente para liberar el unique del nombre

@@ -8,6 +8,7 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.EspirituMongo;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.persistencia.mongo.EspirituDAOMongo;
+import ar.edu.unq.epersgeist.persistencia.mongo.UbicacionDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAOSQL;
 import ar.edu.unq.epersgeist.persistencia.sql.MediumDAOSQL;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
@@ -35,9 +36,12 @@ public class EspirituServiceImpl implements EspirituService {
 
     private MediumDAOSQL mediumDAOSQL;
 
+    private UbicacionDAOMongo ubicacionDAOMongo;
+
     @Override
     public Espiritu crear(Espiritu espiritu, Coordenada coordenada) {
         this.validarEspiritu(espiritu);
+        //chequeo con ubicacionDAOMongo.buscarUbicacionQueContiene(coordenada.getLatitud(), coordenada.getLongitud());
         espirituDAOSQL.save(espiritu);
         espirituDAOMongo.save(new EspirituMongo(espiritu, coordenada));
         return espiritu;

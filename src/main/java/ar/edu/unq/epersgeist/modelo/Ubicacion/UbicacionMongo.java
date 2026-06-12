@@ -38,7 +38,7 @@ public class UbicacionMongo {
         this.area = crearPoligono(coords);
     }
 
-    private GeoJsonPolygon crearPoligono(List<Coordenada> coords) {
+    public static GeoJsonPolygon crearPoligono(List<Coordenada> coords) {
         if (coords == null || coords.size() < 3) {
             throw new CoordenadasInsuficientesException();
         }
