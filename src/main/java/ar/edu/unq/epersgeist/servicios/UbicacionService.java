@@ -55,4 +55,6 @@ public interface UbicacionService {
     List<String> ubicacionesConflictivas();
 
     List<String> ubicacionesFrias();
+
+    void normalize();
 }
