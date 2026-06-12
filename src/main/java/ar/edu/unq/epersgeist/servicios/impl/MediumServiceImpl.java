@@ -240,7 +240,7 @@ public class MediumServiceImpl implements MediumService {
 
             // depende el estado del medium se guarda o se elimina
             if (mediumAMover.sinMana()) {
-                mediumDAOSQL.deleteById(mediumAMover.getId());
+                this.eliminar(mediumAMover.getId());
                 mediumDAOMongo.deleteById(mediumAMover.getId());
             } else {
                 mediumDAOSQL.save(mediumAMover);

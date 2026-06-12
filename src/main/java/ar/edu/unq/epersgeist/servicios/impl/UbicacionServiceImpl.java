@@ -223,7 +223,6 @@ public class UbicacionServiceImpl implements UbicacionService {
     @Override
     public List<HarmonicResult> harmonicResult(List<Long> ids) {
         //validación de la existencia de Ubicaciones
-//        ids.stream().forEach((id) -> this.recuperar(id));
         List<Ubicacion> ubisExistentes = ubicacionDAOSQL.findAllById(ids);
         if (ubisExistentes.size() != ids.size()) {
             throw new NoTodasLasUbicacionesExistenException();
