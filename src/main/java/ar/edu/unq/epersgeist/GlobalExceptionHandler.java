@@ -147,7 +147,8 @@ public class GlobalExceptionHandler {
             UbicacionLejanaException.class,
             EspirituDominadoException.class,
             EspirituMuyLejanoException.class,
-            InterseccionInvalidaException.class
+            InterseccionInvalidaException.class,
+            CoordenadaNoPerteneceAUbicacion.class
     })
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponseDTO conflictHandler(
