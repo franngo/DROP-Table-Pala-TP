@@ -6,6 +6,7 @@ import ar.edu.unq.epersgeist.controller.dtos.reportes.responses.ReporteSantuario
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.CoordenadaDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionCreateDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.UbicacionUpdateDTO;
+import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.NormalizeResponseDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.SucesosResponseDTO;
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.response.UbicacionResponseDTO;
 import ar.edu.unq.epersgeist.controller.mappers.*;
@@ -226,6 +227,17 @@ public class UbicacionControllerREST {
     public UbicacionesSensadasResponse ubicacionesConflictivas() {
         return new UbicacionesSensadasResponse(
                 ubicacionService.ubicacionesConflictivas()
+        );
+    }
+
+    @PostMapping("/normalize")
+    @ResponseStatus(HttpStatus.OK)
+    public NormalizeResponseDTO normalize() {
+        ubicacionService.normalize();
+
+        return new NormalizeResponseDTO(
+                "Toda la coleccion de datos_sensores fue normalizada exitosamente.",
+                "SUCCESS"
         );
     }
 
