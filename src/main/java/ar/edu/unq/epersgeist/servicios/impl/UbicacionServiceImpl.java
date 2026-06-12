@@ -6,10 +6,7 @@ import ar.edu.unq.epersgeist.modelo.HarmonicResult;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionMongo;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.NoTodasLasUbicacionesExistenException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionYaExisteException;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.*;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.persistencia.mongo.UbicacionDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
@@ -20,6 +17,7 @@ import lombok.AllArgsConstructor;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.geo.GeoJsonPolygon;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -55,6 +53,15 @@ public class UbicacionServiceImpl implements UbicacionService {
         // Si existe y NO está eliminada lógicamente, entonces no se puede crear otra con el mismo nombre
         if (existente != null && !existente.getDeletedAt()) {
             throw new UbicacionYaExisteException(ubicacion.getNombre());
+        }
+
+        //en este punto, ya está decidido que la Ubicacion como tal es válida para ser creada, PERO falta realizar un chequeo sobre las coordenadas.
+
+        // Se chequea que las coordenadas dadas no pertenezcan al área de otra Ubicacion existente, ya que las Ubicaciones no se pueden intersectar.
+        GeoJsonPolygon polygon = UbicacionMongo.crearPoligono(coordenadas);
+        List<UbicacionMongo> intersectan = ubicacionDAOMongo.ubicacionesQueIntersectan(polygon);
+        if(!intersectan.isEmpty()) {
+            throw new InterseccionInvalidaException();
         }
 
         // Si existe pero estaba soft deleted, la elimino físicamente para liberar el unique del nombre
@@ -223,7 +230,6 @@ public class UbicacionServiceImpl implements UbicacionService {
     @Override
     public List<HarmonicResult> harmonicResult(List<Long> ids) {
         //validación de la existencia de Ubicaciones
-//        ids.stream().forEach((id) -> this.recuperar(id));
         List<Ubicacion> ubisExistentes = ubicacionDAOSQL.findAllById(ids);
         if (ubisExistentes.size() != ids.size()) {
             throw new NoTodasLasUbicacionesExistenException();

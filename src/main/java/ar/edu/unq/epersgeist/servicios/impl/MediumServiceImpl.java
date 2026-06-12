@@ -3,6 +3,7 @@ package ar.edu.unq.epersgeist.servicios.impl;
 import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionMongo;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.CoordenadaNoPerteneceAUbicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
@@ -63,6 +64,12 @@ public class MediumServiceImpl implements MediumService {
 
         if (medium.getId() != null) {
             throw new ErrorAlCrearMediumException("ya tiene un id asignado.");
+        }
+
+        //Se chequea que la coordenada dada pertenezca al área de la Ubicación del Medium
+        List<UbicacionMongo> ubiCord = ubicacionDAOMongo.buscarUbicacionQueContiene(coordenada.getLatitud(), coordenada.getLongitud());
+        if(ubiCord.isEmpty() || !Objects.equals(ubiCord.getFirst().getId(), medium.getUbicacion().getId())) {
+            throw new CoordenadaNoPerteneceAUbicacion();
         }
 
         mediumDAOSQL.save(medium);
@@ -240,7 +247,7 @@ public class MediumServiceImpl implements MediumService {
 
             // depende el estado del medium se guarda o se elimina
             if (mediumAMover.sinMana()) {
-                mediumDAOSQL.deleteById(mediumAMover.getId());
+                this.eliminar(mediumAMover.getId());
                 mediumDAOMongo.deleteById(mediumAMover.getId());
             } else {
                 mediumDAOSQL.save(mediumAMover);

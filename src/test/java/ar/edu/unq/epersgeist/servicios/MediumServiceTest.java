@@ -33,27 +33,36 @@ import static org.junit.jupiter.api.Assertions.*;
 public class MediumServiceTest {
     private static final Integer ENERGIA = 100;
 
-    Espiritu rikaM;
-    Espiritu jaegerM;
-    Espiritu rikaP;
-    Espiritu jaegerP;
     @Autowired
     private EspirituService espirituService;
     @Autowired
     private MediumService serviceMedium;
     @Autowired
     private UbicacionService ubicacionService;
+
     private Ubicacion berazategui;
     private Ubicacion bernal;
+
     private Espiritu espirituM;
-    private Espiritu espirituM2;
+    private Espiritu rikaM;
+    private Espiritu jaegerM;
+    private Espiritu rikaP;
+    private Espiritu jaegerP;
+
     private Medium epifanioM;
     private Medium ubedaM;
     private Medium epifanioP;
     private Medium ubedaP;
+
     private List<Coordenada> coordenadas;
     private Coordenada coordenadaMedium;
     private Coordenada coordenadaEspiritu;
+    private List<Coordenada> coordenadas2;
+    private Coordenada coordenadaEspiritu2;
+    private Coordenada coordenadaMedium2;
+    private List<Coordenada> coordenadas3;
+    private Coordenada coordenadaEspiritu3;
+    private Coordenada coordenadaMedium3;
 
 
     @BeforeEach
@@ -64,27 +73,44 @@ public class MediumServiceTest {
                 new Coordenada(-34.80, -58.20)
         );
 
-        coordenadaMedium = new Coordenada(-34.812, -58.214);
-        coordenadaEspiritu = new Coordenada(-34.815, -58.220);
+        coordenadaMedium = new Coordenada(-34.81, -58.22);
+        coordenadaEspiritu = new Coordenada(-34.82, -58.24);
+
+        coordenadas2 = List.of(
+                new Coordenada(-34.91, -58.32),
+                new Coordenada(-34.92, -58.34),
+                new Coordenada(-34.90, -58.30)
+        );
+
+        coordenadaEspiritu2 = new Coordenada(-34.91, -58.32);
+        coordenadaMedium2 = new Coordenada(-34.90, -58.30);
+
+        coordenadas3 = List.of(
+                new Coordenada(-54.91, -78.32),
+                new Coordenada(-54.92, -78.34),
+                new Coordenada(-54.90, -78.30)
+        );
+
+        coordenadaEspiritu3 = new Coordenada(-54.91, -78.32);
+        coordenadaMedium3 = new Coordenada(-54.90, -78.30);
 
         berazategui = ubicacionService.crear(new Santuario("Berazategui", ENERGIA), coordenadas);
-        bernal = ubicacionService.crear(new Santuario("Bernal", ENERGIA), coordenadas);
+        bernal = ubicacionService.crear(new Santuario("Bernal", ENERGIA), coordenadas2);
 
         espirituM = new Angelical("Charizard", berazategui);
-        espirituM2 = new Angelical("Bulbasor", berazategui);
         epifanioM = new Medium("Epifanio el poderoso", 150, 50, bernal);
         ubedaM = new Medium("Ubeda el dt", 100, 20, bernal);
 
-        epifanioP = serviceMedium.crear(epifanioM, coordenadaMedium);
-        ubedaP = serviceMedium.crear(ubedaM, coordenadaMedium);
+        epifanioP = serviceMedium.crear(epifanioM, coordenadaMedium2);
+        ubedaP = serviceMedium.crear(ubedaM, coordenadaMedium2);
 
         rikaM = new Angelical("Rika", bernal);
         rikaM.setNivelDeConexion(60);
-        rikaP = espirituService.crear(rikaM, coordenadaEspiritu);
+        rikaP = espirituService.crear(rikaM, coordenadaEspiritu2);
 
         jaegerM = new Demonio("Jaeger", bernal);
         jaegerM.setNivelDeConexion(50);
-        jaegerP = espirituService.crear(jaegerM, coordenadaEspiritu);
+        jaegerP = espirituService.crear(jaegerM, coordenadaEspiritu2);
     }
 
     //crear
@@ -226,7 +252,7 @@ public class MediumServiceTest {
     public void descansarCasoExitoso() {
 
         Medium mediumPrueba = new Medium("MediumTest", 200, 50, bernal);
-        Medium mediumPruebaP = serviceMedium.crear(mediumPrueba, coordenadaMedium);
+        Medium mediumPruebaP = serviceMedium.crear(mediumPrueba, coordenadaMedium2);
 
         rikaP.setNivelDeConexion(0);
         jaegerP.setNivelDeConexion(0);
@@ -303,26 +329,22 @@ public class MediumServiceTest {
 
     @Test
     void exorcismoNoExitosoDeberiaAfectarElAngelDelMedium() {
-        // Por una cuestion de comodidad voy a crear el contexto con nuevas variables
-        Ubicacion quilmes = ubicacionService.crear(new Santuario("Quilmes", ENERGIA), coordenadas);
+        Medium matiasM = new Medium("Matias", 150, 50, berazategui);
 
-        Medium matiasM = new Medium("Matias", 150, 50, quilmes);
-
-        Medium francoM = new Medium("Franco", 100, 20, quilmes);
+        Medium francoM = new Medium("Franco", 100, 20, berazategui);
 
         Medium matiasP = serviceMedium.crear(matiasM, coordenadaMedium);
         Medium francoP = serviceMedium.crear(francoM, coordenadaMedium);
 
-        Espiritu omnimanM = new Angelical("Omniman", quilmes);
+        Espiritu omnimanM = new Angelical("Omniman", berazategui);
         omnimanM.setNivelDeConexion(60);
         Espiritu omnimanP = espirituService.crear(omnimanM, coordenadaEspiritu);
 
-        Espiritu markM = new Demonio("Mark", quilmes);
+        Espiritu markM = new Demonio("Mark", berazategui);
         markM.setNivelDeConexion(50);
         Espiritu markP = espirituService.crear(markM, coordenadaEspiritu);
         // el demonio siempre gana
         RandomDefensa.setEstrategiaNumero(new EstrategiaRangoEspecifico(99, 99));
-
 
         espirituService.conectar(omnimanP.getId(), matiasP.getId());
         espirituService.conectar(markM.getId(), francoP.getId());
@@ -339,9 +361,7 @@ public class MediumServiceTest {
     @Test
     void unMediumNoSePuedeExorcizarASiMismo() {
         // Por una cuestion de comodidad voy a crear el contexto con nuevas variables
-        Ubicacion quilmes = ubicacionService.crear(new Santuario("Quilmes", ENERGIA), coordenadas);
-
-        Medium matiasM = new Medium("Matias", 150, 50, quilmes);
+        Medium matiasM = new Medium("Matias", 150, 50, berazategui);
 
         Medium matiasP = serviceMedium.crear(matiasM, coordenadaMedium);
 
@@ -350,16 +370,12 @@ public class MediumServiceTest {
 
     @Test
     void unMediumNoPuedeExorcizarAOtroEnUbicacionDiferente() {
-        // Por una cuestion de comodidad voy a crear el contexto con nuevas variables
-        Ubicacion quilmes = ubicacionService.crear(new Santuario("Quilmes", ENERGIA), coordenadas);
-        Ubicacion wilde = ubicacionService.crear(new Santuario("Wilde", ENERGIA), coordenadas);
+        Medium matiasM = new Medium("Matias", 150, 50, berazategui);
 
-        Medium matiasM = new Medium("Matias", 150, 50, quilmes);
-
-        Medium francoM = new Medium("Franco", 100, 20, wilde);
+        Medium francoM = new Medium("Franco", 100, 20, bernal);
 
         Medium matiasP = serviceMedium.crear(matiasM, coordenadaMedium);
-        Medium francoP = serviceMedium.crear(francoM, coordenadaMedium);
+        Medium francoP = serviceMedium.crear(francoM, coordenadaMedium2);
 
         assertThrows(ErrorDeMediumExorcizandoAOtroEnDistintaUbicacion.class, () -> serviceMedium.exorcizar(matiasP.getId(), francoP.getId()));
     }
@@ -389,6 +405,10 @@ public class MediumServiceTest {
         Ubicacion ranelagh;
         Ubicacion sourigues;
         Medium mediumAMover;
+        Coordenada coordenadaEspirituA;
+        Coordenada coordenadaMediumA;
+        Coordenada coordenadaEspirituB;
+        Coordenada coordenadaMediumB;
 
         @BeforeEach
         void setUtMover() {
@@ -406,14 +426,21 @@ public class MediumServiceTest {
                     new Coordenada(-34.83, -58.25)
             );
 
+            coordenadaEspirituA = new Coordenada(-34.80, -58.20);
+            coordenadaMediumA = new Coordenada(-34.78, -58.20);
+            coordenadaEspirituB = new Coordenada(-34.85, -58.25);
+            coordenadaMediumB = new Coordenada(-34.83, -58.25);
+
             ranelagh = ubicacionService.crear(new Santuario("Ranelagh", 99), coordsRanelagh);
             sourigues = ubicacionService.crear(new Santuario("Sourigues", 70), coordsSourigues);
+
             ubicacionService.conectar(ranelagh.getId(), sourigues.getId(), 40L);
-            mediumAMover = serviceMedium.crear(new Medium("Matias Sanchez", 100, 90, ranelagh), coordenadaMedium);
+
+            mediumAMover = serviceMedium.crear(new Medium("Matias Sanchez", 100, 90, ranelagh), coordenadaMediumA);
 
             // espiritus que acompañanan a
-            Espiritu elChiqui = espirituService.crear(new Angelical("Chiqui Tapia", ranelagh), coordenadaEspiritu);
-            Espiritu juanchiElPastelero = espirituService.crear(new Angelical("Juanchito", ranelagh), coordenadaEspiritu);
+            Espiritu elChiqui = espirituService.crear(new Angelical("Chiqui Tapia", ranelagh), coordenadaEspirituA);
+            Espiritu juanchiElPastelero = espirituService.crear(new Angelical("Juanchito", ranelagh), coordenadaEspirituA);
 
             espirituService.conectar(elChiqui.getId(), mediumAMover.getId());
             espirituService.conectar(juanchiElPastelero.getId(), mediumAMover.getId());
@@ -498,7 +525,7 @@ public class MediumServiceTest {
 
             Medium mediumMover = serviceMedium.crear(
                     new Medium("Juan", 50, 50, ezpeleta),
-                    new Coordenada(-34.70, -58.28)
+                    new Coordenada(-34.75, -58.21)
             );
 
 
@@ -691,13 +718,13 @@ public class MediumServiceTest {
         @Test
         void fallaSiElEspirituEstaAMasDe50Km() {
 
-            Coordenada coordenadaLejana =
-                    new Coordenada(-35.50, -58.22);
-
             Medium medium = new Medium("Juan", 120, 20, berazategui);
             Medium mediumP = serviceMedium.crear(medium, coordenadaMedium);
 
-            Espiritu espiritu = new Angelical("Matias", berazategui);
+            Coordenada coordenadaLejana = coordenadaEspiritu3;
+            Ubicacion ubiLejana = ubicacionService.crear(new Santuario("Lugar LEJANO", ENERGIA), coordenadas3);
+
+            Espiritu espiritu = new Angelical("Matias", ubiLejana);
             Espiritu espirituP =
                     espirituService.crear(espiritu, coordenadaLejana);
 

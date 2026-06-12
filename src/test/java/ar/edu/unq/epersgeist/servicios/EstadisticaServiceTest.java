@@ -23,13 +23,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class EstadisticaServiceTest {
-    private Espiritu matias;
     private Espiritu juanchi;
     private Espiritu franco;
     private Espiritu yoel;
-
-    private Espiritu chiqui;
-    private Espiritu leonardo;
     private Espiritu nico;
 
     private Ubicacion berazategui;
@@ -47,6 +43,10 @@ public class EstadisticaServiceTest {
     private MediumService mediumService;
 
     private List<Coordenada> coordenadas;
+    private Coordenada coordenadaEspiritu;
+    private Coordenada coordenadaMedium;
+    private List<Coordenada> coordenadas2;
+    private Coordenada coordenadaEspiritu2;
 
 
     @Nested
@@ -59,24 +59,31 @@ public class EstadisticaServiceTest {
                     new Coordenada(-34.82, -58.24),
                     new Coordenada(-34.80, -58.20)
             );
+
+            coordenadaEspiritu = new Coordenada(-34.81, -58.22);
+            coordenadaMedium = new Coordenada(-34.80, -58.20);
+
+            coordenadas2 = List.of(
+                    new Coordenada(-34.91, -58.32),
+                    new Coordenada(-34.92, -58.34),
+                    new Coordenada(-34.90, -58.30)
+            );
+
+            coordenadaEspiritu2 = new Coordenada(-34.91, -58.32);
+
             //ubicaciones
-            berazategui = ubicacionService.crear(new Santuario("Berazategui", 100),coordenadas);
             varela = ubicacionService.crear(new Santuario("Varela", 100),coordenadas);
+            berazategui = ubicacionService.crear(new Santuario("Berazategui", 100),coordenadas2);
 
             //demonios
-            matias = espirituService.crear(new Demonio("Matias", berazategui), new Coordenada(-34.81, -58.22));
-            juanchi = espirituService.crear(new Demonio("juanchi", varela), new Coordenada(-34.82, -58.23));
-            franco = espirituService.crear(new Demonio("franco", varela), new Coordenada(-34.83, -58.24));
-            yoel = espirituService.crear(new Demonio("yoel", varela), new Coordenada(-34.84, -58.25));
-            nico = espirituService.crear(new Demonio("nico", varela), new Coordenada(-34.85, -58.26));
+            juanchi = espirituService.crear(new Demonio("juanchi", varela), coordenadaEspiritu);
+            franco = espirituService.crear(new Demonio("franco", varela), coordenadaEspiritu);
+            yoel = espirituService.crear(new Demonio("yoel", varela), coordenadaEspiritu);
+            nico = espirituService.crear(new Demonio("nico", varela), coordenadaEspiritu);
 
-
-            //angeles
-            chiqui = espirituService.crear(new Angelical("chiqui", berazategui), new Coordenada(-34.86, -58.27));
-            leonardo = espirituService.crear(new Angelical("leonardo", varela), new Coordenada(-34.87, -58.28));
-
-            valentin = mediumService.crear(new Medium("Valentin", 100, 100, varela), new Coordenada(-34.87, -58.29));
-            pancho = mediumService.crear(new Medium("Pancho", 100, 100, varela), new Coordenada(-34.88, -58.30));
+            //mediums
+            valentin = mediumService.crear(new Medium("Valentin", 100, 100, varela), coordenadaMedium);
+            pancho = mediumService.crear(new Medium("Pancho", 100, 100, varela), coordenadaMedium);
 
             espirituService.conectar(juanchi.getId(), valentin.getId());
             espirituService.conectar(yoel.getId(), valentin.getId());
@@ -149,9 +156,9 @@ public class EstadisticaServiceTest {
         void empateEntreSantuariosDevuelveCualquiera() {
             //llegan 3 demonios mas a berazategui y ahora podria darme cualquier
             // santuario el reporte
-            espirituService.crear(new Demonio("benja", berazategui), new Coordenada(-34.89, -58.31));
-            espirituService.crear(new Demonio("fidel", berazategui), new Coordenada(-34.90, -58.32));
-            espirituService.crear(new Demonio("raul", berazategui), new Coordenada(-34.91, -58.33));
+            espirituService.crear(new Demonio("benja", berazategui), coordenadaEspiritu2);
+            espirituService.crear(new Demonio("fidel", berazategui), coordenadaEspiritu2);
+            espirituService.crear(new Demonio("raul", berazategui), coordenadaEspiritu2);
 
             ReporteSantuarioMasCorrupto reporte =
                     estadisticaService.santuarioCorrupto();
