@@ -35,7 +35,7 @@ dependencies {
 
 
     implementation 'net.ravendb:ravendb:7.2.3'
-
+    implementation 'org.apache.commons:commons-lang3:3.18.0'
 }
 
 tasks.test {
