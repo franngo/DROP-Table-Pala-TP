@@ -1,6 +1,6 @@
 package ar.edu.unq.epersgeist.configuration;
 
-import lombok.Value;
+import org.springframework.beans.factory.annotation.Value;
 import net.ravendb.client.documents.DocumentStore;
 import net.ravendb.client.documents.IDocumentStore;
 import org.springframework.context.annotation.Bean;
