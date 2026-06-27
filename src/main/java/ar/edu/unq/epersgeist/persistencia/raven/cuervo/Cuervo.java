@@ -14,7 +14,7 @@ public class Cuervo {
 
     public Cuervo(String nombre, Integer edad) {
         this.nombre = nombre;
-        this.edad = edad;
+        
     }
 
 }
