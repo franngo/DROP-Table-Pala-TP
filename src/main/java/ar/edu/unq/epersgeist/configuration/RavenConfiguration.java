@@ -16,6 +16,11 @@ public class RavenConfiguration {
             @Value("${ravendb.database}") String database
     ) {
 
+        System.out.println("===========================");
+        System.out.println(url);
+        System.out.println(database);
+        System.out.println("===========================");
+
         DocumentStore store = new DocumentStore();
         store.setUrls(new String[]{url});
         store.setDatabase(database);

@@ -1,20 +1,17 @@
 package ar.edu.unq.epersgeist.persistencia.raven.cuervo;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
+@NoArgsConstructor
 public class Cuervo {
     private String id;
     private String nombre;
 
-    public Cuervo() {
-    }
-
-    public Cuervo(String nombre, Integer edad) {
+    public Cuervo(String nombre) {
         this.nombre = nombre;
-        
     }
-
 }

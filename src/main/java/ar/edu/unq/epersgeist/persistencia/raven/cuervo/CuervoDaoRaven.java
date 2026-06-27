@@ -1,9 +1,17 @@
 package ar.edu.unq.epersgeist.persistencia.raven.cuervo;
 
-import org.springframework.stereotype.Repository;
+import java.util.List;
 
-@Repository
 public interface CuervoDaoRaven {
+    Cuervo guardar(Cuervo cuervo);
 
-    Cuervo crear(String nombre);
+    Cuervo actualizar(Cuervo cuervo);
+
+    Cuervo buscarPorId(String id);
+
+    List<Cuervo> recuperarTodos();
+
+    void eliminar(String id);
+
+    void eliminarTodos();
 }
