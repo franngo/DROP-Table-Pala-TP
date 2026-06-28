@@ -73,4 +73,13 @@ public class RavenDAOImpl<T, ID> implements RavenDAO<T, ID> {
             session.saveChanges();
         }
     }
+
+    // --------------------------------------------------------------------------------
+
+    @Override
+    public List<T> findRevisionsById(ID id) {
+        try (IDocumentSession session = store.openSession()) {
+            return session.advanced().revisions().getFor(clazz, String.valueOf(id));
+        }
+    }
 }

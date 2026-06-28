@@ -1,6 +1,6 @@
 package ar.edu.unq.epersgeist.controller;
 
-import ar.edu.unq.epersgeist.persistencia.raven.cuervo.Cuervo;
+import ar.edu.unq.epersgeist.persistencia.raven.Cuervo;
 import ar.edu.unq.epersgeist.servicios.CuervoService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,58 +12,62 @@ import java.util.List;
 @RequestMapping("/cuervos")
 @AllArgsConstructor
 public class CuervoControllerREST {
-
     private final CuervoService cuervoService;
 
-    // ------------------------------------------------------------------------
-
-    @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public List<Cuervo> obtenerTodos() {
-        return cuervoService.obtenerTodos();
-    }
-
-    // ------------------------------------------------------------------------
-
-    @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public Cuervo obtenerPorId(@PathVariable String id) {
-        return cuervoService.obtenerPorId(id);
-    }
-
-    // ------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Cuervo crear(@RequestBody String nombre) {
-        return cuervoService.crear(nombre);
+    public Cuervo crear(@RequestBody CuervoRequest request) {
+        return cuervoService.crear(request.nombre());
     }
 
-    // ------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
 
-    @PutMapping("/{id}")
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Cuervo actualizar(
-            @PathVariable String id,
-            @RequestBody Cuervo cuervo
-    ) {
-        cuervo.setId(id);
-        return cuervoService.actualizar(cuervo);
+    public Cuervo recuperar(@PathVariable Long id) {
+        return cuervoService.recuperar(id);
     }
 
-    // ------------------------------------------------------------------------
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<Cuervo> recuperarTodos() {
+        return cuervoService.recuperarTodos();
+    }
+
+    // --------------------------------------------------------------------------------
+
+    @PutMapping
+    @ResponseStatus(HttpStatus.OK)
+    public void actualizar(@RequestBody Cuervo cuervo) {
+        cuervoService.actualizar(cuervo);
+    }
+
+    // --------------------------------------------------------------------------------
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminar(@PathVariable String id) {
+    public void eliminar(@PathVariable Long id) {
         cuervoService.eliminar(id);
     }
-
-    // ------------------------------------------------------------------------
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void eliminarTodos() {
         cuervoService.eliminarTodos();
+    }
+
+    // --------------------------------------------------------------------------------
+
+    @GetMapping("/{id}/historial")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Cuervo> recuperarHistorial(@PathVariable Long id) {
+        return cuervoService.recuperarHistorial(id);
+    }
+
+    // --------------------------------------------------------------------------------
+
+    public record CuervoRequest(String nombre) {
     }
 }

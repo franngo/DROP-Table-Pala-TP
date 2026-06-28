@@ -1,19 +1,22 @@
 package ar.edu.unq.epersgeist.servicios;
 
-import ar.edu.unq.epersgeist.persistencia.raven.cuervo.Cuervo;
+import ar.edu.unq.epersgeist.persistencia.raven.Cuervo;
 
 import java.util.List;
+
 
 public interface CuervoService {
     Cuervo crear(String nombre);
 
-    Cuervo actualizar(Cuervo cuervo);
+    Cuervo recuperar(Long id);
 
-    Cuervo obtenerPorId(String id);
+    List<Cuervo> recuperarTodos();
 
-    List<Cuervo> obtenerTodos();
+    void actualizar(Cuervo cuervo);
 
-    void eliminar(String id);
+    void eliminar(Long id);
 
     void eliminarTodos();
+
+    List<Cuervo> recuperarHistorial(Long id);
 }

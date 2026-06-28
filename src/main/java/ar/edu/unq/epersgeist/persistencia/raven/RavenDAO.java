@@ -13,4 +13,6 @@ public interface RavenDAO<T, ID> {
     boolean deleteById(ID id);
 
     void deleteAll();
+
+    List<T> findRevisionsById(ID id);
 }

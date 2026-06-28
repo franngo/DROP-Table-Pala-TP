@@ -1,4 +1,4 @@
-package ar.edu.unq.epersgeist.persistencia.raven.cuervo;
+package ar.edu.unq.epersgeist.persistencia.raven;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

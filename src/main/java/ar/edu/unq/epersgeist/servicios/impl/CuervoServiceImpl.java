@@ -1,7 +1,7 @@
 package ar.edu.unq.epersgeist.servicios.impl;
 
-import ar.edu.unq.epersgeist.persistencia.raven.cuervo.Cuervo;
-import ar.edu.unq.epersgeist.persistencia.raven.cuervo.CuervoDaoRaven;
+import ar.edu.unq.epersgeist.persistencia.raven.Cuervo;
+import ar.edu.unq.epersgeist.persistencia.raven.impl.CuervoDaoRavenImpl;
 import ar.edu.unq.epersgeist.servicios.CuervoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,35 +11,54 @@ import java.util.List;
 @Service
 public class CuervoServiceImpl implements CuervoService {
     @Autowired
-    private CuervoDaoRaven dao;
+    private CuervoDaoRavenImpl cuervoDao;
+
+    // --------------------------------------------------------------------------------
 
     @Override
     public Cuervo crear(String nombre) {
-        return dao.guardar(new Cuervo(nombre));
+        Cuervo nuevoCuervo = new Cuervo(nombre);
+        return cuervoDao.save(nuevoCuervo);
+    }
+    // --------------------------------------------------------------------------------
+
+    @Override
+    public Cuervo recuperar(Long id) {
+        return cuervoDao.findById(id)
+                .orElseThrow(() -> new RuntimeException("No se encontró el cuervo con ID: " + id));
     }
 
     @Override
-    public Cuervo actualizar(Cuervo cuervo) {
-        return dao.actualizar(cuervo);
+    public List<Cuervo> recuperarTodos() {
+        return cuervoDao.findAll();
     }
 
-    @Override
-    public Cuervo obtenerPorId(String id) {
-        return dao.buscarPorId(id);
-    }
+    // --------------------------------------------------------------------------------
 
     @Override
-    public List<Cuervo> obtenerTodos() {
-        return dao.recuperarTodos();
+    public void actualizar(Cuervo cuervo) {
+        cuervoDao.save(cuervo);
     }
 
+    // --------------------------------------------------------------------------------
+
     @Override
-    public void eliminar(String id) {
-        dao.eliminar(id);
+    public void eliminar(Long id) {
+        boolean eliminado = cuervoDao.deleteById(id);
+        if (!eliminado) {
+            throw new RuntimeException("No se pudo eliminar: no existe el cuervo con ID: " + id);
+        }
     }
 
     @Override
     public void eliminarTodos() {
-        dao.eliminarTodos();
+        cuervoDao.deleteAll();
+    }
+
+    // --------------------------------------------------------------------------------
+
+    @Override
+    public List<Cuervo> recuperarHistorial(Long id) {
+        return cuervoDao.findRevisionsById(id);
     }
 }
