@@ -1,9 +1,9 @@
-package ar.edu.unq.epersgeist.raven;
+package ar.edu.unq.epersgeist.persistencia.raven;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface RavenGenericDao<T, ID> {
+public interface RavenDAO<T, ID> {
     T save(T entity);
 
     Optional<T> findById(ID id);

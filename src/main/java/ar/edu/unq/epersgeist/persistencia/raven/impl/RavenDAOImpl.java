@@ -1,15 +1,17 @@
-package ar.edu.unq.epersgeist.raven;
+package ar.edu.unq.epersgeist.persistencia.raven.impl;
 
+import ar.edu.unq.epersgeist.persistencia.raven.RavenDAO;
 import net.ravendb.client.documents.IDocumentStore;
 import net.ravendb.client.documents.session.IDocumentSession;
+
 import java.util.List;
 import java.util.Optional;
 
-public class RavenGenericDaoImpl<T, ID> implements RavenGenericDao<T, ID> {
+public class RavenDAOImpl<T, ID> implements RavenDAO<T, ID> {
     protected final IDocumentStore store;
     private final Class<T> clazz;
 
-    public RavenGenericDaoImpl(IDocumentStore store, Class<T> clazz) {
+    public RavenDAOImpl(IDocumentStore store, Class<T> clazz) {
         this.store = store;
         this.clazz = clazz;
     }
