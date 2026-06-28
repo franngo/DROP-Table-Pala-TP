@@ -5,18 +5,21 @@ import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Espiritu.EspirituMongo;
+import ar.edu.unq.epersgeist.modelo.Espiritu.EspirituRaven;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionMongo;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.CoordenadaNoPerteneceAUbicacion;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.persistencia.mongo.EspirituDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.mongo.UbicacionDAOMongo;
+import ar.edu.unq.epersgeist.persistencia.raven.impl.EspirituDAORavenImpl;
 import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAOSQL;
 import ar.edu.unq.epersgeist.persistencia.sql.MediumDAOSQL;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -41,20 +44,26 @@ public class EspirituServiceImpl implements EspirituService {
 
     private UbicacionDAOMongo ubicacionDAOMongo;
 
+    @Autowired
+    private EspirituDAORavenImpl espirituDAORaven;
+
     @Override
     public Espiritu crear(Espiritu espiritu, Coordenada coordenada) {
         this.validarEspiritu(espiritu);
 
-        //Se chequea que la coordenada dada pertenezca al área de la Ubicación del Espiritu
+        // Se chequea que la coordenada dada pertenezca al área de la Ubicación del Espiritu
         List<UbicacionMongo> ubiCord = ubicacionDAOMongo.buscarUbicacionQueContiene(coordenada.getLatitud(), coordenada.getLongitud());
-        if(ubiCord.isEmpty() || !Objects.equals(ubiCord.getFirst().getId(), espiritu.getUbicacion().getId())) {
+        if (ubiCord.isEmpty() || !Objects.equals(ubiCord.getFirst().getId(), espiritu.getUbicacion().getId())) {
             throw new CoordenadaNoPerteneceAUbicacion();
         }
 
         espirituDAOSQL.save(espiritu);
-        espirituDAOMongo.save(new EspirituMongo(espiritu, coordenada));
-        return espiritu;
 
+        espirituDAORaven.save(new EspirituRaven(espiritu, coordenada));
+
+        espirituDAOMongo.save(new EspirituMongo(espiritu, coordenada));
+
+        return espiritu;
     }
 
     private void validarEspiritu(Espiritu espiritu) {

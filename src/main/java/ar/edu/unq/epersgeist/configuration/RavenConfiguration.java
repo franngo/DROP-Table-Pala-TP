@@ -2,6 +2,7 @@ package ar.edu.unq.epersgeist.configuration;
 
 import net.ravendb.client.documents.DocumentStore;
 import net.ravendb.client.documents.IDocumentStore;
+import net.ravendb.client.documents.conventions.DocumentConventions;
 import net.ravendb.client.documents.operations.revisions.ConfigureRevisionsOperation;
 import net.ravendb.client.documents.operations.revisions.RevisionsCollectionConfiguration;
 import net.ravendb.client.documents.operations.revisions.RevisionsConfiguration;
@@ -25,20 +26,21 @@ public class RavenConfiguration {
         store.setDatabase(database);
 
         // Deshabilita las actualizaciones de topología para evitar problemas de conexión en entornos de desarrollo
-        store.setConventions(new net.ravendb.client.documents.conventions.DocumentConventions() {{
+        store.setConventions(new DocumentConventions() {{
             setDisableTopologyUpdates(true);
         }});
 
         store.initialize();
 
-        // Activa el historial (revisiones) automático para la colección Cuervos
+        // Activa el historial (revisiones) automático para cada colección
         store.maintenance().send(
                 new ConfigureRevisionsOperation(
                         new RevisionsConfiguration() {{
-                            setCollections(
-                                    Map.of("Cuervos", new RevisionsCollectionConfiguration() {{
+                            setCollections(Map.of(
+                                    "EspirituRavens", new RevisionsCollectionConfiguration() {{
                                         setDisabled(false);
-                                    }}));
+                                    }}
+                            ));
                         }}
                 ));
 
