@@ -30,6 +30,8 @@ public class RavenConfiguration {
             setDisableTopologyUpdates(true);
         }});
 
+        store.getConventions().setFindIdentityProperty(memberInfo -> Boolean.valueOf("id_de_raven_fantasma"));
+
         store.initialize();
 
         // Activa el historial (revisiones) automático para cada colección
@@ -37,7 +39,7 @@ public class RavenConfiguration {
                 new ConfigureRevisionsOperation(
                         new RevisionsConfiguration() {{
                             setCollections(Map.of(
-                                    "EspirituRavens", new RevisionsCollectionConfiguration() {{
+                                    "Espiritus", new RevisionsCollectionConfiguration() {{
                                         setDisabled(false);
                                     }}
                             ));

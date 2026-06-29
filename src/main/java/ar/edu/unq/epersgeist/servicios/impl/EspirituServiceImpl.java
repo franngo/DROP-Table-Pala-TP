@@ -5,14 +5,13 @@ import ar.edu.unq.epersgeist.modelo.Direccion;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Espiritu.EspirituMongo;
-import ar.edu.unq.epersgeist.modelo.Espiritu.EspirituRaven;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionMongo;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.CoordenadaNoPerteneceAUbicacion;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.persistencia.mongo.EspirituDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.mongo.UbicacionDAOMongo;
-import ar.edu.unq.epersgeist.persistencia.raven.impl.EspirituDAORavenImpl;
+import ar.edu.unq.epersgeist.persistencia.raven.RegistroHistoricoDAO;
 import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAOSQL;
 import ar.edu.unq.epersgeist.persistencia.sql.MediumDAOSQL;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
@@ -45,7 +44,7 @@ public class EspirituServiceImpl implements EspirituService {
     private UbicacionDAOMongo ubicacionDAOMongo;
 
     @Autowired
-    private EspirituDAORavenImpl espirituDAORaven;
+    private RegistroHistoricoDAO registroHistorico;
 
     @Override
     public Espiritu crear(Espiritu espiritu, Coordenada coordenada) {
@@ -59,9 +58,10 @@ public class EspirituServiceImpl implements EspirituService {
 
         espirituDAOSQL.save(espiritu);
 
-        espirituDAORaven.save(new EspirituRaven(espiritu, coordenada));
+        EspirituMongo espirituMongo = espirituDAOMongo.save(new EspirituMongo(espiritu, coordenada));
 
-        espirituDAOMongo.save(new EspirituMongo(espiritu, coordenada));
+        registroHistorico.registrarEstado("espiritus_sql/" + espiritu.getId(), espiritu);
+        registroHistorico.registrarEstado("espiritus_mongo/" + espiritu.getId(), espirituMongo);
 
         return espiritu;
     }
