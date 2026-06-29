@@ -9,6 +9,7 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
+import ar.edu.unq.epersgeist.persistencia.raven.RegistroHistoricoDAO;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,6 +43,9 @@ public class EspirituServiceTest {
     private MediumService mediumService;
     @Autowired
     private UbicacionService ubicacionService;
+
+    @Autowired
+    private RegistroHistoricoDAO registroHistorico;
 
     @BeforeEach
     public void setUp() {
@@ -632,7 +636,7 @@ public class EspirituServiceTest {
         serviceEspiritu.eliminarTodos();
         mediumService.eliminarTodos();
         ubicacionService.eliminarTodos();
-
+        registroHistorico.borrarTodosLosDocumentos();
     }
 
 

@@ -9,6 +9,7 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.NoExisteSantuarioCorruptoException;
 import ar.edu.unq.epersgeist.modelo.reportes.ReporteSantuarioMasCorrupto;
+import ar.edu.unq.epersgeist.persistencia.raven.RegistroHistoricoDAO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -41,6 +42,9 @@ public class EstadisticaServiceTest {
     private EspirituService espirituService;
     @Autowired
     private MediumService mediumService;
+
+    @Autowired
+    private RegistroHistoricoDAO registroHistorico;
 
     private List<Coordenada> coordenadas;
     private Coordenada coordenadaEspiritu;
@@ -203,7 +207,7 @@ public class EstadisticaServiceTest {
         espirituService.eliminarTodos();
         mediumService.eliminarTodos();
         ubicacionService.eliminarTodos();
-
+        registroHistorico.borrarTodosLosDocumentos();
     }
 
 }

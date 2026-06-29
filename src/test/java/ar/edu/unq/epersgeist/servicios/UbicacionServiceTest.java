@@ -10,6 +10,7 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.*;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
+import ar.edu.unq.epersgeist.persistencia.raven.RegistroHistoricoDAO;
 import org.bson.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,6 +52,9 @@ public class UbicacionServiceTest {
 
     @Autowired
     private MediumService mediumService;
+
+    @Autowired
+    private RegistroHistoricoDAO registroHistorico;
 
     // --------------------------------------------------------------------------------
     // ATRIBUTOS
@@ -331,6 +335,7 @@ public class UbicacionServiceTest {
         void tearDown() {
             espirituService.eliminarTodos();
             ubicacionService.eliminarTodos();
+            registroHistorico.borrarTodosLosDocumentos();
         }
 
         // --------------------------------------------------------------------------------
@@ -398,6 +403,7 @@ public class UbicacionServiceTest {
             espirituService.eliminarTodos();
             mediumService.eliminarTodos();
             ubicacionService.eliminarTodos();
+            registroHistorico.borrarTodosLosDocumentos();
         }
         // --------------------------------------------------------------------------------
 

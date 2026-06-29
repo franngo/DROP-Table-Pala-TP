@@ -8,4 +8,6 @@ public interface RegistroHistoricoDAO {
     <T> T obtenerEstadoEnFecha(Class<T> claseEntidad, String ravenId, java.util.Date fecha);
 
     void eliminarRegistroDePrueba(String ravenId);
+
+    void borrarTodosLosDocumentos();
 }

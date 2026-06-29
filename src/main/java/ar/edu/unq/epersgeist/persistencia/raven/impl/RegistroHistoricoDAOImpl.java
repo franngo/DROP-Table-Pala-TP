@@ -1,6 +1,7 @@
 package ar.edu.unq.epersgeist.persistencia.raven.impl;
 
 import ar.edu.unq.epersgeist.persistencia.raven.RegistroHistoricoDAO;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import net.ravendb.client.documents.IDocumentStore;
 import net.ravendb.client.documents.session.IDocumentSession;
 import org.springframework.stereotype.Repository;
@@ -21,7 +22,7 @@ public class RegistroHistoricoDAOImpl implements RegistroHistoricoDAO {
     /**
      * C (CREATE / UPDATE) de la historia.
      * Guarda el estado actual de cualquier entidad. Si el Revisioning está activo en RavenDB,
-     * este método generará automáticamente una nueva revisión (un hito en la historia).
+     * este method generará automáticamente una nueva revisión (un hito en la historia).
      */
     public void registrarEstado(String ravenId, Object entidad) {
         try (IDocumentSession session = documentStore.openSession()) {
@@ -36,7 +37,7 @@ public class RegistroHistoricoDAOImpl implements RegistroHistoricoDAO {
      */
     public <T> List<T> obtenerHistorial(Class<T> claseEntidad, String ravenId) {
         try (IDocumentSession session = documentStore.openSession()) {
-            // El método nativo de RavenDB .getFor() te trae el historial inmutable
+            // El method nativo de RavenDB .getFor() te trae el historial inmutable
             return session.advanced().revisions().getFor(claseEntidad, ravenId);
         }
     }
@@ -59,6 +60,22 @@ public class RegistroHistoricoDAOImpl implements RegistroHistoricoDAO {
     public void eliminarRegistroDePrueba(String ravenId) {
         try (IDocumentSession session = documentStore.openSession()) {
             session.delete(ravenId);
+            session.saveChanges();
+        }
+    }
+
+    public void borrarTodosLosDocumentos() {
+        try (IDocumentSession session = documentStore.openSession()) {
+            List<ObjectNode> documentos = session
+                    .advanced()
+                    .rawQuery(ObjectNode.class, "from @all_docs")
+                    .toList();
+
+            for (ObjectNode documento : documentos) {
+                String id = documento.get("@metadata").get("@id").asText();
+                session.delete(id);
+            }
+
             session.saveChanges();
         }
     }

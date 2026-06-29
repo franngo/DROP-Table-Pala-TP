@@ -16,6 +16,7 @@ import ar.edu.unq.epersgeist.modelo.medium.MediumMongo;
 import ar.edu.unq.epersgeist.modelo.random.Estrategia.EstrategiaRangoEspecifico;
 import ar.edu.unq.epersgeist.modelo.random.RandomDefensa;
 import ar.edu.unq.epersgeist.persistencia.mongo.MediumDAOMongo;
+import ar.edu.unq.epersgeist.persistencia.raven.RegistroHistoricoDAO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -39,6 +40,9 @@ public class MediumServiceTest {
     private MediumService serviceMedium;
     @Autowired
     private UbicacionService ubicacionService;
+
+    @Autowired
+    private RegistroHistoricoDAO registroHistorico;
 
     private Ubicacion berazategui;
     private Ubicacion bernal;
@@ -803,7 +807,7 @@ public class MediumServiceTest {
         espirituService.eliminarTodos();
         serviceMedium.eliminarTodos();
         ubicacionService.eliminarTodos();
-
+        registroHistorico.borrarTodosLosDocumentos();
     }
 
 
