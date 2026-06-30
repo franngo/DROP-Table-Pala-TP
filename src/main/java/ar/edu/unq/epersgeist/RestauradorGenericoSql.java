@@ -5,6 +5,11 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import java.lang.reflect.Field;
+import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.lang.reflect.Modifier;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -88,6 +93,90 @@ public class RestauradorGenericoSql {
      * @return lista de campos persistentes mapeados para inserción SQL
      */
     private List<CampoPersistente> analizarEntidad(Class<?> tipo) {
-        return null;
+
+        List<CampoPersistente> campos = new ArrayList<>();
+
+        // Incluye campos heredados (ej: Auditable)
+        Class<?> claseActual = tipo;
+        while (claseActual != null && claseActual != Object.class) {
+
+            for (Field field : claseActual.getDeclaredFields()) {
+                field.setAccessible(true);
+
+                // Ignorar static o transient
+                if (Modifier.isStatic(field.getModifiers()) ||
+                        Modifier.isTransient(field.getModifiers())) {
+                    continue;
+                }
+
+                // Ignorar colecciones (OneToMany, ManyToMany)
+                if (Collection.class.isAssignableFrom(field.getType())) {
+                    continue;
+                }
+
+                CampoPersistente cp = new CampoPersistente();
+                cp.setField(field);
+
+                // =========================
+                // ID
+                // =========================
+                if (field.isAnnotationPresent(Id.class)) {
+                    cp.setEsId(true);
+                    cp.setNombreColumna("id");
+                    campos.add(cp);
+                    continue;
+                }
+
+                // =========================
+                // ManyToOne -> FK
+                // =========================
+                if (field.isAnnotationPresent(ManyToOne.class)) {
+                    cp.setEsManyToOne(true);
+
+                    JoinColumn join = field.getAnnotation(JoinColumn.class);
+                    if (join != null && !join.name().isEmpty()) {
+                        cp.setNombreColumna(join.name());
+                    } else {
+                        cp.setNombreColumna(field.getName() + "_id");
+                    }
+
+                    campos.add(cp);
+                    continue;
+                }
+
+                // =========================
+                // Discriminador (SINGLE_TABLE)
+                // =========================
+                if (tipo.getSuperclass() != null &&
+                        tipo.getSuperclass().isAnnotationPresent(Inheritance.class)) {
+
+                    DiscriminatorColumn disc =
+                            tipo.getSuperclass().getAnnotation(DiscriminatorColumn.class);
+
+                    if (disc != null && field.getName().equals(disc.name())) {
+                        cp.setEsDiscriminador(true);
+                        cp.setNombreColumna(disc.name());
+                        campos.add(cp);
+                        continue;
+                    }
+                }
+
+                // =========================
+                // Column normal
+                // =========================
+                Column column = field.getAnnotation(Column.class);
+                if (column != null && !column.name().isEmpty()) {
+                    cp.setNombreColumna(column.name());
+                } else {
+                    cp.setNombreColumna(field.getName());
+                }
+
+                campos.add(cp);
+            }
+
+            claseActual = claseActual.getSuperclass();
+        }
+
+        return campos;
     }
 }
