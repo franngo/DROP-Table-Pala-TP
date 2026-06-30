@@ -79,4 +79,12 @@ public class RegistroHistoricoControllerREST {
     // ============================================================================
     // HITO 2 (PARTE B): EL BOTÓN DE RESTAURACIÓN GLOBAL (Viaje en el tiempo)
     // ============================================================================
+
+    @PostMapping("/restaurar")
+    @ResponseStatus(HttpStatus.OK)
+    public void restaurarSistemaAFecha(
+            @RequestParam("fecha") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fecha
+    ) {
+        restauracionService.restaurarSistemaAFecha(fecha);
+    }
 }

@@ -1,5 +1,7 @@
 package ar.edu.unq.epersgeist.servicios;
 
+import java.time.LocalDateTime;
+
 public interface RestauracionService {
 
     /**
@@ -7,5 +9,5 @@ public interface RestauracionService {
      * Borra el estado actual de todas las bases de datos de la aplicación (SQL, Mongo, Neo4j)
      * y reconstruye el universo completo exactamente como estaba en la fecha especificada.
      */
-//    void restaurarSistemaAFecha(LocalDateTime fecha);
+    void restaurarSistemaAFecha(LocalDateTime fecha);
 }
