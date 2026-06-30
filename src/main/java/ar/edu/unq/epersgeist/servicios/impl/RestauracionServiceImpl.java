@@ -20,6 +20,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -77,7 +78,7 @@ public class RestauracionServiceImpl implements RestauracionService {
         // PASO 1: LEER TODOS LOS PLANOS DEL PASADO (Desde la caja negra en RavenDB)
         // ============================================================================
 
-        List<String> idsUbicacionesSQL = registroHistoricoService.obtenerTodosLosIdsDeColeccion("Santuarios");
+        List<String> idsUbicacionesSQL = new ArrayList<String>(registroHistoricoService.obtenerTodosLosIdsDeColeccion("Santuarios"));
         List<String> idsUbicacionesSQL2 = registroHistoricoService.obtenerTodosLosIdsDeColeccion("Cementerios");
         idsUbicacionesSQL.addAll(idsUbicacionesSQL2);
         List<Ubicacion> ubicacionesSQL = recuperarFotosDelPasado(Ubicacion.class, idsUbicacionesSQL, fecha);
@@ -98,7 +99,7 @@ public class RestauracionServiceImpl implements RestauracionService {
 
         // ----------------------------------------
 
-        List<String> idsEspiritusSQL = registroHistoricoService.obtenerTodosLosIdsDeColeccion("Angelicals");
+        List<String> idsEspiritusSQL = new ArrayList<String>(registroHistoricoService.obtenerTodosLosIdsDeColeccion("Angelicals"));
         List<String> idsEspiritusSQL2 = registroHistoricoService.obtenerTodosLosIdsDeColeccion("Demonios");
         idsEspiritusSQL.addAll(idsEspiritusSQL2);
         List<Espiritu> espiritusSQL = recuperarFotosDelPasado(Espiritu.class, idsEspiritusSQL, fecha);
