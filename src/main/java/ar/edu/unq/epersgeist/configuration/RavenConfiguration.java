@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Map;
-
 @Configuration
 public class RavenConfiguration {
 
@@ -25,26 +23,39 @@ public class RavenConfiguration {
         store.setUrls(new String[]{url});
         store.setDatabase(database);
 
+        // --------------------------------------------------------------------------------
         // Deshabilita las actualizaciones de topología para evitar problemas de conexión en entornos de desarrollo
+        // --------------------------------------------------------------------------------
+        
         store.setConventions(new DocumentConventions() {{
             setDisableTopologyUpdates(true);
         }});
 
-        store.getConventions().setFindIdentityProperty(memberInfo -> Boolean.valueOf("id_de_raven_fantasma"));
+        // --------------------------------------------------------------------------------
+        // Deshabilita las actualizaciones de topología para evitar problemas de conexión en entornos de desarrollo
+        // --------------------------------------------------------------------------------
+
+        store.getConventions().setFindIdentityProperty(
+                memberInfo -> Boolean.valueOf("id_de_raven_fantasma")
+        );
 
         store.initialize();
 
-        // Activa el historial (revisiones) automático para cada colección
+        // --------------------------------------------------------------------------------
+        // Activa las revisiones para ABSOLUTAMENTE TODAS las colecciones creadas
+        // --------------------------------------------------------------------------------
+
         store.maintenance().send(
                 new ConfigureRevisionsOperation(
                         new RevisionsConfiguration() {{
-                            setCollections(Map.of(
-                                    "Espiritus", new RevisionsCollectionConfiguration() {{
-                                        setDisabled(false);
-                                    }}
-                            ));
+                            setDefaultConfig(new RevisionsCollectionConfiguration() {{
+                                setDisabled(false);
+                                setMinimumRevisionsToKeep(25L);
+                            }});
                         }}
                 ));
+
+        // --------------------------------------------------------------------------------
 
         return store;
     }

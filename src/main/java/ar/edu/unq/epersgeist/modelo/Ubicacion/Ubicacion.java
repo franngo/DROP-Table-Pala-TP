@@ -2,6 +2,8 @@ package ar.edu.unq.epersgeist.modelo.Ubicacion;
 
 import ar.edu.unq.epersgeist.controller.dtos.ubicaciones.request.TipoUbicacion;
 import ar.edu.unq.epersgeist.modelo.Auditable;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -18,6 +20,18 @@ import lombok.Setter;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "tipo_ubicacion")
+
+// --------------------------------------------------------------------------------
+
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "tipoUbicacion"
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Santuario.class, name = "SANTUARIO"),
+        @JsonSubTypes.Type(value = Cementerio.class, name = "CEMENTERIO")
+})
 
 // --------------------------------------------------------------------------------
 
