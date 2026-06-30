@@ -114,6 +114,7 @@ public class RestauracionServiceImpl implements RestauracionService {
         // A. Primero Espíritus
 //        espirituDAOMongo.deleteAll();
         espirituDAOSQL.deleteAll();
+        System.out.println(espirituDAOSQL.count());
 
         // B. Luego eliminamos los Médiums
 //        mediumDAOMongo.deleteAll();
@@ -123,6 +124,8 @@ public class RestauracionServiceImpl implements RestauracionService {
 //        ubicacionDAOMongo.deleteAll();
 //        ubicacionDAONeo4j.deleteAll();
         ubicacionDAOSQL.deleteAll();
+        System.out.println(ubicacionDAOSQL.count());
+
 
         // ============================================================================
         // PASO 3: RECONSTRUCCIÓN CRONOLÓGICA (Siguiendo las restricciones de integridad)
@@ -133,6 +136,9 @@ public class RestauracionServiceImpl implements RestauracionService {
         // ----------------------------------------
 
         ubicacionDAOSQL.saveAll(ubicacionesSQL);
+        ubicacionDAOSQL.findAll().forEach(u ->
+                System.out.println(u.getId() + " - " + u.getNombre())
+        );
         espirituDAOSQL.flush();
 
 //        for (UbicacionNeo4j u : ubicacionesNeo) {
