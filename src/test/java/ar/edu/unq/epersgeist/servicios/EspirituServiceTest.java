@@ -514,6 +514,14 @@ public class EspirituServiceTest {
     // dominar()
     // --------------------------------------------------------------------------------
 
+    @AfterEach
+    void tearDown() {
+        serviceEspiritu.eliminarTodos();
+        mediumService.eliminarTodos();
+        ubicacionService.eliminarTodos();
+        registroHistorico.reiniciarBaseDeDatos();
+    }
+
     @Nested
     class Dominar {
 
@@ -628,15 +636,6 @@ public class EspirituServiceTest {
                     )
             );
         }
-    }
-
-
-    @AfterEach
-    void tearDown() {
-        serviceEspiritu.eliminarTodos();
-        mediumService.eliminarTodos();
-        ubicacionService.eliminarTodos();
-        registroHistorico.borrarTodosLosDocumentos();
     }
 
 

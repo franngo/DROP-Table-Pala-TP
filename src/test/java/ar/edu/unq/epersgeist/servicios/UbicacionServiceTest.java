@@ -335,7 +335,7 @@ public class UbicacionServiceTest {
         void tearDown() {
             espirituService.eliminarTodos();
             ubicacionService.eliminarTodos();
-            registroHistorico.borrarTodosLosDocumentos();
+            registroHistorico.reiniciarBaseDeDatos();
         }
 
         // --------------------------------------------------------------------------------
@@ -403,7 +403,7 @@ public class UbicacionServiceTest {
             espirituService.eliminarTodos();
             mediumService.eliminarTodos();
             ubicacionService.eliminarTodos();
-            registroHistorico.borrarTodosLosDocumentos();
+            registroHistorico.reiniciarBaseDeDatos();
         }
         // --------------------------------------------------------------------------------
 
@@ -1149,10 +1149,9 @@ public class UbicacionServiceTest {
     @Nested
     class UbicacionesFrias {
 
+        private static final double UMBRAL = 5.0;
         @Autowired
         private MongoTemplate mongoTemplate;
-
-        private static final double UMBRAL = 5.0;
 
         @BeforeEach
         void setUp() {
@@ -1447,11 +1446,9 @@ public class UbicacionServiceTest {
 
     @Nested
     class UbicacionesConflictivas {
+        private static final Integer UMBRAL = 90;
         @Autowired
         private MongoTemplate mongoTemplate;
-
-        private static final Integer UMBRAL = 90;
-
 
         @BeforeEach
         void setUp() {
@@ -1487,7 +1484,6 @@ public class UbicacionServiceTest {
                     );
         }
 
-        
 
         // ------------------------------------------------------------
         // CASO 1: retorna ubicaciones con decibeles altos
@@ -1574,12 +1570,11 @@ public class UbicacionServiceTest {
     // --------------------------------------------------------------------------------
 
     @Nested
-    class Normalize{
-        @Autowired
-        private MongoTemplate mongoTemplate;
-
+    class Normalize {
         private static final double TOPE_DECIBELES = 90.0;
         private static final double TOPE_TEMPERATURA = 5.0;
+        @Autowired
+        private MongoTemplate mongoTemplate;
 
         @BeforeEach
         void setUp() {

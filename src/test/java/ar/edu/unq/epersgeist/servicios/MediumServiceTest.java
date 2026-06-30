@@ -9,10 +9,8 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
-import ar.edu.unq.epersgeist.modelo.medium.MediumMongo;
 import ar.edu.unq.epersgeist.modelo.random.Estrategia.EstrategiaRangoEspecifico;
 import ar.edu.unq.epersgeist.modelo.random.RandomDefensa;
 import ar.edu.unq.epersgeist.persistencia.mongo.MediumDAOMongo;
@@ -402,6 +400,13 @@ public class MediumServiceTest {
         assertTrue(es.stream().anyMatch((e) -> e.getId().equals(jaegerP.getId())));
     }
 
+    @AfterEach
+    void tearDown() {
+        espirituService.eliminarTodos();
+        serviceMedium.eliminarTodos();
+        ubicacionService.eliminarTodos();
+        registroHistorico.reiniciarBaseDeDatos();
+    }
 
     @Nested
     public class MoverConActualizacionDeUbicaciones {
@@ -799,15 +804,6 @@ public class MediumServiceTest {
             serviceMedium.eliminarTodos();
             ubicacionService.eliminarTodos();
         }
-    }
-
-
-    @AfterEach
-    void tearDown() {
-        espirituService.eliminarTodos();
-        serviceMedium.eliminarTodos();
-        ubicacionService.eliminarTodos();
-        registroHistorico.borrarTodosLosDocumentos();
     }
 
 

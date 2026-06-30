@@ -1,13 +1,12 @@
 package ar.edu.unq.epersgeist.servicios;
 
 import ar.edu.unq.epersgeist.modelo.Coordenada;
-import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.NoExisteSantuarioCorruptoException;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.reportes.ReporteSantuarioMasCorrupto;
 import ar.edu.unq.epersgeist.persistencia.raven.RegistroHistoricoDAO;
 import org.junit.jupiter.api.AfterEach;
@@ -52,6 +51,13 @@ public class EstadisticaServiceTest {
     private List<Coordenada> coordenadas2;
     private Coordenada coordenadaEspiritu2;
 
+    @AfterEach
+    void tearDown() {
+        espirituService.eliminarTodos();
+        mediumService.eliminarTodos();
+        ubicacionService.eliminarTodos();
+        registroHistorico.reiniciarBaseDeDatos();
+    }
 
     @Nested
     class CasosExitosos {
@@ -76,8 +82,8 @@ public class EstadisticaServiceTest {
             coordenadaEspiritu2 = new Coordenada(-34.91, -58.32);
 
             //ubicaciones
-            varela = ubicacionService.crear(new Santuario("Varela", 100),coordenadas);
-            berazategui = ubicacionService.crear(new Santuario("Berazategui", 100),coordenadas2);
+            varela = ubicacionService.crear(new Santuario("Varela", 100), coordenadas);
+            berazategui = ubicacionService.crear(new Santuario("Berazategui", 100), coordenadas2);
 
             //demonios
             juanchi = espirituService.crear(new Demonio("juanchi", varela), coordenadaEspiritu);
@@ -200,14 +206,6 @@ public class EstadisticaServiceTest {
             );
         }
 
-    }
-    
-    @AfterEach
-    void tearDown() {
-        espirituService.eliminarTodos();
-        mediumService.eliminarTodos();
-        ubicacionService.eliminarTodos();
-        registroHistorico.borrarTodosLosDocumentos();
     }
 
 }
