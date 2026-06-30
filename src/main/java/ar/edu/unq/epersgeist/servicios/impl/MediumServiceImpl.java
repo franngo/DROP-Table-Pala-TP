@@ -2,25 +2,26 @@ package ar.edu.unq.epersgeist.servicios.impl;
 
 import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionMongo;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.CoordenadaNoPerteneceAUbicacion;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
-import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionMongo;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.CoordenadaNoPerteneceAUbicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.medium.MediumMongo;
 import ar.edu.unq.epersgeist.persistencia.mongo.EspirituDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.mongo.MediumDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.mongo.UbicacionDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
+import ar.edu.unq.epersgeist.persistencia.raven.RegistroHistoricoDAO;
 import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAOSQL;
 import ar.edu.unq.epersgeist.persistencia.sql.MediumDAOSQL;
 import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
 import ar.edu.unq.epersgeist.servicios.MediumService;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.stereotype.Service;
 
@@ -33,10 +34,13 @@ public class MediumServiceImpl implements MediumService {
     private final MediumDAOSQL mediumDAOSQL;
     private final MediumDAOMongo mediumDAOMongo;
     private final EspirituDAOSQL espirituDAOSQL;
-    private final EspirituDAOMongo espirituDAOMongo;;
+    private final EspirituDAOMongo espirituDAOMongo;
     private final UbicacionDAOSQL ubicacionDAOSQL;
     private final UbicacionDAONeo4j ubicacionDAONeo4j;
     private final UbicacionDAOMongo ubicacionDAOMongo;
+
+    @Autowired
+    private RegistroHistoricoDAO registroHistorico;
 
     public MediumServiceImpl(
             MediumDAOSQL mediumDAOSQL,
@@ -66,15 +70,21 @@ public class MediumServiceImpl implements MediumService {
             throw new ErrorAlCrearMediumException("ya tiene un id asignado.");
         }
 
-        //Se chequea que la coordenada dada pertenezca al área de la Ubicación del Medium
+        // Se chequea que la coordenada dada pertenezca al área de la Ubicación del Medium
         List<UbicacionMongo> ubiCord = ubicacionDAOMongo.buscarUbicacionQueContiene(coordenada.getLatitud(), coordenada.getLongitud());
-        if(ubiCord.isEmpty() || !Objects.equals(ubiCord.getFirst().getId(), medium.getUbicacion().getId())) {
+        if (ubiCord.isEmpty() || !Objects.equals(ubiCord.getFirst().getId(), medium.getUbicacion().getId())) {
             throw new CoordenadaNoPerteneceAUbicacion();
         }
 
         mediumDAOSQL.save(medium);
 
-        mediumDAOMongo.save(new MediumMongo(medium, coordenada));
+        MediumMongo mediumMongo = mediumDAOMongo.save(new MediumMongo(medium, coordenada));
+
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+        registroHistorico.registrarEstado("mediums_sql/" + medium.getId(), medium);
+        registroHistorico.registrarEstado("mediums_mongo/" + medium.getId(), mediumMongo);
 
         return medium;
     }
@@ -91,11 +101,20 @@ public class MediumServiceImpl implements MediumService {
             throw new ErrorAlActualizarMediumSinIdException("No se puede actualizar un medium que no tiene id.");
         }
 
-        //lo intento recuperar solo para saber si está o no en la DB y si debo tirar el error
+        // Lo intento recuperar solo para saber si está o no en la DB y si debo tirar el error
         Long idMedium = medium.getId();
         mediumDAOSQL.findById(idMedium).orElseThrow(() -> new ErrorAlActualizarMediumException("No existe en la BD el medium con id: " + idMedium));
 
         this.mediumDAOSQL.save(medium);
+
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+        mediumDAOMongo.findById(idMedium).ifPresent(mediumMongo -> {
+            registroHistorico.registrarEstado("mediums_mongo/" + idMedium, mediumMongo);
+        });
+
+        registroHistorico.registrarEstado("mediums_sql/" + medium.getId(), medium);
     }
 
     @Override
@@ -103,9 +122,19 @@ public class MediumServiceImpl implements MediumService {
         Medium medium = this.recuperar(idMedium);
         medium.setDeletedAt(true);
         mediumDAOSQL.save(medium);
-        mediumDAOMongo.deleteById(idMedium);
-    }
 
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+        mediumDAOMongo.findById(idMedium).ifPresent(mediumMongo -> {
+            registroHistorico.registrarEstado("mediums_mongo/" + idMedium, mediumMongo);
+        });
+
+        mediumDAOMongo.deleteById(idMedium);
+
+        registroHistorico.registrarEstado("mediums_sql/" + medium.getId(), medium);
+    }
+    
     @Override
     public List<Medium> recuperarTodos() {
         return mediumDAOSQL.findAll();
@@ -217,7 +246,7 @@ public class MediumServiceImpl implements MediumService {
 
             // Calculo si esta a menos de 30km de distacia
             mediumDAOMongo.mediumDentroDeDistancia(mediumId, latitud, longitud, 30000.0)
-                    .orElseThrow(()->
+                    .orElseThrow(() ->
                             new UbicacionLejanaException("La ubicacion esta a mas de 30km"));
 
             // calculo el costo de moverse

@@ -60,6 +60,10 @@ public class EspirituServiceImpl implements EspirituService {
 
         EspirituMongo espirituMongo = espirituDAOMongo.save(new EspirituMongo(espiritu, coordenada));
 
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+        
         registroHistorico.registrarEstado("espiritus_sql/" + espiritu.getId(), espiritu);
         registroHistorico.registrarEstado("espiritus_mongo/" + espiritu.getId(), espirituMongo);
 
@@ -94,6 +98,16 @@ public class EspirituServiceImpl implements EspirituService {
         espirituDAOSQL.findById(espirituId).orElseThrow(() -> new ErrorAlActualizarEspirituException("No existe en la BD el espiritu con id: " + espirituId));
 
         this.espirituDAOSQL.save(espiritu);
+
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+
+        espirituDAOMongo.findById(espirituId).ifPresent(espirituMongo -> {
+            registroHistorico.registrarEstado("espiritus_mongo/" + espirituId, espirituMongo);
+        });
+
+        registroHistorico.registrarEstado("espiritus_sql/" + espiritu.getId(), espiritu);
     }
 
     @Override
@@ -102,8 +116,18 @@ public class EspirituServiceImpl implements EspirituService {
         Espiritu espiritu = this.recuperar(espirituId);
         espiritu.setDeletedAt(true);
         espirituDAOSQL.save(espiritu);
+
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+
+        espirituDAOMongo.findById(espirituId).ifPresent(espirituMongo -> {
+            registroHistorico.registrarEstado("espiritus_mongo/" + espirituId, espirituMongo);
+        });
+
         espirituDAOMongo.deleteById(espirituId);
 
+        registroHistorico.registrarEstado("espiritus_sql/" + espiritu.getId(), espiritu);
     }
 
     @Override
