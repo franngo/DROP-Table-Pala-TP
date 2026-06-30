@@ -63,7 +63,7 @@ public class EspirituServiceImpl implements EspirituService {
         // ----------------------------------------
         // REGISTRO HISTORICO
         // ----------------------------------------
-        
+
         registroHistorico.registrarEstado("espiritus_sql/" + espiritu.getId(), espiritu);
         registroHistorico.registrarEstado("espiritus_mongo/" + espiritu.getId(), espirituMongo);
 
@@ -156,8 +156,14 @@ public class EspirituServiceImpl implements EspirituService {
             throw new EspirituDominadoException();
         }
 
-        //las validaciones sobre si está libre y en la misma ubicación se dan en el method del modelo.
+        // Las validaciones sobre si está libre y en la misma ubicación se dan en el method del modelo.
         espirituEncontrado.aumentarConexionYConectar(mediumEncontrado);
+
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+
+        registroHistorico.registrarEstado("espiritus_sql/" + espirituEncontrado.getId(), espirituEncontrado);
 
         return mediumDAOSQL.save(mediumEncontrado);
     }
@@ -223,6 +229,12 @@ public class EspirituServiceImpl implements EspirituService {
         }
 
         espirituDominante.dominar(espirituADominar, distanciaEspiritus);
-    }
 
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+
+        registroHistorico.registrarEstado("espiritus_sql/" + espirituDominante.getId(), espirituDominante);
+        registroHistorico.registrarEstado("espiritus_sql/" + espirituADominar.getId(), espirituADominar);
+    }
 }

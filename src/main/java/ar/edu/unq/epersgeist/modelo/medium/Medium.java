@@ -9,6 +9,7 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeInvocacionDeEspirituException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorManaMayorQueManaMaxAlCrearMedium;
 import ar.edu.unq.epersgeist.modelo.exceptions.ExorcistaSinAngelesException;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,6 +39,7 @@ public class Medium extends Auditable implements Serializable {
     private String nombre;
     private Integer manaMax;
     private Integer mana;
+    @JsonIgnoreProperties("mediumCon") // <-- PARA RAVEN
     @OneToMany(mappedBy = "mediumCon", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Espiritu> espiritus;
     @ManyToOne

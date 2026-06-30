@@ -8,6 +8,7 @@ import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDominacionInvalidaCandidatoN
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDominacionInvalidaPorDistanciaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionInvalidaException;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,7 @@ public abstract class Espiritu extends Auditable implements Serializable {
     private Long id;
     private double nivelDeConexion;
     private String nombre;
+    @JsonIgnoreProperties("espiritus") // <-- PARA RAVEN
     @ManyToOne
     @JoinColumn(name = "mediumCon_id")
     private Medium mediumCon;

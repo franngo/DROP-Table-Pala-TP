@@ -134,7 +134,7 @@ public class MediumServiceImpl implements MediumService {
 
         registroHistorico.registrarEstado("mediums_sql/" + medium.getId(), medium);
     }
-    
+
     @Override
     public List<Medium> recuperarTodos() {
         return mediumDAOSQL.findAll();
@@ -197,8 +197,14 @@ public class MediumServiceImpl implements MediumService {
         }
 
         mediumAtacante.exorcizar(mediumAExorcizar);
-    }
 
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+
+        registroHistorico.registrarEstado("mediums_sql/" + mediumAtacante.getId(), mediumAtacante);
+        registroHistorico.registrarEstado("mediums_sql/" + mediumAExorcizar.getId(), mediumAExorcizar);
+    }
 
     @Override
     public List<Espiritu> espiritus(Long mediumId) {
@@ -281,6 +287,13 @@ public class MediumServiceImpl implements MediumService {
             } else {
                 mediumDAOSQL.save(mediumAMover);
                 mediumDAOMongo.actualizarCoordenada(mediumId, longitud, latitud);
+
+                // ----------------------------------------
+                // REGISTRO HISTORICO
+                // ----------------------------------------
+
+                registroHistorico.registrarEstado("mediums_sql/" + mediumAMover.getId(), mediumAMover);
+                registroHistorico.registrarEstado("mediums_mongo/" + mediumId, mediumMongo);
             }
         }
     }
