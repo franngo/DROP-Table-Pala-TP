@@ -25,10 +25,9 @@ public class RestauradorGenericoSql {
 
         Class<?> tipo = entidades.getFirst().getClass();
 
-//        String tabla = obtenerNombreTabla(tipo);
-//
-          String sql = "a";
-//        = construirInsert(tipo);
+        String tabla = obtenerNombreTabla(tipo);
+
+        String sql = construirInsert(tipo);
 
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
 
@@ -37,7 +36,7 @@ public class RestauradorGenericoSql {
 
                 T entidad = entidades.get(i);
 
-//                cargarParametros(ps, entidad);
+                cargarParametros(ps, entidad);
             }
 
             @Override
@@ -46,6 +45,24 @@ public class RestauradorGenericoSql {
             }
         });
 
-//        sincronizarSecuencia(tabla);
+        sincronizarSecuencia(tabla);
+    }
+
+    private String obtenerNombreTabla(Class<?> tipo) {
+        // devuelve el nombre de la tabla SQL asociada a la entidad raíz
+        return null;
+    }
+
+    private String construirInsert(Class<?> tipo) {
+        // construye dinámicamente el SQL INSERT según los campos persistidos
+        return null;
+    }
+
+    private void cargarParametros(PreparedStatement ps, Object entidad) throws SQLException {
+        // carga los valores de la entidad en el PreparedStatement
+    }
+
+    private void sincronizarSecuencia(String tabla) {
+        // ajusta la sequence de PostgreSQL al MAX(id) de la tabla
     }
 }
