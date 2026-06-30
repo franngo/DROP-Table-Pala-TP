@@ -92,7 +92,7 @@ public class RestauradorGenericoSql {
      * @param tipo clase de entidad JPA concreta o base
      * @return lista de campos persistentes mapeados para inserción SQL
      */
-    private List<CampoPersistente> analizarEntidad(Class<?> tipo) {
+    public List<CampoPersistente> analizarEntidad(Class<?> tipo) {
 
         List<CampoPersistente> campos = new ArrayList<>();
 
