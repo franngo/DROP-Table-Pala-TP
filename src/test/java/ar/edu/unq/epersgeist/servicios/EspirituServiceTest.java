@@ -71,6 +71,14 @@ public class EspirituServiceTest {
         matias = new Angelical("Matias", berazategui);
     }
 
+    @AfterEach
+    void tearDown() {
+        serviceEspiritu.eliminarTodos();
+        mediumService.eliminarTodos();
+        ubicacionService.eliminarTodos();
+        registroHistorico.reiniciarBaseDeDatos();
+    }
+
     //crear
 
     @Test
@@ -513,14 +521,6 @@ public class EspirituServiceTest {
     // --------------------------------------------------------------------------------
     // dominar()
     // --------------------------------------------------------------------------------
-
-    @AfterEach
-    void tearDown() {
-        serviceEspiritu.eliminarTodos();
-        mediumService.eliminarTodos();
-        ubicacionService.eliminarTodos();
-        registroHistorico.reiniciarBaseDeDatos();
-    }
 
     @Nested
     class Dominar {

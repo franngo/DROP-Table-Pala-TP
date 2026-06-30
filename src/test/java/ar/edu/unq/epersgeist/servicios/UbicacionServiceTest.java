@@ -132,6 +132,7 @@ public class UbicacionServiceTest {
     @AfterEach
     void tearDown() {
         ubicacionService.eliminarTodos();
+        registroHistorico.reiniciarBaseDeDatos();
     }
 
     // --------------------------------------------------------------------------------

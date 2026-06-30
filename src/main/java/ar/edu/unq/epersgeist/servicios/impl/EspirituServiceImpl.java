@@ -43,7 +43,6 @@ public class EspirituServiceImpl implements EspirituService {
 
     private UbicacionDAOMongo ubicacionDAOMongo;
 
-    @Autowired
     private RegistroHistoricoDAO registroHistorico;
 
     @Override
@@ -94,6 +93,8 @@ public class EspirituServiceImpl implements EspirituService {
         espirituDAOSQL.findById(espirituId).orElseThrow(() -> new ErrorAlActualizarEspirituException("No existe en la BD el espiritu con id: " + espirituId));
 
         this.espirituDAOSQL.save(espiritu);
+
+        registroHistorico.registrarEstado("espiritus_sql/" + espiritu.getId(), espiritu);
     }
 
     @Override
@@ -104,6 +105,8 @@ public class EspirituServiceImpl implements EspirituService {
         espirituDAOSQL.save(espiritu);
         espirituDAOMongo.deleteById(espirituId);
 
+        registroHistorico.registrarEstado("espiritus_sql/" + espiritu.getId(), espiritu);
+        //borrar en RavenDB el doc espirituMongo
     }
 
     @Override

@@ -16,11 +16,13 @@ import ar.edu.unq.epersgeist.persistencia.mongo.EspirituDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.mongo.MediumDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.mongo.UbicacionDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
+import ar.edu.unq.epersgeist.persistencia.raven.RegistroHistoricoDAO;
 import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAOSQL;
 import ar.edu.unq.epersgeist.persistencia.sql.MediumDAOSQL;
 import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
 import ar.edu.unq.epersgeist.servicios.MediumService;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,7 @@ import java.util.Objects;
 
 @Service
 @Transactional
+@AllArgsConstructor
 public class MediumServiceImpl implements MediumService {
     private final MediumDAOSQL mediumDAOSQL;
     private final MediumDAOMongo mediumDAOMongo;
@@ -37,24 +40,7 @@ public class MediumServiceImpl implements MediumService {
     private final UbicacionDAOSQL ubicacionDAOSQL;
     private final UbicacionDAONeo4j ubicacionDAONeo4j;
     private final UbicacionDAOMongo ubicacionDAOMongo;
-
-    public MediumServiceImpl(
-            MediumDAOSQL mediumDAOSQL,
-            EspirituDAOSQL espirituDAOSQL,
-            UbicacionDAOSQL ubicacionDAOSQL,
-            UbicacionDAONeo4j ubicacionDAONeo4j,
-            UbicacionDAOMongo ubicacionDAOMongo,
-            MediumDAOMongo mediumDAOMongo,
-            EspirituDAOMongo espirituDAOMongo
-    ) {
-        this.mediumDAOSQL = mediumDAOSQL;
-        this.mediumDAOMongo = mediumDAOMongo;
-        this.espirituDAOSQL = espirituDAOSQL;
-        this.espirituDAOMongo = espirituDAOMongo;
-        this.ubicacionDAOSQL = ubicacionDAOSQL;
-        this.ubicacionDAONeo4j = ubicacionDAONeo4j;
-        this.ubicacionDAOMongo = ubicacionDAOMongo;
-    }
+    private RegistroHistoricoDAO registroHistorico;
 
     @Override
     public Medium crear(Medium medium, Coordenada coordenada) {
@@ -74,7 +60,10 @@ public class MediumServiceImpl implements MediumService {
 
         mediumDAOSQL.save(medium);
 
-        mediumDAOMongo.save(new MediumMongo(medium, coordenada));
+        MediumMongo mediumMongo = mediumDAOMongo.save(new MediumMongo(medium, coordenada));
+
+        registroHistorico.registrarEstado("mediums_sql/" + medium.getId(), medium);
+        registroHistorico.registrarEstado("mediums_mongo/" + medium.getId(), mediumMongo);
 
         return medium;
     }
@@ -96,6 +85,8 @@ public class MediumServiceImpl implements MediumService {
         mediumDAOSQL.findById(idMedium).orElseThrow(() -> new ErrorAlActualizarMediumException("No existe en la BD el medium con id: " + idMedium));
 
         this.mediumDAOSQL.save(medium);
+
+        registroHistorico.registrarEstado("mediums_sql/" + medium.getId(), medium);
     }
 
     @Override
@@ -104,6 +95,9 @@ public class MediumServiceImpl implements MediumService {
         medium.setDeletedAt(true);
         mediumDAOSQL.save(medium);
         mediumDAOMongo.deleteById(idMedium);
+
+        registroHistorico.registrarEstado("mediums_sql/" + medium.getId(), medium);
+        //borrar en RavenDB el doc mediumMongo
     }
 
     @Override

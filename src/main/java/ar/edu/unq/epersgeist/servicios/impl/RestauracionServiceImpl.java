@@ -80,43 +80,43 @@ public class RestauracionServiceImpl implements RestauracionService {
         List<String> idsUbicacionesSQL = registroHistoricoService.obtenerTodosLosIdsDeColeccion("ubicaciones_sql");
         List<Ubicacion> ubicacionesSQL = recuperarFotosDelPasado(Ubicacion.class, idsUbicacionesSQL, fecha);
 
-        List<String> idsUbicacionesMongo = registroHistoricoService.obtenerTodosLosIdsDeColeccion("ubicaciones_mongo");
-        List<UbicacionMongo> ubicacionesMongo = recuperarFotosDelPasado(UbicacionMongo.class, idsUbicacionesMongo, fecha);
-
-        List<String> idsUbicacionesNeo = registroHistoricoService.obtenerTodosLosIdsDeColeccion("ubicaciones_neo");
-        List<UbicacionNeo4j> ubicacionesNeo = recuperarFotosDelPasado(UbicacionNeo4j.class, idsUbicacionesNeo, fecha);
+//        List<String> idsUbicacionesMongo = registroHistoricoService.obtenerTodosLosIdsDeColeccion("ubicaciones_mongo");
+//        List<UbicacionMongo> ubicacionesMongo = recuperarFotosDelPasado(UbicacionMongo.class, idsUbicacionesMongo, fecha);
+//
+//        List<String> idsUbicacionesNeo = registroHistoricoService.obtenerTodosLosIdsDeColeccion("ubicaciones_neo");
+//        List<UbicacionNeo4j> ubicacionesNeo = recuperarFotosDelPasado(UbicacionNeo4j.class, idsUbicacionesNeo, fecha);
 
         // ----------------------------------------
 
         List<String> idsMediumsSQL = registroHistoricoService.obtenerTodosLosIdsDeColeccion("mediums_sql");
         List<Medium> mediumsSQL = recuperarFotosDelPasado(Medium.class, idsMediumsSQL, fecha);
 
-        List<String> idsMediumsMongo = registroHistoricoService.obtenerTodosLosIdsDeColeccion("mediums_mongo");
-        List<MediumMongo> mediumsMongo = recuperarFotosDelPasado(MediumMongo.class, idsMediumsMongo, fecha);
+//        List<String> idsMediumsMongo = registroHistoricoService.obtenerTodosLosIdsDeColeccion("mediums_mongo");
+//        List<MediumMongo> mediumsMongo = recuperarFotosDelPasado(MediumMongo.class, idsMediumsMongo, fecha);
 
         // ----------------------------------------
 
         List<String> idsEspiritusSQL = registroHistoricoService.obtenerTodosLosIdsDeColeccion("espiritus_sql");
         List<Espiritu> espiritusSQL = recuperarFotosDelPasado(Espiritu.class, idsEspiritusSQL, fecha);
 
-        List<String> idsEspiritusMongo = registroHistoricoService.obtenerTodosLosIdsDeColeccion("espiritus_mongo");
-        List<EspirituMongo> espiritusMongo = recuperarFotosDelPasado(EspirituMongo.class, idsEspiritusMongo, fecha);
+//        List<String> idsEspiritusMongo = registroHistoricoService.obtenerTodosLosIdsDeColeccion("espiritus_mongo");
+//        List<EspirituMongo> espiritusMongo = recuperarFotosDelPasado(EspirituMongo.class, idsEspiritusMongo, fecha);
 
         // ============================================================================
         // PASO 2: LIMPIEZA ABSOLUTA DEL PRESENTE (En orden inverso de FKs para evitar caídas)
         // ============================================================================
 
         // A. Primero Espíritus
-        espirituDAOMongo.deleteAll();
+//        espirituDAOMongo.deleteAll();
         espirituDAOSQL.deleteAll();
 
         // B. Luego eliminamos los Médiums
-        mediumDAOMongo.deleteAll();
+//        mediumDAOMongo.deleteAll();
         mediumDAOSQL.deleteAll();
 
         // C. Por último las Ubicaciones
-        ubicacionDAOMongo.deleteAll();
-        ubicacionDAONeo4j.deleteAll();
+//        ubicacionDAOMongo.deleteAll();
+//        ubicacionDAONeo4j.deleteAll();
         ubicacionDAOSQL.deleteAll();
 
         // ============================================================================
@@ -131,13 +131,13 @@ public class RestauracionServiceImpl implements RestauracionService {
             ubicacionDAOSQL.save(u);
         }
 
-        for (UbicacionNeo4j u : ubicacionesNeo) {
-            ubicacionDAONeo4j.save(u);
-        }
-
-        for (UbicacionMongo u : ubicacionesMongo) {
-            ubicacionDAOMongo.save(u);
-        }
+//        for (UbicacionNeo4j u : ubicacionesNeo) {
+//            ubicacionDAONeo4j.save(u);
+//        }
+//
+//        for (UbicacionMongo u : ubicacionesMongo) {
+//            ubicacionDAOMongo.save(u);
+//        }
 
         // ----------------------------------------
         // B. Restauramos los Médiums
@@ -147,9 +147,9 @@ public class RestauracionServiceImpl implements RestauracionService {
             mediumDAOSQL.save(m);
         }
 
-        for (MediumMongo m : mediumsMongo) {
-            mediumDAOMongo.save(m);
-        }
+//        for (MediumMongo m : mediumsMongo) {
+//            mediumDAOMongo.save(m);
+//        }
 
         // ----------------------------------------
         // C. Restauramos los Espíritus
@@ -159,9 +159,9 @@ public class RestauracionServiceImpl implements RestauracionService {
             espirituDAOSQL.save(e);
         }
 
-        for (EspirituMongo e : espiritusMongo) {
-            espirituDAOMongo.save(e);
-        }
+//        for (EspirituMongo e : espiritusMongo) {
+//            espirituDAOMongo.save(e);
+//        }
     }
 
     // --------------------------------------------------------------------------------

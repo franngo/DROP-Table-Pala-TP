@@ -10,6 +10,7 @@ import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.*;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.persistencia.mongo.UbicacionDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
+import ar.edu.unq.epersgeist.persistencia.raven.RegistroHistoricoDAO;
 import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
 import jakarta.transaction.Transactional;
@@ -40,6 +41,7 @@ public class UbicacionServiceImpl implements UbicacionService {
     private final UbicacionDAONeo4j ubicacionDAONeo;
     private final UbicacionDAOMongo ubicacionDAOMongo;
     private final MongoTemplate mongoTemplate;
+    private RegistroHistoricoDAO registroHistorico;
 
     // --------------------------------------------------------------------------------
     // CREAR
@@ -74,10 +76,14 @@ public class UbicacionServiceImpl implements UbicacionService {
         ubicacionDAOSQL.save(ubicacion);
 
         // La persisto también en Neo4j usando el id generado en SQL
-        ubicacionDAONeo.save(new UbicacionNeo4j(ubicacion));
+        UbicacionNeo4j ubicacionNeo4j = ubicacionDAONeo.save(new UbicacionNeo4j(ubicacion));
 
         //La persisto también en Mongo
-        ubicacionDAOMongo.save(new UbicacionMongo(ubicacion, coordenadas));
+        UbicacionMongo ubicacionMongo = ubicacionDAOMongo.save(new UbicacionMongo(ubicacion, coordenadas));
+
+        registroHistorico.registrarEstado("ubicaciones_sql/" + ubicacion.getId(), ubicacion);
+        registroHistorico.registrarEstado("ubicaciones_mongo/" + ubicacion.getId(), ubicacionMongo);
+        registroHistorico.registrarEstado("ubicaciones_neo/" + ubicacion.getId(), ubicacionNeo4j);
 
         return ubicacion;
     }
@@ -111,6 +117,8 @@ public class UbicacionServiceImpl implements UbicacionService {
         }
 
         ubicacionDAOSQL.save(ubicacion);
+
+        registroHistorico.registrarEstado("ubicaciones_sql/" + ubicacion.getId(), ubicacion);
     }
 
     // --------------------------------------------------------------------------------
@@ -124,6 +132,10 @@ public class UbicacionServiceImpl implements UbicacionService {
             ubicacionDAOSQL.save(ubicacion);
             ubicacionDAONeo.deleteById(id); //hace un DETACH DELETE del nodo en la DB Neo4j con dicho id
             ubicacionDAOMongo.deleteById(id);
+
+            registroHistorico.registrarEstado("ubicaciones_sql/" + ubicacion.getId(), ubicacion);
+            //borrar en RavenDB el doc ubicacionMongo
+            //borrar en RavenDB el doc ubicacionNeo
         });
     }
 
