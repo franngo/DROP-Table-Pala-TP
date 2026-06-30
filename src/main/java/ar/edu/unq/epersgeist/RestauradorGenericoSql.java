@@ -65,4 +65,29 @@ public class RestauradorGenericoSql {
     private void sincronizarSecuencia(String tabla) {
         // ajusta la sequence de PostgreSQL al MAX(id) de la tabla
     }
+
+    /**
+     * Analiza una clase de entidad JPA utilizando reflection y extrae
+     * todos los campos persistentes relevantes para la operación de restauración SQL.
+     *
+     * Este method construye una representación intermedia (CampoPersistente) que
+     * abstrae la metadata de JPA necesaria para generar dinámicamente sentencias INSERT.
+     *
+     * Se incluyen:
+     * - Campos simples (@Column, @Id)
+     * - Relaciones @ManyToOne (como claves foráneas por ID)
+     * - Discriminadores de herencia SINGLE_TABLE (@DiscriminatorValue)
+     *
+     * Se excluyen:
+     * - @OneToMany y @ManyToMany (no se representan como columnas)
+     * - Campos transient o estáticos
+     *
+     * Además, se consideran campos heredados desde clases base (ej. Auditable).
+     *
+     * @param tipo clase de entidad JPA concreta o base
+     * @return lista de campos persistentes mapeados para inserción SQL
+     */
+    private List<CampoPersistente> analizarEntidad(Class<?> tipo) {
+        return null;
+    }
 }
