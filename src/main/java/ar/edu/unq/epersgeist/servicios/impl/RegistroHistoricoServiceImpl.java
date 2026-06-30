@@ -35,8 +35,8 @@ public class RegistroHistoricoServiceImpl implements RegistroHistoricoService {
     // --------------------------------------------------------------------------------
 
     @Override
-    public <T> T obtenerEstadoEnFecha(Class<T> claseEntidad, String ravenId, LocalDateTime fecha) {
-        Date fechaDate = Date.from(fecha.atZone(ZoneId.systemDefault()).toInstant());
+    public <T> T obtenerEstadoEnFecha(Class<T> claseEntidad, String ravenId, LocalDateTime fechaHora) {
+        Date fechaDate = Date.from(fechaHora.atZone(ZoneId.systemDefault()).toInstant());
         return registroHistoricoDAO.obtenerEstadoEnFecha(claseEntidad, ravenId, fechaDate);
     }
 

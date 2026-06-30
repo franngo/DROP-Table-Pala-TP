@@ -82,9 +82,9 @@ public class RegistroHistoricoControllerREST {
 
     @PostMapping("/restaurar")
     @ResponseStatus(HttpStatus.OK)
-    public void restaurarSistemaAFecha(
-            @RequestParam("fecha") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fecha
+    public void restaurarSistemaAFechaYHora(
+            @RequestParam() @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaHora
     ) {
-        restauracionService.restaurarSistemaAFecha(fecha);
+        restauracionService.restaurarSistemaAFechaYHora(fechaHora);
     }
 }
