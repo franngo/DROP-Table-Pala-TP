@@ -110,7 +110,7 @@ public class RestauradorGenericoSql {
                 }
 
                 // Ignorar colecciones (OneToMany, ManyToMany)
-                if (Collection.class.isAssignableFrom(field.getType())) {
+                if (field.isAnnotationPresent(OneToMany.class) || field.isAnnotationPresent(ManyToMany.class)) {
                     continue;
                 }
 
@@ -145,23 +145,6 @@ public class RestauradorGenericoSql {
                 }
 
                 // =========================
-                // Discriminador (SINGLE_TABLE)
-                // =========================
-                if (tipo.getSuperclass() != null &&
-                        tipo.getSuperclass().isAnnotationPresent(Inheritance.class)) {
-
-                    DiscriminatorColumn disc =
-                            tipo.getSuperclass().getAnnotation(DiscriminatorColumn.class);
-
-                    if (disc != null && field.getName().equals(disc.name())) {
-                        cp.setEsDiscriminador(true);
-                        cp.setNombreColumna(disc.name());
-                        campos.add(cp);
-                        continue;
-                    }
-                }
-
-                // =========================
                 // Column normal
                 // =========================
                 Column column = field.getAnnotation(Column.class);
@@ -175,6 +158,35 @@ public class RestauradorGenericoSql {
             }
 
             claseActual = claseActual.getSuperclass();
+        }
+
+        // =========================
+        // Campo virtual: DiscriminatorValue
+        // =========================
+
+        Class<?> claseBase = tipo;
+
+        // Buscamos la raíz de la jerarquía que declara la herencia
+        while (claseBase.getSuperclass() != null &&
+                !claseBase.isAnnotationPresent(Inheritance.class)) {
+            claseBase = claseBase.getSuperclass();
+        }
+
+        DiscriminatorColumn discriminatorColumn =
+                claseBase.getAnnotation(DiscriminatorColumn.class);
+
+        DiscriminatorValue discriminatorValue =
+                tipo.getAnnotation(DiscriminatorValue.class);
+
+        if (discriminatorColumn != null && discriminatorValue != null) {
+
+            CampoPersistente cp = new CampoPersistente();
+
+            cp.setEsDiscriminador(true);
+            cp.setNombreColumna(discriminatorColumn.name());
+            cp.setValorConstante(discriminatorValue.value());
+
+            campos.add(cp);
         }
 
         return campos;

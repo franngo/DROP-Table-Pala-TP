@@ -8,9 +8,12 @@ import java.lang.reflect.Field;
 @Setter
 @Getter
 public class CampoPersistente {
-    Field field;
-    String nombreColumna;
-    boolean esId;
-    boolean esManyToOne;
-    boolean esDiscriminador;
+    private Field field; //Un campo que existe realmente en la entidad. Es null si es un campo virtual
+    private String nombreColumna;
+
+    private boolean esId;
+    private boolean esManyToOne;
+    private boolean esDiscriminador;
+
+    private Object valorConstante;    // Solo se usa para campos virtuales (x ej: un valor discriminador como "SANTUARIO" o "CEMENTERIO")
 }
