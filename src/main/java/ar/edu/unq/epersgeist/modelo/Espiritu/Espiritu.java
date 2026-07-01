@@ -9,6 +9,8 @@ import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDominacionInvalidaPorDistanc
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionInvalidaException;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,6 +29,16 @@ import java.io.Serializable;
 
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "tipo_espiritu")
+
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "tipo" // o el nombre de campo que use tu JSON para distinguir el tipo
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Angelical.class, name = "Angelical"),
+        @JsonSubTypes.Type(value = Demonio.class, name = "Demonio")
+})
 
 public abstract class Espiritu extends Auditable implements Serializable {
 

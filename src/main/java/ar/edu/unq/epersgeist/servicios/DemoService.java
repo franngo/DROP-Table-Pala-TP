@@ -1,11 +1,18 @@
 package ar.edu.unq.epersgeist.servicios;
 
+import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+
+import java.util.List;
+
 public interface DemoService {
-    void demoCrisisDeIdentidad() throws Exception;
 
-    void demoMapaDeCalorTemporal() throws Exception;
+    List<Espiritu> historialDeAmos();
 
-    void demoDanioDeBatalla() throws Exception;
+//    void demoMapaDeCalorTemporal() throws Exception;
+//
+//    void demoDanioDeBatalla() throws Exception;
+//
+//    void ejecutarDemosTracking() throws Exception;
 
-    void ejecutarDemosTracking() throws Exception;
+    void deleteAll();
 }
