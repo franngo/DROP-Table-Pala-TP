@@ -53,9 +53,21 @@ public class RestauradorGenericoSql {
         sincronizarSecuencia(tabla);
     }
 
-    private String obtenerNombreTabla(Class<?> tipo) {
+    //pasar a private los métodos de abajo.
+
+    public String obtenerNombreTabla(Class<?> tipo) {
         // devuelve el nombre de la tabla SQL asociada a la entidad raíz
-        return null;
+        Class<?> claseTabla = tipo;
+
+        while (claseTabla != null && !claseTabla.isAnnotationPresent(Inheritance.class)) {
+            claseTabla = claseTabla.getSuperclass();
+        }
+
+        if (claseTabla == null) {
+            claseTabla = tipo;
+        }
+
+        return claseTabla.getSimpleName().toLowerCase();
     }
 
     private String construirInsert(Class<?> tipo) {
