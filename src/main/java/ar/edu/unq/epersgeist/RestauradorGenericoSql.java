@@ -7,13 +7,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import java.lang.reflect.Field;
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.Collection;
+
+import java.util.*;
 import java.lang.reflect.Modifier;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.List;
 
 @Component
 @Transactional
@@ -53,10 +52,10 @@ public class RestauradorGenericoSql {
         sincronizarSecuencia(tabla);
     }
 
-    //pasar a private los métodos de abajo.
+    //¡pasar a private los métodos de abajo!
 
+    // devuelve el nombre de la tabla SQL asociada a la entidad raíz
     public String obtenerNombreTabla(Class<?> tipo) {
-        // devuelve el nombre de la tabla SQL asociada a la entidad raíz
         Class<?> claseTabla = tipo;
 
         while (claseTabla != null && !claseTabla.isAnnotationPresent(Inheritance.class)) {
@@ -70,9 +69,23 @@ public class RestauradorGenericoSql {
         return claseTabla.getSimpleName().toLowerCase();
     }
 
-    private String construirInsert(Class<?> tipo) {
-        // construye dinámicamente el SQL INSERT según los campos persistidos
-        return null;
+    // construye dinámicamente el SQL INSERT según los campos persistidos
+    public String construirInsert(Class<?> tipo) {
+        String tabla = obtenerNombreTabla(tipo);
+
+        List<CampoPersistente> campos = analizarEntidad(tipo);
+
+        StringJoiner columnas = new StringJoiner(", ");
+        StringJoiner valores = new StringJoiner(", ");
+
+        for (CampoPersistente campo : campos) {
+            columnas.add(campo.getNombreColumna());
+            valores.add("?");
+        }
+
+        return "INSERT INTO " + tabla +
+                " (" + columnas + ")" +
+                " VALUES (" + valores + ")";
     }
 
     private void cargarParametros(PreparedStatement ps, Object entidad) throws SQLException {
@@ -163,7 +176,7 @@ public class RestauradorGenericoSql {
                 if (column != null && !column.name().isEmpty()) {
                     cp.setNombreColumna(column.name());
                 } else {
-                    cp.setNombreColumna(field.getName());
+                    cp.setNombreColumna(this.camelToSnake(field.getName()));
                 }
 
                 campos.add(cp);
@@ -202,5 +215,10 @@ public class RestauradorGenericoSql {
         }
 
         return campos;
+    }
+
+    private String camelToSnake(String nombre) {
+        return nombre.replaceAll("([a-z])([A-Z])", "$1_$2")
+                .toLowerCase();
     }
 }

@@ -49,4 +49,11 @@ public class PruebaTest {
         assertEquals("espiritu", restauradorSqlGenerico.obtenerNombreTabla(Demonio.class));
         assertEquals("medium", restauradorSqlGenerico.obtenerNombreTabla(Medium.class));
     }
+
+    @Test
+    void prueba3() {
+        String sql = restauradorSqlGenerico.construirInsert(Medium.class);
+
+        System.out.println(sql);
+    }
 }
