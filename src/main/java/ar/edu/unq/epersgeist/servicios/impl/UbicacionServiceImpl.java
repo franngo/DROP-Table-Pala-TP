@@ -77,7 +77,7 @@ public class UbicacionServiceImpl implements UbicacionService {
         ubicacionDAOSQL.save(ubicacion);
 
         // La persisto también en Neo4j usando el id generado en SQL
-        ubicacionDAONeo.save(new UbicacionNeo4j(ubicacion));
+        UbicacionNeo4j ubicacionNeo = ubicacionDAONeo.save(new UbicacionNeo4j(ubicacion));
 
         // La persisto también en Mongo
         UbicacionMongo ubicacionMongo = ubicacionDAOMongo.save(new UbicacionMongo(ubicacion, coordenadas));
@@ -87,6 +87,7 @@ public class UbicacionServiceImpl implements UbicacionService {
         // ----------------------------------------
         registroHistorico.registrarEstado("ubicaciones_sql/" + ubicacion.getId(), ubicacion);
         registroHistorico.registrarEstado("ubicaciones_mongo/" + ubicacion.getId(), ubicacionMongo);
+        registroHistorico.registrarEstado("ubicaciones_neo/" + ubicacion.getId(), ubicacionNeo);
 
         return ubicacion;
     }
@@ -124,9 +125,6 @@ public class UbicacionServiceImpl implements UbicacionService {
         // ----------------------------------------
         // REGISTRO HISTORICO
         // ----------------------------------------
-        ubicacionDAOMongo.findById(id).ifPresent(ubicacionMongo -> {
-            registroHistorico.registrarEstado("ubicaciones_mongo/" + id, ubicacionMongo);
-        });
 
         registroHistorico.registrarEstado("ubicaciones_sql/" + ubicacion.getId(), ubicacion);
     }
@@ -138,19 +136,30 @@ public class UbicacionServiceImpl implements UbicacionService {
     @Override
     public void eliminar(Long id) {
         ubicacionDAOSQL.findById(id).ifPresent(ubicacion -> {
+            // 1. Modificación y persistencia del Soft Delete en SQL
             ubicacion.setDeletedAt(true);
             ubicacionDAOSQL.save(ubicacion);
 
-            // ----------------------------------------
-            // REGISTRO HISTORICO
-            // ----------------------------------------
+            // ----------------------------------------------------------------------
+            // REGISTRO HISTÓRICO
+            // MONGO (Antes de que deje de existir)
+            // NEO4J (Antes de borrar el nodo)
+            // ----------------------------------------------------------------------
             ubicacionDAOMongo.findById(id).ifPresent(ubicacionMongo -> {
                 registroHistorico.registrarEstado("ubicaciones_mongo/" + id, ubicacionMongo);
             });
 
-            ubicacionDAONeo.deleteById(id); // hace un DETACH DELETE del nodo en la DB Neo4j
+            ubicacionDAONeo.findById(id).ifPresent(ubicacionNeo -> {
+                registroHistorico.registrarEstado("ubicaciones_neo/" + id, ubicacionNeo);
+            });
+
+            // Eliminación física en Neo4j y Mongo
+            ubicacionDAONeo.deleteById(id);
             ubicacionDAOMongo.deleteById(id);
 
+            // ----------------------------------------------------------------------
+            // REGISTRO HISTÓRICO - SQL (Con el estado "Soft Deleted")
+            // ----------------------------------------------------------------------
             registroHistorico.registrarEstado("ubicaciones_sql/" + ubicacion.getId(), ubicacion);
         });
     }

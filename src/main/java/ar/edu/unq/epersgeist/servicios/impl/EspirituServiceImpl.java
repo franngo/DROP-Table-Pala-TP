@@ -103,30 +103,32 @@ public class EspirituServiceImpl implements EspirituService {
         // REGISTRO HISTORICO
         // ----------------------------------------
 
-        espirituDAOMongo.findById(espirituId).ifPresent(espirituMongo -> {
-            registroHistorico.registrarEstado("espiritus_mongo/" + espirituId, espirituMongo);
-        });
-
         registroHistorico.registrarEstado("espiritus_sql/" + espiritu.getId(), espiritu);
     }
 
     @Override
     public void eliminar(Long espirituId) {
-
         Espiritu espiritu = this.recuperar(espirituId);
         espiritu.setDeletedAt(true);
         espirituDAOSQL.save(espiritu);
 
-        // ----------------------------------------
-        // REGISTRO HISTORICO
-        // ----------------------------------------
-
+        // ----------------------------------------------------------------------
+        // REGISTRO HISTÓRICO - PASO 1: MONGO (Antes de que deje de existir)
+        // ----------------------------------------------------------------------
+        // Buscamos el documento en Mongo y registramos su ÚLTIMO estado vivo en Raven
+        // antes de que sea eliminado físicamente de MongoDB.
         espirituDAOMongo.findById(espirituId).ifPresent(espirituMongo -> {
             registroHistorico.registrarEstado("espiritus_mongo/" + espirituId, espirituMongo);
         });
 
+        // Eliminación física en MongoDB
         espirituDAOMongo.deleteById(espirituId);
 
+        // ----------------------------------------------------------------------
+        // REGISTRO HISTÓRICO - PASO 2: SQL (Con el estado "Soft Deleted")
+        // ----------------------------------------------------------------------
+        // Registramos en Raven el espíritu de SQL. Esta snapshot va a persistir
+        // el objeto con "deletedAt: true", marcando el fin de su ciclo activo.
         registroHistorico.registrarEstado("espiritus_sql/" + espiritu.getId(), espiritu);
     }
 

@@ -110,9 +110,6 @@ public class MediumServiceImpl implements MediumService {
         // ----------------------------------------
         // REGISTRO HISTORICO
         // ----------------------------------------
-        mediumDAOMongo.findById(idMedium).ifPresent(mediumMongo -> {
-            registroHistorico.registrarEstado("mediums_mongo/" + idMedium, mediumMongo);
-        });
 
         registroHistorico.registrarEstado("mediums_sql/" + medium.getId(), medium);
     }
@@ -123,15 +120,23 @@ public class MediumServiceImpl implements MediumService {
         medium.setDeletedAt(true);
         mediumDAOSQL.save(medium);
 
-        // ----------------------------------------
-        // REGISTRO HISTORICO
-        // ----------------------------------------
+        // ----------------------------------------------------------------------
+        // REGISTRO HISTÓRICO - PASO 1: MONGO (Antes de que deje de existir)
+        // ----------------------------------------------------------------------
+        // Buscamos el documento en Mongo y registramos su ÚLTIMO estado vivo en Raven
+        // antes de que sea eliminado físicamente de MongoDB.
         mediumDAOMongo.findById(idMedium).ifPresent(mediumMongo -> {
             registroHistorico.registrarEstado("mediums_mongo/" + idMedium, mediumMongo);
         });
 
+        // Eliminación física en MongoDB
         mediumDAOMongo.deleteById(idMedium);
 
+        // ----------------------------------------------------------------------
+        // REGISTRO HISTÓRICO - PASO 2: SQL (Con el estado "Soft Deleted")
+        // ----------------------------------------------------------------------
+        // Registramos en Raven el médium de SQL. Esta snapshot va a persistir
+        // el objeto con "deletedAt: true", marcando el fin de su ciclo activo.
         registroHistorico.registrarEstado("mediums_sql/" + medium.getId(), medium);
     }
 
