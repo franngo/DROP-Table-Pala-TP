@@ -40,7 +40,11 @@ public class RestauradorGenericoSql {
 
                 T entidad = entidades.get(i);
 
-                cargarParametros(ps, entidad);
+                try {
+                    cargarParametros(ps, entidad);
+                } catch (IllegalAccessException e) {
+                    throw new SQLException("Error cargando parámetros del PreparedStatement.", e);
+                }
             }
 
             @Override
@@ -88,8 +92,50 @@ public class RestauradorGenericoSql {
                 " VALUES (" + valores + ")";
     }
 
-    private void cargarParametros(PreparedStatement ps, Object entidad) throws SQLException {
-        // carga los valores de la entidad en el PreparedStatement
+    private void cargarParametros(PreparedStatement ps, Object entidad) throws SQLException, IllegalAccessException {
+        List<CampoPersistente> campos = analizarEntidad(entidad.getClass());
+
+        int indice = 1;
+
+        for (CampoPersistente campo : campos) {
+
+            // ==========================
+            // Discriminador
+            // ==========================
+            if (campo.isEsDiscriminador()) {
+                ps.setObject(indice++, campo.getValorConstante());
+                continue;
+            }
+
+            Field field = campo.getField();
+            field.setAccessible(true);
+
+            Object valor = field.get(entidad);
+
+            // ==========================
+            // ManyToOne
+            // ==========================
+            if (campo.isEsManyToOne()) {
+
+                if (valor == null) {
+                    ps.setObject(indice++, null);
+                    continue;
+                }
+
+                Field idField = obtenerCampoId(valor.getClass());
+                idField.setAccessible(true);
+
+                Object id = idField.get(valor);
+
+                ps.setObject(indice++, id);
+                continue;
+            }
+
+            // ==========================
+            // Campo normal
+            // ==========================
+            ps.setObject(indice++, valor);
+        }
     }
 
     private void sincronizarSecuencia(String tabla) {
@@ -220,5 +266,26 @@ public class RestauradorGenericoSql {
     private String camelToSnake(String nombre) {
         return nombre.replaceAll("([a-z])([A-Z])", "$1_$2")
                 .toLowerCase();
+    }
+
+    private Field obtenerCampoId(Class<?> tipo) {
+
+        Class<?> actual = tipo;
+
+        while (actual != null && actual != Object.class) {
+
+            for (Field field : actual.getDeclaredFields()) {
+
+                if (field.isAnnotationPresent(Id.class)) {
+                    field.setAccessible(true);
+                    return field;
+                }
+            }
+
+            actual = actual.getSuperclass();
+        }
+
+        throw new IllegalStateException(
+                "La clase " + tipo.getName() + " no tiene un campo @Id.");
     }
 }
