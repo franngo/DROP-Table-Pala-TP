@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.*;
 
 @Service
@@ -34,13 +35,24 @@ public class TrackingServiceImpl implements TrackingService {
         int cambios = 0;
 
         List<Espiritu> revisiones = registroHistoricoDAO.obtenerHistorial(Espiritu.class, idRaven);
+
+//        System.out.println("=========================================================================================================");
+//        System.out.println(revisiones);
+//        System.out.println("=========================================================================================================");
+
         Boolean ultimoEstadoDominado = null;
 
         try (IDocumentSession session = documentStore.openSession()) {
+//
+//            System.out.println("=========================================================================================================");
+//            System.out.println("TRYYYYYYYYYYYYYYYYYYYY");
+//            System.out.println("=========================================================================================================");
             for (Espiritu rev : revisiones) {
+
+
                 // Extraemos la fecha de modificación usando @last-modified
                 String fechaStr = session.advanced().getMetadataFor(rev).getString("@last-modified");
-                LocalDateTime fechaRev = java.time.OffsetDateTime.parse(fechaStr).toLocalDateTime();
+                LocalDateTime fechaRev = OffsetDateTime.parse(fechaStr).toLocalDateTime();
 
                 if (fechaRev.isAfter(desde)) {
                     boolean estaDominadoAhora = rev.estaDominado();
@@ -55,10 +67,54 @@ public class TrackingServiceImpl implements TrackingService {
         return cambios;
     }
 
+//    @Override
+//    public int cantidadDeCambiosDeBando(Long espirituId, LocalDateTime desde) {
+//        String idRaven = "espiritus_sql/" + espirituId;
+//        int cambios = 0;
+//
+//        try (IDocumentSession session = documentStore.openSession()) {
+//            List<IMetadataDictionary> metadatas = session.advanced().revisions().getMetadataFor(idRaven);
+//
+//            if (metadatas.isEmpty()) {
+//                return 0;
+//            }
+//
+//            // Damos vuelta para procesar cronológicamente (Pasado -> Presente)
+//            List<IMetadataDictionary> cronologico = new ArrayList<>(metadatas);
+//            Collections.reverse(cronologico);
+//
+//            Boolean ultimoEstadoDominado = null;
+//
+//            for (IMetadataDictionary meta : cronologico) {
+//                // El diccionario de metadatos de Raven implementa métodos tipados como getString()
+//                // Raven usa las constantes de metadatos del sistema, "Last-Modified" y "@change-vector"
+//                String fechaStr = meta.getString("Last-Modified");
+//                LocalDateTime fechaRev = OffsetDateTime.parse(fechaStr).toLocalDateTime();
+//
+//                String changeVector = meta.getString("@change-vector");
+//                Espiritu rev = session.advanced().revisions().get(Espiritu.class, changeVector);
+//
+//                if (fechaRev.isAfter(desde)) {
+//                    boolean estaDominadoAhora = rev.estaDominado();
+//
+//                    if (ultimoEstadoDominado != null && ultimoEstadoDominado != estaDominadoAhora) {
+//                        cambios++;
+//                    }
+//                    ultimoEstadoDominado = estaDominadoAhora;
+//                } else {
+//                    // Mantener el hilo del bando en el que venía antes de entrar al rango "desde"
+//                    ultimoEstadoDominado = rev.estaDominado();
+//                }
+//            }
+//        }
+//
+//        return cambios;
+//    }
+
+
     // --------------------------------------------------------------------------------
     // ALCANCE MEDIO 2. EL MAPA DE CALOR TEMPORAL
     // --------------------------------------------------------------------------------
-
     public List<GeoJsonPoint> trayectoriaTemporalDeMedium(Long mediumId, LocalDateTime inicio, LocalDateTime fin) {
         String idRaven = "mediums_mongo/" + mediumId;
         List<GeoJsonPoint> trayectoria = new ArrayList<>();

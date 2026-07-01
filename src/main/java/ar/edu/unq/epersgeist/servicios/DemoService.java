@@ -6,4 +6,6 @@ public interface DemoService {
     void demoMapaDeCalorTemporal() throws Exception;
 
     void demoDanioDeBatalla() throws Exception;
+
+    void ejecutarDemosTracking() throws Exception;
 }

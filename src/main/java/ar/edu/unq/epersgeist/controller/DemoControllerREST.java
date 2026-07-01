@@ -21,7 +21,7 @@ public class DemoControllerREST {
     @PostMapping("/crisis-identidad")
     @ResponseStatus(HttpStatus.OK)
     public String ejecutarDemoCrisisIdentidad() throws Exception {
-        demoService.demoCrisisDeIdentidad();
+        demoService.ejecutarDemosTracking();
         return "Demo 1 (Crisis de Identidad) ejecutada con éxito. Revisá los logs de la consola.";
     }
 
@@ -46,7 +46,7 @@ public class DemoControllerREST {
         demoService.demoDanioDeBatalla();
         return "Demo 3 (Análisis de Daño de Batalla) ejecutada con éxito. Revisá los logs de la consola.";
     }
-    
+
     // --------------------------------------------------------------------------------
 
     @ExceptionHandler(Exception.class)
