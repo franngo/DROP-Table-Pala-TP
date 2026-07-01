@@ -1,5 +1,6 @@
 package ar.edu.unq.epersgeist.servicios.impl;
 
+import ar.edu.unq.epersgeist.RestauradorGenericoSql;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Espiritu.EspirituMongo;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
@@ -17,6 +18,7 @@ import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
 import ar.edu.unq.epersgeist.servicios.RegistroHistoricoService;
 import ar.edu.unq.epersgeist.servicios.RestauracionService;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@AllArgsConstructor
 public class RestauracionServiceImpl implements RestauracionService {
 
     private final RegistroHistoricoService registroHistoricoService;
@@ -42,31 +45,7 @@ public class RestauracionServiceImpl implements RestauracionService {
     private final UbicacionDAOMongo ubicacionDAOMongo;
     private final UbicacionDAONeo4j ubicacionDAONeo4j;
 
-    public RestauracionServiceImpl(
-            RegistroHistoricoService registroHistoricoService,
-
-            EspirituDAOSQL espirituDAOSQL,
-            EspirituDAOMongo espirituDAOMongo,
-
-            MediumDAOSQL mediumDAOSQL,
-            MediumDAOMongo mediumDAOMongo,
-
-            UbicacionDAOSQL ubicacionDAOSQL,
-            UbicacionDAOMongo ubicacionDAOMongo,
-            UbicacionDAONeo4j ubicacionDAONeo4j
-    ) {
-        this.registroHistoricoService = registroHistoricoService;
-
-        this.espirituDAOSQL = espirituDAOSQL;
-        this.espirituDAOMongo = espirituDAOMongo;
-
-        this.mediumDAOSQL = mediumDAOSQL;
-        this.mediumDAOMongo = mediumDAOMongo;
-
-        this.ubicacionDAOSQL = ubicacionDAOSQL;
-        this.ubicacionDAOMongo = ubicacionDAOMongo;
-        this.ubicacionDAONeo4j = ubicacionDAONeo4j;
-    }
+    private final RestauradorGenericoSql restaurador;
 
     // --------------------------------------------------------------------------------
 
@@ -135,7 +114,8 @@ public class RestauracionServiceImpl implements RestauracionService {
         // A. Restauramos Ubicaciones
         // ----------------------------------------
 
-        ubicacionDAOSQL.saveAll(ubicacionesSQL);
+//        ubicacionDAOSQL.saveAll(ubicacionesSQL);
+        restaurador.restaurar(ubicacionesSQL);
         ubicacionDAOSQL.findAll().forEach(u ->
                 System.out.println(u.getId() + " - " + u.getNombre())
         );
@@ -153,7 +133,8 @@ public class RestauracionServiceImpl implements RestauracionService {
         // B. Restauramos los Médiums
         // ----------------------------------------
 
-        mediumDAOSQL.saveAll(mediumsSQL);
+//        mediumDAOSQL.saveAll(mediumsSQL);
+        restaurador.restaurar(mediumsSQL);
         mediumDAOSQL.flush();
 
 //        for (MediumMongo m : mediumsMongo) {
@@ -164,7 +145,8 @@ public class RestauracionServiceImpl implements RestauracionService {
         // C. Restauramos los Espíritus
         // ----------------------------------------
 
-        espirituDAOSQL.saveAll(espiritusSQL);
+//        espirituDAOSQL.saveAll(espiritusSQL);
+        restaurador.restaurar(espiritusSQL);
         espirituDAOSQL.flush();
 
 //        for (EspirituMongo e : espiritusMongo) {

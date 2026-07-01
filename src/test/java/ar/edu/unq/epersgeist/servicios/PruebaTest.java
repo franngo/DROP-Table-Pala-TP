@@ -22,6 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class PruebaTest {
 
     @Autowired
+    private EspirituService serviceEspiritu;
+    @Autowired
+    private MediumService mediumService;
+    @Autowired
+    private UbicacionService ubicacionService;
+    @Autowired
     private RestauradorGenericoSql restauradorSqlGenerico;
 
     @Test
@@ -55,5 +61,10 @@ public class PruebaTest {
         String sql = restauradorSqlGenerico.construirInsert(Medium.class);
 
         System.out.println(sql);
+    }
+
+    @Test
+    void restaurarSistemaRecuperaEntidadesEliminadasYModificadas() {
+
     }
 }
