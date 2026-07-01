@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.lang.reflect.Field;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.lang.reflect.Modifier;
 
@@ -135,6 +136,17 @@ public class RestauradorGenericoSql {
             // ==========================
             // Campo normal
             // ==========================
+
+            if (valor instanceof java.util.Date date) {
+                ps.setTimestamp(indice++, new java.sql.Timestamp(date.getTime()));
+                continue;
+            }
+
+            if (valor instanceof LocalDateTime ldt) {
+                ps.setTimestamp(indice++, java.sql.Timestamp.valueOf(ldt));
+                continue;
+            }
+
             ps.setObject(indice++, valor);
         }
     }
