@@ -92,6 +92,7 @@ public class RestauradorGenericoSql {
                 " VALUES (" + valores + ")";
     }
 
+    // carga los valores de la entidad en el PreparedStatement
     private void cargarParametros(PreparedStatement ps, Object entidad) throws SQLException, IllegalAccessException {
         List<CampoPersistente> campos = analizarEntidad(entidad.getClass());
 
@@ -138,9 +139,25 @@ public class RestauradorGenericoSql {
         }
     }
 
+    // ajusta la sequence de PostgreSQL al MAX(id) de la tabla
     private void sincronizarSecuencia(String tabla) {
-        // ajusta la sequence de PostgreSQL al MAX(id) de la tabla
+
+        String secuencia = tabla + "_id_seq";
+
+        String sql = """
+        SELECT setval(
+            '%s',
+            COALESCE((SELECT MAX(id) FROM %s), 1),
+            true
+        )
+        """.formatted(secuencia, tabla);
+
+        jdbcTemplate.execute(sql);
     }
+
+    // ==========================
+    // ==========================
+    // ==========================
 
     /**
      * Analiza una clase de entidad JPA utilizando reflection y extrae
