@@ -4,6 +4,7 @@ import ar.edu.unq.epersgeist.controller.dtos.espiritus.response.EspirituResponse
 import ar.edu.unq.epersgeist.controller.mappers.MapperEspiritu;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.servicios.DemoService;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,7 @@ public class DemoControllerREST {
 
     @PostMapping("/amos")
     @ResponseStatus(HttpStatus.OK)
-    public List<EspirituResponseDTO> amos() {
+    public List<EspirituResponseDTO> amos() throws InterruptedException {
         List<Espiritu> amos = demoService.historialDeAmos();
         return amos.stream().map(MapperEspiritu::toDTO).toList();
     }
@@ -34,12 +35,11 @@ public class DemoControllerREST {
     // Demo 2: El mapa de calor temporal
     // --------------------------------------------------------------------------------
 
-//    @PostMapping("/mapa-calor")
-//    @ResponseStatus(HttpStatus.OK)
-//    public String ejecutarDemoMapaCalor() throws Exception {
-//        demoService.demoMapaDeCalorTemporal();
-//        return "Demo 2 (Mapa de Calor Temporal) ejecutada con éxito. Revisá los logs de la consola.";
-//    }
+    @PostMapping("/mapa-calor")
+    @ResponseStatus(HttpStatus.OK)
+    public List<GeoJsonPoint> ejecutarDemoMapaCalor() throws Exception {
+        return demoService.demoMapaDeCalorTemporal();
+    }
 
     // --------------------------------------------------------------------------------
     // Demo 3: Análisis de daño de batalla

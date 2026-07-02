@@ -1,6 +1,7 @@
 package ar.edu.unq.epersgeist.servicios;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.List;
 public interface TrackingService {
 
     /**
-     * ALCANCE MEDIO 1: LA CRISIS DE IDENTIDAD (HISTORIAL DE AMOS)
+     * ALCANCE MEDIO 1: HISTORIAL DE AMOS
      * <p>
      * Recupera el historial de revisiones de un espíritu específico desde RavenDB y
      * devuelve la lista cronológica de todos los espíritus dominantes (amos) que lo
@@ -19,10 +20,11 @@ public interface TrackingService {
     /**
      * ALCANCE MEDIO 2: EL MAPA DE CALOR TEMPORAL
      * <p>
-     * Filtra la colección mediums_mongo en RavenDB, por un rango de tiempo
-     * (ej. entre las 14:00 y las 15:00) y obtenés todas las coordenadas por las que caminó ese médium.
+     * Recupera el historial de revisiones de un médium específico desde RavenDB y
+     * devuelve la lista cronológica de todas las coordenadas geográficas por las que
+     * transitó dentro de un rango de tiempo determinado.
      */
-//    List<GeoJsonPoint> trayectoriaTemporalDeMedium(Long mediumId, LocalDateTime inicio, LocalDateTime fin);
+    List<GeoJsonPoint> trayectoriaTemporalDeMedium(Long mediumId);
 
     /**
      * ALCANCE MEDIO 3: ANÁLISIS DE DAÑO DE BATALLA

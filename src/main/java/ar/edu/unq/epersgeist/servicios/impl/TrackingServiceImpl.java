@@ -172,8 +172,11 @@ package ar.edu.unq.epersgeist.servicios.impl;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.persistencia.raven.RegistroHistoricoDAO;
 import ar.edu.unq.epersgeist.servicios.TrackingService;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import net.ravendb.client.documents.IDocumentStore;
+import net.ravendb.client.documents.session.IDocumentSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -189,34 +192,8 @@ public class TrackingServiceImpl implements TrackingService {
 
     @Autowired
     private RegistroHistoricoDAO registroHistoricoDAO;
-//
-//    @Override
-//    public List<Espiritu> historialDeAmos(Long espirituId, LocalDateTime desde) {
-//        String idRaven = "espiritus_sql/" + espirituId;
-//
-//        List<Espiritu> revisiones = registroHistoricoDAO.obtenerHistorial(Espiritu.class, idRaven);
-//        if (revisiones == null || revisiones.isEmpty()) {
-//            return new ArrayList<>();
-//        }
-//
-//        Collections.reverse(revisiones);
-//
-//        // Usamos LinkedHashSet para evitar duplicados manteniendo el orden cronológico
-//        Set<Espiritu> amosUnicos = new LinkedHashSet<>();
-//
-//        try (IDocumentSession session = documentStore.openSession()) {
-//            for (Espiritu rev : revisiones) {
-//                String fechaStr = session.advanced().getMetadataFor(rev).getString("@last-modified");
-//                LocalDateTime fechaRev = OffsetDateTime.parse(fechaStr).toLocalDateTime();
-//
-//                if (fechaRev.isAfter(desde) && rev.getEspirituDominante() != null) {
-//                    amosUnicos.add(rev.getEspirituDominante());
-//                }
-//            }
-//        }
-//
-//        return new ArrayList<>(amosUnicos);
-//    }
+
+    // -----------------------------------------------------------------------------------------------------------------
 
     @Override
     public List<Espiritu> historialDeAmos(Long espirituId, LocalDateTime desde) {
@@ -235,7 +212,7 @@ public class TrackingServiceImpl implements TrackingService {
         Set<Espiritu> amosUnicos = new LinkedHashSet<>();
 
         // 3. Pasamos la fecha 'desde' a Date para poder comparar de forma directa
-        Date fechaDesde = Date.from(desde.atZone(ZoneId.systemDefault()).toInstant());
+        Date fechaDesde = formatLocalDateTime(desde);
 
         for (Espiritu rev : revisiones) {
             Date fechaRev = rev.getUpdatedAt();
@@ -249,4 +226,39 @@ public class TrackingServiceImpl implements TrackingService {
 
         return new ArrayList<>(amosUnicos);
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    // --------------------------------------------------------------------------------
+    // ALCANCE MEDIO 2. EL MAPA DE CALOR TEMPORAL
+    // --------------------------------------------------------------------------------
+
+    @Override
+    public List<GeoJsonPoint> trayectoriaTemporalDeMedium(Long mediumId) {
+        String ravenId = "mediums_mongo/" + mediumId;
+
+        try (IDocumentSession session = documentStore.openSession()) {
+            List<ObjectNode> revisionesJson = session.advanced().revisions().getFor(ObjectNode.class, ravenId);
+
+            return revisionesJson.stream()
+                    .map(json -> {
+                        var coordenadaNode = json.get("coordenada");
+                        var coordinatesArray = coordenadaNode.get("coordinates");
+
+                        double longitud = coordinatesArray.get(0).asDouble();
+                        double latitud = coordinatesArray.get(1).asDouble();
+
+                        return new GeoJsonPoint(longitud, latitud);
+                    })
+                    .toList();
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    private Date formatLocalDateTime(LocalDateTime time) {
+        return Date.from(time.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
 }

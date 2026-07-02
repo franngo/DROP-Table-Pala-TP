@@ -5,6 +5,7 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.persistencia.mongo.EspirituDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.mongo.MediumDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.mongo.UbicacionDAOMongo;
@@ -21,6 +22,7 @@ import net.ravendb.client.serverwide.DatabaseRecord;
 import net.ravendb.client.serverwide.operations.CreateDatabaseOperation;
 import net.ravendb.client.serverwide.operations.DeleteDatabasesOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -162,6 +164,73 @@ public class DemoServiceImpl implements DemoService {
         System.out.println("\n[CONSULTA] Extrayendo historial cronológico desde RavenDB...");
         return trackingService.historialDeAmos(subordinado.getId(), desde);
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
+
+    public List<GeoJsonPoint> demoMapaDeCalorTemporal() {
+        System.out.println("\n========================================================================");
+        System.out.println("🚀 DEMO: MAPA DE CALOR TEMPORAL (3 UBICACIONES CONECTADAS)");
+        System.out.println("========================================================================\n");
+
+        // 1. SETUP DE PUNTOS CENTRALES
+        Coordenada coordenada1 = new Coordenada(-34.800, -58.200);
+        Coordenada coordenada2 = new Coordenada(-34.810, -58.210);
+        Coordenada coordenada3 = new Coordenada(-34.820, -58.220);
+
+        // 2. SETUP DE POLÍGONOS (Cada ubicación requiere una lista de 3 coordenadas)
+        List<Coordenada> areaU1 = List.of(
+                coordenada1,
+                new Coordenada(-34.801, -58.201),
+                new Coordenada(-34.802, -58.202)
+        );
+        List<Coordenada> areaU2 = List.of(
+                coordenada2,
+                new Coordenada(-34.811, -58.211),
+                new Coordenada(-34.812, -58.212)
+        );
+        List<Coordenada> areaU3 = List.of(
+                coordenada3,
+                new Coordenada(-34.821, -58.221),
+                new Coordenada(-34.822, -58.222)
+        );
+
+        // Guardamos las 3 ubicaciones en las bases de datos (SQL, Mongo, Neo4j)
+        Ubicacion u1 = ubicacionService.crear(new Santuario("Santuario Alfa", 100), areaU1);
+        Ubicacion u2 = ubicacionService.crear(new Santuario("Santuario Beta", 100), areaU2);
+        Ubicacion u3 = ubicacionService.crear(new Santuario("Santuario Gamma", 100), areaU3);
+        System.out.println("[SQL] Se crearon las ubicaciones Alfa, Beta y Gamma");
+
+        // 3. CONEXIÓN EN NEO4J
+        ubicacionService.conectar(u1.getId(), u2.getId(), 5L);
+        ubicacionService.conectar(u2.getId(), u3.getId(), 5L);
+        ubicacionService.conectar(u3.getId(), u1.getId(), 5L);
+        System.out.println("[NEO4J] Se conectaron los nodos: Alfa -> Beta -> Gamma -> Alfa.");
+
+        // Creamos el médium con maná de sobra (200) para costear los viajes en el Santuario Alfa (u1)
+        Medium medium = mediumService.crear(new Medium("Caminante Astral", 200, 180, u1), coordenada1);
+        System.out.println("[SETUP] Médium creado en el Santuario Alfa.");
+
+        // 4. TRAYECTO (El médium visita todas las ubicaciones conectadas)
+
+        // Movimiento 1: De Alfa a Beta (Coordenada c2)
+        System.out.println("[TRAYECTO] Moviéndose a Santuario Beta...");
+        mediumService.mover(medium.getId(), coordenada2.getLatitud(), coordenada2.getLongitud());
+
+        // Movimiento 2: De Beta a Gamma (Coordenada c3)
+        System.out.println("[TRAYECTO] Moviéndose a Santuario Gamma...");
+        mediumService.mover(medium.getId(), coordenada3.getLatitud(), coordenada3.getLongitud());
+
+        // Movimiento 3: De Gamma volviendo a Alfa (Coordenada c1)
+        System.out.println("[TRAYECTO] Regresando a Santuario Alfa...");
+        mediumService.mover(medium.getId(), coordenada1.getLatitud(), coordenada1.getLongitud());
+
+        // 5. CONSULTA DE TELEMETRÍA
+        System.out.println("\n[CONSULTA] Extrayendo mapa de calor temporal desde el TrackingService...");
+        return trackingService.trayectoriaTemporalDeMedium(medium.getId());
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------------------------------------
