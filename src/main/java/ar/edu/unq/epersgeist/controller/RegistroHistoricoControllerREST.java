@@ -46,7 +46,7 @@ public class RegistroHistoricoControllerREST {
     }
 
     // ============================================================================
-    // HITO 2 (PARTE A): ESTADO DE UNA ENTIDAD EN UNA FECHA DETERMINADA
+    // HITO 2 (PARTE A): RECUPERAR ESTADO DE UNA ENTIDAD EN UNA FECHA DETERMINADA
     // ============================================================================
 
     @GetMapping("/espiritus/{id}")
@@ -80,11 +80,11 @@ public class RegistroHistoricoControllerREST {
     // HITO 2 (PARTE B): EL BOTÓN DE RESTAURACIÓN GLOBAL (Viaje en el tiempo)
     // ============================================================================
 
-    @PostMapping("/restaurar")
-    @ResponseStatus(HttpStatus.OK)
-    public void restaurarSistemaAFecha(
-            @RequestParam("fecha") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fecha
-    ) {
-        restauracionService.restaurarSistemaAFecha(fecha);
-    }
+//    @PostMapping("/restaurar")
+//    @ResponseStatus(HttpStatus.OK)
+//    public void restaurarSistemaAFecha(
+//            @RequestParam("fecha") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fecha
+//    ) {
+//        restauracionService.restaurarSistemaAFecha(fecha);
+//    }
 }

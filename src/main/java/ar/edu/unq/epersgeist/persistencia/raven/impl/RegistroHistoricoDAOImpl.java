@@ -3,6 +3,9 @@ package ar.edu.unq.epersgeist.persistencia.raven.impl;
 import ar.edu.unq.epersgeist.persistencia.raven.RegistroHistoricoDAO;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import net.ravendb.client.documents.IDocumentStore;
+import net.ravendb.client.documents.operations.revisions.ConfigureRevisionsOperation;
+import net.ravendb.client.documents.operations.revisions.RevisionsCollectionConfiguration;
+import net.ravendb.client.documents.operations.revisions.RevisionsConfiguration;
 import net.ravendb.client.documents.session.IDocumentSession;
 import net.ravendb.client.serverwide.DatabaseRecord;
 import net.ravendb.client.serverwide.operations.CreateDatabaseOperation;
@@ -80,5 +83,15 @@ public class RegistroHistoricoDAOImpl implements RegistroHistoricoDAO {
         documentStore.maintenance()
                 .server()
                 .send(new CreateDatabaseOperation(new DatabaseRecord(database)));
+
+        documentStore.maintenance().send(
+                new ConfigureRevisionsOperation(
+                        new RevisionsConfiguration() {{
+                            setDefaultConfig(new RevisionsCollectionConfiguration() {{
+                                setDisabled(false);
+                                setMinimumRevisionsToKeep(25L);
+                            }});
+                        }}
+                ));
     }
 }

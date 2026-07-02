@@ -5,10 +5,7 @@ import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -17,6 +14,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
 public class RegistroHistoricoServiceTest {
 
@@ -28,6 +26,11 @@ public class RegistroHistoricoServiceTest {
     private Ubicacion ubicacionSantuario;
     private String ravenIdAngel;
     private String ravenIdDemonio;
+
+    @BeforeAll
+    void pre() {
+        registroHistoricoService.reiniciarBaseDeDatos();
+    }
 
     @BeforeEach
     void setUp() {
