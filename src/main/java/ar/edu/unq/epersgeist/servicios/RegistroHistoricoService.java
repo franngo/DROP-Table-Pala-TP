@@ -21,12 +21,13 @@ public interface RegistroHistoricoService {
     <T> T obtenerEstadoEnFecha(Class<T> claseEntidad, String ravenId, LocalDateTime fecha);
 
     /**
+     * Limpia por completo la base de datos de RavenDB (Exclusivo para entornos de Test).
+     */
+    void reiniciarBaseDeDatos();
+
+    /**
      * Obtiene todos los identificadores de documentos almacenados en una colección dada.
      */
     List<String> obtenerTodosLosIdsDeColeccion(String nombreColeccion);
 
-    /**
-     * Limpia por completo la base de datos de RavenDB (Exclusivo para entornos de Test).
-     */
-    void reiniciarBaseDeDatos();
 }

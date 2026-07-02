@@ -43,14 +43,15 @@ public class RegistroHistoricoServiceImpl implements RegistroHistoricoService {
     // --------------------------------------------------------------------------------
 
     @Override
-    public List<String> obtenerTodosLosIdsDeColeccion(String nombreColeccion) {
-        return registroHistoricoDAO.obtenerTodosLosIdsDeColeccion(nombreColeccion);
+    public void reiniciarBaseDeDatos() {
+        registroHistoricoDAO.reiniciarBaseDeDatos();
     }
 
     // --------------------------------------------------------------------------------
 
     @Override
-    public void reiniciarBaseDeDatos() {
-        registroHistoricoDAO.reiniciarBaseDeDatos();
+    public List<String> obtenerTodosLosIdsDeColeccion(String nombreColeccion) {
+        return registroHistoricoDAO.obtenerTodosLosIdsDeColeccion(nombreColeccion);
     }
+
 }

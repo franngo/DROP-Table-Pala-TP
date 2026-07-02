@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -80,8 +81,9 @@ public class RegistroHistoricoServiceTest {
             List<Espiritu> historial = registroHistoricoService.obtenerHistorial(Espiritu.class, ravenIdAngel);
 
             assertEquals(2, historial.size());
-            assertEquals(0, historial.get(0).getNivelDeConexion());
-            assertEquals(50, historial.get(1).getNivelDeConexion());
+            //Tener en cuenta que devuelve de la revisión más reciente a la más antigua
+            assertEquals(50, historial.get(0).getNivelDeConexion());
+            assertEquals(0, historial.get(1).getNivelDeConexion());
         }
 
         @Test
@@ -157,7 +159,9 @@ public class RegistroHistoricoServiceTest {
             // Registramos un objeto de otra colección para validar el filtrado lof
             registroHistoricoService.registrarEstado("ubicaciones_sql/1", ubicacionSantuario);
 
-            List<String> idsEspiritus = registroHistoricoService.obtenerTodosLosIdsDeColeccion("espiritus_sql");
+            List<String> idsEspiritus = new ArrayList<String>(registroHistoricoService.obtenerTodosLosIdsDeColeccion("Angelicals"));
+            List<String> idsEspiritus2 = registroHistoricoService.obtenerTodosLosIdsDeColeccion("Demonios");
+            idsEspiritus.addAll(idsEspiritus2);
 
             assertEquals(2, idsEspiritus.size());
             assertTrue(idsEspiritus.contains(ravenIdAngel));

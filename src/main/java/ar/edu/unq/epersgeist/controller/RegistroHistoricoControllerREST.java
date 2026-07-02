@@ -30,6 +30,7 @@ public class RegistroHistoricoControllerREST {
     @GetMapping("/espiritus/{id}/historial")
     @ResponseStatus(HttpStatus.OK)
     public List<Espiritu> obtenerHistorialEspiritu(@PathVariable Long id) {
+        System.out.println("Entró al endpoint");
         return registroHistoricoService.obtenerHistorial(Espiritu.class, "espiritus_sql/" + id);
     }
 
@@ -49,7 +50,7 @@ public class RegistroHistoricoControllerREST {
     // HITO 2 (PARTE A): RECUPERAR ESTADO DE UNA ENTIDAD EN UNA FECHA DETERMINADA
     // ============================================================================
 
-    @GetMapping("/espiritus/{id}")
+    @GetMapping("/espiritus/{id}/estado")
     @ResponseStatus(HttpStatus.OK)
     public Espiritu obtenerEstadoEnFechaEspiritu(
             @PathVariable Long id,
@@ -58,7 +59,7 @@ public class RegistroHistoricoControllerREST {
         return registroHistoricoService.obtenerEstadoEnFecha(Espiritu.class, "espiritus_sql/" + id, fecha);
     }
 
-    @GetMapping("/mediums/{id}")
+    @GetMapping("/mediums/{id}/estado")
     @ResponseStatus(HttpStatus.OK)
     public Medium obtenerEstadoEnFechaMedium(
             @PathVariable Long id,
@@ -67,7 +68,7 @@ public class RegistroHistoricoControllerREST {
         return registroHistoricoService.obtenerEstadoEnFecha(Medium.class, "mediums_sql/" + id, fecha);
     }
 
-    @GetMapping("/ubicaciones/{id}")
+    @GetMapping("/ubicaciones/{id}/estado")
     @ResponseStatus(HttpStatus.OK)
     public Ubicacion obtenerEstadoEnFechaUbicacion(
             @PathVariable Long id,
