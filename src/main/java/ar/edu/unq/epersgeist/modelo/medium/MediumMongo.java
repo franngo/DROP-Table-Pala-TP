@@ -24,7 +24,7 @@ public class MediumMongo {
     )
     private GeoJsonPoint coordenada;
 
-    public MediumMongo( Medium medium, Coordenada coordenada) {
+    public MediumMongo(Medium medium, Coordenada coordenada) {
         this.id = medium.getId();
 
         this.coordenada =

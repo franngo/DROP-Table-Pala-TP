@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -148,7 +149,8 @@ public class GlobalExceptionHandler {
             EspirituDominadoException.class,
             EspirituMuyLejanoException.class,
             InterseccionInvalidaException.class,
-            CoordenadaNoPerteneceAUbicacion.class
+            CoordenadaNoPerteneceAUbicacion.class,
+            NoSuchElementException.class
     })
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponseDTO conflictHandler(

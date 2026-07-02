@@ -9,13 +9,12 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.*;
-import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
-import ar.edu.unq.epersgeist.modelo.medium.MediumMongo;
 import ar.edu.unq.epersgeist.modelo.random.Estrategia.EstrategiaRangoEspecifico;
 import ar.edu.unq.epersgeist.modelo.random.RandomDefensa;
 import ar.edu.unq.epersgeist.persistencia.mongo.MediumDAOMongo;
+import ar.edu.unq.epersgeist.persistencia.raven.RegistroHistoricoDAO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -39,6 +38,9 @@ public class MediumServiceTest {
     private MediumService serviceMedium;
     @Autowired
     private UbicacionService ubicacionService;
+
+    @Autowired
+    private RegistroHistoricoDAO registroHistoricoService;
 
     private Ubicacion berazategui;
     private Ubicacion bernal;
@@ -398,6 +400,13 @@ public class MediumServiceTest {
         assertTrue(es.stream().anyMatch((e) -> e.getId().equals(jaegerP.getId())));
     }
 
+    @AfterEach
+    void tearDown() {
+        espirituService.eliminarTodos();
+        serviceMedium.eliminarTodos();
+        ubicacionService.eliminarTodos();
+        registroHistoricoService.reiniciarBaseDeDatos();
+    }
 
     @Nested
     public class MoverConActualizacionDeUbicaciones {
@@ -686,7 +695,7 @@ public class MediumServiceTest {
             espirituService.eliminarTodos();
             serviceMedium.eliminarTodos();
             ubicacionService.eliminarTodos();
-
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
     }
 
@@ -794,16 +803,8 @@ public class MediumServiceTest {
             espirituService.eliminarTodos();
             serviceMedium.eliminarTodos();
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
-    }
-
-
-    @AfterEach
-    void tearDown() {
-        espirituService.eliminarTodos();
-        serviceMedium.eliminarTodos();
-        ubicacionService.eliminarTodos();
-
     }
 
 

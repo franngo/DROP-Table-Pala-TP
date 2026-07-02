@@ -10,11 +10,13 @@ import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.*;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.persistencia.mongo.UbicacionDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
+import ar.edu.unq.epersgeist.persistencia.raven.RegistroHistoricoDAO;
 import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
 import ar.edu.unq.epersgeist.servicios.UbicacionService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.bson.Document;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.geo.GeoJsonPolygon;
@@ -41,6 +43,9 @@ public class UbicacionServiceImpl implements UbicacionService {
     private final UbicacionDAOMongo ubicacionDAOMongo;
     private final MongoTemplate mongoTemplate;
 
+    @Autowired
+    private RegistroHistoricoDAO registroHistorico;
+
     // --------------------------------------------------------------------------------
     // CREAR
     // --------------------------------------------------------------------------------
@@ -55,12 +60,10 @@ public class UbicacionServiceImpl implements UbicacionService {
             throw new UbicacionYaExisteException(ubicacion.getNombre());
         }
 
-        //en este punto, ya está decidido que la Ubicacion como tal es válida para ser creada, PERO falta realizar un chequeo sobre las coordenadas.
-
-        // Se chequea que las coordenadas dadas no pertenezcan al área de otra Ubicacion existente, ya que las Ubicaciones no se pueden intersectar.
+        // Se chequea que las coordenadas dadas no pertenezcan al área de otra Ubicacion existente
         GeoJsonPolygon polygon = UbicacionMongo.crearPoligono(coordenadas);
         List<UbicacionMongo> intersectan = ubicacionDAOMongo.ubicacionesQueIntersectan(polygon);
-        if(!intersectan.isEmpty()) {
+        if (!intersectan.isEmpty()) {
             throw new InterseccionInvalidaException();
         }
 
@@ -74,10 +77,17 @@ public class UbicacionServiceImpl implements UbicacionService {
         ubicacionDAOSQL.save(ubicacion);
 
         // La persisto también en Neo4j usando el id generado en SQL
-        ubicacionDAONeo.save(new UbicacionNeo4j(ubicacion));
+        UbicacionNeo4j ubicacionNeo = ubicacionDAONeo.save(new UbicacionNeo4j(ubicacion));
 
-        //La persisto también en Mongo
-        ubicacionDAOMongo.save(new UbicacionMongo(ubicacion, coordenadas));
+        // La persisto también en Mongo
+        UbicacionMongo ubicacionMongo = ubicacionDAOMongo.save(new UbicacionMongo(ubicacion, coordenadas));
+
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+        registroHistorico.registrarEstado("ubicaciones_sql/" + ubicacion.getId(), ubicacion);
+        registroHistorico.registrarEstado("ubicaciones_mongo/" + ubicacion.getId(), ubicacionMongo);
+        registroHistorico.registrarEstado("ubicaciones_neo/" + ubicacion.getId(), ubicacionNeo);
 
         return ubicacion;
     }
@@ -111,6 +121,12 @@ public class UbicacionServiceImpl implements UbicacionService {
         }
 
         ubicacionDAOSQL.save(ubicacion);
+
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+
+        registroHistorico.registrarEstado("ubicaciones_sql/" + ubicacion.getId(), ubicacion);
     }
 
     // --------------------------------------------------------------------------------
@@ -120,10 +136,31 @@ public class UbicacionServiceImpl implements UbicacionService {
     @Override
     public void eliminar(Long id) {
         ubicacionDAOSQL.findById(id).ifPresent(ubicacion -> {
+            // 1. Modificación y persistencia del Soft Delete en SQL
             ubicacion.setDeletedAt(true);
             ubicacionDAOSQL.save(ubicacion);
-            ubicacionDAONeo.deleteById(id); //hace un DETACH DELETE del nodo en la DB Neo4j con dicho id
+
+            // ----------------------------------------------------------------------
+            // REGISTRO HISTÓRICO
+            // MONGO (Antes de que deje de existir)
+            // NEO4J (Antes de borrar el nodo)
+            // ----------------------------------------------------------------------
+            ubicacionDAOMongo.findById(id).ifPresent(ubicacionMongo -> {
+                registroHistorico.registrarEstado("ubicaciones_mongo/" + id, ubicacionMongo);
+            });
+
+            ubicacionDAONeo.findById(id).ifPresent(ubicacionNeo -> {
+                registroHistorico.registrarEstado("ubicaciones_neo/" + id, ubicacionNeo);
+            });
+
+            // Eliminación física en Neo4j y Mongo
+            ubicacionDAONeo.deleteById(id);
             ubicacionDAOMongo.deleteById(id);
+
+            // ----------------------------------------------------------------------
+            // REGISTRO HISTÓRICO - SQL (Con el estado "Soft Deleted")
+            // ----------------------------------------------------------------------
+            registroHistorico.registrarEstado("ubicaciones_sql/" + ubicacion.getId(), ubicacion);
         });
     }
 
@@ -381,53 +418,53 @@ public class UbicacionServiceImpl implements UbicacionService {
     @Override
     public void normalize() {
         AggregationOperation etapaProyeccion = context -> org.bson.Document.parse("""
-        {
-          "$project": {
-            "_id": "$_id",
-            "ubicacion": "$ubicacion",
-            "sensor_id": "$sensor_id",
-            "fecha": "$fecha",
-            
-            "medicion": {
-              "$switch": {
-                "branches": [
-                  { "case": { "$ne": [{ "$type": "$decibeles" }, "missing"] }, "then": "sonido" },
-                  { "case": { "$ne": [{ "$type": "$temperatura" }, "missing"] }, "then": "temperatura" },
-                  { "case": { "$ne": [{ "$type": "$presionAtmosferica" }, "missing"] }, "then": "presión" }
-                ],
-                "default": "desconocido"
-              }
-            },
-            
-            "evento": {
-              "$cond": [
-                { "$gt": ["$decibeles", 90.0] }, "Exorcismo",
-                { "$cond": [
-                  { "$and": [
-                    { "$ne": [{ "$type": "$temperatura" }, "missing"] },
-                    { "$lt": ["$temperatura.grados", 5.0] }
-                  ]}, "Invocación Demoníaca",
-                  { "$cond": [
-                    { "$ne": [{ "$type": "$l3kTUr4" }, "missing"] }, "Suceso Desconocido",
-                    { "$cond": [ { "$ne": [{ "$type": "$presionAtmosferica" }, "missing"] }, "Presencia de Demonios", "Lectura Normal" ] }
-                  ]}
-                ]}
-              ]
-            },
-            
-            "resultado_sensor": {
-              "$switch": {
-                "branches": [
-                  { "case": { "$ne": [{ "$type": "$decibeles" }, "missing"] }, "then": { "valor": "$decibeles", "medida": "dB" } },
-                  { "case": { "$ne": [{ "$type": "$temperatura" }, "missing"] }, "then": { "valor": "$temperatura.grados", "medida": "$temperatura.unidad" } },
-                  { "case": { "$ne": [{ "$type": "$presionAtmosferica" }, "missing"] }, "then": { "valor": "$presionAtmosferica", "medida": "hPa" } }
-                ],
-                "default": { "valor": null, "medida": "N/A" }
-              }
-            }
-          }
-        }
-        """);
+                {
+                  "$project": {
+                    "_id": "$_id",
+                    "ubicacion": "$ubicacion",
+                    "sensor_id": "$sensor_id",
+                    "fecha": "$fecha",
+                
+                    "medicion": {
+                      "$switch": {
+                        "branches": [
+                          { "case": { "$ne": [{ "$type": "$decibeles" }, "missing"] }, "then": "sonido" },
+                          { "case": { "$ne": [{ "$type": "$temperatura" }, "missing"] }, "then": "temperatura" },
+                          { "case": { "$ne": [{ "$type": "$presionAtmosferica" }, "missing"] }, "then": "presión" }
+                        ],
+                        "default": "desconocido"
+                      }
+                    },
+                
+                    "evento": {
+                      "$cond": [
+                        { "$gt": ["$decibeles", 90.0] }, "Exorcismo",
+                        { "$cond": [
+                          { "$and": [
+                            { "$ne": [{ "$type": "$temperatura" }, "missing"] },
+                            { "$lt": ["$temperatura.grados", 5.0] }
+                          ]}, "Invocación Demoníaca",
+                          { "$cond": [
+                            { "$ne": [{ "$type": "$l3kTUr4" }, "missing"] }, "Suceso Desconocido",
+                            { "$cond": [ { "$ne": [{ "$type": "$presionAtmosferica" }, "missing"] }, "Presencia de Demonios", "Lectura Normal" ] }
+                          ]}
+                        ]}
+                      ]
+                    },
+                
+                    "resultado_sensor": {
+                      "$switch": {
+                        "branches": [
+                          { "case": { "$ne": [{ "$type": "$decibeles" }, "missing"] }, "then": { "valor": "$decibeles", "medida": "dB" } },
+                          { "case": { "$ne": [{ "$type": "$temperatura" }, "missing"] }, "then": { "valor": "$temperatura.grados", "medida": "$temperatura.unidad" } },
+                          { "case": { "$ne": [{ "$type": "$presionAtmosferica" }, "missing"] }, "then": { "valor": "$presionAtmosferica", "medida": "hPa" } }
+                        ],
+                        "default": { "valor": null, "medida": "N/A" }
+                      }
+                    }
+                  }
+                }
+                """);
 
         AggregationOperation etapaSalida = context -> new org.bson.Document("$out", "datos_normalizados");
 

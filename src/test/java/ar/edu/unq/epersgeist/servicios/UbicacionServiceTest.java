@@ -10,6 +10,7 @@ import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
 import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.*;
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
+import ar.edu.unq.epersgeist.persistencia.raven.RegistroHistoricoDAO;
 import org.bson.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,6 +52,9 @@ public class UbicacionServiceTest {
 
     @Autowired
     private MediumService mediumService;
+
+    @Autowired
+    private RegistroHistoricoDAO registroHistoricoService;
 
     // --------------------------------------------------------------------------------
     // ATRIBUTOS
@@ -128,6 +132,7 @@ public class UbicacionServiceTest {
     @AfterEach
     void tearDown() {
         ubicacionService.eliminarTodos();
+        registroHistoricoService.reiniciarBaseDeDatos();
     }
 
     // --------------------------------------------------------------------------------
@@ -331,6 +336,7 @@ public class UbicacionServiceTest {
         void tearDown() {
             espirituService.eliminarTodos();
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
 
         // --------------------------------------------------------------------------------
@@ -398,6 +404,7 @@ public class UbicacionServiceTest {
             espirituService.eliminarTodos();
             mediumService.eliminarTodos();
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
         // --------------------------------------------------------------------------------
 
@@ -446,6 +453,7 @@ public class UbicacionServiceTest {
         @AfterEach
         void tearDown() {
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
 
         // ------------------------------------------------------------
@@ -616,6 +624,7 @@ public class UbicacionServiceTest {
         @AfterEach
         void tearDown() {
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
 
         @Test
@@ -725,6 +734,7 @@ public class UbicacionServiceTest {
         @AfterEach
         void tearDown() {
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
 
         // ------------------------------------------------------------
@@ -839,6 +849,7 @@ public class UbicacionServiceTest {
         @AfterEach
         void tearDown() {
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
 
         @Test
@@ -914,6 +925,7 @@ public class UbicacionServiceTest {
         @AfterEach
         void tearDown() {
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
 
         @Test
@@ -1143,10 +1155,9 @@ public class UbicacionServiceTest {
     @Nested
     class UbicacionesFrias {
 
+        private static final double UMBRAL = 5.0;
         @Autowired
         private MongoTemplate mongoTemplate;
-
-        private static final double UMBRAL = 5.0;
 
         @BeforeEach
         void setUp() {
@@ -1157,6 +1168,7 @@ public class UbicacionServiceTest {
         void tearDown() {
             mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
 
         private void insertTemperatura(String ubicacion, double grados) {
@@ -1295,6 +1307,7 @@ public class UbicacionServiceTest {
         void tearDown() {
             mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
 
         private void insertSonido(String ubicacion, double decibeles) {
@@ -1441,11 +1454,9 @@ public class UbicacionServiceTest {
 
     @Nested
     class UbicacionesConflictivas {
+        private static final Integer UMBRAL = 90;
         @Autowired
         private MongoTemplate mongoTemplate;
-
-        private static final Integer UMBRAL = 90;
-
 
         @BeforeEach
         void setUp() {
@@ -1456,6 +1467,7 @@ public class UbicacionServiceTest {
         void tearDown() {
             mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
 
         private void insertSonido(String ubicacion, double decibeles) {
@@ -1481,7 +1493,6 @@ public class UbicacionServiceTest {
                     );
         }
 
-        
 
         // ------------------------------------------------------------
         // CASO 1: retorna ubicaciones con decibeles altos
@@ -1568,12 +1579,11 @@ public class UbicacionServiceTest {
     // --------------------------------------------------------------------------------
 
     @Nested
-    class Normalize{
-        @Autowired
-        private MongoTemplate mongoTemplate;
-
+    class Normalize {
         private static final double TOPE_DECIBELES = 90.0;
         private static final double TOPE_TEMPERATURA = 5.0;
+        @Autowired
+        private MongoTemplate mongoTemplate;
 
         @BeforeEach
         void setUp() {
@@ -1586,6 +1596,7 @@ public class UbicacionServiceTest {
             mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
             mongoTemplate.getCollection("datos_normalizados").deleteMany(new Document());
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
 
         private void insertSonido(String ubicacion, double decibeles) {

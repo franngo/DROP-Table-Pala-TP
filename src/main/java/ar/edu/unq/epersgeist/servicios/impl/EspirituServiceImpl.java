@@ -11,12 +11,14 @@ import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.CoordenadaNoPerteneceAU
 import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.persistencia.mongo.EspirituDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.mongo.UbicacionDAOMongo;
+import ar.edu.unq.epersgeist.persistencia.raven.RegistroHistoricoDAO;
 import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAOSQL;
 import ar.edu.unq.epersgeist.persistencia.sql.MediumDAOSQL;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -41,20 +43,31 @@ public class EspirituServiceImpl implements EspirituService {
 
     private UbicacionDAOMongo ubicacionDAOMongo;
 
+    @Autowired
+    private RegistroHistoricoDAO registroHistorico;
+
     @Override
     public Espiritu crear(Espiritu espiritu, Coordenada coordenada) {
         this.validarEspiritu(espiritu);
 
-        //Se chequea que la coordenada dada pertenezca al área de la Ubicación del Espiritu
+        // Se chequea que la coordenada dada pertenezca al área de la Ubicación del Espiritu
         List<UbicacionMongo> ubiCord = ubicacionDAOMongo.buscarUbicacionQueContiene(coordenada.getLatitud(), coordenada.getLongitud());
-        if(ubiCord.isEmpty() || !Objects.equals(ubiCord.getFirst().getId(), espiritu.getUbicacion().getId())) {
+        if (ubiCord.isEmpty() || !Objects.equals(ubiCord.getFirst().getId(), espiritu.getUbicacion().getId())) {
             throw new CoordenadaNoPerteneceAUbicacion();
         }
 
         espirituDAOSQL.save(espiritu);
-        espirituDAOMongo.save(new EspirituMongo(espiritu, coordenada));
-        return espiritu;
 
+        EspirituMongo espirituMongo = espirituDAOMongo.save(new EspirituMongo(espiritu, coordenada));
+
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+
+        registroHistorico.registrarEstado("espiritus_sql/" + espiritu.getId(), espiritu);
+        registroHistorico.registrarEstado("espiritus_mongo/" + espiritu.getId(), espirituMongo);
+
+        return espiritu;
     }
 
     private void validarEspiritu(Espiritu espiritu) {
@@ -85,16 +98,38 @@ public class EspirituServiceImpl implements EspirituService {
         espirituDAOSQL.findById(espirituId).orElseThrow(() -> new ErrorAlActualizarEspirituException("No existe en la BD el espiritu con id: " + espirituId));
 
         this.espirituDAOSQL.save(espiritu);
+
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+
+        registroHistorico.registrarEstado("espiritus_sql/" + espiritu.getId(), espiritu);
     }
 
     @Override
     public void eliminar(Long espirituId) {
-
         Espiritu espiritu = this.recuperar(espirituId);
         espiritu.setDeletedAt(true);
         espirituDAOSQL.save(espiritu);
+
+        // ----------------------------------------------------------------------
+        // REGISTRO HISTÓRICO - PASO 1: MONGO (Antes de que deje de existir)
+        // ----------------------------------------------------------------------
+        // Buscamos el documento en Mongo y registramos su ÚLTIMO estado vivo en Raven
+        // antes de que sea eliminado físicamente de MongoDB.
+        espirituDAOMongo.findById(espirituId).ifPresent(espirituMongo -> {
+            registroHistorico.registrarEstado("espiritus_mongo/" + espirituId, espirituMongo);
+        });
+
+        // Eliminación física en MongoDB
         espirituDAOMongo.deleteById(espirituId);
 
+        // ----------------------------------------------------------------------
+        // REGISTRO HISTÓRICO - PASO 2: SQL (Con el estado "Soft Deleted")
+        // ----------------------------------------------------------------------
+        // Registramos en Raven el espíritu de SQL. Esta snapshot va a persistir
+        // el objeto con "deletedAt: true", marcando el fin de su ciclo activo.
+        registroHistorico.registrarEstado("espiritus_sql/" + espiritu.getId(), espiritu);
     }
 
     @Override
@@ -123,8 +158,14 @@ public class EspirituServiceImpl implements EspirituService {
             throw new EspirituDominadoException();
         }
 
-        //las validaciones sobre si está libre y en la misma ubicación se dan en el method del modelo.
+        // Las validaciones sobre si está libre y en la misma ubicación se dan en el method del modelo.
         espirituEncontrado.aumentarConexionYConectar(mediumEncontrado);
+
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+
+        registroHistorico.registrarEstado("espiritus_sql/" + espirituEncontrado.getId(), espirituEncontrado);
 
         return mediumDAOSQL.save(mediumEncontrado);
     }
@@ -190,6 +231,12 @@ public class EspirituServiceImpl implements EspirituService {
         }
 
         espirituDominante.dominar(espirituADominar, distanciaEspiritus);
-    }
 
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+
+        registroHistorico.registrarEstado("espiritus_sql/" + espirituDominante.getId(), espirituDominante);
+        registroHistorico.registrarEstado("espiritus_sql/" + espirituADominar.getId(), espirituADominar);
+    }
 }
