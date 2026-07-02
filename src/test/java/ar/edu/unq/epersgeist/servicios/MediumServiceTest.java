@@ -40,7 +40,7 @@ public class MediumServiceTest {
     private UbicacionService ubicacionService;
 
     @Autowired
-    private RegistroHistoricoDAO registroHistorico;
+    private RegistroHistoricoDAO registroHistoricoService;
 
     private Ubicacion berazategui;
     private Ubicacion bernal;
@@ -405,7 +405,7 @@ public class MediumServiceTest {
         espirituService.eliminarTodos();
         serviceMedium.eliminarTodos();
         ubicacionService.eliminarTodos();
-        registroHistorico.reiniciarBaseDeDatos();
+        registroHistoricoService.reiniciarBaseDeDatos();
     }
 
     @Nested
@@ -695,7 +695,7 @@ public class MediumServiceTest {
             espirituService.eliminarTodos();
             serviceMedium.eliminarTodos();
             ubicacionService.eliminarTodos();
-
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
     }
 
@@ -803,6 +803,7 @@ public class MediumServiceTest {
             espirituService.eliminarTodos();
             serviceMedium.eliminarTodos();
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
     }
 

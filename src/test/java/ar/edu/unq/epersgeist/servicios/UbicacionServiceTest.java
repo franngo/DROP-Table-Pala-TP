@@ -54,7 +54,7 @@ public class UbicacionServiceTest {
     private MediumService mediumService;
 
     @Autowired
-    private RegistroHistoricoDAO registroHistorico;
+    private RegistroHistoricoDAO registroHistoricoService;
 
     // --------------------------------------------------------------------------------
     // ATRIBUTOS
@@ -132,6 +132,7 @@ public class UbicacionServiceTest {
     @AfterEach
     void tearDown() {
         ubicacionService.eliminarTodos();
+        registroHistoricoService.reiniciarBaseDeDatos();
     }
 
     // --------------------------------------------------------------------------------
@@ -335,7 +336,7 @@ public class UbicacionServiceTest {
         void tearDown() {
             espirituService.eliminarTodos();
             ubicacionService.eliminarTodos();
-            registroHistorico.reiniciarBaseDeDatos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
 
         // --------------------------------------------------------------------------------
@@ -403,7 +404,7 @@ public class UbicacionServiceTest {
             espirituService.eliminarTodos();
             mediumService.eliminarTodos();
             ubicacionService.eliminarTodos();
-            registroHistorico.reiniciarBaseDeDatos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
         // --------------------------------------------------------------------------------
 
@@ -452,6 +453,7 @@ public class UbicacionServiceTest {
         @AfterEach
         void tearDown() {
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
 
         // ------------------------------------------------------------
@@ -622,6 +624,7 @@ public class UbicacionServiceTest {
         @AfterEach
         void tearDown() {
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
 
         @Test
@@ -731,6 +734,7 @@ public class UbicacionServiceTest {
         @AfterEach
         void tearDown() {
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
 
         // ------------------------------------------------------------
@@ -845,6 +849,7 @@ public class UbicacionServiceTest {
         @AfterEach
         void tearDown() {
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
 
         @Test
@@ -920,6 +925,7 @@ public class UbicacionServiceTest {
         @AfterEach
         void tearDown() {
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
 
         @Test
@@ -1162,6 +1168,7 @@ public class UbicacionServiceTest {
         void tearDown() {
             mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
 
         private void insertTemperatura(String ubicacion, double grados) {
@@ -1300,6 +1307,7 @@ public class UbicacionServiceTest {
         void tearDown() {
             mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
 
         private void insertSonido(String ubicacion, double decibeles) {
@@ -1459,6 +1467,7 @@ public class UbicacionServiceTest {
         void tearDown() {
             mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
 
         private void insertSonido(String ubicacion, double decibeles) {
@@ -1587,6 +1596,7 @@ public class UbicacionServiceTest {
             mongoTemplate.getCollection("datos_sensores").deleteMany(new Document());
             mongoTemplate.getCollection("datos_normalizados").deleteMany(new Document());
             ubicacionService.eliminarTodos();
+            registroHistoricoService.reiniciarBaseDeDatos();
         }
 
         private void insertSonido(String ubicacion, double decibeles) {
