@@ -1676,7 +1676,7 @@ public class UbicacionServiceTest {
             Document doc = mongoTemplate.getCollection("datos_normalizados").find().first();
             assertNotNull(doc);
             assertEquals("temperatura", doc.getString("medicion"));
-            assertEquals("Invocación Demoníaca", doc.getString("evento"));
+            assertEquals("Invocacion", doc.getString("evento"));
 
             Document resultadoSensor = (Document) doc.get("resultado_sensor");
             assertEquals(2.0, resultadoSensor.getDouble("valor"), 0.01);
@@ -1687,18 +1687,18 @@ public class UbicacionServiceTest {
         // CASO 3: Documento de presión atmosférica (Presencia)
         // ------------------------------------------------------------
         @Test
-        void normalizaDocumentoDePresionComoPresenciaDeDemonios() {
-            insertPresion("Bosque Arcano", 980.0);
+        void normalizaDocumentoDePresionComoUbicacionDetectada() {
+            insertPresion("Bosque Arcano", 1100.0);
 
             ubicacionService.normalize();
 
             Document doc = mongoTemplate.getCollection("datos_normalizados").find().first();
             assertNotNull(doc);
             assertEquals("presión", doc.getString("medicion"));
-            assertEquals("Presencia de Demonios", doc.getString("evento"));
+            assertEquals("Ubicacion detectada", doc.getString("evento"));
 
             Document resultadoSensor = (Document) doc.get("resultado_sensor");
-            assertEquals(980.0, resultadoSensor.getDouble("valor"), 0.01);
+            assertEquals(1100.0, resultadoSensor.getDouble("valor"), 0.01);
             assertEquals("hPa", resultadoSensor.getString("medida"));
         }
 
@@ -1715,7 +1715,7 @@ public class UbicacionServiceTest {
             assertNotNull(doc);
             assertNull(doc.get("sensor_id"));
             assertEquals("desconocido", doc.getString("medicion"));
-            assertEquals("Suceso Desconocido", doc.getString("evento"));
+            assertEquals("Desconocida", doc.getString("evento"));
 
             Document resultadoSensor = (Document) doc.get("resultado_sensor");
             assertNull(resultadoSensor.get("valor"));
