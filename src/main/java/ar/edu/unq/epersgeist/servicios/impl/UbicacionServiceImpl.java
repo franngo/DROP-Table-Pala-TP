@@ -418,58 +418,91 @@ public class UbicacionServiceImpl implements UbicacionService {
     @Override
     public void normalize() {
         AggregationOperation etapaProyeccion = context -> org.bson.Document.parse("""
-                {
-                  "$project": {
-                    "_id": "$_id",
-                    "ubicacion": "$ubicacion",
-                    "sensor_id": "$sensor_id",
-                    "fecha": "$fecha",
-                
-                    "medicion": {
-                      "$switch": {
-                        "branches": [
-                          { "case": { "$ne": [{ "$type": "$decibeles" }, "missing"] }, "then": "sonido" },
-                          { "case": { "$ne": [{ "$type": "$temperatura" }, "missing"] }, "then": "temperatura" },
-                          { "case": { "$ne": [{ "$type": "$presionAtmosferica" }, "missing"] }, "then": "presión" }
-                        ],
-                        "default": "desconocido"
-                      }
-                    },
-                
-                    "evento": {
+            {
+              "$project": {
+                "_id": "$_id",
+                "ubicacion": "$ubicacion",
+                "sensor_id": "$sensor_id",
+                "fecha": "$fecha",
+            
+                "medicion": {
+                  "$switch": {
+                    "branches": [
+                      { "case": { "$ne": [{ "$type": "$decibeles" }, "missing"] }, "then": "sonido" },
+                      { "case": { "$ne": [{ "$type": "$temperatura" }, "missing"] }, "then": "temperatura" },
+                      { "case": { "$ne": [{ "$type": "$presionAtmosferica" }, "missing"] }, "then": "presión" }
+                    ],
+                    "default": "desconocido"
+                  }
+                },
+            
+                "evento": {
+                  "$cond": [
+                    { "$gt": ["$decibeles", 90.0] },
+                    "Exorcismo",
+                    {
                       "$cond": [
-                        { "$gt": ["$decibeles", 90.0] }, "Exorcismo",
-                        { "$cond": [
-                          { "$and": [
+                        {
+                          "$and": [
                             { "$ne": [{ "$type": "$temperatura" }, "missing"] },
                             { "$lt": ["$temperatura.grados", 5.0] }
-                          ]}, "Invocación Demoníaca",
-                          { "$cond": [
-                            { "$ne": [{ "$type": "$l3kTUr4" }, "missing"] }, "Suceso Desconocido",
-                            { "$cond": [ { "$ne": [{ "$type": "$presionAtmosferica" }, "missing"] }, "Presencia de Demonios", "Lectura Normal" ] }
-                          ]}
-                        ]}
+                          ]
+                        },
+                        "Invocacion",
+                        {
+                          "$cond": [
+                            {
+                              "$and": [
+                                { "$ne": [{ "$type": "$presionAtmosferica" }, "missing"] },
+                                { "$gt": ["$presionAtmosferica", 1000] }
+                              ]
+                            },
+                            "Ubicacion detectada",
+                            "Desconocida"
+                          ]
+                        }
                       ]
-                    },
-                
-                    "resultado_sensor": {
-                      "$switch": {
-                        "branches": [
-                          { "case": { "$ne": [{ "$type": "$decibeles" }, "missing"] }, "then": { "valor": "$decibeles", "medida": "dB" } },
-                          { "case": { "$ne": [{ "$type": "$temperatura" }, "missing"] }, "then": { "valor": "$temperatura.grados", "medida": "$temperatura.unidad" } },
-                          { "case": { "$ne": [{ "$type": "$presionAtmosferica" }, "missing"] }, "then": { "valor": "$presionAtmosferica", "medida": "hPa" } }
-                        ],
-                        "default": { "valor": null, "medida": "N/A" }
-                      }
                     }
+                  ]
+                },
+            
+                "resultado_sensor": {
+                  "$switch": {
+                    "branches": [
+                      {
+                        "case": { "$ne": [{ "$type": "$decibeles" }, "missing"] },
+                        "then": { "valor": "$decibeles", "medida": "dB" }
+                      },
+                      {
+                        "case": { "$ne": [{ "$type": "$temperatura" }, "missing"] },
+                        "then": {
+                          "valor": "$temperatura.grados",
+                          "medida": "$temperatura.unidad"
+                        }
+                      },
+                      {
+                        "case": { "$ne": [{ "$type": "$presionAtmosferica" }, "missing"] },
+                        "then": { "valor": "$presionAtmosferica", "medida": "hPa" }
+                      }
+                    ],
+                    "default": { "valor": null, "medida": "N/A" }
                   }
                 }
-                """);
+              }
+            }
+            """);
 
-        AggregationOperation etapaSalida = context -> new org.bson.Document("$out", "datos_normalizados");
+        AggregationOperation etapaSalida =
+                context -> new org.bson.Document("$out", "datos_normalizados");
 
-        Aggregation aggregation = Aggregation.newAggregation(etapaProyeccion, etapaSalida);
-        mongoTemplate.aggregate(aggregation, "datos_sensores", org.bson.Document.class);
+        Aggregation aggregation =
+                Aggregation.newAggregation(etapaProyeccion, etapaSalida);
+
+        mongoTemplate.aggregate(
+                aggregation,
+                "datos_sensores",
+                org.bson.Document.class
+        );
     }
 
 
