@@ -288,7 +288,6 @@ public class MediumServiceImpl implements MediumService {
             // depende el estado del medium se guarda o se elimina
             if (mediumAMover.sinMana()) {
                 this.eliminar(mediumAMover.getId());
-                mediumDAOMongo.deleteById(mediumAMover.getId());
             } else {
                 mediumDAOSQL.save(mediumAMover);
                 mediumDAOMongo.actualizarCoordenada(mediumId, longitud, latitud);
