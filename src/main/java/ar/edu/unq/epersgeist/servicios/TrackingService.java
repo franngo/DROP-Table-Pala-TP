@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public interface TrackingService {
 
@@ -29,8 +30,8 @@ public interface TrackingService {
     /**
      * ALCANCE MEDIO 3: ANÁLISIS DE DAÑO DE BATALLA
      * <p>
-     * Una consulta que busque un Médium y compare su estado actual de maná/energía
+     * Una consulta que busca un Médium y compare su estado actual de maná/energía
      * con su estado de hace 5 revisiones atrás.
      */
-//    Map<String, Object> analizarDanioDeBatalla(Long mediumId, int revisionesAtras);
+    Map<String, Object> costoDeMoverseDesdeLaUltimaUbicacion(Long mediumId);
 }

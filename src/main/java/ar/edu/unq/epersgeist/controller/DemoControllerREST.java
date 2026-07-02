@@ -24,7 +24,7 @@ public class DemoControllerREST {
     // Demo 1: Historial de Amos
     // --------------------------------------------------------------------------------
 
-    @PostMapping("/amos")
+    @GetMapping("/amos")
     @ResponseStatus(HttpStatus.OK)
     public List<EspirituResponseDTO> amos() throws InterruptedException {
         List<Espiritu> amos = demoService.historialDeAmos();
@@ -35,7 +35,7 @@ public class DemoControllerREST {
     // Demo 2: El mapa de calor temporal
     // --------------------------------------------------------------------------------
 
-    @PostMapping("/mapa-calor")
+    @GetMapping("/mapa-calor")
     @ResponseStatus(HttpStatus.OK)
     public List<GeoJsonPoint> ejecutarDemoMapaCalor() throws Exception {
         return demoService.demoMapaDeCalorTemporal();
@@ -45,12 +45,11 @@ public class DemoControllerREST {
     // Demo 3: Análisis de daño de batalla
     // --------------------------------------------------------------------------------
 
-//    @PostMapping("/danio-batalla")
-//    @ResponseStatus(HttpStatus.OK)
-//    public String ejecutarDemoDanioBatalla() throws Exception {
-//        demoService.demoDanioDeBatalla();
-//        return "Demo 3 (Análisis de Daño de Batalla) ejecutada con éxito. Revisá los logs de la consola.";
-//    }
+    @GetMapping("/danio-batalla")
+    @ResponseStatus(HttpStatus.OK)
+    public void ejecutarDemoDanioBatalla() {
+        demoService.demoCostoMoverseUltimaUbicacion();
+    }
 
     // --------------------------------------------------------------------------------
 
@@ -61,10 +60,4 @@ public class DemoControllerREST {
     }
 
     // --------------------------------------------------------------------------------
-
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String manejarErrores(Exception e) {
-        return "Error al ejecutar la demo: " + e.getMessage();
-    }
 }

@@ -170,6 +170,7 @@
 package ar.edu.unq.epersgeist.servicios.impl;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.persistencia.raven.RegistroHistoricoDAO;
 import ar.edu.unq.epersgeist.servicios.TrackingService;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -252,6 +253,37 @@ public class TrackingServiceImpl implements TrackingService {
                     })
                     .toList();
         }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    @Override
+    public Map<String, Object> costoDeMoverseDesdeLaUltimaUbicacion(Long mediumId) {
+        String idRaven = "mediums_sql/" + mediumId;
+        Map<String, Object> reporte = new HashMap<>();
+
+        List<Medium> revisiones = registroHistoricoDAO.obtenerHistorial(Medium.class, idRaven);
+
+        if (revisiones.isEmpty()) {
+            throw new NoSuchElementException("No hay historial para el médium con ID: " + mediumId);
+        }
+
+        Medium actual = revisiones.getFirst();
+
+        int targetIndex = revisiones.size() - 1;
+        Medium pasado = revisiones.get(targetIndex);
+
+        int manaActual = actual.getMana();
+        int manaPasado = pasado.getMana();
+        int diferenciaMana = manaPasado - manaActual;
+
+        reporte.put("mediumNombre", actual.getNombre());
+        reporte.put("manaActual", manaActual);
+        reporte.put("manaPasado", manaPasado);
+        reporte.put("manaGastado", diferenciaMana);
+        reporte.put("porcentajeGastado", manaPasado > 0 ? ((double) diferenciaMana / manaPasado) * 100 : 0);
+
+        return reporte;
     }
 
     // -----------------------------------------------------------------------------------------------------------------

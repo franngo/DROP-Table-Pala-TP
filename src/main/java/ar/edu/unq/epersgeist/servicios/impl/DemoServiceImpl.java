@@ -10,23 +10,19 @@ import ar.edu.unq.epersgeist.persistencia.mongo.EspirituDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.mongo.MediumDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.mongo.UbicacionDAOMongo;
 import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
+import ar.edu.unq.epersgeist.persistencia.raven.RegistroHistoricoDAO;
 import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAOSQL;
 import ar.edu.unq.epersgeist.persistencia.sql.MediumDAOSQL;
 import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
 import ar.edu.unq.epersgeist.servicios.*;
 import net.ravendb.client.documents.IDocumentStore;
-import net.ravendb.client.documents.operations.revisions.ConfigureRevisionsOperation;
-import net.ravendb.client.documents.operations.revisions.RevisionsCollectionConfiguration;
-import net.ravendb.client.documents.operations.revisions.RevisionsConfiguration;
-import net.ravendb.client.serverwide.DatabaseRecord;
-import net.ravendb.client.serverwide.operations.CreateDatabaseOperation;
-import net.ravendb.client.serverwide.operations.DeleteDatabasesOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class DemoServiceImpl implements DemoService {
@@ -55,7 +51,7 @@ public class DemoServiceImpl implements DemoService {
     @Autowired
     private UbicacionDAOSQL ubicacionDAOSQL;
     @Autowired
-    private UbicacionDAOSQL registroHistorico;
+    private RegistroHistoricoDAO registroHistorico;
     @Autowired
     private IDocumentStore documentStore;
 
@@ -235,6 +231,64 @@ public class DemoServiceImpl implements DemoService {
     // -----------------------------------------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------------------------------------
 
+    public void demoCostoMoverseUltimaUbicacion() {
+        System.out.println("\n========================================================================");
+        System.out.println("🚀 DEMO: COSTO DE MOVERSE DESDE LA ÚLTIMA UBICACIÓN (2 UBICACIONES)");
+        System.out.println("========================================================================\n");
+
+        // 1. SETUP DE PUNTOS CENTRALES (2 Ubicaciones)
+        Coordenada coordenada1 = new Coordenada(-34.800, -58.200);
+        Coordenada coordenada2 = new Coordenada(-34.810, -58.210);
+
+        // 2. SETUP DE POLÍGONOS
+        List<Coordenada> areaU1 = List.of(
+                coordenada1,
+                new Coordenada(-34.801, -58.201),
+                new Coordenada(-34.802, -58.202)
+        );
+        List<Coordenada> areaU2 = List.of(
+                coordenada2,
+                new Coordenada(-34.811, -58.211),
+                new Coordenada(-34.812, -58.212)
+        );
+
+        // Guardamos las ubicaciones en las bases de datos
+        Ubicacion u1 = ubicacionService.crear(new Santuario("Santuario Alfa", 100), areaU1);
+        Ubicacion u2 = ubicacionService.crear(new Santuario("Santuario Beta", 100), areaU2);
+        System.out.println("[SQL/MONGO/NEO4J] Se crearon las ubicaciones Alfa y Beta.");
+
+        // 3. CONEXIÓN EN NEO4J (Camino de ida y vuelta para simular el movimiento)
+        ubicacionService.conectar(u1.getId(), u2.getId(), 8L);
+        ubicacionService.conectar(u2.getId(), u1.getId(), 8L);
+        System.out.println("[NEO4J] Se conectaron los nodos: Alfa <-> Beta con costo 8.");
+
+        // Creamos el médium inicialmente en el Santuario Alfa (u1)
+        Medium medium = mediumService.crear(new Medium("Caminante Nocturno", 150, 100, u1), coordenada1);
+        System.out.println("[SETUP] Médium creado en el Santuario Alfa con 150 de maná.");
+
+        // 4. TRAYECTO: Movimiento hacia la segunda ubicación
+        System.out.println("[TRAYECTO] Moviéndose a Santuario Beta...");
+        mediumService.mover(medium.getId(), coordenada2.getLatitud(), coordenada2.getLongitud());
+
+        // 5. CONSULTA DE TELEMETRÍA (Costo desde la última ubicación en RavenDB)
+        System.out.println("\n[CONSULTA] Extrayendo reporte de costo de movimiento desde el TrackingService...");
+        Map<String, Object> reporte = trackingService.costoDeMoverseDesdeLaUltimaUbicacion(medium.getId());
+
+        System.out.println("[RAVENDB RESULT] Telemetría de movimiento:");
+        System.out.println("   Nombre: " + reporte.get("mediumNombre"));
+        System.out.println("   Maná Pasado (Origen): " + reporte.get("manaPasado"));
+        System.out.println("   Maná Actual (Destino): " + reporte.get("manaActual"));
+        System.out.println("   Maná Gastado: " + reporte.get("manaGastado"));
+        System.out.println("   Porcentaje Drenado/Variación: " + String.format("%.2f", reporte.get("porcentajeGastado")) + "%");
+        System.out.println("========================================================================\n");
+
+//        return reporte;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
+
     public void deleteAll() {
         System.out.println("🧹 Iniciando limpieza total de bases de datos...");
 
@@ -252,31 +306,6 @@ public class DemoServiceImpl implements DemoService {
         ubicacionDAOSQL.deleteAll();
 
         // D. Limpieza y recreación de la base de RavenDB
-        try {
-            String database = documentStore.getDatabase();
-
-            documentStore.maintenance()
-                    .server()
-                    .send(new DeleteDatabasesOperation(database, true));
-
-            documentStore.maintenance()
-                    .server()
-                    .send(new CreateDatabaseOperation(new DatabaseRecord(database)));
-
-            // 🔴 FORZAR LAS REVISIONES JUSTO DESPUÉS DE RECREAR LA BASE
-            documentStore.maintenance().send(
-                    new ConfigureRevisionsOperation(
-                            new RevisionsConfiguration() {{
-                                setDefaultConfig(new RevisionsCollectionConfiguration() {{
-                                    setDisabled(false);
-                                    setMinimumRevisionsToKeep(25L);
-                                }});
-                            }}
-                    ));
-
-            System.out.println("✨ RavenDB recreada con éxito.");
-        } catch (Exception e) {
-            System.err.println("⚠️ Error al reiniciar la base de RavenDB: " + e.getMessage());
-        }
+        registroHistorico.reiniciarBaseDeDatos();
     }
 }
