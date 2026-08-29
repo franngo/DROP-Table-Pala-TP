@@ -1,143 +1,322 @@
 package ar.edu.unq.epersgeist.servicios.impl;
 
+import ar.edu.unq.epersgeist.modelo.Coordenada;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.Medium;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarMediumException;
-import ar.edu.unq.epersgeist.modelo.exceptions.ExorcismoPropioNoPermitidoException;
-import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
-import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionMongo;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionNeo4j;
+import ar.edu.unq.epersgeist.modelo.exceptions.*;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.CoordenadaNoPerteneceAUbicacion;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionNoEncontradaException;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.UbicacionesNoConectadasException;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
+import ar.edu.unq.epersgeist.modelo.medium.MediumMongo;
+import ar.edu.unq.epersgeist.persistencia.mongo.EspirituDAOMongo;
+import ar.edu.unq.epersgeist.persistencia.mongo.MediumDAOMongo;
+import ar.edu.unq.epersgeist.persistencia.mongo.UbicacionDAOMongo;
+import ar.edu.unq.epersgeist.persistencia.neo.UbicacionDAONeo4j;
+import ar.edu.unq.epersgeist.persistencia.raven.RegistroHistoricoDAO;
+import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAOSQL;
+import ar.edu.unq.epersgeist.persistencia.sql.MediumDAOSQL;
+import ar.edu.unq.epersgeist.persistencia.sql.UbicacionDAOSQL;
 import ar.edu.unq.epersgeist.servicios.MediumService;
-import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
-//TODO IMPLEMENTAR
-/*
- *
- * Servicio Medium
- * */
+@Service
+@Transactional
 public class MediumServiceImpl implements MediumService {
-    private MediumDAO mediumDao;
-    private EspirituDAO espirituDao; //se requiere para usar en el invocar()
+    private final MediumDAOSQL mediumDAOSQL;
+    private final MediumDAOMongo mediumDAOMongo;
+    private final EspirituDAOSQL espirituDAOSQL;
+    private final EspirituDAOMongo espirituDAOMongo;
+    private final UbicacionDAOSQL ubicacionDAOSQL;
+    private final UbicacionDAONeo4j ubicacionDAONeo4j;
+    private final UbicacionDAOMongo ubicacionDAOMongo;
 
-    public MediumServiceImpl(MediumDAO mediumDao, EspirituDAO espirituDao) {
-        this.mediumDao = mediumDao;
-        this.espirituDao = espirituDao;
+    @Autowired
+    private RegistroHistoricoDAO registroHistorico;
+
+    public MediumServiceImpl(
+            MediumDAOSQL mediumDAOSQL,
+            EspirituDAOSQL espirituDAOSQL,
+            UbicacionDAOSQL ubicacionDAOSQL,
+            UbicacionDAONeo4j ubicacionDAONeo4j,
+            UbicacionDAOMongo ubicacionDAOMongo,
+            MediumDAOMongo mediumDAOMongo,
+            EspirituDAOMongo espirituDAOMongo
+    ) {
+        this.mediumDAOSQL = mediumDAOSQL;
+        this.mediumDAOMongo = mediumDAOMongo;
+        this.espirituDAOSQL = espirituDAOSQL;
+        this.espirituDAOMongo = espirituDAOMongo;
+        this.ubicacionDAOSQL = ubicacionDAOSQL;
+        this.ubicacionDAONeo4j = ubicacionDAONeo4j;
+        this.ubicacionDAOMongo = ubicacionDAOMongo;
     }
 
     @Override
-    public Medium crear(Medium medium) {
-        return HibernateTransactionRunner.runTrx(() -> this.mediumDao.crear(medium));
+    public Medium crear(Medium medium, Coordenada coordenada) {
+        if (medium == null) {
+            throw new ErrorAlCrearMediumException("medium nulo.");
+        }
+
+        if (medium.getId() != null) {
+            throw new ErrorAlCrearMediumException("ya tiene un id asignado.");
+        }
+
+        // Se chequea que la coordenada dada pertenezca al área de la Ubicación del Medium
+        List<UbicacionMongo> ubiCord = ubicacionDAOMongo.buscarUbicacionQueContiene(coordenada.getLatitud(), coordenada.getLongitud());
+        if (ubiCord.isEmpty() || !Objects.equals(ubiCord.getFirst().getId(), medium.getUbicacion().getId())) {
+            throw new CoordenadaNoPerteneceAUbicacion();
+        }
+
+        mediumDAOSQL.save(medium);
+
+        MediumMongo mediumMongo = mediumDAOMongo.save(new MediumMongo(medium, coordenada));
+
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+        registroHistorico.registrarEstado("mediums_sql/" + medium.getId(), medium);
+        registroHistorico.registrarEstado("mediums_mongo/" + medium.getId(), mediumMongo);
+
+        return medium;
     }
 
     @Override
     public Medium recuperar(Long idMedium) {
-        return HibernateTransactionRunner.runTrx(() -> {
-            Medium mediumRecuperado = mediumDao.recuperar(idMedium);
 
-            if (mediumRecuperado == null) {
-                throw new ErrorAlRecuperarMediumException(idMedium);
-            }
-
-            return mediumRecuperado;
-        });
+        return mediumDAOSQL.findById(idMedium).orElseThrow(() -> new ErrorDeMediumNoEncontradoException(idMedium));
     }
 
     @Override
     public void actualizar(Medium medium) {
-        HibernateTransactionRunner.runTrx(() -> {
-            this.mediumDao.actualizar(medium);
-            return null;
-        });
+        if (medium.getId() == null) {
+            throw new ErrorAlActualizarMediumSinIdException("No se puede actualizar un medium que no tiene id.");
+        }
+
+        // Lo intento recuperar solo para saber si está o no en la DB y si debo tirar el error
+        Long idMedium = medium.getId();
+        mediumDAOSQL.findById(idMedium).orElseThrow(() -> new ErrorAlActualizarMediumException("No existe en la BD el medium con id: " + idMedium));
+
+        this.mediumDAOSQL.save(medium);
+
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+
+        registroHistorico.registrarEstado("mediums_sql/" + medium.getId(), medium);
     }
 
     @Override
     public void eliminar(Long idMedium) {
-        HibernateTransactionRunner.runTrx(() -> {
-            mediumDao.eliminar(idMedium);
-            return null;
+        Medium medium = this.recuperar(idMedium);
+        medium.setDeletedAt(true);
+        mediumDAOSQL.save(medium);
+
+        // ----------------------------------------------------------------------
+        // REGISTRO HISTÓRICO - PASO 1: MONGO (Antes de que deje de existir)
+        // ----------------------------------------------------------------------
+        // Buscamos el documento en Mongo y registramos su ÚLTIMO estado vivo en Raven
+        // antes de que sea eliminado físicamente de MongoDB.
+        mediumDAOMongo.findById(idMedium).ifPresent(mediumMongo -> {
+            registroHistorico.registrarEstado("mediums_mongo/" + idMedium, mediumMongo);
         });
+
+        // Eliminación física en MongoDB
+        mediumDAOMongo.deleteById(idMedium);
+
+        // ----------------------------------------------------------------------
+        // REGISTRO HISTÓRICO - PASO 2: SQL (Con el estado "Soft Deleted")
+        // ----------------------------------------------------------------------
+        // Registramos en Raven el médium de SQL. Esta snapshot va a persistir
+        // el objeto con "deletedAt: true", marcando el fin de su ciclo activo.
+        registroHistorico.registrarEstado("mediums_sql/" + medium.getId(), medium);
     }
 
     @Override
     public List<Medium> recuperarTodos() {
-        return HibernateTransactionRunner.runTrx(() ->
-                mediumDao.recuperarTodos());
+        return mediumDAOSQL.findAll();
     }
 
     @Override
-    public void descansar(Long id) {
-        HibernateTransactionRunner.runTrx(() -> {
-            Medium m = mediumDao.recuperar(id);
-
-            if (m == null) {
-                throw new ErrorAlRecuperarMediumException(id);
-            }
-
-            m.descansar();
-            return null;
-        });
+    public void descansar(Long idMedium) {
+        Medium m = this.recuperar(idMedium);
+        m.descansar();
     }
-
 
     @Override
     public Espiritu invocar(Long mediumId, Long espirituId) {
-        return HibernateTransactionRunner.runTrx(() -> {
-            Medium m = mediumDao.recuperar(mediumId);
-            Espiritu e = espirituDao.recuperar(espirituId);
 
-            if (m == null) {
-                throw new ErrorAlRecuperarMediumException(mediumId);
-            }
-            if (e == null) {
-                throw new ErrorAlRecuperarEspirituException(espirituId);
-            }
+        Medium medium = this.recuperar(mediumId);
 
-            return m.invocar(e);
+        Espiritu espiritu = espirituDAOSQL
+                .findById(espirituId)
+                .orElseThrow(
+                        () -> new ErrorDeEspirituNoEncontradoException(espirituId)
+                );
 
-        });
+        MediumMongo mediumMongo = mediumDAOMongo
+                .findById(mediumId)
+                .orElseThrow(
+                        () -> new ErrorDeMediumNoEncontradoException(mediumId)
+                );
+
+        GeoJsonPoint coordenadasMedium = mediumMongo.getCoordenada();
+
+        double longitud = coordenadasMedium.getX();
+        double latitud = coordenadasMedium.getY();
+
+        double distancia =
+                espirituDAOMongo
+                        .distanciaHastaEspiritu(longitud, latitud, espirituId)
+                        .distanciaCalculada();
+
+        // 50 KM EN METROS
+        if (distancia > 50000) {
+            throw new EspirituMuyLejanoException();
+        }
+
+        return medium.invocar(espiritu);
     }
-
 
     @Override
     public void exorcizar(Long idMediumExorcista, Long idMediumAExorcizar) throws ExorcismoPropioNoPermitidoException {
-        if (idMediumExorcista == idMediumAExorcizar) {
+        if (idMediumExorcista.equals(idMediumAExorcizar)) {
             throw new ExorcismoPropioNoPermitidoException("Un medium no puede exorcizarse a si mismo");
         }
-        HibernateTransactionRunner.runTrx(() -> {
-            Medium mediumAtacante = mediumDao.recuperar(idMediumExorcista);
-            Medium mediumAExorcizar = mediumDao.recuperar(idMediumAExorcizar);
-            // aplico logica de modelo
-            mediumAtacante.exorcizar(mediumAExorcizar);
-            // persisto los cambios
-            // mediumDao.actualizar(mediumAtacante);
-            // mediumDao.actualizar(mediumAExorcizar);
 
-            return null;
+        Medium mediumAtacante = this.recuperar(idMediumExorcista);
+        Medium mediumAExorcizar = this.recuperar(idMediumAExorcizar);
 
-        });
+        //en el service porque involucra ids, que es lo que usamos para comparar objetos por igualdad. Los recuperar anteriores nos aseguran los ids
 
+        if (!mediumAtacante.getUbicacion().getId().equals(mediumAExorcizar.getUbicacion().getId())) {
+            throw new ErrorDeMediumExorcizandoAOtroEnDistintaUbicacion(mediumAtacante.getId(), mediumAExorcizar.getId());
+        }
+
+        mediumAtacante.exorcizar(mediumAExorcizar);
+
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+
+        registroHistorico.registrarEstado("mediums_sql/" + mediumAtacante.getId(), mediumAtacante);
+        registroHistorico.registrarEstado("mediums_sql/" + mediumAExorcizar.getId(), mediumAExorcizar);
     }
-
 
     @Override
     public List<Espiritu> espiritus(Long mediumId) {
-        return HibernateTransactionRunner.runTrx(() -> {
-            Medium recuperado = this.recuperar(mediumId);
-            return recuperado.getEspiritus();
-        });
+        Medium recuperado = this.recuperar(mediumId);
+        List<Espiritu> espiritus = recuperado.getEspiritus();
+        espiritus.size();
+        return espiritus;
     }
 
+    @Override
+    public void mover(Long mediumId, Double latitud, Double longitud) {
+
+
+        Medium mediumAMover = mediumDAOSQL.findById(mediumId)
+                .orElseThrow(() ->
+                        new ErrorDeMediumNoEncontradoException(mediumId)
+                );
+
+        // Busco en ubicacion mongo si existe una ubicacion dada.
+        List<UbicacionMongo> ubicaciones = ubicacionDAOMongo.buscarUbicacionQueContiene(latitud, longitud);
+        if (ubicaciones.isEmpty()) {
+            throw new CoordenadasSinUbicacion();
+        }
+
+        Long idDestino = ubicaciones.getFirst().getId();
+
+        // Ubicacion neo para calcular si existe a donde se puede mover
+        UbicacionNeo4j ubicacionNeoDestino =
+                ubicacionDAONeo4j.findById(idDestino)
+                        .orElseThrow(() ->
+                                new UbicacionNoEncontradaException(idDestino)
+                        );
+        Ubicacion ubicacionActualMedium = mediumAMover.getUbicacion();
+        Long ubicacionMediumId = ubicacionActualMedium.getId();
+
+        if (!quiereMoverseALaMisma(ubicacionMediumId, idDestino)) {
+
+            // Procedo a recuperar la ubicacion destino de la fuente de la verdad
+            Ubicacion ubicacionDestino = ubicacionDAOSQL.findById(idDestino)
+                    .orElseThrow(() ->
+                            new UbicacionNoEncontradaException(idDestino));
+
+            // Se valida si las ubicaciones estan conectadas
+            this.validarConexion(ubicacionMediumId, ubicacionNeoDestino.getId());
+
+            // Calculo si esta a menos de 30km de distacia
+            mediumDAOMongo.mediumDentroDeDistancia(mediumId, latitud, longitud, 30000.0)
+                    .orElseThrow(() ->
+                            new UbicacionLejanaException("La ubicacion esta a mas de 30km"));
+
+            // calculo el costo de moverse
+            int costo = Math.toIntExact(ubicacionDAONeo4j.costoHacia(ubicacionMediumId, idDestino));
+
+            // el medium se mueve
+            mediumAMover.moverA(ubicacionDestino, costo);
+
+
+            // actualizo en mongo
+            MediumMongo mediumMongo =
+                    mediumDAOMongo.findById(mediumId)
+                            .orElseThrow();
+
+            mediumMongo.setCoordenada(
+                    new GeoJsonPoint(longitud, latitud)
+            );
+
+            mediumAMover.getEspiritus()
+                    .forEach(e ->
+                            espirituDAOMongo.actualizarCoordenada(
+                                    e.getId(),
+                                    longitud,
+                                    latitud
+                            )
+                    );
+
+            // depende el estado del medium se guarda o se elimina
+            if (mediumAMover.sinMana()) {
+                this.eliminar(mediumAMover.getId());
+            } else {
+                mediumDAOSQL.save(mediumAMover);
+                mediumDAOMongo.actualizarCoordenada(mediumId, longitud, latitud);
+
+                // ----------------------------------------
+                // REGISTRO HISTORICO
+                // ----------------------------------------
+
+                registroHistorico.registrarEstado("mediums_sql/" + mediumAMover.getId(), mediumAMover);
+                registroHistorico.registrarEstado("mediums_mongo/" + mediumId, mediumMongo);
+            }
+        }
+    }
+
+    private void validarConexion(Long idOrigen, Long idDestino) {
+        if (!ubicacionDAONeo4j.estanConectadas(idOrigen, idDestino)) {
+            throw new UbicacionesNoConectadasException(idOrigen, idDestino);
+        }
+    }
+
+
+    private boolean quiereMoverseALaMisma(Long idUbicacionActual, Long idUbicacionAMover) {
+        return Objects.equals(idUbicacionActual, idUbicacionAMover);
+    }
 
     @Override
     public void eliminarTodos() {
-        HibernateTransactionRunner.runTrx(() -> {
-
-            mediumDao.eliminarTodos();
-            return null;
-        });
+        mediumDAOSQL.deleteAll();
+        mediumDAOMongo.deleteAll();
     }
-
 
 }

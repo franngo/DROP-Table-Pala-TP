@@ -3,8 +3,12 @@ package ar.edu.unq.epersgeist.modelo;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Cementerio;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import ar.edu.unq.epersgeist.modelo.exceptions.ErrorDeInvocacionDeEspirituException;
 import ar.edu.unq.epersgeist.modelo.exceptions.ExorcistaSinAngelesException;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 import ar.edu.unq.epersgeist.modelo.random.Estrategia.EstrategiaRangoEspecifico;
 import ar.edu.unq.epersgeist.modelo.random.Random;
 import ar.edu.unq.epersgeist.modelo.random.RandomDefensa;
@@ -14,6 +18,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MediumTest {
+    private static final Integer ENERGIA = 100;
+
+    Ubicacion bernal = new Santuario("Bernal", ENERGIA);
+
+
+    Ubicacion cementerio;
+    Ubicacion santuario;
+
 
     Medium mediumM;
     Medium mediumM2;
@@ -30,22 +42,26 @@ public class MediumTest {
 
     @BeforeEach
     void setUp() {
-        mediumM = new Medium("Juan", 100, 50);
-        mediumM2 = new Medium("Matias", 80, 40);
-        espirituM = new Angelical("Charizard");
-        espirituM2 = new Angelical("Bulbasor");
+
+        cementerio = new Cementerio("Cementerio Chacarita", ENERGIA);
+        santuario = new Santuario("Santario Lujan", ENERGIA);
+
+        mediumM = new Medium("Juan", 100, 50, bernal);
+        mediumM2 = new Medium("Matias", 80, 40, bernal);
+        espirituM = new Angelical("Charizard", bernal);
+        espirituM2 = new Angelical("Bulbasor", bernal);
 
 
         //contexto de los espiritus y demonios en el exorcismo
-        rika = new Angelical("Rika");
+        rika = new Angelical("Rika", bernal);
         rika.setNivelDeConexion(60);
-        ivaar = new Angelical("Ivaar");
+        ivaar = new Angelical("Ivaar", bernal);
         ivaar.setNivelDeConexion(80);
-        hana = new Angelical("Hana");
+        hana = new Angelical("Hana", bernal);
         hana.setNivelDeConexion(5);
-        jaeger = new Demonio("Jaeger");
+        jaeger = new Demonio("Jaeger", bernal);
         jaeger.setNivelDeConexion(50);
-        noroi = new Demonio("Noroi");
+        noroi = new Demonio("Noroi", bernal);
         noroi.setNivelDeConexion(66);
     }
 
@@ -80,79 +96,160 @@ public class MediumTest {
     }
 
     @Test
-    public void descansar() {
-        assertEquals(50, mediumM.getMana());
-        assertEquals(0, espirituM.getNivelDeConexion());
-        assertEquals(0, espirituM2.getNivelDeConexion());
+    public void descansarEnSantuario() {
+        mediumM.setManaMax(200);
+        rika.setNivelDeConexion(0); //Angelical
+        jaeger.setNivelDeConexion(0); //Demonio
 
-        mediumM.agregarEspiritu(espirituM);
-        mediumM.agregarEspiritu(espirituM2);
+        assertEquals(50, mediumM.getMana());
+        assertEquals(0, rika.getNivelDeConexion());
+        assertEquals(0, jaeger.getNivelDeConexion());
+
+        //todos en bernal, que es un Santuario
+        rika.aumentarConexionYConectar(mediumM);
+        jaeger.aumentarConexionYConectar(mediumM);
+
+        assertEquals(50, mediumM.getMana());
+        assertEquals(10, rika.getNivelDeConexion());
+        assertEquals(10, jaeger.getNivelDeConexion());
 
         mediumM.descansar();
 
-        assertEquals(65, mediumM.getMana());
-        assertEquals(5, espirituM.getNivelDeConexion());
-        assertEquals(5, espirituM2.getNivelDeConexion());
+        assertEquals(200, mediumM.getMana()); //aumenta en un 150% su maná
+        assertEquals(100, rika.getNivelDeConexion()); //aumenta en un 100% su nivel de conexión
+        assertEquals(10, jaeger.getNivelDeConexion()); //aumenta en un 0% su nivel de conexión
+    }
+
+    @Test
+    public void descansarEnCementerio() {
+        Medium mediumCem = new Medium("Matias", 100, 50, cementerio);
+        Espiritu gabriel = new Angelical("Gabriel", cementerio);
+        Espiritu belcebu = new Demonio("Belcebú", cementerio);
+
+        assertEquals(50, mediumCem.getMana());
+        assertEquals(0, gabriel.getNivelDeConexion());
+        assertEquals(0, belcebu.getNivelDeConexion());
+
+        //todos en cementerio, que es un Cementerio
+        gabriel.aumentarConexionYConectar(mediumCem);
+        belcebu.aumentarConexionYConectar(mediumCem);
+
+        assertEquals(50, mediumCem.getMana());
+        assertEquals(10, gabriel.getNivelDeConexion());
+        assertEquals(10, belcebu.getNivelDeConexion());
+
+        mediumCem.descansar();
+
+        assertEquals(100, mediumCem.getMana()); //aumenta en un 50% su maná
+        assertEquals(10, gabriel.getNivelDeConexion()); //aumenta en un 0% su nivel de conexión
+        assertEquals(100, belcebu.getNivelDeConexion()); //aumenta en un 100% su nivel de conexión
     }
 
     @Test
     public void noSeExcedenLimitesEnDescansar() {
+        //mediumM tiene 100 de manaMax
+        rika.setNivelDeConexion(0); //Angelical
+        jaeger.setNivelDeConexion(0); //Demonio
+
         assertEquals(50, mediumM.getMana());
-        assertEquals(0, espirituM.getNivelDeConexion());
-        assertEquals(0, espirituM2.getNivelDeConexion());
+        assertEquals(0, rika.getNivelDeConexion());
+        assertEquals(0, jaeger.getNivelDeConexion());
 
-        mediumM.agregarEspiritu(espirituM);
-        mediumM.agregarEspiritu(espirituM2);
+        //todos en bernal, que es un Santuario
+        rika.aumentarConexionYConectar(mediumM);
+        jaeger.aumentarConexionYConectar(mediumM);
 
-        mediumM.setMana(89); //tiene un manaMax de 100
-        espirituM.setNivelDeConexion(94); //el límite del nivelDeConexion es de 100
-        espirituM2.setNivelDeConexion(97); //el límite del nivelDeConexion es de 100
+        assertEquals(50, mediumM.getMana());
+        assertEquals(10, rika.getNivelDeConexion());
+        assertEquals(10, jaeger.getNivelDeConexion());
+
+        rika.setNivelDeConexion(94); //el límite del nivelDeConexion de todos los Espiritus es de 100
 
         mediumM.descansar();
 
-        assertEquals(100, mediumM.getMana());
-        assertEquals(99, espirituM.getNivelDeConexion());
-        assertEquals(100, espirituM2.getNivelDeConexion());
+        assertEquals(100, mediumM.getMana()); //aumenta en un 150% su maná, pero queda en 100 debido al manaMax
+        assertEquals(100, rika.getNivelDeConexion()); //aumenta en un 100% su nivel de conexión, pero queda en 100 debido al límite
+        assertEquals(10, jaeger.getNivelDeConexion()); //aumenta en un 0% su nivel de conexión
     }
 
     @Test
-    public void invocarCasoExitoso() {
-        Ubicacion ubicacion = new Ubicacion("Quilmes");
-        mediumM.setUbicacion(ubicacion);
+    public void invocarCasoExitosoAngelicalYSantuario() {
+        mediumM.moverA(santuario, 1);
 
-        assertEquals(50, mediumM.getMana());
-        assertNull(espirituM.getUbicacion());
+        assertEquals(49, mediumM.getMana());
 
-        //mediumM tiene suficiente maná (50) y espirituM está libre
+        //mediumM tiene suficiente maná (50) y rika está libre. Además, rika es un Angelical (puede ser invocado en santuario)
 
-        mediumM.invocar(espirituM);
+        mediumM.invocar(rika);
 
-        assertEquals(40, mediumM.getMana());
-        assertEquals(mediumM.getUbicacion(), espirituM.getUbicacion());
+        assertEquals(39, mediumM.getMana());
+        assertEquals(mediumM.getUbicacion(), rika.getUbicacion());
+    }
+
+    @Test
+    public void invocarCasoExitosoDemonioYCementerio() {
+        mediumM.moverA(cementerio, 1);
+
+        assertEquals(49, mediumM.getMana());
+
+        //mediumM tiene suficiente maná (50) y jaeger está libre. Además, jaeger es un Demonio (puede ser invocado en cementerio)
+
+        mediumM.invocar(jaeger);
+
+        assertEquals(39, mediumM.getMana());
+        assertEquals(mediumM.getUbicacion(), jaeger.getUbicacion());
     }
 
     @Test
     public void invocarCasoManaInsuficiente() {
-        Ubicacion ubicacion = new Ubicacion("Quilmes");
+        Ubicacion ubicacion = new Santuario("Quilmes", ENERGIA);
         mediumM.setUbicacion(ubicacion);
 
         mediumM.setMana(5); //mana insuficiente para invocar()
-
+        Ubicacion ubiActual = espirituM.getUbicacion();
         mediumM.invocar(espirituM);
 
         //no hay ningún cambio de estado
         assertEquals(5, mediumM.getMana());
-        assertNull(espirituM.getUbicacion());
+
+        // No cambio la ubicacion del espiritu
+        assertEquals(ubiActual.getNombre(), espirituM.getUbicacion().getNombre());
     }
 
     @Test
-    public void invocarCasoFallido() {
-        Ubicacion ubicacion = new Ubicacion("Quilmes");
+    public void invocarCasoFallidoPorNoLibre() {
+        Ubicacion ubicacion = new Santuario("Quilmes", ENERGIA);
         mediumM.setUbicacion(ubicacion);
 
         espirituM.setMediumCon(mediumM2); //espirituM pasa a NO estar libre, por lo que no puede ser invocado
 
         assertThrows(ErrorDeInvocacionDeEspirituException.class, () -> mediumM.invocar(espirituM));
+    }
+
+    @Test
+    public void invocarCasoFallidoPorDemonioYSantuario() {
+        mediumM.moverA(santuario, 1);
+
+        assertEquals(49, mediumM.getMana());
+
+        //mediumM tiene suficiente maná (50) y jaeger está libre. Sin embargo, jaeger es un Demonio (NO puede ser invocado en santuario)
+
+        ErrorDeInvocacionDeEspirituException excepcion = assertThrows(ErrorDeInvocacionDeEspirituException.class, () ->
+                mediumM.invocar(jaeger));
+        assertEquals("Un espíritu del tipo dado no se puede invocar en la ubicación actual ni ninguna otra de su mismo tipo", excepcion.getMessage());
+    }
+
+    @Test
+    public void invocarCasoFallidoPorAngelicalYSementerio() {
+        mediumM.moverA(cementerio, 1);
+
+        assertEquals(49, mediumM.getMana());
+
+        //mediumM tiene suficiente maná (50) y rika está libre. Sin embargo, rika es un Angelical (NO puede ser invocado en cementerio)
+
+        ErrorDeInvocacionDeEspirituException excepcion = assertThrows(ErrorDeInvocacionDeEspirituException.class, () ->
+                mediumM.invocar(rika));
+        assertEquals("Un espíritu del tipo dado no se puede invocar en la ubicación actual ni ninguna otra de su mismo tipo", excepcion.getMessage());
     }
 
     //Test de exorcismo
@@ -163,14 +260,16 @@ public class MediumTest {
         Random.setEstrategiaNumero(new EstrategiaRangoEspecifico(10, 10));
         RandomDefensa.setEstrategiaNumero(new EstrategiaRangoEspecifico(5, 5));
 
-        mediumM.agregarEspiritu(rika); // rika cuenta con 60 de conexion
+        mediumM.agregarEspiritu(rika);
+        assertEquals(60, rika.getNivelDeConexion());// rika cuenta con 60 de conexion
 
         // Demonios
-        mediumM2.agregarEspiritu(jaeger); // jaeger tiene 50 de conexion
+        mediumM2.agregarEspiritu(jaeger);
+        assertEquals(50, jaeger.getNivelDeConexion());// jaeger tiene 50 de conexion
         mediumM.exorcizar(mediumM2);
-        // Jaeger recibe daño 30
+        // Jaeger recibe daño 30 pero sigue conectado al medium2
 
-        assertTrue(jaeger.getLibre());
+        assertFalse(jaeger.estaLibre());
 
         assertEquals(20, jaeger.getNivelDeConexion());
 
@@ -187,7 +286,7 @@ public class MediumTest {
         mediumM2.agregarEspiritu(jaeger); // jaeger tiene 50 de conexion
         mediumM.exorcizar(mediumM2);
         // Jaeger recibe primero 30 de daño y luego recibe 40 de daño, quedando en 0 y libre
-        assertTrue(jaeger.getLibre());
+        assertTrue(jaeger.estaLibre());
         assertEquals(0, jaeger.getNivelDeConexion());
 
     }
@@ -205,7 +304,7 @@ public class MediumTest {
 
         mediumM.exorcizar(mediumM2);
 
-        assertTrue(hana.getLibre());
+        assertTrue(hana.estaLibre());
         assertEquals(0, hana.getNivelDeConexion());
 
 
@@ -218,6 +317,123 @@ public class MediumTest {
         assertThrows(ExorcistaSinAngelesException.class, () -> {
             mediumM.exorcizar(mediumM2);
         });
+    }
+
+
+    // MOVER
+    @Test
+    public void elMediumSeMueveExitosamente() {
+        //El medium se conecta con dos espiritus y se comprueba que los conoce
+        rika.aumentarConexionYConectar(mediumM);
+        jaeger.aumentarConexionYConectar(mediumM);
+
+        assertTrue(mediumM.getEspiritus().contains(rika));
+        assertTrue(mediumM.getEspiritus().contains(jaeger));
+
+        //todos en la misma ubicacion
+        assertEquals(bernal, mediumM.getUbicacion());
+        assertEquals(bernal, rika.getUbicacion());
+        assertEquals(bernal, jaeger.getUbicacion());
+
+        mediumM.moverA(santuario, 1);
+
+        // todos se movieron al santuario
+        assertEquals(santuario, mediumM.getUbicacion());
+        assertEquals(santuario, rika.getUbicacion());
+        assertEquals(santuario, jaeger.getUbicacion());
+
+    }
+
+    @Test
+    public void elMediumSeMueveALaMismaUbicacion() {
+        //El medium se conecta con dos espiritus y se comprueba que los conoce
+        jaeger.aumentarConexionYConectar(mediumM);
+        rika.aumentarConexionYConectar(mediumM);
+
+        assertTrue(mediumM.getEspiritus().contains(rika));
+        assertTrue(mediumM.getEspiritus().contains(jaeger));
+
+        //todos en la misma ubicacion
+        assertEquals(bernal, mediumM.getUbicacion());
+        assertEquals(bernal, rika.getUbicacion());
+        assertEquals(bernal, jaeger.getUbicacion());
+
+        mediumM.moverA(bernal, 1);
+
+        //todos se siguen en la misma ubicacion
+        assertEquals(bernal, mediumM.getUbicacion());
+        assertEquals(bernal, rika.getUbicacion());
+        assertEquals(bernal, jaeger.getUbicacion());
+
+    }
+
+    // CONEXION DE EXPIRITUS AL ARRIBAR A SANTUARIOS
+    @Test
+    public void conexionDemonios_SI_CambiaAlMoverseA_SANTUARIO() {
+        //El medium tiene 1 demonio
+        jaeger.aumentarConexionYConectar(mediumM);
+
+        //comprobamos conexion del demonio
+        assertEquals(60, jaeger.getNivelDeConexion());
+
+        mediumM.moverA(santuario, 1);
+        // el demonio pierde 10 unidades
+        assertEquals(50, jaeger.getNivelDeConexion());
+    }
+
+    @Test
+    public void conexionAngeles_NO_CambiaAlMoverseA_SANTUARIO() {
+        //El medium tiene 1 angel
+        rika.aumentarConexionYConectar(mediumM);
+
+        //comprobamos conexion del angel
+        assertEquals(70, rika.getNivelDeConexion());
+
+        mediumM.moverA(santuario, 1);
+        // el angel no se ve afectado
+        assertEquals(70, rika.getNivelDeConexion());
+    }
+
+    // CONEXION DE ESPIRITUS AL ARRIBAR A CEMENTERIOS
+    @Test
+    public void conexionDemonios_NO_CambiaAlMoverseA_CEMENTERIO() {
+        //El medium tiene 1 demonio
+        jaeger.aumentarConexionYConectar(mediumM);
+
+        //comprobamos conexion del demonio
+        assertEquals(60, jaeger.getNivelDeConexion());
+
+        mediumM.moverA(cementerio, 1);
+        // el demonio no se ve afectado
+        assertEquals(60, jaeger.getNivelDeConexion());
+    }
+
+    @Test
+    public void conexionAngeles_SI_CambiaAlMoverseA_CEMENTERIO() {
+        //El medium tiene 1 angel
+        rika.aumentarConexionYConectar(mediumM);
+
+        //comprobamos conexion del angel
+        assertEquals(70, rika.getNivelDeConexion());
+
+        mediumM.moverA(cementerio, 1);
+        // el angel se ve afectado
+        assertEquals(65, rika.getNivelDeConexion());
+    }
+
+    // Desvinculacion de mediums al mover
+    @Test
+    void elEspirituSeDesvinculaSiPierdeSuNivelDeConexion() {
+        rika.aumentarConexionYConectar(mediumM);
+        rika.setNivelDeConexion(1); // seteamos para que se pierda la conexion
+        assertEquals(1, rika.getNivelDeConexion());
+
+        mediumM.moverA(cementerio, 1);
+
+        //se desvincularo rika de mediumM
+        assertFalse(mediumM.getEspiritus().contains(rika));
+        assertTrue(rika.estaLibre());
+
     }
 
 

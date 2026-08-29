@@ -1,113 +1,242 @@
 package ar.edu.unq.epersgeist.servicios.impl;
 
+import ar.edu.unq.epersgeist.modelo.Coordenada;
+import ar.edu.unq.epersgeist.modelo.Direccion;
+import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Espiritu;
-import ar.edu.unq.epersgeist.modelo.Medium;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlConectarEspirituConMedium;
-import ar.edu.unq.epersgeist.modelo.exceptions.ErrorAlRecuperarEspirituException;
-import ar.edu.unq.epersgeist.persistencia.dao.EspirituDAO;
-import ar.edu.unq.epersgeist.persistencia.dao.MediumDAO;
+import ar.edu.unq.epersgeist.modelo.Espiritu.EspirituMongo;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.UbicacionMongo;
+import ar.edu.unq.epersgeist.modelo.exceptions.*;
+import ar.edu.unq.epersgeist.modelo.exceptions.Ubicacion.CoordenadaNoPerteneceAUbicacion;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
+import ar.edu.unq.epersgeist.persistencia.mongo.EspirituDAOMongo;
+import ar.edu.unq.epersgeist.persistencia.mongo.UbicacionDAOMongo;
+import ar.edu.unq.epersgeist.persistencia.raven.RegistroHistoricoDAO;
+import ar.edu.unq.epersgeist.persistencia.sql.EspirituDAOSQL;
+import ar.edu.unq.epersgeist.persistencia.sql.MediumDAOSQL;
 import ar.edu.unq.epersgeist.servicios.EspirituService;
-import ar.edu.unq.epersgeist.servicios.runner.HibernateTransactionRunner;
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
+@Slf4j
+@Service
+@Transactional
+@AllArgsConstructor
 public class EspirituServiceImpl implements EspirituService {
-    private EspirituDAO espirituDao;
+    private EspirituDAOSQL espirituDAOSQL;
 
-    private MediumDAO mediumDao;
+    private EspirituDAOMongo espirituDAOMongo;
 
-    public EspirituServiceImpl(EspirituDAO espirituDao, MediumDAO mediumDao) {
+    private MediumDAOSQL mediumDAOSQL;
 
-        this.espirituDao = espirituDao;
-        this.mediumDao = mediumDao;
-    }
+    private UbicacionDAOMongo ubicacionDAOMongo;
+
+    @Autowired
+    private RegistroHistoricoDAO registroHistorico;
 
     @Override
-    public Espiritu crear(Espiritu espiritu) {
-        return
-                HibernateTransactionRunner.runTrx(() -> espirituDao.crear(espiritu));
+    public Espiritu crear(Espiritu espiritu, Coordenada coordenada) {
+        this.validarEspiritu(espiritu);
+
+        // Se chequea que la coordenada dada pertenezca al área de la Ubicación del Espiritu
+        List<UbicacionMongo> ubiCord = ubicacionDAOMongo.buscarUbicacionQueContiene(coordenada.getLatitud(), coordenada.getLongitud());
+        if (ubiCord.isEmpty() || !Objects.equals(ubiCord.getFirst().getId(), espiritu.getUbicacion().getId())) {
+            throw new CoordenadaNoPerteneceAUbicacion();
+        }
+
+        espirituDAOSQL.save(espiritu);
+
+        EspirituMongo espirituMongo = espirituDAOMongo.save(new EspirituMongo(espiritu, coordenada));
+
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+
+        registroHistorico.registrarEstado("espiritus_sql/" + espiritu.getId(), espiritu);
+        registroHistorico.registrarEstado("espiritus_mongo/" + espiritu.getId(), espirituMongo);
+
+        return espiritu;
     }
+
+    private void validarEspiritu(Espiritu espiritu) {
+        if (espiritu == null) {
+            throw new ErrorAlCrearEspirituException("No se puede crear el espiritu");
+        }
+        if (espiritu.getId() != null) {
+            throw new ErrorAlCrearEspirituException("No se puede crear espiritu con id existente");
+        }
+    }
+
 
     @Override
     public Espiritu recuperar(Long espirituId) {
-        return HibernateTransactionRunner.runTrx(() -> {
-            Espiritu espiritu = espirituDao.recuperar(espirituId);
 
-            if (espiritu == null) {
-                throw new ErrorAlRecuperarEspirituException(espirituId);
-            }
-
-            return espiritu;
-        });
+        return espirituDAOSQL.findById(espirituId).orElseThrow(
+                () -> new ErrorDeEspirituNoEncontradoException(espirituId)
+        );
     }
 
     @Override
     public void actualizar(Espiritu espiritu) {
-        HibernateTransactionRunner.runTrx(() -> {
-            espirituDao.actualizar(espiritu);
-            return null;
-        });
+        if (espiritu.getId() == null) {
+            throw new ErrorAlActualizarEspirituSinIdException("No se puede actualizar un espiritu que no tiene id.");
+        }
+
+        Long espirituId = espiritu.getId();
+        espirituDAOSQL.findById(espirituId).orElseThrow(() -> new ErrorAlActualizarEspirituException("No existe en la BD el espiritu con id: " + espirituId));
+
+        this.espirituDAOSQL.save(espiritu);
+
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+
+        registroHistorico.registrarEstado("espiritus_sql/" + espiritu.getId(), espiritu);
     }
 
     @Override
     public void eliminar(Long espirituId) {
-        HibernateTransactionRunner.runTrx(() -> {
-            espirituDao.eliminar(espirituId);
-            return null;
+        Espiritu espiritu = this.recuperar(espirituId);
+        espiritu.setDeletedAt(true);
+        espirituDAOSQL.save(espiritu);
+
+        // ----------------------------------------------------------------------
+        // REGISTRO HISTÓRICO - PASO 1: MONGO (Antes de que deje de existir)
+        // ----------------------------------------------------------------------
+        // Buscamos el documento en Mongo y registramos su ÚLTIMO estado vivo en Raven
+        // antes de que sea eliminado físicamente de MongoDB.
+        espirituDAOMongo.findById(espirituId).ifPresent(espirituMongo -> {
+            registroHistorico.registrarEstado("espiritus_mongo/" + espirituId, espirituMongo);
         });
+
+        // Eliminación física en MongoDB
+        espirituDAOMongo.deleteById(espirituId);
+
+        // ----------------------------------------------------------------------
+        // REGISTRO HISTÓRICO - PASO 2: SQL (Con el estado "Soft Deleted")
+        // ----------------------------------------------------------------------
+        // Registramos en Raven el espíritu de SQL. Esta snapshot va a persistir
+        // el objeto con "deletedAt: true", marcando el fin de su ciclo activo.
+        registroHistorico.registrarEstado("espiritus_sql/" + espiritu.getId(), espiritu);
     }
 
     @Override
     public List<Espiritu> recuperarTodos() {
-        return HibernateTransactionRunner.runTrx(() ->
-                espirituDao.recuperarTodos());
+
+        return espirituDAOSQL.findAll();
     }
 
-    /*
-     * Paso 1: pedir el espiritu a la BBDD
-     * Paso 2: aplicar logica de negocio entre MODELOS
-     * Paso 3: persistir los cambios
-     * */
     @Override
     public Medium conectar(Long espirituId, Long mediumId) {
-        return HibernateTransactionRunner.runTrx(() -> {
-            Espiritu espirituAConectar = espirituDao.recuperar(espirituId);
-            Medium mediumAConectar = mediumDao.recuperar(mediumId);
+        Optional<Espiritu> espirituAConectar = espirituDAOSQL.findById(espirituId);
 
-            if (!espirituAConectar.getLibre()) {
-                throw new ErrorAlConectarEspirituConMedium("El espiritu no se encuentra libre");
-            }
-            if (!espirituAConectar.estaUbicadoEnElMismoLugarQue(mediumAConectar)) {
-                throw new ErrorAlConectarEspirituConMedium("El espiritu se encuentra en una ubicacion diferente al medium");
-            }
+        Optional<Medium> mediumAConectar = mediumDAOSQL.findById(mediumId);
 
-            espirituAConectar.setMediumCon(mediumAConectar);
+        if (espirituAConectar.isEmpty()) {
+            throw new ErrorAlConectarEspirituConMedium("El espiritu no existe en la bbdd");
+        }
+        if (mediumAConectar.isEmpty()) {
+            throw new ErrorAlConectarEspirituConMedium("El medium no existe en la bbdd");
+        }
+        Espiritu espirituEncontrado = espirituAConectar.get();
+        Medium mediumEncontrado = mediumAConectar.get();
 
+        // No puede conectarse si está siendo dominado
+        if (espirituEncontrado.estaDominado()) {
+            throw new EspirituDominadoException();
+        }
 
-            espirituAConectar.setUbicacion(mediumAConectar.getUbicacion());
+        // Las validaciones sobre si está libre y en la misma ubicación se dan en el method del modelo.
+        espirituEncontrado.aumentarConexionYConectar(mediumEncontrado);
 
-            espirituAConectar.aumentarConexion(mediumAConectar);
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
 
-            mediumDao.actualizar(mediumAConectar);
+        registroHistorico.registrarEstado("espiritus_sql/" + espirituEncontrado.getId(), espirituEncontrado);
 
-            return mediumAConectar;
-        });
+        return mediumDAOSQL.save(mediumEncontrado);
     }
 
     @Override
-    public List<Espiritu> espiritusDemoniacos() {
-        return HibernateTransactionRunner.runTrx(() ->
-                espirituDao.espiritusDemoniacos());
+    public List<Demonio> espiritusDemoniacos() {
+
+        return espirituDAOSQL.espiritusDemoniacos();
+    }
+
+    //versión que implementa la paginación
+    @Override
+    public Page<Espiritu> espiritusDemoniacos(Direccion direccion, int pag, int cantPorPag) {
+        if (direccion == null) {
+            throw new ErrorDireccionNulaException();
+        }
+
+        if (pag <= 0) {
+            throw new ErrorNumeroPaginaInvalidoExcepcion();
+        }
+
+        if (cantPorPag <= 0) {
+            throw new ErrorCantidadPorPaginaInvalidaExcepcion();
+        }
+
+        Sort sort = (direccion == Direccion.DESCENDENTE)
+                ? Sort.by("nivelDeConexion").descending()
+                : Sort.by("nivelDeConexion").ascending();
+
+        Pageable pageable = PageRequest.of(pag - 1, cantPorPag, sort);
+
+        return espirituDAOSQL.espiritusDemoniacos(pageable);
+
     }
 
     @Override
-
     public void eliminarTodos() {
-        HibernateTransactionRunner.runTrx(() -> {
-            espirituDao.eliminarTodos();
-            return null;
-        });
+
+        espirituDAOSQL.deleteAll();
+        espirituDAOMongo.deleteAll();
+
     }
 
+    @Override
+    public void dominar(Long espirituDominanteId, Long espirituADominarId) {
+        Espiritu espirituDominante = this.recuperar(espirituDominanteId);
+        Espiritu espirituADominar = this.recuperar(espirituADominarId);
 
+        EspirituMongo dominanteMongo =
+                espirituDAOMongo.findById(espirituDominanteId).orElseThrow(() -> new ErrorDeEspirituNoEncontradoException(espirituDominanteId));
+        //Se evita la mala práctica de hacer get() directamente sobre un Optional, aunque, a menos que haya inconsistencias, no será vacío.
+
+        GeoJsonPoint coordenadasDom = dominanteMongo.getCoordenada();
+
+        double longitud = coordenadasDom.getX();
+        double latitud = coordenadasDom.getY();
+
+        double distanciaEspiritus = this.espirituDAOMongo.distanciaHastaEspiritu(longitud, latitud, espirituADominarId).distanciaCalculada();
+
+        //Se realiza esta validación en service porque involucra ids y no tiene sentido en modelo.
+        if (espirituDominante.estaDominado() && espirituADominar.getId().equals(espirituDominante.getEspirituDominante().getId())) {
+            throw new ErrorDominacionInvalidaCandidatoLoDominaException(espirituDominante.getId(), espirituADominar.getId());
+        }
+
+        espirituDominante.dominar(espirituADominar, distanciaEspiritus);
+
+        // ----------------------------------------
+        // REGISTRO HISTORICO
+        // ----------------------------------------
+
+        registroHistorico.registrarEstado("espiritus_sql/" + espirituDominante.getId(), espirituDominante);
+        registroHistorico.registrarEstado("espiritus_sql/" + espirituADominar.getId(), espirituADominar);
+    }
 }

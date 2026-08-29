@@ -2,7 +2,7 @@ package ar.edu.unq.epersgeist.modelo.Batalla;
 
 import ar.edu.unq.epersgeist.modelo.Espiritu.Angelical;
 import ar.edu.unq.epersgeist.modelo.Espiritu.Demonio;
-import ar.edu.unq.epersgeist.modelo.Medium;
+import ar.edu.unq.epersgeist.modelo.medium.Medium;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,7 +13,7 @@ public class Batalla {
     Medium atacante;
     Medium atacado;
 
-    private RondaDeCombateStandard ronda = new RondaDeCombateStandard();
+    private RondaDeCombate ronda = new RondaDeCombateStandard();
 
     public Batalla(Medium medium, Medium mediumAExorcizar) {
 
@@ -38,9 +38,6 @@ public class Batalla {
             if (!demonioActual.estaActivo()) {
                 demonioActual.desvincularse();
 
-
-                atacado.desvincularseDe(demonioActual);
-
                 itDemonios.remove();
 
                 if (!itDemonios.hasNext()) {
@@ -52,9 +49,6 @@ public class Batalla {
 
             if (!angel.estaActivo()) {
                 angel.desvincularse();
-
-
-                atacante.desvincularseDe(angel);
             }
         }
     }

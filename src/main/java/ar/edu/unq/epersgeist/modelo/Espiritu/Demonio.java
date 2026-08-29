@@ -1,14 +1,18 @@
 package ar.edu.unq.epersgeist.modelo.Espiritu;
 
+import ar.edu.unq.epersgeist.controller.dtos.espiritus.request.TipoEspiritu;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Santuario;
+import ar.edu.unq.epersgeist.modelo.Ubicacion.Ubicacion;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
 
 
 @Entity
@@ -16,8 +20,8 @@ import lombok.Setter;
 public class Demonio extends Espiritu implements Combatiente {
 
 
-    public Demonio(@NonNull String nombre) {
-        super(nombre);
+    public Demonio(@NonNull String nombre, Ubicacion ubicacion) {
+        super(nombre, ubicacion);
     }
 
     public boolean estaActivo() {
@@ -27,11 +31,30 @@ public class Demonio extends Espiritu implements Combatiente {
     @Override
     public void recibirAtaqueDe(Espiritu angelAtacante) {
 
-        
 
         double danhoARecibir = angelAtacante.getNivelDeConexion() / 2;
 
         // le baja el nivel de conexion segun el calculo en el ataque y la deja en un valor o en 0
         this.setNivelDeConexion(Math.max(0, this.getNivelDeConexion() - danhoARecibir));
     }
+
+    @Override
+    public void cambiosConexion(Ubicacion ubicacion) {
+        if (ubicacion instanceof Santuario) {
+            this.afectarConexion(Santuario.DANIO_A_ESPIRITU);
+        }
+    }
+
+    public int porcentajeDescansarEn(Ubicacion ubicacion) {
+        return ubicacion.porcentajeDescansarDemonio();
+    }
+
+    @Override
+    public boolean puedeInvocarseEn(Ubicacion ubicacion) {
+        return ubicacion.puedeInvocarseUnDemonio();
+    }
+
+    @Override
+    public TipoEspiritu getTipoEspiritu() { return TipoEspiritu.DEMONIO; }
+
 }
